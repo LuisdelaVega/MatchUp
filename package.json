@@ -1,0 +1,17 @@
+{
+  "name": "MatchUp_Server",
+  "version": "0.0.1",
+  "description": "Server for the MatchUp application",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "body-parser": "*",
+    "cookie-parser": "*",
+    "express": "*",
+    "express-session": "*"
+  },
+  "author": "Luis de la Vega",
+  "license": ""
+}
