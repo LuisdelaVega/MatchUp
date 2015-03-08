@@ -226,13 +226,56 @@ function generateBracket(tournament, players) {
 		}
 
 		// Create the Linked List
+		// Winners Round 1 - Winner goes to
 		for ( i = 0; i < winnerRounds[0].amountOfMatches; i++) {
-			winnerRounds[0].matches[i].winnerGoesTo = winnerRounds[1].matches[winnerRounds[0].amountOfMatches - i - 1];
+			if (i < (winnerRounds[0].amountOfMatches - winnerRounds[1].amountOfMatches)) {
+				winnerRounds[0].matches[i].winnerGoesTo = winnerRounds[1].matches[winnerRounds[0].amountOfMatches + i - ((winnerRounds[0].amountOfMatches - winnerRounds[1].amountOfMatches) * 2)];
+			} else {
+				winnerRounds[0].matches[i].winnerGoesTo = winnerRounds[1].matches[winnerRounds[0].amountOfMatches - i - 1];
+			}
 		}
-		i = 1;
+		// Losers Round 1 - Winner goes to
+		for ( i = 0; i < loserRounds[0].amountOfMatches; i++) {
+			if (i < (loserRounds[0].amountOfMatches - loserRounds[1].amountOfMatches)) {
+				loserRounds[0].matches[i].winnerGoesTo = loserRounds[1].matches[loserRounds[0].amountOfMatches + i - ((loserRounds[0].amountOfMatches - loserRounds[1].amountOfMatches) * 2)];
+			} else {
+				loserRounds[0].matches[i].winnerGoesTo = loserRounds[1].matches[loserRounds[0].amountOfMatches - i - 1];
+			}
+		}
+		// Winners Round 1 & 2 - Loser goes to
+		var temp = i;
+		if (winnerRounds[0].amountOfMatches > loserRounds[0].amountOfMatches) {
+			for ( i = 0; i < winnerRounds[0].amountOfMatches; i++) {
+				if (i < (winnerRounds[0].amountOfMatches - winnerRounds[1].amountOfMatches)) {
+					winnerRounds[0].matches[i].loserGoesTo = loserRounds[0].matches[i];
+				} else if (i < ((winnerRounds[0].amountOfMatches - winnerRounds[1].amountOfMatches) * 2)) {
+					winnerRounds[0].matches[i].loserGoesTo = loserRounds[0].matches[loserRounds[0].amountOfMatches - i + 1];
+				} else {
+					winnerRounds[0].matches[i].loserGoesTo = loserRounds[1].matches[loserRounds[1].amountOfMatches + (loserRounds[0].amountOfMatches * 2) - i - 1];
+					winnerRounds[1].matches[winnerRounds[1].amountOfMatches + (loserRounds[0].amountOfMatches * 2) - i - 1].loserGoesTo = loserRounds[1].matches[loserRounds[1].amountOfMatches + (loserRounds[0].amountOfMatches * 2) - i - 1];
+				}
+			}
+			for ( i = 0; i < (winnerRounds[0].amountOfMatches - winnerRounds[1].amountOfMatches); i++) {
+				winnerRounds[1].matches[i].loserGoesTo = loserRounds[1].matches[i];
+			}
+		} else {
+			for ( i = 0; i < winnerRounds[0].amountOfMatches; i++) {
+				winnerRounds[0].matches[i].loserGoesTo = loserRounds[0].matches[loserRounds[0].amountOfMatches - i - 1];
+				winnerRounds[1].matches[winnerRounds[1].amountOfMatches - i - 1].loserGoesTo = loserRounds[0].matches[loserRounds[0].amountOfMatches - i - 1];
+			}
+			for ( i = 0; i < (winnerRounds[1].amountOfMatches - winnerRounds[0].amountOfMatches); i++) {
+				winnerRounds[1].matches[i].loserGoesTo = loserRounds[1].matches[i];
+			}
+		}
 	}
 
 	// Create the Linked List
+	// Winner rounds - Winner goes to
+	if (tournament.byes) {
+		i = 1;
+	} else {
+		i = 0;
+	}
 	var count = 0;
 	for (; i < (tournament.numOfWinnerRounds - 1); i++) {
 		count = 0;
@@ -246,6 +289,59 @@ function generateBracket(tournament, players) {
 			}
 		}
 	}
+
+	// Winner rounds - Loser goes to
+	if (tournament.byes && winnerRounds[0].amountOfMatches > loserRounds[0].amountOfMatches) {
+		i = 2;
+	} else {
+		i = 0;
+	}
+	var temp = i;
+	for (; i < (tournament.numOfWinnerRounds - 1); i++) {
+		count = 0;
+		for ( j = 0; j < winnerRounds[i].amountOfMatches; j++) {
+			if (!i) {
+				if (j < loserRounds[i].amountOfMatches) {
+					winnerRounds[i].matches[j].loserGoesTo = loserRounds[i].matches[j];
+				} else {
+					count++;
+					winnerRounds[i].matches[j].loserGoesTo = loserRounds[i].matches[j - count];
+					count++;
+				}
+			} else {
+				if (loserRounds[temp].amountOfMatches < loserRounds[temp - 1].amountOfMatches) {
+					temp++;
+				}
+				winnerRounds[i].matches[j].loserGoesTo = loserRounds[temp].matches[((j + 2) % loserRounds[temp].amountOfMatches)];
+			}
+		}
+		temp++;
+	}
+
+	// Loser rounds - Winner goes to
+	if (tournament.byes) {
+		i = 1;
+	} else {
+		i = 0;
+	}
+	var count = 0;
+	for (; i < (tournament.numOfLoserRounds - 1); i++) {
+		count = 0;
+		for ( j = 0; j < loserRounds[i].amountOfMatches; j++) {
+			if (loserRounds[i].amountOfMatches > loserRounds[i + 1].amountOfMatches) {
+				if (j < loserRounds[i + 1].amountOfMatches) {
+					loserRounds[i].matches[j].winnerGoesTo = loserRounds[i+1].matches[j];
+				} else {
+					count++;
+					loserRounds[i].matches[j].winnerGoesTo = loserRounds[i+1].matches[j - count];
+					count++;
+				}
+			} else {
+				loserRounds[i].matches[j].winnerGoesTo = loserRounds[i+1].matches[j];
+			}
+		}
+	}
+	loserRounds[tournament.numOfLoserRounds-1].matches[loserRounds[tournament.numOfLoserRounds - 1].amountOfMatches - 1].winnerGoesTo = winnerRounds[tournament.numOfWinnerRounds-1].matches[winnerRounds[tournament.numOfWinnerRounds - 1].amountOfMatches - 1];
 
 	for ( i = 0; i < tournament.numOfWinnerRounds; i++) {
 		tournament.winnerRounds[i] = winnerRounds[i];
