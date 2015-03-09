@@ -12,7 +12,8 @@
     "express": "*",
     "express-session": "*",
     "express-jwt": "*",
-    "jsonwebtoken": "*"
+    "jsonwebtoken": "*",
+    "basic-auth": "*"
   },
   "author": "Luis de la Vega",
   "license": ""
