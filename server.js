@@ -3,25 +3,42 @@
  */
 
 var express = require('express');
-var cookieParser = require('cookie-parser');
+var jwt = require('jsonwebtoken');
+//https://npmjs.org/package/node-jsonwebtoken
+var expressJwt = require('express-jwt');
+//https://npmjs.org/package/express-jwt
+// var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var session = require('express-session');
+// var session = require('express-session');
+
+var secret = '7h1s p1ac6 i5 th6 p6rf6c7 plac6 t0 p1ace a Nyx A5sas51n j0k6!';
 
 var app = express();
+
+// We are going to protect /api routes with JWT
+app.use('/api', expressJwt({
+	secret : secret
+}));
 
 // Needed to handle JSON posts
 app.use(bodyParser.json());
 
 // Cookie parsing needed for sessions
-app.use(cookieParser('notsosecretkey'));
+// app.use(cookieParser('notsosecretkey'));
 
 // Session framework
-app.use(session({
-	secret : 'notsosecretkey123'
-}));
+// app.use(session({
+// secret : 'notsosecretkey123'
+// }));
+
+app.use(function(err, req, res, next) {
+	if (err.constructor.name === 'UnauthorizedError') {
+		res.status(401).send('Unauthorized');
+	}
+});
 
 // Consider all URLs under /public/ as static files, and return them raw.
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/token'));
 
 /////////////////////////////////////////////////////////////////////////////////////////// HANDLERS
 function getName(req, res) {
@@ -84,8 +101,45 @@ function createTournament(req, res) {
 	return res.send(tournament);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////// SESSION TEST ROUTES
+function authenticate(req, res) {
+	//TODO validate req.body.username and req.body.password
+	//if is invalid, return 401
+	if (!(req.body.username === 'edwin' && req.body.password === 'badillo')) {
+		res.send(401, 'Wrong user or password');
+		return;
+	}
 
+	var profile = {
+		first_name : 'Edwin',
+		last_name : 'Badillo',
+		email : 'edwin@badillo.com',
+		id : 123
+	};
+
+	// We are sending the profile inside the token
+	var token = jwt.sign(profile, secret/*
+	, {
+			expiresInMinutes : 60 * 5
+		}*/
+	);
+
+	res.json({
+		token : token
+	});
+}
+
+function restricted(req, res) {
+	console.log('user ' + req.user.email + ' is calling /api/restricted');
+	res.json({
+		name : req.user.first_name
+	});
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////// TOKEN TEST ROUTES
+app.post('/authenticate', authenticate);
+app.get('/api/restricted', restricted);
+
+///////////////////////////////////////////////////////////////////////////////////////////// SESSION TEST ROUTES
 app.get('/name', getName);
 app.post('/name', setName);
 app.get('/logout', logout);
