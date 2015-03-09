@@ -406,7 +406,7 @@ function generateBracket(tournament, players) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////// SERVER LISTEN
-var port = process.env.PORT || 80;
+var port = process.env.PORT || 5000;
 app.listen(port, function() {
 	console.log("Listening on port " + port);
 });
