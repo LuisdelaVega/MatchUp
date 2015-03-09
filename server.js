@@ -3,6 +3,7 @@
  */
 
 var express = require('express');
+var cors = require('cors');
 var jwt = require('jsonwebtoken');
 //https://npmjs.org/package/node-jsonwebtoken
 var expressJwt = require('express-jwt');
@@ -38,6 +39,9 @@ app.use(function(err, req, res, next) {
 		res.status(401).send('Unauthorized');
 	}
 });
+
+// Allow Cross-origin resourse sharing
+app.use(cors());
 
 // Consider all URLs under /public/ as static files, and return them raw.
 app.use(express.static(__dirname + '/token'));
