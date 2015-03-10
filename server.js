@@ -18,19 +18,19 @@ var secret = '7h1s h6Re i5 th6 p6rf6c7 plac6 t0 m4kE 4 Nyx A5s4s51n j0k6!';
 
 var app = express();
 
-var allowCrossDomain = function(req, res, next) {
-	res.header('Access-Control-Allow-Origin', '*');
-	res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-	res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
-	// intercept OPTIONS method
-	if ('OPTIONS' == req.method) {
-		res.send(200);
-	} else {
-		next();
-	}
-};
-
-app.use(allowCrossDomain);
+// var allowCrossDomain = function(req, res, next) {
+	// res.header('Access-Control-Allow-Origin', '*');
+	// res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+	// res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+	// // intercept OPTIONS method
+	// if ('OPTIONS' == req.method) {
+		// res.send(200);
+	// } else {
+		// next();
+	// }
+// };
+// 
+// app.use(allowCrossDomain);
 
 // We are going to protect /api routes with JWT
 app.use('/matchup', expressJwt({
@@ -55,7 +55,7 @@ app.use(function(err, req, res, next) {
 });
 
 // Allow Cross-origin resourse sharing
-// app.use(cors());
+app.use(cors());
 // app.options('*', cors()); // include before other routes
 
 // Consider all URLs under /public/ as static files, and return them raw.
