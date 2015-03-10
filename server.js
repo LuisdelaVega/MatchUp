@@ -18,6 +18,13 @@ var secret = '7h1s h6Re i5 th6 p6rf6c7 plac6 t0 m4kE 4 Nyx A5s4s51n j0k6!';
 
 var app = express();
 
+app.use(function(req, res, next) {
+	res.header('Access-Control-Allow-Origin', '*');
+	res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+	res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+	next();
+});
+
 // We are going to protect /api routes with JWT
 app.use('/matchup', expressJwt({
 	secret : secret
@@ -41,8 +48,8 @@ app.use(function(err, req, res, next) {
 });
 
 // Allow Cross-origin resourse sharing
-app.use(cors());
-app.options('*', cors()); // include before other routes
+// app.use(cors());
+// app.options('*', cors()); // include before other routes
 
 // Consider all URLs under /public/ as static files, and return them raw.
 app.use(express.static(__dirname + '/token'));
