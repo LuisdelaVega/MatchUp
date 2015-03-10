@@ -42,6 +42,7 @@ app.use(function(err, req, res, next) {
 
 // Allow Cross-origin resourse sharing
 app.use(cors());
+app.options('*', cors()); // include before other routes
 
 // Consider all URLs under /public/ as static files, and return them raw.
 app.use(express.static(__dirname + '/token'));
