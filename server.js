@@ -5,12 +5,8 @@
 var express = require('express');
 var cors = require('cors');
 var jwt = require('jsonwebtoken');
-//https://npmjs.org/package/node-jsonwebtoken
 var expressJwt = require('express-jwt');
-//https://npmjs.org/package/express-jwt
-// var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-// var session = require('express-session');
 
 var basicAuth = require('basic-auth');
 
@@ -18,35 +14,13 @@ var secret = '7h1s h6Re i5 th6 p6rf6c7 plac6 t0 m4kE 4 Nyx A5s4s51n j0k6!';
 
 var app = express();
 
-// var allowCrossDomain = function(req, res, next) {
-	// res.header('Access-Control-Allow-Origin', '*');
-	// res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-	// res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
-	// // intercept OPTIONS method
-	// if ('OPTIONS' == req.method) {
-		// res.send(200);
-	// } else {
-		// next();
-	// }
-// };
-// 
-// app.use(allowCrossDomain);
-
-// We are going to protect /api routes with JWT
+// We are going to protect /matchup routes with JWT
 app.use('/matchup', expressJwt({
 	secret : secret
 }));
 
 // Needed to handle JSON posts
 app.use(bodyParser.json());
-
-// Cookie parsing needed for sessions
-// app.use(cookieParser('notsosecretkey'));
-
-// Session framework
-// app.use(session({
-// secret : 'notsosecretkey123'
-// }));
 
 app.use(function(err, req, res, next) {
 	if (err.constructor.name === 'UnauthorizedError') {
@@ -56,10 +30,9 @@ app.use(function(err, req, res, next) {
 
 // Allow Cross-origin resourse sharing
 app.use(cors());
-// app.options('*', cors()); // include before other routes
 
-// Consider all URLs under /public/ as static files, and return them raw.
-app.use(express.static(__dirname + '/token'));
+// Serve the HTML
+app.use(express.static(__dirname + '/public'));
 
 /////////////////////////////////////////////////////////////////////////////////////////// HANDLERS
 function getName(req, res) {
@@ -122,33 +95,6 @@ function createTournament(req, res) {
 	return res.send(tournament);
 }
 
-//TODO Delete this
-// function authenticate(req, res) {
-// //if is invalid, return 401
-// if (!(req.body.username === 'edwin' && req.body.password === 'badillo')) {
-// res.send(401, 'Wrong user or password');
-// return;
-// }
-//
-// var profile = {
-// first_name : 'Edwin',
-// last_name : 'Badillo',
-// email : 'edwin@badillo.com',
-// id : 123
-// };
-//
-// // We are sending the profile inside the token
-// var token = jwt.sign(profile, secret/*
-// , {
-// expiresInMinutes : 60 * 5
-// }*/
-// );
-//
-// res.json({
-// token : token
-// });
-// }
-
 function restricted(req, res) {
 	console.log('user ' + req.user.email + ' is calling /api/restricted');
 	res.json({
@@ -192,14 +138,6 @@ function auth(req, res) {
 		return unauthorized(res);
 	};
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////// TOKEN TEST ROUTES
-// app.post('/authenticate', authenticate);
-
-///////////////////////////////////////////////////////////////////////////////////////////// SESSION TEST ROUTES
-app.get('/name', getName);
-app.post('/name', setName);
-app.get('/logout', logout);
 
 ///////////////////////////////////////////////////////////////////////////////////////////// ROUTES
 app.get('/test/:numofplayers', createTournament);

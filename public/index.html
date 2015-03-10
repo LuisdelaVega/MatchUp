@@ -1,82 +1,11 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Expressjs Session Example</title>
-		<script src="jquery.min.js"></script>
-		<script>
-			$(function() {
-				$("#post-name").click(function() {
-					postName();
-				});
-				$("#logout").click(function() {
-					logout();
-				});
-
-				getName();
-			});
-
-			function getName() {
-				$.get("/name/", function(response) {
-					var name = response['name'];
-					updateUI(name);
-				});
-			}
-
-			function postName() {
-				var name = $("#user-name").val();
-
-				// Clear the text field
-				$("#user-name").val("");
-
-				$.ajax({
-					url : "/name",
-					type : "POST",
-					dataType : "json",
-					contentType : "application/json; charset=utf-8",
-					data : JSON.stringify({
-						"name" : name
-					}),
-					success : function(response) {
-						var name = response['name'];
-						updateUI(name);
-					}
-				});
-			}
-
-			function logout() {
-				$.get("/logout", function(data) {
-					updateUI("");
-				});
-			}
-
-			function updateUI(name) {
-				if (name !== '') {
-					$("#name").html(name);
-					$("#name-display").show();
-					$("#name-form").hide();
-				} else {
-					$("#name-display").hide();
-					$("#name-form").show();
-				}
-			}
-		</script>
+		<title>MatchUp</title>
 	</head>
 	<body>
-
-		<div id="name-display">
-			<p>
-				Hello, <span id="name"></span>
-			</p>
-			<input type="button" name="logout" id="logout" value="Forget me" />
-		</div>
-
-		<div id="name-form">
-			<p>
-				What is your name?
-			</p>
-			<input type="text" name="user-name" id="user-name" />
-			<input type="button" name="post-name" id="post-name" value="Enter" />
-		</div>
-
+		<p>
+			Hello
+		</p>
 	</body>
 </html>
