@@ -3,61 +3,39 @@
  */
 
 var express = require('express');
-var cookieParser = require('cookie-parser');
+var cors = require('cors');
+var jwt = require('jsonwebtoken');
+var expressJwt = require('express-jwt');
 var bodyParser = require('body-parser');
-var session = require('express-session');
+var basicAuth = require('basic-auth');
+var pg = require('pg');
+
+var conString = "pg://luis:portal1!@127.0.0.1:5432/matchupdb";
+var secret = '7h1s h6Re i5 th6 p6rf6c7 plac6 t0 m4kE 4 Nyx A5s4s51n j0k6!';
 
 var app = express();
+
+// We are going to protect /matchup routes with JWT
+app.use('/matchup', expressJwt({
+	secret : secret
+}));
 
 // Needed to handle JSON posts
 app.use(bodyParser.json());
 
-// Cookie parsing needed for sessions
-app.use(cookieParser('notsosecretkey'));
+app.use(function(err, req, res, next) {
+	if (err.constructor.name === 'UnauthorizedError') {
+		res.status(401).send('Unauthorized');
+	}
+});
 
-// Session framework
-app.use(session({
-	secret : 'notsosecretkey123'
-}));
+// Allow Cross-origin resourse sharing
+app.use(cors());
 
-// Consider all URLs under /public/ as static files, and return them raw.
+// Serve the HTML
 app.use(express.static(__dirname + '/public'));
 
 /////////////////////////////////////////////////////////////////////////////////////////// HANDLERS
-function getName(req, res) {
-	if (req.session.name) {
-		return res.json({
-			name : req.session.name
-		});
-	} else {
-		return res.json({
-			name : ''
-		});
-	}
-}
-
-function setName(req, res) {
-	if (!req.body.hasOwnProperty('name')) {
-		res.statusCode = 400;
-		return res.send(req.body.name);
-	} else {
-		req.session.name = req.body.name;
-		return res.json({
-			name : req.body.name
-		});
-	}
-}
-
-function logout(req, res) {
-	req.session.destroy(function(err) {
-		if (err) {
-			res.statusCode = 500;
-			return res.send(req.body.name);
-		} else {
-			res.redirect('/');
-		}
-	});
-}
 
 function createTournament(req, res) {
 	var tournament = new Object();
@@ -81,17 +59,73 @@ function createTournament(req, res) {
 
 	generateBracket(tournament, players);
 
-	return res.send(tournament);
+	res.send(tournament);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////// SESSION TEST ROUTES
+function getMyProfile(req, res) {
+	// console.log('user ' + req.user.email + ' is calling /api/restricted');
+	res.json({
+		username : req.user.acc[0].customer_username,
+		first_name : req.user.acc[0].customer_first_name,
+		bio : req.user.acc[0].customer_bio
+	});
+}
 
-app.get('/name', getName);
-app.post('/name', setName);
-app.get('/logout', logout);
+function authenticate(req, res) {
+	function unauthorized(res) {
+		res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
+		return res.send(401);
+	};
+
+	// Get the values for basic authentication in the header
+	var user = basicAuth(req);
+	if (!user || !user.name || !user.pass) {
+		return unauthorized(res);
+	};
+
+	// Query the DB to find the account
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+		
+		// Query the database to find the account
+		var query = client.query({
+			text : "SELECT * FROM customer WHERE customer_username = $1 AND customer_password = $2",
+			values : [user.name, user.pass]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on("end", function(result) {
+			// Create the token
+			if (result.rows.length > 0) {
+				var response = {
+					"success" : true,
+					"acc" : result.rows
+				};
+				// We are sending the profile inside the token
+				var token = jwt.sign(response, secret);
+
+				res.json({
+					token : token
+				});
+			} else {
+				return unauthorized(res);
+			};
+		});
+	});
+};
+
+function getUserProfile(req, res){
+	res.send("Hello!");
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////// ROUTES
 app.get('/test/:numofplayers', createTournament);
+app.post('/login', authenticate);
+app.get('/matchup/profile', getMyProfile);
+app.get('/matchup/profile/:username', getUserProfile);
 
 ///////////////////////////////////////////////////////////////////////////////////////////// OTHER FUNCTIONS
 function getNextPowerOf2(numOfPlayers) {
@@ -226,13 +260,56 @@ function generateBracket(tournament, players) {
 		}
 
 		// Create the Linked List
+		// Winners Round 1 - Winner goes to
 		for ( i = 0; i < winnerRounds[0].amountOfMatches; i++) {
-			winnerRounds[0].matches[i].winnerGoesTo = winnerRounds[1].matches[winnerRounds[0].amountOfMatches - i - 1];
+			if (i < (winnerRounds[0].amountOfMatches - winnerRounds[1].amountOfMatches)) {
+				winnerRounds[0].matches[i].winnerGoesTo = winnerRounds[1].matches[winnerRounds[0].amountOfMatches + i - ((winnerRounds[0].amountOfMatches - winnerRounds[1].amountOfMatches) * 2)];
+			} else {
+				winnerRounds[0].matches[i].winnerGoesTo = winnerRounds[1].matches[winnerRounds[0].amountOfMatches - i - 1];
+			}
 		}
-		i = 1;
+		// Losers Round 1 - Winner goes to
+		for ( i = 0; i < loserRounds[0].amountOfMatches; i++) {
+			if (i < (loserRounds[0].amountOfMatches - loserRounds[1].amountOfMatches)) {
+				loserRounds[0].matches[i].winnerGoesTo = loserRounds[1].matches[loserRounds[0].amountOfMatches + i - ((loserRounds[0].amountOfMatches - loserRounds[1].amountOfMatches) * 2)];
+			} else {
+				loserRounds[0].matches[i].winnerGoesTo = loserRounds[1].matches[loserRounds[0].amountOfMatches - i - 1];
+			}
+		}
+		// Winners Round 1 & 2 - Loser goes to
+		var temp = i;
+		if (winnerRounds[0].amountOfMatches > loserRounds[0].amountOfMatches) {
+			for ( i = 0; i < winnerRounds[0].amountOfMatches; i++) {
+				if (i < (winnerRounds[0].amountOfMatches - winnerRounds[1].amountOfMatches)) {
+					winnerRounds[0].matches[i].loserGoesTo = loserRounds[0].matches[i];
+				} else if (i < ((winnerRounds[0].amountOfMatches - winnerRounds[1].amountOfMatches) * 2)) {
+					winnerRounds[0].matches[i].loserGoesTo = loserRounds[0].matches[loserRounds[0].amountOfMatches - i + 1];
+				} else {
+					winnerRounds[0].matches[i].loserGoesTo = loserRounds[1].matches[loserRounds[1].amountOfMatches + (loserRounds[0].amountOfMatches * 2) - i - 1];
+					winnerRounds[1].matches[winnerRounds[1].amountOfMatches + (loserRounds[0].amountOfMatches * 2) - i - 1].loserGoesTo = loserRounds[1].matches[loserRounds[1].amountOfMatches + (loserRounds[0].amountOfMatches * 2) - i - 1];
+				}
+			}
+			for ( i = 0; i < (winnerRounds[0].amountOfMatches - winnerRounds[1].amountOfMatches); i++) {
+				winnerRounds[1].matches[i].loserGoesTo = loserRounds[1].matches[i];
+			}
+		} else {
+			for ( i = 0; i < winnerRounds[0].amountOfMatches; i++) {
+				winnerRounds[0].matches[i].loserGoesTo = loserRounds[0].matches[loserRounds[0].amountOfMatches - i - 1];
+				winnerRounds[1].matches[winnerRounds[1].amountOfMatches - i - 1].loserGoesTo = loserRounds[0].matches[loserRounds[0].amountOfMatches - i - 1];
+			}
+			for ( i = 0; i < (winnerRounds[1].amountOfMatches - winnerRounds[0].amountOfMatches); i++) {
+				winnerRounds[1].matches[i].loserGoesTo = loserRounds[1].matches[i];
+			}
+		}
 	}
 
 	// Create the Linked List
+	// Winner rounds - Winner goes to
+	if (tournament.byes) {
+		i = 1;
+	} else {
+		i = 0;
+	}
 	var count = 0;
 	for (; i < (tournament.numOfWinnerRounds - 1); i++) {
 		count = 0;
@@ -246,6 +323,59 @@ function generateBracket(tournament, players) {
 			}
 		}
 	}
+
+	// Winner rounds - Loser goes to
+	if (tournament.byes && winnerRounds[0].amountOfMatches > loserRounds[0].amountOfMatches) {
+		i = 2;
+	} else {
+		i = 0;
+	}
+	var temp = i;
+	for (; i < (tournament.numOfWinnerRounds - 1); i++) {
+		count = 0;
+		for ( j = 0; j < winnerRounds[i].amountOfMatches; j++) {
+			if (!i) {
+				if (j < loserRounds[i].amountOfMatches) {
+					winnerRounds[i].matches[j].loserGoesTo = loserRounds[i].matches[j];
+				} else {
+					count++;
+					winnerRounds[i].matches[j].loserGoesTo = loserRounds[i].matches[j - count];
+					count++;
+				}
+			} else {
+				if (loserRounds[temp].amountOfMatches < loserRounds[temp - 1].amountOfMatches) {
+					temp++;
+				}
+				winnerRounds[i].matches[j].loserGoesTo = loserRounds[temp].matches[((j + 2) % loserRounds[temp].amountOfMatches)];
+			}
+		}
+		temp++;
+	}
+
+	// Loser rounds - Winner goes to
+	if (tournament.byes) {
+		i = 1;
+	} else {
+		i = 0;
+	}
+	var count = 0;
+	for (; i < (tournament.numOfLoserRounds - 1); i++) {
+		count = 0;
+		for ( j = 0; j < loserRounds[i].amountOfMatches; j++) {
+			if (loserRounds[i].amountOfMatches > loserRounds[i + 1].amountOfMatches) {
+				if (j < loserRounds[i + 1].amountOfMatches) {
+					loserRounds[i].matches[j].winnerGoesTo = loserRounds[i+1].matches[j];
+				} else {
+					count++;
+					loserRounds[i].matches[j].winnerGoesTo = loserRounds[i+1].matches[j - count];
+					count++;
+				}
+			} else {
+				loserRounds[i].matches[j].winnerGoesTo = loserRounds[i+1].matches[j];
+			}
+		}
+	}
+	loserRounds[tournament.numOfLoserRounds-1].matches[loserRounds[tournament.numOfLoserRounds - 1].amountOfMatches - 1].winnerGoesTo = winnerRounds[tournament.numOfWinnerRounds-1].matches[winnerRounds[tournament.numOfWinnerRounds - 1].amountOfMatches - 1];
 
 	for ( i = 0; i < tournament.numOfWinnerRounds; i++) {
 		tournament.winnerRounds[i] = winnerRounds[i];

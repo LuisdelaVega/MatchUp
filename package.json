@@ -10,7 +10,12 @@
     "body-parser": "*",
     "cookie-parser": "*",
     "express": "*",
-    "express-session": "*"
+    "express-session": "*",
+    "express-jwt": "*",
+    "jsonwebtoken": "*",
+    "basic-auth": "*",
+    "cors": "*",
+    "pg": "*"
   },
   "author": "Luis de la Vega",
   "license": ""
