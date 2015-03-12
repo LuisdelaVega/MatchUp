@@ -7,9 +7,10 @@ var cors = require('cors');
 var jwt = require('jsonwebtoken');
 var expressJwt = require('express-jwt');
 var bodyParser = require('body-parser');
-
 var basicAuth = require('basic-auth');
+var pg = require('pg');
 
+var conString = "pg://root:portal1!@127.0.0.1:5432/matchupdb";
 var secret = '7h1s h6Re i5 th6 p6rf6c7 plac6 t0 m4kE 4 Nyx A5s4s51n j0k6!';
 
 var app = express();
@@ -35,40 +36,6 @@ app.use(cors());
 app.use(express.static(__dirname + '/public'));
 
 /////////////////////////////////////////////////////////////////////////////////////////// HANDLERS
-function getName(req, res) {
-	if (req.session.name) {
-		return res.json({
-			name : req.session.name
-		});
-	} else {
-		return res.json({
-			name : ''
-		});
-	}
-}
-
-function setName(req, res) {
-	if (!req.body.hasOwnProperty('name')) {
-		res.statusCode = 400;
-		return res.send(req.body.name);
-	} else {
-		req.session.name = req.body.name;
-		return res.json({
-			name : req.body.name
-		});
-	}
-}
-
-function logout(req, res) {
-	req.session.destroy(function(err) {
-		if (err) {
-			res.statusCode = 500;
-			return res.send(req.body.name);
-		} else {
-			res.redirect('/');
-		}
-	});
-}
 
 function createTournament(req, res) {
 	var tournament = new Object();
@@ -92,57 +59,73 @@ function createTournament(req, res) {
 
 	generateBracket(tournament, players);
 
-	return res.send(tournament);
+	res.send(tournament);
 }
 
-function restricted(req, res) {
-	console.log('user ' + req.user.email + ' is calling /api/restricted');
+function getMyProfile(req, res) {
+	// console.log('user ' + req.user.email + ' is calling /api/restricted');
 	res.json({
-		first_name : req.user.first_name,
-		last_name : req.user.last_name,
-		email : req.user.email,
-		id : req.user.id
+		username : req.user.acc[0].customer_username,
+		first_name : req.user.acc[0].customer_first_name,
+		bio : req.user.acc[0].customer_bio
 	});
 }
 
-function auth(req, res) {
+function authenticate(req, res) {
 	function unauthorized(res) {
 		res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
 		return res.send(401);
 	};
 
+	// Get the values for basic authentication in the header
 	var user = basicAuth(req);
-
 	if (!user || !user.name || !user.pass) {
 		return unauthorized(res);
 	};
 
-	//TODO validate user.name and user.pass with the DB
 	// Query the DB to find the account
-	if (user.name === 'foo' && user.pass === 'bar') {
-		// Create the token
-		var profile = {
-			first_name : user.name,
-			last_name : user.pass,
-			email : 'edwin@badillo.com',
-			id : 123
-		};
-
-		// We are sending the profile inside the token
-		var token = jwt.sign(profile, secret);
-
-		res.json({
-			token : token
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+		
+		// Query the database to find the account
+		var query = client.query({
+			text : "SELECT * FROM customer WHERE customer_username = $1 AND customer_password = $2",
+			values : [user.name, user.pass]
 		});
-	} else {
-		return unauthorized(res);
-	};
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on("end", function(result) {
+			// Create the token
+			if (result.rows.length > 0) {
+				var response = {
+					"success" : true,
+					"acc" : result.rows
+				};
+				// We are sending the profile inside the token
+				var token = jwt.sign(response, secret);
+
+				res.json({
+					token : token
+				});
+			} else {
+				return unauthorized(res);
+			};
+		});
+	});
 };
+
+function getUserProfile(req, res){
+	res.send("Hello!");
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////// ROUTES
 app.get('/test/:numofplayers', createTournament);
-app.post('/login', auth);
-app.get('/matchup/profile', restricted);
+app.post('/login', authenticate);
+app.get('/matchup/profile', getMyProfile);
+app.get('/matchup/profile/:username', getUserProfile);
 
 ///////////////////////////////////////////////////////////////////////////////////////////// OTHER FUNCTIONS
 function getNextPowerOf2(numOfPlayers) {
