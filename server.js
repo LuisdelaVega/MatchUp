@@ -10,7 +10,7 @@ var bodyParser = require('body-parser');
 var basicAuth = require('basic-auth');
 var pg = require('pg');
 
-var conString = "pg://root:portal1!@127.0.0.1:5432/matchupdb";
+var conString = "pg://luis:portal1!@127.0.0.1:5432/matchupdb";
 var secret = '7h1s h6Re i5 th6 p6rf6c7 plac6 t0 m4kE 4 Nyx A5s4s51n j0k6!';
 
 var app = express();
