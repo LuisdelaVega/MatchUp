@@ -67,7 +67,6 @@ function createBraket(req, res) {
 }
 
 function getMyProfile(req, res) {
-	// console.log('user ' + req.user.email + ' is calling /api/restricted');
 	res.json({
 		username : req.user.acc[0].customer_username,
 		first_name : req.user.acc[0].customer_first_name,
@@ -326,9 +325,8 @@ function doubleEliminationBracket(bracket) {
 			for ( i = 0; i < bracket.winnerRounds[0].amountOfMatches; i++) {
 				if (i < (bracket.winnerRounds[0].amountOfMatches - bracket.winnerRounds[1].amountOfMatches)) {
 					bracket.winnerRounds[0].matches[i].loserGoesTo = loserRounds[0].matches[i].name;
-				} else if (i < ((bracket.winnerRounds[0].amountOfMatches - bracket.winnerRounds[1].amountOfMatches) * 2)) {// Checked
+				} else if (i < ((bracket.winnerRounds[0].amountOfMatches - bracket.winnerRounds[1].amountOfMatches) * 2)) {
 					bracket.winnerRounds[0].matches[i].loserGoesTo = loserRounds[0].matches[loserRounds[0].amountOfMatches - (i % loserRounds[0].amountOfMatches) - 1].name;
-					// .name makes it explode. Apparantelly it going out of bounds
 				} else {
 					bracket.winnerRounds[0].matches[i].loserGoesTo = loserRounds[1].matches[loserRounds[1].amountOfMatches + (loserRounds[0].amountOfMatches * 2) - i - 1].name;
 					bracket.winnerRounds[1].matches[bracket.winnerRounds[1].amountOfMatches + (loserRounds[0].amountOfMatches * 2) - i - 1].loserGoesTo = loserRounds[1].matches[loserRounds[1].amountOfMatches + (loserRounds[0].amountOfMatches * 2) - i - 1].name;
@@ -337,13 +335,18 @@ function doubleEliminationBracket(bracket) {
 			for ( i = 0; i < (bracket.winnerRounds[0].amountOfMatches - bracket.winnerRounds[1].amountOfMatches); i++) {
 				bracket.winnerRounds[1].matches[i].loserGoesTo = loserRounds[1].matches[i].name;
 			}
-		} else {// Se ve bien
+		} else {
 			for ( i = 0; i < bracket.winnerRounds[0].amountOfMatches; i++) {
 				bracket.winnerRounds[0].matches[i].loserGoesTo = loserRounds[0].matches[loserRounds[0].amountOfMatches - i - 1].name;
 				bracket.winnerRounds[1].matches[bracket.winnerRounds[1].amountOfMatches - i - 1].loserGoesTo = loserRounds[0].matches[loserRounds[0].amountOfMatches - i - 1].name;
 			}
 			for ( i = 0; i < (bracket.winnerRounds[1].amountOfMatches - bracket.winnerRounds[0].amountOfMatches); i++) {
-				bracket.winnerRounds[1].matches[i].loserGoesTo = loserRounds[1].matches[i].name;
+				// bracket.winnerRounds[1].matches[i].loserGoesTo = loserRounds[1].matches[i].name;
+				if (i < loserRounds[1].amountOfMatches) {
+					bracket.winnerRounds[1].matches[i].loserGoesTo = loserRounds[1].matches[i].name;
+				} else {
+					bracket.winnerRounds[1].matches[i].loserGoesTo = loserRounds[1].matches[loserRounds[1].amountOfMatches - (i % loserRounds[1].amountOfMatches) - 1].name;
+				}
 			}
 		}
 	}
