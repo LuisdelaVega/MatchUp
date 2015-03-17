@@ -14,6 +14,7 @@ var pg = require('pg');
 // My modules
 var test = require('./modules/test');
 var events = require('./modules/events');
+var games = require('./modules/games');
 
 // Global variables
 var conString = "pg://luis:portal1!@127.0.0.1:5432/matchupdb";
@@ -119,7 +120,13 @@ function getUserProfile(req, res) {
 	res.send("Hello!");
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////// ROUTES
+function getPopularStuff(req, res) {
+	games.getPopularStuff(res, pg, conString);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
+///////////////////////////////////////////////////////////////////////////////////////////// API ROUTES
+///////////////////////////////////////////////////////////////////////////////////////////// PROTECTED ROUTES
 app.get('/test/bracket/:type/:numofplayers', test.createBraket);
 app.post('/login', authenticate);
 app.get('/matchup/profile', getMyProfile);
@@ -128,6 +135,8 @@ app.get('/test/home', getHome);
 app.get('/api/events/live', getLiveEvents);
 app.get('/api/events/regular', getLocalEvents);
 app.get('/api/events/hosted', getHostedEvents);
+
+app.get('/test/popularstuff', getPopularStuff);
 
 ////////////////////////////////////////////////////////////////////////////////////// SERVER LISTEN
 var port = process.env.PORT || 5000;
