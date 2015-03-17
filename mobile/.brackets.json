@@ -1,0 +1,5 @@
+{
+    "jscodehints.detectedExclusions": [
+        "/Users/Sam/Developer/MatchUp/mobile/platforms/ios/build/emulator/matchupPT.app/www/lib/ionic/js/angular-ui/angular-ui-router.min.js"
+    ]
+}

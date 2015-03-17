@@ -1,197 +1,94 @@
 <ion-view view-title="MatchUp">
     <ion-content>
-        <h3 style="padding-left:15px; padding-top: 15px">Live</h3>
-        <div class="row">
-            <div col-25>
-                <div class="list card">
-                    <div class="item item-image">
-                        <img src="img/ionic.png" style="width: 50vw" />
-                    </div>
-                    <a class="item" href="#">
-                        Event Name
-                    </a>
-                </div>
-            </div>
-            <div col-25>
-                <div class="list card">
-                    <div class="item item-image">
-                        <img src="img/ionic.png" style="width: 50vw" />
-                    </div>
-                    <a class="item" href="#">
-                        Event Name
-                    </a>
-                </div>
-            </div>
+        <div class="item item-divider">
+            Live
         </div>
+        <div class="list list-inset">
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/apex2015.png">
+                <h2>Apex 2015</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/evo.png">
+                <h2>EVO Championship Series</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/lol2.png">
+                <h2>LOL Championship Series</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/lolbr.jpeg">
+                <h2>LOL Championship Series</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+        </div>
+        <div class="item item-divider">
+            Premium
+        </div>
+        <div class="list list-inset">
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/apex2015.png">
+                <h2>Apex 2015</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/evo.png">
+                <h2>EVO Championship Series</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/lol2.png">
+                <h2>LOL Championship Series</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/lolbr.jpeg">
+                <h2>LOL Championship Series</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+        </div>
+        <div class="item item-divider">
+            Local
+        </div>
+        <div class="list list-inset">
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/apex2015.png">
+                <h2>Apex 2015</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/evo.png">
+                <h2>EVO Championship Series</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/lol2.png">
+                <h2>LOL Championship Series</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/lolbr.jpeg">
+                <h2>LOL Championship Series</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+        </div>
+        <div class="item item-divider">
+            Popular Games
+        </div>
+        <div ng-controller="gameController">
 
-        <div class="row">
-            <div col-25>
-                <div class="list card">
-                    <div class="item item-image">
-                        <img src="img/ionic.png" style="width: 50vw" />
-                    </div>
-                    <a class="item" href="#">
-                        Event Name
-                    </a>
+            <div class="pad-sides" masonry="{columnWidth: 60, gutter: 0}">
+                <div class="masonry-brick" ng-repeat="singer in singers">
+                    <img ng-src="{{ singer }}" alt="pop singer">
                 </div>
             </div>
-            <div col-25>
-                <div class="list card">
-                    <div class="item item-image">
-                        <img src="img/ionic.png" style="width: 50vw" />
-                    </div>
-                    <a class="item" href="#" style="align:center">
-                        Event Name
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <hr class="fadinghr" />
-        
-         <h3 style="padding-left:15px; padding-top: 15px">Promoted</h3>
-        <div class="row">
-            <div col-25>
-                <div class="list card">
-                    <div class="item item-image">
-                        <img src="img/ionic.png" style="width: 50vw" />
-                    </div>
-                    <a class="item" href="#">
-                        Event Name
-                    </a>
-                </div>
-            </div>
-            <div col-25>
-                <div class="list card">
-                    <div class="item item-image">
-                        <img src="img/ionic.png" style="width: 50vw" />
-                    </div>
-                    <a class="item" href="#">
-                        Event Name
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div col-25>
-                <div class="list card">
-                    <div class="item item-image">
-                        <img src="img/ionic.png" style="width: 50vw" />
-                    </div>
-                    <a class="item" href="#">
-                        Event Name
-                    </a>
-                </div>
-            </div>
-            <div col-25>
-                <div class="list card">
-                    <div class="item item-image">
-                        <img src="img/ionic.png" style="width: 50vw" />
-                    </div>
-                    <a class="item" href="#" style="align:center">
-                        Event Name
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <hr class="fadinghr" />
-        
-         <h3 style="padding-left:15px; padding-top: 15px">Local</h3>
-        <div class="row">
-            <div col-25>
-                <div class="list card">
-                    <div class="item item-image">
-                        <img src="img/ionic.png" style="width: 50vw" />
-                    </div>
-                    <a class="item" href="#">
-                        Event Name
-                    </a>
-                </div>
-            </div>
-            <div col-25>
-                <div class="list card">
-                    <div class="item item-image">
-                        <img src="img/ionic.png" style="width: 50vw" />
-                    </div>
-                    <a class="item" href="#">
-                        Event Name
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div col-25>
-                <div class="list card">
-                    <div class="item item-image">
-                        <img src="img/ionic.png" style="width: 50vw" />
-                    </div>
-                    <a class="item" href="#">
-                        Event Name
-                    </a>
-                </div>
-            </div>
-            <div col-25>
-                <div class="list card">
-                    <div class="item item-image">
-                        <img src="img/ionic.png" style="width: 50vw" />
-                    </div>
-                    <a class="item" href="#" style="align:center">
-                        Event Name
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <hr class="fadinghr" />
-        
-         <h3 style="padding-left:15px; padding-top: 15px">Popular Games</h3>
-        <div class="row">
-            <div col-25>
-                <div class="list card">
-                    <div class="item item-image">
-                        <img src="img/ionic.png" style="width: 50vw" />
-                    </div>
-                    <a class="item" href="#">
-                        Game Name
-                    </a>
-                </div>
-            </div>
-            <div col-25>
-                <div class="list card">
-                    <div class="item item-image">
-                        <img src="img/ionic.png" style="width: 50vw" />
-                    </div>
-                    <a class="item" href="#">
-                        Game Name
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div col-25>
-                <div class="list card">
-                    <div class="item item-image">
-                        <img src="img/ionic.png" style="width: 50vw" />
-                    </div>
-                    <a class="item" href="#">
-                        Game Name
-                    </a>
-                </div>
-            </div>
-            <div col-25>
-                <div class="list card">
-                    <div class="item item-image">
-                        <img src="img/ionic.png" style="width: 50vw" />
-                    </div>
-                    <a class="item" href="#" style="align:center">
-                        Game Name
-                    </a>
-                </div>
-            </div>
+            <ion-infinite-scroll
+                                 on-infinite="add()"
+                                 distance="1%">
+            </ion-infinite-scroll>
         </div>
     </ion-content>
 </ion-view>
