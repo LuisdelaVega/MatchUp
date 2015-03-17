@@ -1,0 +1,94 @@
+<ion-view view-title="MatchUp">
+    <ion-content>
+        <div class="item item-divider">
+            Live
+        </div>
+        <div class="list list-inset">
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/apex2015.png">
+                <h2>Apex 2015</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/evo.png">
+                <h2>EVO Championship Series</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/lol2.png">
+                <h2>LOL Championship Series</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/lolbr.jpeg">
+                <h2>LOL Championship Series</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+        </div>
+        <div class="item item-divider">
+            Premium
+        </div>
+        <div class="list list-inset">
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/apex2015.png">
+                <h2>Apex 2015</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/evo.png">
+                <h2>EVO Championship Series</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/lol2.png">
+                <h2>LOL Championship Series</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/lolbr.jpeg">
+                <h2>LOL Championship Series</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+        </div>
+        <div class="item item-divider">
+            Local
+        </div>
+        <div class="list list-inset">
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/apex2015.png">
+                <h2>Apex 2015</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/evo.png">
+                <h2>EVO Championship Series</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/lol2.png">
+                <h2>LOL Championship Series</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/lolbr.jpeg">
+                <h2>LOL Championship Series</h2>
+                <p>Badillo's House, Jersey</p>
+            </a>
+        </div>
+        <div class="item item-divider">
+            Popular Games
+        </div>
+        <div ng-controller="gameController">
+
+            <div class="pad-sides" masonry="{columnWidth: 60, gutter: 0}">
+                <div class="masonry-brick" ng-repeat="singer in singers">
+                    <img ng-src="{{ singer }}" alt="pop singer">
+                </div>
+            </div>
+            <ion-infinite-scroll
+                                 on-infinite="add()"
+                                 distance="1%">
+            </ion-infinite-scroll>
+        </div>
+    </ion-content>
+</ion-view>
