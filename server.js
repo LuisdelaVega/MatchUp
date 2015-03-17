@@ -109,7 +109,11 @@ function getLiveEvents(req, res) {
 }
 
 function getLocalEvents(req, res) {
-	events.getLocalEvents(res, pg, conString);
+	events.getRegularEvents(res, pg, conString);
+}
+
+function getHostedEvents(req, res) {
+	events.getHostedEvents(res, pg, conString);
 }
 
 function getUserProfile(req, res) {
@@ -122,8 +126,9 @@ app.post('/login', authenticate);
 app.get('/matchup/profile', getMyProfile);
 app.get('/matchup/profile/:username', getUserProfile);
 app.get('/test/home', getHome);
-app.get('/test/events/live', getLiveEvents);
-app.get('/test/events/local', getLocalEvents);
+app.get('/api/events/live', getLiveEvents);
+app.get('/api/events/regular', getLocalEvents);
+app.get('/api/events/hosted', getHostedEvents);
 
 ////////////////////////////////////////////////////////////////////////////////////// SERVER LISTEN
 var port = process.env.PORT || 5000;
