@@ -89,11 +89,13 @@ var getHostedEvents = function(res, pg, conString) {
 	});
 };
 
-var getHome = function(res, eventList, pg, conString) {
+var getHome = function(res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
+		
+		var eventList = new Object();
 		// Look for all the Events that are currently in progress
 		var queryLive = client.query({
 			text : "select * from event where event_start_date < now() at time zone 'utc' and event_end_date > now() at time zone 'utc' order by event_start_date"
@@ -124,9 +126,21 @@ var getHome = function(res, eventList, pg, conString) {
 				queryHosted.on("end", function(result) {
 					eventList.hosted = result.rows;
 
-					//TODO Look for Popular Games
-					res.json({
-						events : eventList
+					// Look for most Popular Games
+					var gamesList = new Object();
+					var queryPopularGames = client.query({
+						text : "select game.*, count(game.game_id) as popularity from tournament natural join game group by game.game_id order by popularity desc"
+					});
+					queryPopularGames.on("row", function(row, result) {
+						result.addRow(row);
+					});
+					queryPopularGames.on("end", function(result) {
+						gamesList.popular_games = result.rows;
+
+						res.json({
+							events : eventList,
+							games : gamesList
+						});
 					});
 				});
 			});

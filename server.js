@@ -100,8 +100,7 @@ function authenticate(req, res) {
 }
 
 function getHome(req, res) {
-	var eventList = new Object();
-	events.getHome(res, eventList, pg, conString);
+	events.getHome(res, pg, conString);
 }
 
 function getLiveEvents(req, res) {
