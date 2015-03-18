@@ -2,7 +2,11 @@
     <ion-side-menu-content edge-drag-threshold="true">
         <ion-nav-bar class="bar-positive has-tabs-top">
             <ion-nav-buttons side="left">
-                <button class="button button-icon button-clear ion-navicon" menu-toggle="left">
+                <button class="button button-icon ion-navicon" menu-toggle="left">
+                </button>
+            </ion-nav-buttons>
+            <ion-nav-buttons side="right">
+                <button class="button button-icon ion-android-alert">
                 </button>
             </ion-nav-buttons>
         </ion-nav-bar>
@@ -19,7 +23,7 @@
                     <i class="icon ion-home"></i>Home
                 </ion-item>
                 <ion-item class="item-icon-left" nav-clear menu-close href="#/app/profile/summary">
-                    <i class="icon ion-person"></i>View Profile
+                    <i class="icon ion-person"></i>Profile
                 </ion-item>
                 <ion-item class="item-icon-left" nav-clear menu-close href="#/app/events/list">
                     <i class="icon ion-calendar"></i>Events
@@ -29,6 +33,9 @@
                 </ion-item>
                 <ion-item class="item-icon-left" nav-clear menu-close href="#/app/populargames">
                     <i class="icon ion-ios-game-controller-a"></i> Popular Games
+                </ion-item>
+                <ion-item class="item-icon-left" nav-clear menu-close href="#">
+                    <i class="icon ion-search"></i> Search
                 </ion-item>
                 <ion-item class="item-divider"></ion-item>
                 <ion-item nav-clear menu-close href="#/app/home">

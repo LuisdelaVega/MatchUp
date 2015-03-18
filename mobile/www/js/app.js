@@ -73,6 +73,22 @@ angular.module('App', ['ionic', 'wu.masonry'])
                 }
             }
         })
+        .state('app.profile.teams', {
+            url: "/teams",
+            views: {
+                'profile-summary-tab': {
+                    templateUrl: "templates/team/teams-list.html"
+                }
+            }
+        })
+        .state('app.profile.organizations', {
+            url: "/organizations",
+            views: {
+                'profile-summary-tab': {
+                    templateUrl: "templates/organization/organizations-list.html"
+                }
+            }
+        })
         .state('app.profile.events', {
             url: "/events",
             views: {
@@ -85,11 +101,10 @@ angular.module('App', ['ionic', 'wu.masonry'])
             url: "/genres",
             templateUrl: "templates/genre.html"
         })
-
-    .state('app.populargames', {
-        url: "/populargames",
-        templateUrl: "templates/popular-games.html"
-    });
+        .state('app.populargames', {
+            url: "/populargames",
+            templateUrl: "templates/popular-games.html"
+        });
 
     // if none of the above states are matched, use this as the fallback
     $urlRouterProvider.otherwise('/app/home');
