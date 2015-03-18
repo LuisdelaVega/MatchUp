@@ -1,0 +1,17 @@
+<ion-view view-title="Popular Games">
+    <ion-content>
+        <div ng-controller="popularGameViewController">
+            <div class="pad-sides" masonry="{columnWidth: 60, gutter: 0}">
+                <div class="masonry-brick" ng-repeat="game in games track by $index">
+                    <a href="#/app/home">
+                        <img ng-src="{{ game }}" alt="game discription">
+                    </a>
+                </div>
+            </div>
+            <ion-infinite-scroll
+                                 on-infinite="add()"
+                                 distance="1%">
+            </ion-infinite-scroll>
+        </div>
+    </ion-content>
+</ion-view>

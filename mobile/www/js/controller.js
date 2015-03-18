@@ -1,24 +1,19 @@
 var myApp = angular.module('App')
 
-myApp.controller('gameController', ['$scope', function ($scope) {
-
-    $scope.singers = ['img/csgo.jpg'];
-    var moreImgs = ['img/dota2.jpg', 'img/hearthstone.jpg', 'img/leagueofeppa.jpg']
-    $scope.add = function add(name) {
-        if (moreImgs.length > 0)
-            $scope.singers.push(moreImgs.pop());
-        else {
-            moreImgs.push($scope.singers.splice(0, 1)[0]);
-        }
-        $scope.$broadcast('scroll.infiniteScrollComplete');
-    }
-    $scope.remove = function remove() {
-        var num = ~~(Math.random() * $scope.singers.length);
-        moreImgs.push($scope.singers[num]);
-        $scope.singers.splice(num, 1)[0];
-    };
-
-}]);
+//Good night sweet prince. We will always remember the way you danced.  
+//myApp.controller('gameController', ['$scope', function($scope) {
+//
+//    $scope.games = ['img/csgo.jpg'];
+//    var moreImgs = ['img/dota2.jpg', 'img/hearthstone.jpg', 'img/leagueofeppa.jpg']
+//    $scope.add = function add(name) {
+//        if (moreImgs.length>0)
+//            $scope.games.push(moreImgs.pop());
+//        else {
+//            moreImgs.push($scope.games.splice(0,1)[0]);
+//        }
+//        $scope.$broadcast('scroll.infiniteScrollComplete');
+//    }
+//}]);  
 
 myApp.controller('EventController', function ($scope, $ionicPopover) {
     $scope.events = 'hi';
@@ -42,3 +37,19 @@ myApp.controller('RegularEventController', function ($scope) {
 myApp.controller('PremiumEventController', function ($scope) {
 
 });
+
+myApp.controller('popularGameViewController', ['$scope', '$http', function($scope, $http) {
+    
+    $scope.games = ['img/csgo.jpg', 'img/dota2.jpg', 'img/hearthstone.jpg', 'img/leagueofeppa.jpg'];
+    var moreImgs = ['img/csgo.jpg', 'img/dota2.jpg', 'img/hearthstone.jpg', 'img/leagueofeppa.jpg']
+    
+    $scope.add = function add(name) {
+        if (moreImgs.length>0){
+            $scope.games.push(moreImgs.pop());
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+        }
+        else
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+    }
+    
+}]);

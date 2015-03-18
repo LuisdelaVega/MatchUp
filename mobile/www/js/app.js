@@ -6,7 +6,7 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('App', ['ionic', 'wu.masonry'])
 
-.run(function ($ionicPlatform) {
+    .run(function ($ionicPlatform) {
     $ionicPlatform.ready(function () {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
@@ -20,42 +20,51 @@ angular.module('App', ['ionic', 'wu.masonry'])
     });
 })
 
-.config(function ($stateProvider, $urlRouterProvider) {
+    .config(function ($stateProvider, $urlRouterProvider) {
     $stateProvider
         .state('app', {
-            url: "/app",
-            /*An abstract state can have child states but can not get activated itself. An 'abstract' state is simply a state 
+        url: "/app",
+        /*An abstract state can have child states but can not get activated itself. An 'abstract' state is simply a state 
             that can't be transitioned to. It is activated implicitly when one of its descendants are activated*/
-            abstract: true,
-            templateUrl: "templates/sidebar.html",
-        })
+        abstract: true,
+        templateUrl: "templates/sidebar.html",
+    })
         .state('app.home', {
-            url: "/home",
-            templateUrl: "templates/home.html"
-        })
+        url: "/home",
+        templateUrl: "templates/home.html"
+    })
         .state('app.events', {
-            url: "/events",
-            abstract: true,
-            templateUrl: "templates/events.html",
-            controller: "EventController"
-        })
+        url: "/events",
+        abstract: true,
+        templateUrl: "templates/events.html",
+        controller: "EventController"
+    })
         .state('app.events.list', {
-            url: "/list",
-            views: {
-                'regular-tab': {
-                    templateUrl: "templates/regular-list-events.html",
-                    controller: "RegularEventController"
-                },
-                'premium-tab': {
-                    templateUrl: "templates/premium-list-events.html",
-                    controller: "PremiumEventController"
-                }
+        url: "/list",
+        views: {
+            'regular-tab': {
+                templateUrl: "templates/regular-list-events.html",
+                controller: "RegularEventController"
+            },
+            'premium-tab': {
+                templateUrl: "templates/premium-list-events.html",
+                controller: "PremiumEventController"
             }
-        })
+        }
+    })
         .state('app.profile', {
-            url: "/profile",
-            templateUrl: "templates/profile.html"
-        });
+        url: "/profile",
+        templateUrl: "templates/profile.html"
+    })
+        .state('app.genres', {
+        url: "/genres",
+        templateUrl: "templates/genre.html"
+    })
+
+        .state('app.populargames', {
+        url: "/populargames",
+        templateUrl: "templates/popular-games.html"
+    });
 
     // if none of the above states are matched, use this as the fallback
     $urlRouterProvider.otherwise('/app/home');
