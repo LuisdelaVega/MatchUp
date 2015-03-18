@@ -17,6 +17,7 @@ var getAllEvents = function(res, pg, conString) {
 			res.json({
 				local : result.rows
 			});
+			client.end();
 		});
 	});
 };
@@ -38,6 +39,7 @@ var getLiveEvents = function(res, pg, conString) {
 			res.json({
 				live : result.rows
 			});
+			client.end();
 		});
 	});
 };
@@ -60,6 +62,7 @@ var getRegularEvents = function(res, pg, conString) {
 			res.json({
 				regular : result.rows
 			});
+			client.end();
 		});
 	});
 };
@@ -82,6 +85,7 @@ var getHostedEvents = function(res, pg, conString) {
 			res.json({
 				hosted : result.rows
 			});
+			client.end();
 		});
 	});
 };
@@ -138,6 +142,7 @@ var getHome = function(res, pg, conString) {
 							events : eventList,
 							popular_games : gamesList.popular_games
 						});
+						client.end();
 					});
 				});
 			});

@@ -20,6 +20,7 @@ var getPopularGames = function(res, pg, conString) {
 			res.json({
 				games : gamesList.popular_games
 			});
+			client.end();
 		});
 	});
 };
@@ -45,6 +46,7 @@ var getPopularGenres = function(res, pg, conString) {
 			res.json({
 				genre : genreList.genres
 			});
+			client.end();
 		});
 	});
 };
@@ -82,6 +84,7 @@ var getPopularStuff = function(res, pg, conString) {
 					popular_games : gamesList.popular_games,
 					genres : genreList.genres
 				});
+				client.end();
 			});
 		});
 	});

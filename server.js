@@ -15,7 +15,7 @@ var pg = require('pg');
 var brackets = require('./modules/brackets');
 var events = require('./modules/events');
 var games = require('./modules/games');
-var customer = require('./modules/customers');
+var customers = require('./modules/customers');
 
 // Global variables
 var conString = "pg://luis:portal1!@127.0.0.1:5432/matchupdb";
@@ -24,7 +24,7 @@ var secret = '7h1s h6Re i5 th6 p6rf6c7 plac6 t0 m4kE 4 Nyx A5s4s51n j0k6!';
 // Most Valuable Player
 var app = express();
 
-// We are going to protect /matchup routes with JWT
+// We are going to protect /matchup/ routes with JWT
 app.use('/matchup', expressJwt({
 	secret : secret
 }));
@@ -42,7 +42,7 @@ app.use(function(err, req, res, next) {
 // Allow Cross-origin resourse sharing
 app.use(cors());
 
-// Serve the HTML
+// Serve the Website
 app.use(express.static(__dirname + '/public'));
 
 /////////////////////////////////////////////////////////////////////////////////////////// HANDLERS
@@ -66,17 +66,17 @@ function authenticate(req, res) {
 
 		// Query the database to find the account
 		var query = client.query({
-			text : "SELECT customer.customer_id, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_username, customer.customer_email, customer.customer_profile_pic, customer.customer_cover_photo, customer.customer_bio, customer.customer_country, customer.customer_region FROM customer WHERE customer_username = $1 AND customer_password = $2",
+			text : "SELECT customer.customer_username FROM customer WHERE customer_username = $1 AND customer_password = $2",
 			values : [user.name, user.pass]
 		});
 		query.on("row", function(row, result) {
 			result.addRow(row);
 		});
 		query.on("end", function(result) {
-			// Create the token
+			// Create the token with just the username
 			if (result.rows.length > 0) {
 				var response = {
-					"acc" : result.rows[0]
+					username : result.rows[0].customer_username
 				};
 				// We are sending the profile inside the token
 				var token = jwt.sign(response, secret);
@@ -107,8 +107,12 @@ function getHostedEvents(req, res) {
 	events.getHostedEvents(res, pg, conString);
 }
 
+function getMyProfile(req, res) {
+	customers.getMyProfile(req, res, pg, conString);
+}
+
 function getUserProfile(req, res) {
-	res.send("Hello!");
+	customers.getUserProfile(req, res, pg, conString);
 }
 
 function getPopularStuff(req, res) {
@@ -128,7 +132,7 @@ app.get('/api/events/hosted', getHostedEvents);
 
 ///////////////////////////////////////////////////////////////////////////////////////////// MatchUp ROUTES
 app.post('/login', authenticate); // Get token by loging in to our service
-app.get('/matchup/profile', customer.getMyProfile);
+app.get('/matchup/profile', getMyProfile);
 app.get('/matchup/profile/:username', getUserProfile);
 
 ////////////////////////////////////////////////////////////////////////////////////// SERVER LISTEN
