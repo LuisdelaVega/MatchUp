@@ -1,6 +1,6 @@
 <ion-side-menus enable-menu-with-back-views="true">
     <ion-side-menu-content edge-drag-threshold="true">
-        <ion-nav-bar class="bar-positive">
+        <ion-nav-bar class="bar-positive has-tabs-top">
             <ion-nav-buttons side="left">
                 <button class="button button-icon button-clear ion-navicon" menu-toggle="left">
                 </button>
@@ -8,7 +8,6 @@
         </ion-nav-bar>
         <ion-nav-view></ion-nav-view>
     </ion-side-menu-content>
-
     <!-- Left menu -->
     <ion-side-menu side="left">
         <ion-header-bar class="bar bar-header bar-positive">
@@ -22,7 +21,7 @@
                 <ion-item class="item-icon-left" nav-clear menu-close href="#/app/profile">
                     <i class="icon ion-person"></i>View Profile
                 </ion-item>
-                <ion-item class="item-icon-left" nav-clear menu-close href="#/app/events">
+                <ion-item class="item-icon-left" nav-clear menu-close href="#/app/events/list">
                     <i class="icon ion-calendar"></i>Events
                 </ion-item>
                 <ion-item class="item-icon-left" nav-clear menu-close href="#/app/genres">
@@ -36,7 +35,7 @@
                     Registered Events
                 </ion-item>
                 <ion-item nav-clear menu-close href="#/app/home">
-                    My Matcups
+                    My Matchups
                 </ion-item>
                 <ion-item nav-clear menu-close href="#/app/home">
                     My Events
