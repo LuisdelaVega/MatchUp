@@ -1,0 +1,30 @@
+<ion-view view-title="My Matchups">
+    <ion-content>
+        <div class="list list-inset">
+            <label class="item item-input">
+                <i class="icon ion-search placeholder-icon"></i>
+                <input type="text" placeholder="Search">
+            </label>
+        </div>
+
+        <div ng-controller="myMatchupViewController">
+            <div class="list">
+                <a class="item item-avatar" href="#">
+                    <img src="{{ competitors[0] }}">
+                    <h2 style="color: rgb(102, 221, 51);">WIN vs. Ron Paul</h2>
+                    <p>Round 2: 3 - 2 @ Apex 2015</p>
+                </a>
+                <a class="item item-avatar" href="#">
+                    <img src="{{ competitors[0] }}">
+                    <h2 style="color: rgb(255, 102, 102);">LOSE vs. Ron Paul</h2>
+                    <p>Round 1: 3 - 2 @ Apex 2015</p>
+                </a>
+                <a class="item item-avatar" href="#">
+                    <img src="{{ competitors[0] }}">
+                    <h2 style="color: rgb(255, 102, 102);">LOSE vs. Ron Paul</h2>
+                    <p>Finals: 3 - 2 @ Apex 2015</p>
+                </a>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

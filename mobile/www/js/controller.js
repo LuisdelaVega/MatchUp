@@ -53,3 +53,9 @@ myApp.controller('popularGameViewController', ['$scope', '$http', function($scop
     }
     
 }]);
+
+myApp.controller('myMatchupViewController', ['$scope', '$http', function($scope, $http) {
+    
+    $scope.competitors = ['img/ron.jpg', 'img/ronpaul.gif'];
+    
+}]);  
