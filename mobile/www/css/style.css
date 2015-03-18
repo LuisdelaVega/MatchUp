@@ -55,6 +55,21 @@ display: block;
     text-align: center;
 }
 
-#username-text{
+.h1-username {
     font-size: 24px
+}
+
+.round {
+    -webkit-border-radius: 30px;
+    -moz-border-radius: 30px;
+    border-radius: 30px;
+    padding: 10px;
+}
+
+.round-won{
+    border: 2px solid #33cd5f;
+}
+
+.round-lost{
+    border: 2px solid #ef473a;
 }

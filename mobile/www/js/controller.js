@@ -17,7 +17,7 @@ var myApp = angular.module('App')
 
 myApp.controller('EventController', function ($scope, $ionicPopover) {
     $scope.events = 'hi';
-    $ionicPopover.fromTemplateUrl('templates/events-popover.html', {
+    $ionicPopover.fromTemplateUrl('templates/events/events-popover.html', {
         scope: $scope,
     }).then(function (popover) {
         $scope.popover = popover;
