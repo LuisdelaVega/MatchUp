@@ -12,7 +12,7 @@ var basicAuth = require('basic-auth');
 var pg = require('pg');
 
 // My modules
-var test = require('./modules/test');
+var brackets = require('./modules/brackets');
 var events = require('./modules/events');
 var games = require('./modules/games');
 
@@ -31,8 +31,7 @@ app.use('/matchup', expressJwt({
 // Needed to handle JSON posts
 app.use(bodyParser.json());
 
-//TODO Find out what the hell this is used for
-// Error handling, not really sure why I added this
+// Response sent when trying to access a protected route without a valid token
 app.use(function(err, req, res, next) {
 	if (err.constructor.name === 'UnauthorizedError') {
 		res.status(401).send('Unauthorized');
@@ -125,18 +124,20 @@ function getPopularStuff(req, res) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
-///////////////////////////////////////////////////////////////////////////////////////////// API ROUTES
-///////////////////////////////////////////////////////////////////////////////////////////// PROTECTED ROUTES
-app.get('/test/bracket/:type/:numofplayers', test.createBraket);
-app.post('/login', authenticate);
-app.get('/matchup/profile', getMyProfile);
-app.get('/matchup/profile/:username', getUserProfile);
+app.get('/test/bracket/:type/:numofplayers', brackets.createBraket);
 app.get('/test/home', getHome);
+app.get('/test/popularstuff', getPopularStuff);
+
+///////////////////////////////////////////////////////////////////////////////////////////// API ROUTES
+//TODO Eventually, protect these routes with the token service
 app.get('/api/events/live', getLiveEvents);
 app.get('/api/events/regular', getLocalEvents);
 app.get('/api/events/hosted', getHostedEvents);
 
-app.get('/test/popularstuff', getPopularStuff);
+///////////////////////////////////////////////////////////////////////////////////////////// MatchUp ROUTES
+app.post('/login', authenticate); // Get token by loging in to our service
+app.get('/matchup/profile', getMyProfile);
+app.get('/matchup/profile/:username', getUserProfile);
 
 ////////////////////////////////////////////////////////////////////////////////////// SERVER LISTEN
 var port = process.env.PORT || 5000;

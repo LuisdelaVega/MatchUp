@@ -1,3 +1,4 @@
+//TODO Implement offsets like in Spruce
 var getPopularGames = function(res, pg, conString) {
 	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
@@ -86,4 +87,6 @@ var getPopularStuff = function(res, pg, conString) {
 	});
 };
 
+module.exports.getPopularGames = getPopularGames;
+module.exports.getPopularGenres = getPopularGenres;
 module.exports.getPopularStuff = getPopularStuff;

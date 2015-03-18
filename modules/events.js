@@ -1,3 +1,4 @@
+//TODO Implement offsets like in Spruce
 var getAllEvents = function(res, pg, conString) {
 	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
@@ -21,10 +22,6 @@ var getAllEvents = function(res, pg, conString) {
 };
 
 var getLiveEvents = function(res, pg, conString) {
-	//TODO Give the code below to the clients. I don't need this
-	// var today = new Date();
-	// var todaysDate = today.getUTCFullYear()+"-"+today.getUTCMonth()+"-"+today.getUTCDay()+" "+today.getUTCHours()+":"+today.getUTCMinutes()+":"+today.getUTCSeconds();
-
 	// Query the DB to find the live Events
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -139,7 +136,7 @@ var getHome = function(res, pg, conString) {
 
 						res.json({
 							events : eventList,
-							games : gamesList
+							popular_games : gamesList.popular_games
 						});
 					});
 				});
