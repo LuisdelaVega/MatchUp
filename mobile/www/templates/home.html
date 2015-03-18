@@ -1,9 +1,9 @@
 <ion-view view-title="MatchUp">
     <ion-content>
-        <div class="item item-divider">
-            Live
-        </div>
         <div class="list list-inset">
+            <div class="item item-divider">
+                Live
+            </div>
             <a class="item item-thumbnail-left" href="#">
                 <img src="img/apex2015.png">
                 <h2>Apex 2015</h2>
@@ -25,10 +25,10 @@
                 <p>Badillo's House, Jersey</p>
             </a>
         </div>
-        <div class="item item-divider">
-            Premium
-        </div>
         <div class="list list-inset">
+            <div class="item item-divider">
+                Premium
+            </div>
             <a class="item item-thumbnail-left" href="#">
                 <img src="img/apex2015.png">
                 <h2>Apex 2015</h2>
@@ -50,10 +50,10 @@
                 <p>Badillo's House, Jersey</p>
             </a>
         </div>
-        <div class="item item-divider">
-            Local
-        </div>
         <div class="list list-inset">
+            <div class="item item-divider">
+                Local
+            </div>
             <a class="item item-thumbnail-left" href="#">
                 <img src="img/apex2015.png">
                 <h2>Apex 2015</h2>
@@ -85,9 +85,7 @@
                     <img ng-src="{{ singer }}" alt="pop singer">
                 </div>
             </div>
-            <ion-infinite-scroll
-                                 on-infinite="add()"
-                                 distance="1%">
+            <ion-infinite-scroll on-infinite="add()" distance="1%">
             </ion-infinite-scroll>
         </div>
     </ion-content>
