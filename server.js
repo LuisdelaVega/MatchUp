@@ -45,6 +45,8 @@ app.use(cors());
 
 // Serve the Website
 app.use(express.static(__dirname + '/public'));
+app.use('/bower_components',  express.static(__dirname + '/bower_components'));
+app.use('/dist',  express.static(__dirname + '/dist'));
 
 /////////////////////////////////////////////////////////////////////////////////////////// HANDLERS
 function authenticate(req, res) {
@@ -124,11 +126,16 @@ function getSearchResults(req, res) {
 	search.getSearchResults(req, res, pg, conString);
 }
 
+function getEvent(req, res) {
+	events.getEvent(req, res, pg, conString);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
 app.get('/test/bracket/:type/:numofplayers', brackets.createBraket);
 app.get('/test/home', getHome);
 app.get('/test/popularstuff', getPopularStuff);
 app.get('/test/search/:parameter', getSearchResults);
+app.get('/test/events/:event', getEvent);
 
 ///////////////////////////////////////////////////////////////////////////////////////////// API ROUTES
 //TODO Eventually, protect these routes with the token service
