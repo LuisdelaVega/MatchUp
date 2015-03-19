@@ -1,10 +1,10 @@
 <ion-view view-title="Popular Games">
     <ion-content>
         <div ng-controller="popularGameViewController">
-            <div class="pad-sides" masonry="{columnWidth: 60, gutter: 0}">
+            <div class="pad-sides" masonry="{columnWidth: 60}">
                 <div class="masonry-brick" ng-repeat="game in games track by $index">
                     <a href="#/app/home">
-                        <img ng-src="{{ game }}" alt="game discription">
+                        <img ng-src="{{ game }}" alt="game discription" style="max-width: 40vw; max-height: 50vh;">
                     </a>
                 </div>
             </div>

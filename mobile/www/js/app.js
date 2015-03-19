@@ -108,6 +108,44 @@ angular.module('App', ['ionic', 'wu.masonry'])
         .state('app.mymatchups', {
         url: "/mymatchups",
         templateUrl: "templates/my-matchups.html"
+    })
+        .state('app.myevents', {
+        url: "/myevents",
+        abstract: true,
+        templateUrl: "templates/myevents/my-events.html"
+    })
+        .state('app.myevents.melist', {
+        url: "/melist",
+        views: {
+            'upcoming-tab': {
+                templateUrl: "templates/myevents/my-eventsupcoming.html"
+            },
+            'history-tab': {
+                templateUrl: "templates/myevents/my-eventshistory.html"
+            },
+            'live-tab': {
+                templateUrl: "templates/myevents/my-eventslive.html"
+            }
+        }
+    })
+        .state('app.registeredevents', {
+        url: "/registeredevents",
+        abstract: true,
+        templateUrl: "templates/registeredevents/registered-events.html"
+    })
+        .state('app.registeredevents.relist', {
+        url: "/relist",
+        views: {
+            're-upcoming-tab': {
+                templateUrl: "templates/registeredevents/registered-eventsupcoming.html"
+            },
+            're-history-tab': {
+                templateUrl: "templates/registeredevents/registered-eventshistory.html"
+            },
+            're-live-tab': {
+                templateUrl: "templates/registeredevents/registered-eventslive.html"
+            }
+        }
     });
 
     // if none of the above states are matched, use this as the fallback
