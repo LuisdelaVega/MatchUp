@@ -1,4 +1,5 @@
 //TODO Implement offsets like in Spruce
+//TODO Filter by games and genres featured in tournaments
 var getAllEvents = function(res, pg, conString) {
 	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {

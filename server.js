@@ -16,6 +16,7 @@ var brackets = require('./modules/brackets');
 var events = require('./modules/events');
 var games = require('./modules/games');
 var customers = require('./modules/customers');
+var search = require('./modules/search');
 
 // Global variables
 var conString = "pg://luis:portal1!@127.0.0.1:5432/matchupdb";
@@ -119,10 +120,15 @@ function getPopularStuff(req, res) {
 	games.getPopularStuff(res, pg, conString);
 }
 
+function getSearchResults(req, res) {
+	search.getSearchResults(req, res, pg, conString);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
 app.get('/test/bracket/:type/:numofplayers', brackets.createBraket);
 app.get('/test/home', getHome);
 app.get('/test/popularstuff', getPopularStuff);
+app.get('/test/search/:parameter', getSearchResults);
 
 ///////////////////////////////////////////////////////////////////////////////////////////// API ROUTES
 //TODO Eventually, protect these routes with the token service

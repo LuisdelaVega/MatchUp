@@ -41,7 +41,7 @@ var getUserProfile = function(req, res, pg, conString) {
 				teamsQuery.on("end", function(result) {
 					profile.teams = result.rows;
 
-					// Query the database to find the user's organizations
+					// Query the database to find the user's Organizations
 					var organizationsQuery = client.query({
 						text : "SELECT organization.* FROM customer natural join belongs_to natural join organization WHERE customer_username = $1",
 						values : [req.params.username]
@@ -52,22 +52,36 @@ var getUserProfile = function(req, res, pg, conString) {
 					organizationsQuery.on("end", function(result) {
 						profile.organizations = result.rows;
 
-						if (req.params.username === req.user.username) {
-							res.json({
-								my_profile : true,
-								info : profile.info,
-								teams : profile.teams,
-								origanizations : profile.organizations
-							});
-						} else {
-							res.json({
-								my_profile : false,
-								info : profile.info,
-								teams : profile.teams,
-								origanizations : profile.organizations
-							});
-						}
-						client.end();
+						// Query the database to find the user's created Events
+						var eventsQuery = client.query({
+							text : "select event.* from customer natural join creates natural join event where customer_username = $1",
+							values : [req.params.username]
+						});
+						eventsQuery.on("row", function(row, result) {
+							result.addRow(row);
+						});
+						eventsQuery.on("end", function(result) {
+							profile.events = result.rows;
+
+							if (req.params.username === req.user.username) {
+								res.json({
+									my_profile : true,
+									info : profile.info,
+									teams : profile.teams,
+									origanizations : profile.organizations,
+									events : profile.events
+								});
+							} else {
+								res.json({
+									my_profile : false,
+									info : profile.info,
+									teams : profile.teams,
+									origanizations : profile.organizations,
+									events : profile.events
+								});
+							}
+							client.end();
+						});
 					});
 				});
 			} else {
