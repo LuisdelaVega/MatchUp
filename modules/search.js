@@ -54,12 +54,62 @@ var getSearchResults = function(req, res, pg, conString) {
 						});
 						queryHosted.on("end", function(result) {
 							searchresults.events.hosted = result.rows;
-
-							res.json({
-								users : searchresults.users,
-								events : searchresults.events
+							
+							//TODO check for active/inactive
+							// Look for all relevant Teams
+							var queryTeams = client.query({
+								text : "select * from team where team_name ilike '%" + req.params.parameter + "%'"
 							});
-							client.end();
+							queryTeams.on("row", function(row, result) {
+								result.addRow(row);
+							});
+							queryTeams.on("end", function(result) {
+								searchresults.teams = result.rows;
+								
+								//TODO check for active/inactive
+								// Look for all relevant Organizations
+								var queryOrganizations = client.query({
+									text : "select * from organization where organization_name ilike '%" + req.params.parameter + "%'"
+								});
+								queryOrganizations.on("row", function(row, result) {
+									result.addRow(row);
+								});
+								queryOrganizations.on("end", function(result) {
+									searchresults.organizations = result.rows;
+
+									// Look for all relevant Games
+									var queryGames = client.query({
+										text : "select * from game where game_name ilike '%" + req.params.parameter + "%'"
+									});
+									queryGames.on("row", function(row, result) {
+										result.addRow(row);
+									});
+									queryGames.on("end", function(result) {
+										searchresults.games = result.rows;
+
+										// Look for all relevant Genres
+										var queryGenres = client.query({
+											text : "select * from genre where genre_name ilike '%" + req.params.parameter + "%'"
+										});
+										queryGenres.on("row", function(row, result) {
+											result.addRow(row);
+										});
+										queryGenres.on("end", function(result) {
+											searchresults.genres = result.rows;
+
+											res.json({
+												users : searchresults.users,
+												events : searchresults.events,
+												teams : searchresults.teams,
+												organizations : searchresults.organizations,
+												games : searchresults.games,
+												genres : searchresults.genres
+											});
+											client.end();
+										});
+									});
+								});
+							});
 						});
 					});
 				});
