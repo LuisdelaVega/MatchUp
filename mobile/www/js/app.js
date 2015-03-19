@@ -146,6 +146,18 @@ angular.module('App', ['ionic', 'wu.masonry'])
                 templateUrl: "templates/registeredevents/registered-eventslive.html"
             }
         }
+    })
+        .state('app.myorganizations', {
+        url: "/myorganizations",
+        templateUrl: "templates/my-organizations.html"
+    })
+        .state('app.myteams', {
+        url: "/myteams",
+        templateUrl: "templates/my-teams.html"
+    })
+        .state('app.mysubscriptions', {
+        url: "/mysubscriptions",
+        templateUrl: "templates/my-subscriptions.html"
     });
 
     // if none of the above states are matched, use this as the fallback

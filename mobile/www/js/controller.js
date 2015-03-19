@@ -59,3 +59,16 @@ myApp.controller('myMatchupViewController', ['$scope', '$http', function($scope,
     $scope.competitors = ['img/ron.jpg', 'img/ronpaul.gif'];
     
 }]);  
+
+myApp.controller('subscriptionsController', ['$scope', '$http', function($scope, $http) {
+
+    $scope.isSubscribed = '-positive';
+    
+    $scope.toggleSubscribe = function() {
+        if($scope.isSubscribed == '-positive')
+            $scope.isSubscribed = '';
+        else
+            $scope.isSubscribed = '-positive';
+    };
+
+}]); 
