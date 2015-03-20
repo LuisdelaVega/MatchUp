@@ -184,7 +184,7 @@ app.get('/test/events/game/:game', getEventFeaturingGame);
 app.get('/test/events/genre/:genre', getEventFeaturingGenre);
 
 app.get('/send', send);
-app.get('/subscribe', subscribe);
+app.post('/subscribe', subscribe);
 
 ///////////////////////////////////////////////////////////////////////////////////////////// API ROUTES
 //TODO Eventually, protect these routes with the token service
