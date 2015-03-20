@@ -13,7 +13,8 @@
     "jsonwebtoken": "*",
     "basic-auth": "*",
     "cors": "*",
-    "pg": "*"
+    "pg": "*",
+    "node-gcm": "*"
   },
   "author": "Luis de la Vega",
   "license": ""

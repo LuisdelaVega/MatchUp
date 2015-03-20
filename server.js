@@ -10,6 +10,7 @@ var expressJwt = require('express-jwt');
 var bodyParser = require('body-parser');
 var basicAuth = require('basic-auth');
 var pg = require('pg');
+var gcm = require('node-gcm');
 
 // My modules
 var brackets = require('./modules/brackets');
@@ -45,8 +46,38 @@ app.use(cors());
 
 // Serve the Website
 app.use(express.static(__dirname + '/public'));
-app.use('/bower_components',  express.static(__dirname + '/bower_components'));
-app.use('/dist',  express.static(__dirname + '/dist'));
+app.use('/bower_components', express.static(__dirname + '/bower_components'));
+app.use('/dist', express.static(__dirname + '/dist'));
+
+/////////////////////////////////////////////////////////////////////////////////////////// GCM Test
+// Create a message with some given values
+var message = new gcm.Message({
+	collapseKey : 'demo',
+	delayWhileIdle : true,
+	timeToLive : 3,
+	data : {
+		key1 : 'message1',
+		key2 : 'message2'
+	}
+});
+
+// Set up the sender with you API key
+var sender = new gcm.Sender('AIzaSyBwGlC5OD-LGKftTzHO_6v_sb26bxSwxLA');
+
+// Add the registration IDs of the devices you want to send to
+var registrationIds = [];
+registrationIds.push('regId1');
+
+function send(req, res) {
+	sender.send(message, registrationIds, function(err, result) {
+		if (err)
+			console.error(err);
+		else
+			console.log(result);
+	});
+	
+	res.json(message);
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////// HANDLERS
 function authenticate(req, res) {
@@ -146,6 +177,8 @@ app.get('/test/search/:parameter', getSearchResults);
 app.get('/test/events/:event', getEvent);
 app.get('/test/events/game/:game', getEventFeaturingGame);
 app.get('/test/events/genre/:genre', getEventFeaturingGenre);
+
+app.get('/send', send);
 
 ///////////////////////////////////////////////////////////////////////////////////////////// API ROUTES
 //TODO Eventually, protect these routes with the token service
