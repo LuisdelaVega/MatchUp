@@ -6,7 +6,7 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('App', ['ionic', 'wu.masonry'])
 
-    .run(function ($ionicPlatform) {
+.run(function ($ionicPlatform) {
     $ionicPlatform.ready(function () {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
@@ -20,145 +20,188 @@ angular.module('App', ['ionic', 'wu.masonry'])
     });
 })
 
-    .config(function ($stateProvider, $urlRouterProvider) {
+.config(function ($stateProvider, $urlRouterProvider) {
     $stateProvider
+        //================================================================================
+        // Parent Home View
+        //================================================================================
         .state('app', {
-        url: "/app",
-        /*An abstract state can have child states but can not get activated itself. An 'abstract' state is simply a state 
-                that can't be transitioned to. It is activated implicitly when one of its descendants are activated*/
-        abstract: true,
-        templateUrl: "templates/home/sidebar.html",
-    })
+            url: "/app",
+            /*An abstract state can have child states but can not get activated itself. An 'abstract' state is simply a state 
+                    that can't be transitioned to. It is activated implicitly when one of its descendants are activated*/
+            abstract: true,
+            templateUrl: "templates/home/sidebar.html",
+        })
         .state('app.home', {
-        url: "/home",
-        templateUrl: "templates/home/home.html"
-    })
+            url: "/home",
+            templateUrl: "templates/home/home.html"
+        })
+        //================================================================================
+        // Events
+        //================================================================================
         .state('app.events', {
-        url: "/events",
-        abstract: true,
-        templateUrl: "templates/events/events.html",
-        controller: "EventController"
-    })
+            url: "/events",
+            abstract: true,
+            templateUrl: "templates/events/events.html",
+            controller: "EventController"
+        })
         .state('app.events.list', {
-        url: "/list",
-        views: {
-            'regular-tab': {
-                templateUrl: "templates/events/regular-list-events.html",
-                controller: "RegularEventController"
-            },
-            'premium-tab': {
-                templateUrl: "templates/events/premium-list-events.html",
-                controller: "PremiumEventController"
+            url: "/list",
+            views: {
+                'regular-tab': {
+                    templateUrl: "templates/events/regular-list-events.html",
+                    controller: "RegularEventController"
+                },
+                'premium-tab': {
+                    templateUrl: "templates/events/premium-list-events.html",
+                    controller: "PremiumEventController"
+                }
             }
-        }
-    })
+        })
+        //================================================================================
+        // Profile
+        //================================================================================
         .state('app.profile', {
-        url: "/profile",
-        abstract: true,
-        templateUrl: "templates/profile/profile.html"
-    })
-        .state('app.profile.summary', {
-        url: "/summary",
-        views: {
-            'profile-summary-tab': {
-                templateUrl: "templates/profile/profile-summary.html",
+            url: "/profile",
+            abstract: true,
+            templateUrl: "templates/profile/profile.html"
+        })
+        .state('app.profile.home', {
+            url: "/summary",
+            views: {
+                'profile-summary-tab': {
+                    templateUrl: "templates/profile/profile-summary.html",
+                }
             }
-        }
-    })
+        })
         .state('app.profile.standings', {
-        url: "/standings",
-        views: {
-            'profile-standings-tab': {
-                templateUrl: "templates/profile/profile-standings.html",
+            url: "/standings",
+            views: {
+                'profile-standings-tab': {
+                    templateUrl: "templates/profile/profile-standings.html",
+                }
             }
-        }
-    })
+        })
         .state('app.profile.teams', {
-        url: "/teams",
-        views: {
-            'profile-summary-tab': {
-                templateUrl: "templates/team/teams-list.html"
+            url: "/teams",
+            views: {
+                'profile-summary-tab': {
+                    templateUrl: "templates/team/teams-list.html"
+                }
             }
-        }
-    })
+        })
         .state('app.profile.organizations', {
-        url: "/organizations",
-        views: {
-            'profile-summary-tab': {
-                templateUrl: "templates/organization/organizations-list.html"
+            url: "/organizations",
+            views: {
+                'profile-summary-tab': {
+                    templateUrl: "templates/organization/organizations-list.html"
+                }
             }
-        }
-    })
+        })
         .state('app.profile.events', {
-        url: "/events",
-        views: {
-            'profile-events-tab': {
-                templateUrl: "templates/profile/profile-events.html",
+            url: "/events",
+            views: {
+                'profile-events-tab': {
+                    templateUrl: "templates/profile/profile-events.html",
+                }
             }
-        }
-    })
+        })
+        //================================================================================
+        // Genres and Popular Games
+        //================================================================================
         .state('app.genres', {
-        url: "/genres",
-        templateUrl: "templates/genre.html"
-    })
+            url: "/genres",
+            templateUrl: "templates/genre.html"
+        })
         .state('app.populargames', {
-        url: "/populargames",
-        templateUrl: "templates/popular-games.html"
-    })
+            url: "/populargames",
+            templateUrl: "templates/popular-games.html"
+        })
+        //================================================================================
+        // Search
+        //================================================================================
+        .state('app.search', {
+            url: "/search",
+            templateUrl: "templates/search/search.html"
+        })
+        .state('app.search.events', {
+            url: "/events",
+            templateUrl: "templates/search/search-events.html"
+        })
+        .state('app.search.users', {
+            url: "/users",
+            templateUrl: "templates/search/search-users.html"
+        })
+        .state('app.search.teams', {
+            url: "/teams",
+            templateUrl: "templates/search/teams.html"
+        })
+        //================================================================================
+        // Matchups
+        //================================================================================
         .state('app.mymatchups', {
-        url: "/mymatchups",
-        templateUrl: "templates/my-matchups.html"
-    })
+            url: "/mymatchups",
+            templateUrl: "templates/my-matchups.html"
+        })
+        //================================================================================
+        // My Events
+        //================================================================================
         .state('app.myevents', {
-        url: "/myevents",
-        abstract: true,
-        templateUrl: "templates/myevents/my-events.html"
-    })
+            url: "/myevents",
+            abstract: true,
+            templateUrl: "templates/myevents/my-events.html"
+        })
         .state('app.myevents.melist', {
-        url: "/melist",
-        views: {
-            'upcoming-tab': {
-                templateUrl: "templates/myevents/my-eventsupcoming.html"
-            },
-            'history-tab': {
-                templateUrl: "templates/myevents/my-eventshistory.html"
-            },
-            'live-tab': {
-                templateUrl: "templates/myevents/my-eventslive.html"
+            url: "/melist",
+            views: {
+                'upcoming-tab': {
+                    templateUrl: "templates/myevents/my-eventsupcoming.html"
+                },
+                'history-tab': {
+                    templateUrl: "templates/myevents/my-eventshistory.html"
+                },
+                'live-tab': {
+                    templateUrl: "templates/myevents/my-eventslive.html"
+                }
             }
-        }
-    })
+        })
+        //================================================================================
+        // Registered Events
+        //================================================================================
         .state('app.registeredevents', {
-        url: "/registeredevents",
-        abstract: true,
-        templateUrl: "templates/registeredevents/registered-events.html"
-    })
+            url: "/registeredevents",
+            abstract: true,
+            templateUrl: "templates/registeredevents/registered-events.html"
+        })
         .state('app.registeredevents.relist', {
-        url: "/relist",
-        views: {
-            're-upcoming-tab': {
-                templateUrl: "templates/registeredevents/registered-eventsupcoming.html"
-            },
-            're-history-tab': {
-                templateUrl: "templates/registeredevents/registered-eventshistory.html"
-            },
-            're-live-tab': {
-                templateUrl: "templates/registeredevents/registered-eventslive.html"
+            url: "/relist",
+            views: {
+                're-upcoming-tab': {
+                    templateUrl: "templates/registeredevents/registered-eventsupcoming.html"
+                },
+                're-history-tab': {
+                    templateUrl: "templates/registeredevents/registered-eventshistory.html"
+                },
+                're-live-tab': {
+                    templateUrl: "templates/registeredevents/registered-eventslive.html"
+                }
             }
-        }
-    })
+        })
+        //================================================================================
+        // My Stuff
+        //================================================================================
         .state('app.myorganizations', {
-        url: "/myorganizations",
-        templateUrl: "templates/my-organizations.html"
-    })
+            url: "/myorganizations",
+            templateUrl: "templates/my-organizations.html"
+        })
         .state('app.myteams', {
-        url: "/myteams",
-        templateUrl: "templates/my-teams.html"
-    })
+            url: "/myteams",
+            templateUrl: "templates/my-teams.html"
+        })
         .state('app.mysubscriptions', {
-        url: "/mysubscriptions",
-        templateUrl: "templates/my-subscriptions.html"
-    });
+            url: "/mysubscriptions",
+            templateUrl: "templates/my-subscriptions.html"
+        });
 
     // if none of the above states are matched, use this as the fallback
     $urlRouterProvider.otherwise('/app/home');
