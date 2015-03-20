@@ -15,9 +15,85 @@ var getAllEvents = function(res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on("end", function(result) {
-			res.json({
-				local : result.rows
-			});
+			res.json(result.rows);
+			client.end();
+		});
+	});
+};
+
+var getEvent = function(req, res, pg, conString) {
+	// Query the DB to find the local Events
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		// Query the database to find the account
+		var query = client.query({
+			text : "select * from event where event_id = $1",
+			values : [req.params.event]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on("end", function(result) {
+			if (result.rows.length > 0) {
+				res.json(result.rows[0]);
+			} else {
+				return res.status(404).send('Oh, no! This event does not exist');
+			}
+			client.end();
+		});
+	});
+};
+
+var getEventFeaturingGame = function(req, res, pg, conString) {
+	// Query the DB to find the local Events
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		// Query the database to find the account
+		var query = client.query({
+			text : "select * from event where event_id IN (select event.event_id from event natural join has natural join tournament natural join features natural join game where game_id = $1) group by event_id",
+			values : [req.params.game]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on("end", function(result) {
+			if (result.rows.length > 0) {
+				res.json(result.rows);
+			} else {
+				return res.status(404).send('Oh, no! This event does not exist');
+			}
+			client.end();
+		});
+	});
+};
+
+var getEventFeaturingGenre = function(req, res, pg, conString) {
+	// Query the DB to find the local Events
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		// Query the database to find the account
+		var query = client.query({
+			text : "select * from event where event_id IN (select event.event_id from event natural join has natural join tournament natural join features natural join game natural join is_of natural join genre where genre_id = $1) group by event_id",
+			values : [req.params.genre]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on("end", function(result) {
+			if (result.rows.length > 0) {
+				res.json(result.rows);
+			} else {
+				return res.status(404).send('Oh, no! This event does not exist');
+			}
 			client.end();
 		});
 	});
@@ -37,9 +113,7 @@ var getLiveEvents = function(res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on("end", function(result) {
-			res.json({
-				live : result.rows
-			});
+			res.json(result.rows);
 			client.end();
 		});
 	});
@@ -60,9 +134,7 @@ var getRegularEvents = function(res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on("end", function(result) {
-			res.json({
-				regular : result.rows
-			});
+			res.json(result.rows);
 			client.end();
 		});
 	});
@@ -83,9 +155,7 @@ var getHostedEvents = function(res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on("end", function(result) {
-			res.json({
-				hosted : result.rows
-			});
+			res.json(result.rows);
 			client.end();
 		});
 	});
@@ -96,7 +166,7 @@ var getHome = function(res, pg, conString) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
-		
+
 		var eventList = new Object();
 		// Look for all the Events that are currently in progress
 		var queryLive = client.query({
@@ -152,6 +222,9 @@ var getHome = function(res, pg, conString) {
 };
 
 module.exports.getAllEvents = getAllEvents;
+module.exports.getEvent = getEvent;
+module.exports.getEventFeaturingGame = getEventFeaturingGame;
+module.exports.getEventFeaturingGenre = getEventFeaturingGenre;
 module.exports.getLiveEvents = getLiveEvents;
 module.exports.getRegularEvents = getRegularEvents;
 module.exports.getHostedEvents = getHostedEvents;

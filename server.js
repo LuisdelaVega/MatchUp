@@ -130,12 +130,22 @@ function getEvent(req, res) {
 	events.getEvent(req, res, pg, conString);
 }
 
+function getEventFeaturingGame(req, res) {
+	events.getEventFeaturingGame(req, res, pg, conString);
+}
+
+function getEventFeaturingGenre(req, res) {
+	events.getEventFeaturingGenre(req, res, pg, conString);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
 app.get('/test/bracket/:type/:numofplayers', brackets.createBraket);
 app.get('/test/home', getHome);
 app.get('/test/popularstuff', getPopularStuff);
 app.get('/test/search/:parameter', getSearchResults);
 app.get('/test/events/:event', getEvent);
+app.get('/test/events/game/:game', getEventFeaturingGame);
+app.get('/test/events/genre/:genre', getEventFeaturingGenre);
 
 ///////////////////////////////////////////////////////////////////////////////////////////// API ROUTES
 //TODO Eventually, protect these routes with the token service
