@@ -51,22 +51,22 @@ app.use('/dist', express.static(__dirname + '/dist'));
 
 /////////////////////////////////////////////////////////////////////////////////////////// GCM Test
 // Create a message with some given values
-var message = new gcm.Message({
-	collapseKey : 'demo',
-	delayWhileIdle : true,
-	timeToLive : 3,
-	data : {
-		hello : 'world'
-	}
-});
+var message = new gcm.Message();
 
-// Set up the sender with you API key
+//API Server Key
 var sender = new gcm.Sender('AIzaSyBl4Y4-epGZmjmo9__lB3TdlaxXlfQjTdI');
 
-// Add the registration IDs of the devices you want to send to
 var registrationIds = [];
+// Value the payload data to send...
+message.addData('message',"\u270C Peace, Love \u2764 and PhoneGap \u2706!");
+message.addData('title','Push Notification Sample' );
+message.addData('msgcnt','3'); // Shows up in the notification in the status bar when you drag it down by the time
+//message.addData('soundname','beep.wav'); //Sound to play upon notification receipt - put in the www folder in app - may not work
+//message.collapseKey = 'demo';
+//message.delayWhileIdle = true; //Default is false
+message.timeToLive = 3000;// Duration in seconds to hold in GCM and retry before timing out. Default 4 weeks (2,419,200 seconds) if not specified.
 // At least one reg id/token is required
-registrationIds.push('APA92cGtSvVZudbg8ef_CrzPiMiXasKlt1NzYi3FRX7a1z1rpBqBqvT6TvUJL7RHABYviYyL6Q9jw5jTbpRjpkLhrP0f2r11c3bHGUJuUm-eaOXP0QKp0aIpWJIQTHTVQ4prRHuwJYvi8S16cO_B_5LrhfuFthQ9uw5bQXQ3OGngF8N-dmJu-kE');
+// registrationIds.push('APA92cGtSvVZudbg8ef_CrzPiMiXasKlt1NzYi3FRX7a1z1rpBqBqvT6TvUJL7RHABYviYyL6Q9jw5jTbpRjpkLhrP0f2r11c3bHGUJuUm-eaOXP0QKp0aIpWJIQTHTVQ4prRHuwJYvi8S16cO_B_5LrhfuFthQ9uw5bQXQ3OGngF8N-dmJu-kE');
 
 function send(req, res) {
 	sender.send(message, registrationIds, 10, function(err, result) {
