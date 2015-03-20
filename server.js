@@ -65,10 +65,8 @@ var sender = new gcm.Sender('AIzaSyBwGlC5OD-LGKftTzHO_6v_sb26bxSwxLA');
 
 // Add the registration IDs of the devices you want to send to
 var registrationIds = [];
-// At least one reg id/token is required
-registrationIds.push('APA92cGtSvVZudbg8ef_CrzPiMiXasKlt1NzYi3FRX7a1z1rpBqBqvT6TvUJL7RHABYviYyL6Q9jw5jTbpRjpkLhrP0f2r11c3bHGUJuUm-eaOXP0QKp0aIpWJIQTHTVQ4prRHuwJYvi8S16cO_B_5LrhfuFthQ9uw5bQXQ3OGngF8N-dmJu-kE');
 
-// function send(req, res) {
+function send(req, res) {
 	sender.send(message, registrationIds, 10, function(err, result) {
 		if (err)
 			console.error(err);
@@ -76,15 +74,15 @@ registrationIds.push('APA92cGtSvVZudbg8ef_CrzPiMiXasKlt1NzYi3FRX7a1z1rpBqBqvT6Tv
 			console.log(result);
 	});
 	
-	// res.json(message);
-// }
+	res.json(message);
+}
 
-// function subscribe(req, res){
-	// console.log("Here in /subscribe");
-	// console.log(req.body.token);
-	// registrationIds.push(req.body.token);
-	// res.status(200);
-// }
+function subscribe(req, res){
+	console.log("Here in /subscribe");
+	console.log(req.body.token);
+	registrationIds.push(req.body.token);
+	res.status(200);
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////// HANDLERS
 function authenticate(req, res) {
@@ -185,8 +183,8 @@ app.get('/test/events/:event', getEvent);
 app.get('/test/events/game/:game', getEventFeaturingGame);
 app.get('/test/events/genre/:genre', getEventFeaturingGenre);
 
-// app.get('/send', send);
-// app.post('/subscribe', subscribe);
+app.get('/send', send);
+app.post('/subscribe', subscribe);
 
 ///////////////////////////////////////////////////////////////////////////////////////////// API ROUTES
 //TODO Eventually, protect these routes with the token service
