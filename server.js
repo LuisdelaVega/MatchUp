@@ -56,8 +56,7 @@ var message = new gcm.Message({
 	delayWhileIdle : true,
 	timeToLive : 3,
 	data : {
-		key1 : 'message1',
-		key2 : 'message2'
+		hello : 'world'
 	}
 });
 
@@ -66,7 +65,6 @@ var sender = new gcm.Sender('AIzaSyBwGlC5OD-LGKftTzHO_6v_sb26bxSwxLA');
 
 // Add the registration IDs of the devices you want to send to
 var registrationIds = [];
-registrationIds.push('regId1');
 
 function send(req, res) {
 	sender.send(message, registrationIds, function(err, result) {
@@ -77,6 +75,11 @@ function send(req, res) {
 	});
 	
 	res.json(message);
+}
+
+function subscribe(req, res){
+	registrationIds.push(req.body.token);
+	res.status(200);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////// HANDLERS
@@ -179,6 +182,7 @@ app.get('/test/events/game/:game', getEventFeaturingGame);
 app.get('/test/events/genre/:genre', getEventFeaturingGenre);
 
 app.get('/send', send);
+app.get('/subscribe', subscribe);
 
 ///////////////////////////////////////////////////////////////////////////////////////////// API ROUTES
 //TODO Eventually, protect these routes with the token service
