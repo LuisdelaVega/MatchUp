@@ -78,6 +78,8 @@ function send(req, res) {
 }
 
 function subscribe(req, res){
+	console.log("Here in /subscribe");
+	console.log(req.body.token);
 	registrationIds.push(req.body.token);
 	res.status(200);
 }
