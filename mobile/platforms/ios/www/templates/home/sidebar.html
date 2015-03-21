@@ -1,0 +1,62 @@
+<ion-side-menus enable-menu-with-back-views="true">
+    <ion-side-menu-content edge-drag-threshold="true">
+        <ion-nav-bar class="bar-positive has-tabs-top">
+            <ion-nav-buttons side="left">
+                <button class="button button-icon ion-navicon" menu-toggle="left">
+                </button>
+            </ion-nav-buttons>
+            <ion-nav-buttons side="right">
+                <button class="button button-icon ion-android-alert">
+                </button>
+            </ion-nav-buttons>
+        </ion-nav-bar>
+        <ion-nav-view></ion-nav-view>
+    </ion-side-menu-content>
+    <!-- Left menu -->
+    <ion-side-menu side="left">
+        <ion-header-bar class="bar bar-header bar-positive">
+            <h1 class="title">Tag</h1>
+        </ion-header-bar>
+        <ion-content>
+            <ion-list>
+                <ion-item class="item-icon-left" nav-clear menu-close href="#/app/home">
+                    <i class="icon ion-home"></i>Home
+                </ion-item>
+                <ion-item class="item-icon-left" nav-clear menu-close href="#/app/profile/summary">
+                    <i class="icon ion-person"></i>Profile
+                </ion-item>
+                <ion-item class="item-icon-left" nav-clear menu-close href="#/app/events/list">
+                    <i class="icon ion-calendar"></i>Events
+                </ion-item>
+                <ion-item class="item-icon-left" nav-clear menu-close href="#/app/genres">
+                    <i class="icon ion-ios-browsers"></i>Genres
+                </ion-item>
+                <ion-item class="item-icon-left" nav-clear menu-close href="#/app/populargames">
+                    <i class="icon ion-ios-game-controller-a"></i> Popular Games
+                </ion-item>
+                <ion-item class="item-icon-left" nav-clear menu-close href="#/app/search">
+                    <i class="icon ion-search"></i> Search
+                </ion-item>
+                <ion-item class="item-divider"></ion-item>
+                <ion-item nav-clear menu-close href="#/app/registeredevents/relist">
+                    Registered Events
+                </ion-item>
+                <ion-item nav-clear menu-close href="#/app/mymatchups">
+                    My Matchups
+                </ion-item>
+                <ion-item nav-clear menu-close href="#/app/myevents/melist">
+                    My Events
+                </ion-item>
+                <ion-item nav-clear menu-close href="#/app/myteams">
+                    My Teams
+                </ion-item>
+                <ion-item nav-clear menu-close href="#/app/myorganizations">
+                    My Organizations
+                </ion-item>
+                <ion-item nav-clear menu-close href="#/app/mysubscriptions">
+                    Subscribed
+                </ion-item>
+            </ion-list>
+        </ion-content>
+    </ion-side-menu>
+</ion-side-menus>
