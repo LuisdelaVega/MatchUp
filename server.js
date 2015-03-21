@@ -98,18 +98,6 @@ function getHome(req, res) {
 	events.getHome(res, pg, conString);
 }
 
-function getLiveEvents(req, res) {
-	events.getLiveEvents(res, pg, conString);
-}
-
-function getLocalEvents(req, res) {
-	events.getRegularEvents(res, pg, conString);
-}
-
-function getHostedEvents(req, res) {
-	events.getHostedEvents(res, pg, conString);
-}
-
 function getMyProfile(req, res) {
 	customers.getMyProfile(req, res, pg, conString);
 }
@@ -126,32 +114,23 @@ function getSearchResults(req, res) {
 	search.getSearchResults(req, res, pg, conString);
 }
 
+function getEvents(req, res) {
+	events.getEvents(req, res, pg, conString);
+}
+
 function getEvent(req, res) {
 	events.getEvent(req, res, pg, conString);
 }
 
-function getEventFeaturingGame(req, res) {
-	events.getEventFeaturingGame(req, res, pg, conString);
-}
-
-function getEventFeaturingGenre(req, res) {
-	events.getEventFeaturingGenre(req, res, pg, conString);
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
-app.get('/test/bracket/:type/:numofplayers', brackets.createBraket);
-app.get('/test/home', getHome);
-app.get('/test/popularstuff', getPopularStuff);
-app.get('/test/search/:parameter', getSearchResults);
-app.get('/test/events/:event', getEvent);
-app.get('/test/events/game/:game', getEventFeaturingGame);
-app.get('/test/events/genre/:genre', getEventFeaturingGenre);
+app.get('/bracket/:type/:numofplayers', brackets.createBraket);
+app.get('/home', getHome);
+app.get('/popularstuff', getPopularStuff);
+app.get('/search/:parameter', getSearchResults);
+app.get('/events', getEvents);
+app.get('/events/:event', getEvent);
 
 ///////////////////////////////////////////////////////////////////////////////////////////// API ROUTES
-//TODO Eventually, protect these routes with the token service
-app.get('/api/events/live', getLiveEvents);
-app.get('/api/events/regular', getLocalEvents);
-app.get('/api/events/hosted', getHostedEvents);
 
 ///////////////////////////////////////////////////////////////////////////////////////////// MatchUp ROUTES
 app.post('/login', authenticate); // Get token by loging in to our service
