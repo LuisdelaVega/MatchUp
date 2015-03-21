@@ -24,7 +24,7 @@ var getEvents = function(req, res, pg, conString) {
 			break;
 		case getEventsParams.type[1]:
 			queryText += "event.*, organization.organization_id, organization.organization_name FROM event NATURAL JOIN hosts NATURAL JOIN organization";
-			queryGroupBy += " organization.organization_id";
+			queryGroupBy += " event_id, organization.organization_id";
 			console.log(queryText);
 			break;
 		default:
@@ -40,10 +40,9 @@ var getEvents = function(req, res, pg, conString) {
 				where = true;
 			}
 			queryText += "event_id IN (select event.event_id from event NATURAL JOIN has NATURAL JOIN tournament NATURAL JOIN features NATURAL JOIN game WHERE game_id = " + ((!req.query.game) ? 0 : req.query.game) + ")";
-			if (queryGroupBy != " group by") {
-				queryGroupBy += ",";
+			if (queryGroupBy === " group by") {
+				queryGroupBy += " event_id";
 			}
-			queryGroupBy += " event_id";
 			console.log(queryText);
 			break;
 		case getEventsParams.filter[1]:
@@ -54,10 +53,9 @@ var getEvents = function(req, res, pg, conString) {
 				where = true;
 			}
 			queryText += "event_id IN (select event.event_id from event NATURAL JOIN has NATURAL JOIN tournament NATURAL JOIN features NATURAL JOIN game NATURAL JOIN is_of NATURAL JOIN genre WHERE genre_id = " + ((!req.query.genre) ? 0 : req.query.genre) + ")";
-			if (queryGroupBy != " group by") {
-				queryGroupBy += ",";
+			if (queryGroupBy === " group by") {
+				queryGroupBy += " event_id";
 			}
-			queryGroupBy += " event_id";
 			console.log(queryText);
 			break;
 		}
