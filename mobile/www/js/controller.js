@@ -71,4 +71,10 @@ myApp.controller('subscriptionsController', ['$scope', '$http', function($scope,
             $scope.isSubscribed = '-positive';
     };
 
+}]);
+
+myApp.controller('searchResultController', ['$scope', '$stateParams', function($scope, $stateParams) {
+
+    $scope.resultType = $stateParams.type;
+
 }]); 

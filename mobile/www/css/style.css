@@ -1,18 +1,19 @@
 .masonry-brick {
-margin: 1em;
-display: none;
-}
-.masonry-brick.loaded {
-display: block;
+    margin: 1em;
+    display: none;
 }
 
+.masonry-brick.loaded {
+    display: block;
+}
 /* Custom width and heigh for popover in event list*/
+
 .fit-events-popover {
     height: 210px;
     width: 150px
 }
-
 /* Banner Crop */
+
 .crop-banner {
     width: 100%;
     height: 200px;
@@ -23,7 +24,6 @@ display: block;
 .crop-image {
     width: 100%;
 }
-
 
 .profile-pic {
     height: 100px;
@@ -55,10 +55,19 @@ display: block;
     padding: 10px;
 }
 
-.round-won{
+.round-won {
     border: 2px solid #33cd5f;
 }
 
-.round-lost{
+.round-lost {
     border: 2px solid #ef473a;
+}
+
+.game-cover {
+    max-width: 40vw;
+    max-height: 50vh;
+}
+
+.center-horizonatlly {
+    margin: 0 auto;
 }

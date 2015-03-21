@@ -3,8 +3,8 @@
         <div ng-controller="popularGameViewController">
             <div class="pad-sides" masonry="{columnWidth: 60}">
                 <div class="masonry-brick" ng-repeat="game in games track by $index">
-                    <a href="#/app/home">
-                        <img ng-src="{{ game }}" alt="game discription" style="max-width: 40vw; max-height: 50vh;">
+                    <a href="#/app/game/summary">
+                        <img ng-src="{{ game }}" class="game-cover" alt="game discription">
                     </a>
                 </div>
             </div>

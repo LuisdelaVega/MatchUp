@@ -22,9 +22,9 @@ angular.module('App', ['ionic', 'wu.masonry'])
 
 .config(function ($stateProvider, $urlRouterProvider) {
     $stateProvider
-        //================================================================================
-        // Parent Home View
-        //================================================================================
+    //================================================================================
+    // Parent Home View
+    //================================================================================
         .state('app', {
             url: "/app",
             /*An abstract state can have child states but can not get activated itself. An 'abstract' state is simply a state 
@@ -66,7 +66,7 @@ angular.module('App', ['ionic', 'wu.masonry'])
             abstract: true,
             templateUrl: "templates/profile/profile.html"
         })
-        .state('app.profile.home', {
+        .state('app.profile.summary', {
             url: "/summary",
             views: {
                 'profile-summary-tab': {
@@ -124,26 +124,25 @@ angular.module('App', ['ionic', 'wu.masonry'])
             url: "/search",
             templateUrl: "templates/search/search.html"
         })
-        .state('app.search.events', {
-            url: "/events",
-            templateUrl: "templates/search/search-events.html"
+        .state('app.searchgeneral', {
+            url: "/searchgeneral/:type",
+            templateUrl: "templates/search/search-general.html",
+            controller: "searchResultController"
         })
-        .state('app.search.users', {
-            url: "/users",
-            templateUrl: "templates/search/search-users.html"
-        })
-        .state('app.search.teams', {
-            url: "/teams",
-            templateUrl: "templates/search/teams.html"
+        .state('app.searchgenres', {
+            url: "/searchgenres",
+            templateUrl: "templates/search/search-genres.html"
         })
         //================================================================================
         // Matchups
         //================================================================================
         .state('app.mymatchups', {
             url: "/mymatchups",
-            templateUrl: "templates/my-matchups.html"
+            templateUrl: "templates/myStuff/my-matchups.html"
         })
         //================================================================================
+        // My Stuff
+        //
         // My Events
         //================================================================================
         .state('app.myevents', {
@@ -187,21 +186,83 @@ angular.module('App', ['ionic', 'wu.masonry'])
                 }
             }
         })
-        //================================================================================
-        // My Stuff
-        //================================================================================
         .state('app.myorganizations', {
             url: "/myorganizations",
-            templateUrl: "templates/my-organizations.html"
+            templateUrl: "templates/myStuff/my-organizations.html"
         })
         .state('app.myteams', {
             url: "/myteams",
-            templateUrl: "templates/my-teams.html"
+            templateUrl: "templates/myStuff/my-teams.html"
         })
         .state('app.mysubscriptions', {
             url: "/mysubscriptions",
-            templateUrl: "templates/my-subscriptions.html"
+            templateUrl: "templates/myStuff/my-subscriptions.html"
+        })
+        //================================================================================
+        // Game Profile
+        //================================================================================
+        .state('app.game', {
+            url: "/game",
+            abstract: true,
+            templateUrl: "templates/gameProfile/game-profile.html"
+        })
+        .state('app.game.summary', {
+            url: "/summary",
+            views: {
+                'game-summary-tab': {
+                    templateUrl: "templates/gameProfile/game-summary.html",
+                }
+            }
+        })
+        .state('app.game.upcoming', {
+            url: "/upcoming",
+            views: {
+                'game-upcoming-tab': {
+                    templateUrl: "templates/gameProfile/game-upcoming.html",
+                }
+            }
+        })
+        .state('app.game.history', {
+            url: "/history",
+            views: {
+                'game-history-tab': {
+                    templateUrl: "templates/gameProfile/game-history.html",
+                }
+            }
+        })
+        //================================================================================
+        // Genre Profile
+        //================================================================================
+        .state('app.genre', {
+            url: "/genre",
+            abstract: true,
+            templateUrl: "templates/genreProfile/genre-profile.html"
+        })
+        .state('app.genre.upcoming', {
+            url: "/upcoming",
+            views: {
+                'genre-upcoming-tab': {
+                    templateUrl: "templates/genreProfile/genre-upcoming.html",
+                }
+            }
+        })
+        .state('app.genre.live', {
+            url: "/live",
+            views: {
+                'genre-live-tab': {
+                    templateUrl: "templates/genreProfile/genre-live.html",
+                }
+            }
+        })
+        .state('app.genre.history', {
+            url: "/history",
+            views: {
+                'genre-history-tab': {
+                    templateUrl: "templates/genreProfile/genre-history.html",
+                }
+            }
         });
+
 
     // if none of the above states are matched, use this as the fallback
     $urlRouterProvider.otherwise('/app/home');
