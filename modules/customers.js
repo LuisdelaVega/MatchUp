@@ -92,5 +92,89 @@ var getUserProfile = function(req, res, pg, conString) {
 	});
 };
 
+// /create/account - Create a new user account
+var createAccount = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+		
+		console.log(req.body.acc_info);
+		
+		//TODO Modify this a bit. The ones that have an * are required. The others can be filled out later so they dont really have to be here
+		// Query the database to find the account
+		client.query({
+			text : "INSERT INTO customer"+
+			" (customer_first_name, customer_last_name, customer_tag, customer_username, customer_email, customer_password, customer_salt,"+
+			" customer_paypal_info, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, customer_region)"+
+			" VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+			values : [req.body.acc_info[0], // customer_first_name*  
+			req.body.acc_info[1], // customer_last_name*
+			req.body.acc_info[2], // customer_tag*  
+			req.body.acc_info[3], // customer_username //TODO Borrar este. username no creo que sea necesario
+			req.body.acc_info[4], // customer_email*
+			req.body.acc_info[5], // customer_password*
+			req.body.acc_info[6], // customer_salt*
+			req.body.acc_info[7], // customer_paypal_info
+			req.body.acc_info[8], // customer_profile_pic
+			req.body.acc_info[9], // customer_cover_photo
+			req.body.acc_info[10], // customer_bio
+			req.body.acc_info[11], // customer_country
+			req.body.acc_info[12] // customer_region
+			]
+		}, function(err, result) {
+			if (err) {
+				res.status(400).send("Disaster!");
+				client.end();
+			} else {
+				res.status(201).json(result);
+				client.end();
+			}
+		});
+	});
+};
+
+//TODO This is not complete at all. 
+var createTeam = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+		
+		console.log(req.body.acc_info);
+		
+		client.query("START TRANSACTION;");
+		client.query({
+			text : "INSERT INTO customer"+
+			" (customer_first_name, customer_last_name, customer_tag, customer_username, customer_email, customer_password, customer_salt,"+
+			" customer_paypal_info, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, customer_region)"+
+			" VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+			values : [req.body.acc_info[0], // customer_first_name*  
+			req.body.acc_info[1], // customer_last_name*
+			req.body.acc_info[2], // customer_tag*  
+			req.body.acc_info[3], // customer_username //TODO Borrar este. username no creo que sea necesario
+			req.body.acc_info[4], // customer_email*
+			req.body.acc_info[5], // customer_password*
+			req.body.acc_info[6], // customer_salt*
+			req.body.acc_info[7], // customer_paypal_info
+			req.body.acc_info[8], // customer_profile_pic
+			req.body.acc_info[9], // customer_cover_photo
+			req.body.acc_info[10], // customer_bio
+			req.body.acc_info[11], // customer_country
+			req.body.acc_info[12] // customer_region
+			]
+		}, function(err, result) {
+			if (err) {
+				res.status(400).send("Disaster!");
+				client.end();
+			} else {
+				res.status(201).json(result);
+				client.end();
+			}
+		});
+	});
+};
+
 module.exports.getMyProfile = getMyProfile;
 module.exports.getUserProfile = getUserProfile;
+module.exports.createAccount = createAccount;
