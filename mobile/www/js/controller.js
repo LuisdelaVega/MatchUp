@@ -106,25 +106,23 @@ myApp.controller('promotedEventController', ['$scope', '$http', function($scope,
 
 }]);
 
-myApp.controller('cameraReportController', ['$scope', '$http', function($scope, $http) {
-    
+myApp.controller('cameraReportController', ['$scope', '$http', 'Camera', function($scope, $http, Camera) {
+
     $scope.picturetaken = false;
 
-    function takePicture() {
-        navigator.camera.getPicture(function(imageURI) {
-
-            // imageURI is the URL of the image that we can use for
-            // an <img> element or backgroundImage.
+    $scope.takePicture = function() {
+        console.log('Getting camera');
+        Camera.getPicture().then(function(imageURI) {
+            console.log(imageURI);
             $scope.imageURL = imageURI;
-            $scope.picturetaken = true;
-
         }, function(err) {
-
-            //We're doomed
-            $scope.picturetaken = false;
-
-
-        }, cameraOptions);
-    }
+            console.err(err);
+        }, {
+            quality: 75,
+            targetWidth: 320,
+            targetHeight: 320,
+            saveToPhotoAlbum: false
+        });
+    };
 
 }]);

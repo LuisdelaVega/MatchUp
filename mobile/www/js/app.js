@@ -20,6 +20,24 @@ angular.module('App', ['ionic', 'wu.masonry'])
     });
 })
 
+    .factory('Camera', ['$q', function($q) {
+
+        return {
+            getPicture: function(options) {
+                var q = $q.defer();
+
+                navigator.camera.getPicture(function(result) {
+                    // Do any magic you need
+                    q.resolve(result);
+                }, function(err) {
+                    q.reject(err);
+                }, options);
+
+                return q.promise;
+            }
+        }
+    }])
+
     .config(function ($stateProvider, $urlRouterProvider) {
     $stateProvider
     //================================================================================
@@ -384,7 +402,7 @@ angular.module('App', ['ionic', 'wu.masonry'])
         url: "/matchupoingoing",
         templateUrl: "templates/matchup/matchup-ongoing.html"
     })
-    .state('app.report', {
+        .state('app.report', {
         url: "/report",
         templateUrl: "templates/matchup/report.html"
     });
