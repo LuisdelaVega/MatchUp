@@ -367,7 +367,23 @@ angular.module('App', ['ionic', 'wu.masonry'])
         .state('app.notifications', {
         url: "/notifications",
         templateUrl: "templates/notifications.html"
-    });
+    })
+    //================================================================================
+    // Matchup
+    //================================================================================
+    
+        .state('app.matchupmatch', {
+            url: "/matchupmatch",
+            templateUrl: "templates/matchup/matchup-match.html"
+        })
+        .state('app.matchuppoints', {
+            url: "/matchuppoints",
+            templateUrl: "templates/matchup/matchup-points.html"
+        })
+        .state('app.matchupoingoing', {
+            url: "/matchupoingoing",
+            templateUrl: "templates/matchup/matchup-ongoing.html"
+        });
 
 
 

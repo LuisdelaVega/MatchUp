@@ -140,9 +140,7 @@ var createTeam = function(req, res, pg, conString) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
-		
-		console.log(req.body.acc_info);
-		
+				
 		client.query("START TRANSACTION;");
 		client.query({
 			text : "INSERT INTO customer"+
