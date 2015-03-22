@@ -1,4 +1,4 @@
-<ion-view view-title="Tournament">
+<ion-view view-title="Profile">
     <ion-nav-buttons side="right">
         <button class="button button-icon ion-android-alert">
         </button>
@@ -37,87 +37,101 @@
                 </div>
             </div>
         </div>
-        <div class="list card">
-            <label class="item item-divider item-input item-select">
-                <div class="input-label">
-                    Standings
-                </div>
-                <select>
-                    <option selected>Bracket<option>
-                    <option>Group A</option>
-                    <option>Group B</option>
-                    <option>Group C</option>
-                    <option>Group D</option>
-                    <option>Group E</option>
-                </select>
-            </label>
+        <div ng-controller="REController">
+            <div ng-if="isOngoing">
+                <div class="list card">
+                    <label class="item item-divider item-input item-select">
+                        <div class="input-label">
+                            Standings
+                        </div>
+                        <select>
+                            <option selected>Bracket<option>
+                            <option>Group A</option>
+                            <option>Group B</option>
+                            <option>Group C</option>
+                            <option>Group D</option>
+                            <option>Group E</option>
+                        </select>
+                    </label>
 
-            <div class="item item-divider">
-                <h3>1st</h3>
+                    <div class="item item-divider">
+                        <h3>1st</h3>
+                    </div>
+                    <a class="item item-avatar" href="#/app/regulareventmatchups">
+                        <img src="img/ron.jpg" >
+                        <div class="row">
+                            <div class="col col-75">
+                                <h2>Ron Paul</h2>
+                                <p>This is my info</p>
+                            </div>
+                            <div class="col center-text">
+                                <h1 class="h1-username" style="color: rgb(102, 221, 51);"> 3 - 1</h1>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="item item-divider">
+                        <h3>2nd</h3>
+                    </div>
+                    <a class="item item-avatar" href="#/app/regulareventmatchups">
+                        <img src="img/ron.jpg" >
+                        <div class="row">
+                            <div class="col col-75">
+                                <h2>Ron Paul</h2>
+                                <p>This is my info</p>
+                            </div>
+                            <div class="col center-text">
+                                <h1 class="h1-username" style="color: rgb(255, 102, 102);"> 2 - 2</h1>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="item item-divider">
+                        <h3>3rd</h3>
+                    </div>
+                    <a class="item item-avatar" href="#/app/regulareventmatchups">
+                        <img src="img/ron.jpg" >
+                        <div class="row">
+                            <div class="col col-75">
+                                <h2>Ron Paul</h2>
+                                <p>This is my info</p>
+                            </div>
+                            <div class="col center-text">
+                                <h1 class="h1-username" style="color: rgb(255, 102, 102);"> 1 - 2</h1>
+                            </div>
+                        </div>
+                    </a>
+                    <a class="item item-avatar" href="#/app/regulareventmatchups">
+                        <img src="img/ron.jpg" >
+                        <div class="row">
+                            <div class="col col-75">
+                                <h2>Ron Paul</h2>
+                                <p>This is my info</p>
+                            </div>
+                            <div class="col center-text">
+                                <h1 class="h1-username" style="color: rgb(255, 102, 102);"> 1 - 2</h1>
+                            </div>
+                        </div>
+                    </a>
+                </div>
             </div>
-            <a class="item item-avatar" href="#/app/regulareventmatchups">
-                <img src="img/ron.jpg" >
-                <div class="row">
-                    <div class="col col-75">
-                        <h2>Ron Paul</h2>
-                        <p>This is my info</p>
-                    </div>
-                    <div class="col center-text">
-                        <h1 class="h1-username" style="color: rgb(102, 221, 51);"> 3 - 1</h1>
-                    </div>
+
+            <div class="card">
+                <div class="item item-divider">
+                    Rules
                 </div>
-            </a>
-            <div class="item item-divider">
-                <h3>2nd</h3>
+                <div class="item item-text-wrap">
+                    These are the rules for the tournament.
+                </div>
             </div>
-            <a class="item item-avatar" href="#/app/regulareventmatchups">
-                <img src="img/ron.jpg" >
-                <div class="row">
-                    <div class="col col-75">
-                        <h2>Ron Paul</h2>
-                        <p>This is my info</p>
-                    </div>
-                    <div class="col center-text">
-                        <h1 class="h1-username" style="color: rgb(255, 102, 102);"> 2 - 2</h1>
-                    </div>
-                </div>
-            </a>
-            <div class="item item-divider">
-                <h3>3rd</h3>
-            </div>
-            <a class="item item-avatar" href="#/app/regulareventmatchups">
-                <img src="img/ron.jpg" >
-                <div class="row">
-                    <div class="col col-75">
-                        <h2>Ron Paul</h2>
-                        <p>This is my info</p>
-                    </div>
-                    <div class="col center-text">
-                        <h1 class="h1-username" style="color: rgb(255, 102, 102);"> 1 - 2</h1>
-                    </div>
-                </div>
-            </a>
-            <a class="item item-avatar" href="#/app/regulareventmatchups">
-                <img src="img/ron.jpg" >
-                <div class="row">
-                    <div class="col col-75">
-                        <h2>Ron Paul</h2>
-                        <p>This is my info</p>
-                    </div>
-                    <div class="col center-text">
-                        <h1 class="h1-username" style="color: rgb(255, 102, 102);"> 1 - 2</h1>
-                    </div>
-                </div>
-            </a>
+
+            <button class="button" ng-if="!isOngoing && !requiresTeam" ng-click="showConfirm()" style="width: 100vw">
+                Sign Up
+            </button>
+            
+            <button class="button" ng-if="!isOngoing && requiresTeam"  ui-sref="app.teamsignup" style="width: 100vw">
+                Sign Up
+            </button>
         </div>
 
-        <div class="card">
-            <div class="item item-divider">
-                Rules
-            </div>
-            <div class="item item-text-wrap">
-                These are the rules for the tournament.
-            </div>
-        </div>
+
     </ion-content>
 </ion-view>

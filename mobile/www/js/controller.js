@@ -78,3 +78,24 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', function($
     $scope.resultType = $stateParams.type;
 
 }]); 
+
+myApp.controller('REController', ['$scope', '$http', '$ionicPopup', function($scope, $http, $ionicPopup) {
+
+    $scope.isOngoing = false;
+    $scope.requiresTeam = true;
+    
+    $scope.showConfirm = function() {
+   var confirmPopup = $ionicPopup.confirm({
+     title: 'Sign Up',
+     template: 'Are you sure you want to sign up?'
+   });
+   confirmPopup.then(function(res) {
+     if(res) {
+       console.log('You');
+     } else {
+       console.log('No');
+     }
+   });
+ };
+    
+}]); 

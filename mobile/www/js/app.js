@@ -352,7 +352,15 @@ angular.module('App', ['ionic', 'wu.masonry'])
             url: "/createmeetup",
             templateUrl: "templates/meetup/create-meetup.html",
 
-        });
+        })
+    
+    //================================================================================
+    // Team Sign Up
+    //================================================================================
+        .state('app.teamsignup', {
+        url: "/teamsignup",
+        templateUrl: "templates/team-sign-up.html"
+    });
 
 
     // if none of the above states are matched, use this as the fallback
