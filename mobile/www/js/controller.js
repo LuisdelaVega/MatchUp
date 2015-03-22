@@ -39,10 +39,10 @@ myApp.controller('PremiumEventController', function ($scope) {
 });
 
 myApp.controller('popularGameViewController', ['$scope', '$http', function($scope, $http) {
-    
+
     $scope.games = ['img/csgo.jpg', 'img/dota2.jpg', 'img/hearthstone.jpg', 'img/leagueofeppa.jpg'];
     var moreImgs = ['img/csgo.jpg', 'img/dota2.jpg', 'img/hearthstone.jpg', 'img/leagueofeppa.jpg']
-    
+
     $scope.add = function add(name) {
         if (moreImgs.length>0){
             $scope.games.push(moreImgs.pop());
@@ -51,19 +51,19 @@ myApp.controller('popularGameViewController', ['$scope', '$http', function($scop
         else
             $scope.$broadcast('scroll.infiniteScrollComplete');
     }
-    
+
 }]);
 
 myApp.controller('myMatchupViewController', ['$scope', '$http', function($scope, $http) {
-    
+
     $scope.competitors = ['img/ron.jpg', 'img/ronpaul.gif'];
-    
+
 }]);  
 
 myApp.controller('subscriptionsController', ['$scope', '$http', function($scope, $http) {
 
     $scope.isSubscribed = '-positive';
-    
+
     $scope.toggleSubscribe = function() {
         if($scope.isSubscribed == '-positive')
             $scope.isSubscribed = '';
@@ -81,21 +81,50 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', function($
 
 myApp.controller('REController', ['$scope', '$http', '$ionicPopup', function($scope, $http, $ionicPopup) {
 
-    $scope.isOngoing = false;
+    $scope.isOngoing = true;
     $scope.requiresTeam = true;
-    
+
     $scope.showConfirm = function() {
-   var confirmPopup = $ionicPopup.confirm({
-     title: 'Sign Up',
-     template: 'Are you sure you want to sign up?'
-   });
-   confirmPopup.then(function(res) {
-     if(res) {
-       console.log('You');
-     } else {
-       console.log('No');
-     }
-   });
- };
+        var confirmPopup = $ionicPopup.confirm({
+            title: 'Sign Up',
+            template: 'Are you sure you want to sign up?'
+        });
+        confirmPopup.then(function(res) {
+            if(res) {
+                console.log('You');
+            } else {
+                console.log('No');
+            }
+        });
+    };
+
+}]);
+
+myApp.controller('promotedEventController', ['$scope', '$http', function($scope, $http) {
+
+    $scope.isOngoing = false; //Set to true before the event as well
+
+}]);
+
+myApp.controller('cameraReportController', ['$scope', '$http', function($scope, $http) {
     
-}]); 
+    $scope.picturetaken = false;
+
+    function takePicture() {
+        navigator.camera.getPicture(function(imageURI) {
+
+            // imageURI is the URL of the image that we can use for
+            // an <img> element or backgroundImage.
+            $scope.imageURL = imageURI;
+            $scope.picturetaken = true;
+
+        }, function(err) {
+
+            //We're doomed
+            $scope.picturetaken = false;
+
+
+        }, cameraOptions);
+    }
+
+}]);

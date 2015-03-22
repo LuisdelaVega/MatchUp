@@ -360,7 +360,15 @@ angular.module('App', ['ionic', 'wu.masonry'])
         .state('app.teamsignup', {
         url: "/teamsignup",
         templateUrl: "templates/team-sign-up.html"
+    })
+    //================================================================================
+    // Notifications
+    //================================================================================
+        .state('app.notifications', {
+        url: "/notifications",
+        templateUrl: "templates/notifications.html"
     });
+
 
 
     // if none of the above states are matched, use this as the fallback
