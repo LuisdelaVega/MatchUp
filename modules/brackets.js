@@ -27,6 +27,52 @@ var createBraket = function(req, res) {
 	res.send(bracket);
 };
 
+// /groupstage - Generate the Group Stage
+var createGroupStage = function(req, res) {
+	var groupStage = new Object();
+	groupStage.winnersPerGroup = req.body.winnersPerGroup;
+	groupStage.playersPerGroup = req.body.playersPerGroup;
+
+	var players = req.body.players;
+
+	groupStage.numOfGroups = Math.ceil(players.length / groupStage.playersPerGroup);
+	groupStage.groups = new Array();
+
+	for (var k = 0; k < groupStage.numOfGroups; k++) {
+		groupStage.groups[k] = new Object();
+		groupStage.groups[k].name = "Group " + (k + 1);
+		groupStage.groups[k].players = new Array();
+		for (var i = k*groupStage.playersPerGroup, count = 0; i < players.length && i < (k+1)*groupStage.playersPerGroup; i++, count++) {
+			groupStage.groups[k].players[count] = players[i];
+		}
+		groupStage.groups[k].numOfRounds = (!(groupStage.groups[k].players.length % 2)) ? (groupStage.groups[k].players.length - 1) : groupStage.groups[k].players.length;
+		groupStage.groups[k].numOfMatchesPerRound = Math.floor(groupStage.groups[k].players.length / 2);
+	}
+
+	for (var i = 0; i < groupStage.numOfGroups; i++) {
+		groupStage.groups[i].rounds = new Array();
+		for (var j = 0; j < groupStage.groups[i].numOfRounds; j++) {
+			groupStage.groups[i].rounds[j] = new Object();
+			groupStage.groups[i].rounds[j].name = "Round " + (j + 1);
+			groupStage.groups[i].rounds[j].matches = new Array();
+			for (var k = 0; k < groupStage.groups[i].numOfMatchesPerRound; k++) {
+				groupStage.groups[i].rounds[j].matches[k] = new Object();
+				groupStage.groups[i].rounds[j].matches[k].name = "Match " + (k + 1);
+			}
+			for (var l = 0; l < groupStage.groups[i].numOfMatchesPerRound*2; l++){
+				if(l < groupStage.groups[i].numOfMatchesPerRound){
+					groupStage.groups[i].rounds[j].matches[l].player1 = groupStage.groups[i].players[(j+l)%groupStage.groups[i].players.length];
+				}
+				else{
+					groupStage.groups[i].rounds[j].matches[(groupStage.groups[i].numOfMatchesPerRound*2)-l-1].player2 = groupStage.groups[i].players[(j+l)%groupStage.groups[i].players.length];
+				}
+			}
+		}
+	}
+	
+	res.json(groupStage);
+};
+
 function getNextPowerOf2(numOfPlayers) {
 	return Math.ceil(Math.log(numOfPlayers) / Math.log(2));
 }
@@ -309,3 +355,4 @@ function doubleEliminationBracket(bracket) {
 }
 
 module.exports.createBraket = createBraket;
+module.exports.createGroupStage = createGroupStage; 

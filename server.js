@@ -126,6 +126,10 @@ function createAccount(req, res) {
 	customers.createAccount(req, res, pg, conString);
 }
 
+function createGroupStage(req, res){
+	brackets.createGroupStage(req, res);
+}
+
 // function createTeam(req, res) {
 	// customers.createTeam(req, res, pg, conString);
 // }
@@ -138,6 +142,7 @@ app.get('/search/:parameter', getSearchResults);
 app.get('/events', getEvents);
 app.get('/events/:event', getEvent);
 app.post('/create/account', createAccount);
+app.post('/groupstage', createGroupStage);
 
 ///////////////////////////////////////////////////////////////////////////////////////////// API ROUTES
 
@@ -145,7 +150,7 @@ app.post('/create/account', createAccount);
 app.post('/login', authenticate); // Get token by loging in to our service
 app.get('/matchup/profile', getMyProfile);
 app.get('/matchup/profile/:username', getUserProfile);
-//app.post('/matchup/create/team', createTeam);
+// app.post('/matchup/create/team', createTeam);
 
 ////////////////////////////////////////////////////////////////////////////////////// SERVER LISTEN
 var port = process.env.PORT || 5000;
