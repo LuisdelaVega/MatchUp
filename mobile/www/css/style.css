@@ -71,3 +71,64 @@
 .center-horizonatlly {
     margin: 0 auto;
 }
+
+.absolute-center {
+    /* Internet Explorer 10 */
+    
+    display: -ms-flexbox;
+    -ms-flex-pack: center;
+    -ms-flex-align: center;
+    /* Firefox */
+    
+    display: -moz-box;
+    -moz-box-pack: center;
+    -moz-box-align: center;
+    /* Safari, Opera, and Chrome */
+    
+    display: -webkit-box;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+    /* W3C */
+    
+    display: box;
+    box-pack: center;
+    box-align: center;
+}
+
+.img-circular {
+    background-image: url('/img/ron.jpg');
+    background-size: cover;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 100px;
+    -webkit-border-radius: 100px;
+    -moz-border-radius: 100px;
+}
+
+.player-2{
+    border-color: #ef473a;
+    background-color: #ef473a;
+}
+
+.player-1{
+    border-color: #387ef5;
+    background-color: #387ef5;
+}
+
+.set-circular {
+    height: 5vh;
+    width: 5vh;
+    border-radius: 100px;
+    -webkit-border-radius: 100px;
+    -moz-border-radius: 100px;
+}
+
+.large{
+    height: 10vh;
+    width: 10vh;
+}
+
+.mini{
+    height: 7vh;
+    width: 7vh;
+}
