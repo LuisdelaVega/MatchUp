@@ -1,0 +1,34 @@
+<ion-view view-title="Create Meetup">
+    <ion-nav-buttons side="left">
+        <button class="button button-icon" ui-sref="app.meetups">
+            <i class="icon ion-ios-arrow-back"></i>
+        </button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="right">
+        <button class="button button-icon ion-android-alert">
+        </button>
+    </ion-nav-buttons>
+    <ion-content>
+        <div class="list list-inset">
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Meetup Name</span>
+                <input type="text" placeholder="Name">
+            </label>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Location</span>
+                <input type="text" placeholder="Room 101">
+            </label>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Start Date</span>
+                <input type="datetime-local">
+            </label>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Details</span>
+                <textarea></textarea>
+            </label>
+            <button class="button button-block button-positive">
+                Submit
+            </button>
+        </div>
+    </ion-content>
+</ion-view>
