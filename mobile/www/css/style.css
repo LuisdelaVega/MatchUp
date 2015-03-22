@@ -96,7 +96,7 @@
 }
 
 .img-circular {
-    background-image: url('/img/ron.jpg');
+    background-image: url('../img/ron.jpg');
     background-size: cover;
     border-style: solid;
     border-width: 2px;

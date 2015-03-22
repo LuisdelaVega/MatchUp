@@ -1,0 +1,49 @@
++<ion-view view-title="Report">
+<ion-content>
+    <div class="list">
+
+        <label class="item item-radio">
+            <input type="radio" name="group">
+            <div class="item-content">
+                No Show
+            </div>
+            <i class="radio-icon ion-checkmark"></i>
+        </label>
+        <label class="item item-radio">
+            <input type="radio" name="group">
+            <div class="item-content">
+                Score Dispute
+            </div>
+            <i class="radio-icon ion-checkmark"></i>
+        </label>
+        <label class="item item-radio">
+            <input type="radio" name="group">
+            <div class="item-content">
+                Station Malfunction
+            </div>
+            <i class="radio-icon ion-checkmark"></i>
+        </label>
+
+    </div>
+
+    <label class="item item-input">
+        <span class="input-label">Details</span>
+        <input type="text">
+    </label>
+
+    <div ng-controller="cameraReportController">
+        <button class="button" style="width: 100vw" ng-click="takePicture()">
+            Picture
+        </button>
+
+
+        <div class="item item-body">
+            <img class="full-image" ng-src="{{imageURL}}">
+        </div>
+    </div>
+    <button class="button button-positive" style="width: 100vw">
+        Submit
+    </button>
+
+</ion-content>
+</ion-view>
