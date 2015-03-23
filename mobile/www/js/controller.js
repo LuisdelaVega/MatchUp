@@ -100,6 +100,14 @@ myApp.controller('REController', ['$scope', '$http', '$ionicPopup', function($sc
 
 }]);
 
+myApp.controller('ratingsController', ['$scope', '$http', function($scope, $http) {
+
+    // set the rate and max variables
+    $scope.rate = 3;
+    $scope.max = 5;
+
+}]);
+
 myApp.controller('promotedEventController', ['$scope', '$http', function($scope, $http) {
 
     $scope.isOngoing = false; //Set to true before the event as well

@@ -130,7 +130,21 @@
                 </a>
             </div>
 
-
+            <div ng-controller="ratingsController" ng-if="!isOngoing">
+                <div class="card">
+                    <div class="item">
+                        <h2 style="text-align: center;">This is the review title</h2>
+                        <rating ng-model="rate" max="max" style="text-align: center;"></rating> 
+                        <p style="text-align: center;"> by anonymous </p>
+                    </div>
+                    <div class="item item-text-wrap">
+                        This is a review of the event.
+                    </div>
+                </div>
+            </div>
+            <button class="button button-positive" style="width: 100vw"  ui-sref="app.writereview">
+                Write a review
+            </button>
         </div>
     </ion-content>
 </ion-view>
