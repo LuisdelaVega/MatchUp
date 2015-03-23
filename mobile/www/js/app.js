@@ -82,7 +82,8 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating'])
         .state('app.profile', {
             url: "/profile",
             abstract: true,
-            templateUrl: "templates/profile/profile.html"
+            templateUrl: "templates/profile/profile.html",
+            controller: "ProfileController"
         })
         .state('app.profile.summary', {
             url: "/summary",
@@ -123,6 +124,10 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating'])
                     templateUrl: "templates/profile/profile-events.html",
                 }
             }
+        })
+        .state('app.editprofile', {
+            url: "/editprofile",
+            templateUrl: "templates/profile/edit-profile.html",
         })
         //================================================================================
         // Genres and Popular Games
@@ -415,18 +420,18 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating'])
             url: "/writereview",
             templateUrl: "templates/premiumEvent/writereview.html"
         })
-        //================================================================================
-        // Account Stuff
-        //================================================================================
-        .state('app.createaccount', {
+    //================================================================================
+    // Account Stuff
+    //================================================================================
+        .state('createaccount', {
             url: "/createaccount",
             templateUrl: "templates/profile/create-account.html"
         })
-        .state('app.login', {
+        .state('login', {
             url: "/login",
             templateUrl: "templates/profile/login.html"
         });
 
     // if none of the above states are matched, use this as the fallback
-    $urlRouterProvider.otherwise('/app/login');
+    $urlRouterProvider.otherwise('/login');
 });

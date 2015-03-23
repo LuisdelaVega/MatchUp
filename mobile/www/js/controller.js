@@ -16,7 +16,6 @@ var myApp = angular.module('App')
 //}]);  
 
 myApp.controller('EventController', function ($scope, $ionicPopover) {
-    $scope.events = 'hi';
     $ionicPopover.fromTemplateUrl('templates/events/events-popover.html', {
         scope: $scope,
     }).then(function (popover) {
@@ -28,6 +27,26 @@ myApp.controller('EventController', function ($scope, $ionicPopover) {
     $scope.closePopover = function () {
         $scope.popover.hide();
     };
+})
+
+myApp.controller('ProfileController', function ($scope, $ionicPopover,$state) {
+    $ionicPopover.fromTemplateUrl('templates/profile/profile-popover.html', {
+        scope: $scope,
+    }).then(function (popover) {
+        $scope.popover = popover;
+    });
+    $scope.openPopover = function ($event) {
+        $scope.popover.show($event);
+    };
+    $scope.closePopover = function () {
+        $scope.popover.hide();
+    };
+    
+    // Close popover when clicking the popover item: Edit Profile
+    $scope.goToEditProfile = function(){
+        $scope.popover.hide();
+        $state.go("app.editprofile");
+    }
 })
 
 myApp.controller('RegularEventController', function ($scope) {

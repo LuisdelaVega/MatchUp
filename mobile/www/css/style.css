@@ -9,8 +9,11 @@
 /* Custom width and heigh for popover in event list*/
 
 .fit-events-popover {
-    height: 210px;
-    width: 150px
+    height: 38%;
+}
+
+.fit-profile-popover {
+    height: 8%;
 }
 /* Banner Crop */
 

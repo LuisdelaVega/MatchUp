@@ -1,0 +1,62 @@
+<ion-view view-title="Edit Profile">
+    <ion-nav-buttons side="left">
+        <button class="button button-icon" ui-sref="app.profile.summary">
+            <i class="icon ion-ios-arrow-back"></i>
+        </button>
+    </ion-nav-buttons>
+    <ion-content>
+        <div class="list list-inset">
+            <label class="item item-input">
+                <span class="input-label">Tag</span>
+                <input type="text">
+            </label>
+            <label class="item item-input">
+                <span class="input-label">First Name</span>
+                <input type="text">
+            </label>
+            <label class="item item-input">
+                <span class="input-label">Last Name</span>
+                <input type="text">
+            </label>
+            <label class="item item-input item-select">
+                <div class="input-label">
+                    Country
+                </div>
+                <select>
+                    <option>China</option>
+                    <option selected>Mexico</option>
+                    <option>Russia</option>
+                </select>
+            </label>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Bio</span>
+                <textarea rows="5"></textarea>
+            </label>
+            <div class="item">
+                <button class="button button-block button-positive">
+                    Edit
+                </button>
+            </div>
+        </div>
+        <div class="card">
+            <div class="item item-body">
+                <img class="full-image" src="img/dota2.jpg">
+            </div>
+            <div class="item">
+                <button class="button button-block button-positive">
+                    Change Cover
+                </button>
+            </div>
+        </div>
+        <div class="card">
+            <div class="item item-body">
+                <img class="full-image" src="img/ron.jpg">
+            </div>
+            <div class="item">
+                <button class="button button-block button-positive">
+                    Change Profile
+                </button>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>
