@@ -876,6 +876,20 @@ WITH (
 ALTER TABLE "news"
   OWNER TO edwinbadillo;
 
+-- Table: "of_email"
+-- DROP TABLE "of_email";
 
+CREATE TABLE "of_email"
+(
+   customer_username character varying(127) NOT NULL,
+    email_address character varying(127) NOT NULL,
+   CONSTRAINT "PK_of_email" PRIMARY KEY (customer_username, email_address),
+   CONSTRAINT "FK_of_email_customer" FOREIGN KEY (customer_username) REFERENCES "customer" (customer_username)
+)
+WITH (
+ OIDS=FALSE
+);
+ALTER TABLE "of_email"
+ OWNER TO edwinbadillo; 
 
 -- Table: "report"
