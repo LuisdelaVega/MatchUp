@@ -1,3 +1,159 @@
+/*
+ * TODO Query the DB to find the details of a Tournamnet (i.e., Single or Two-Stage, Single or Double Elimination, Winners per Group, Players per Group)
+ * Right now I am taking all the details from the body of the request but in the end the body will only contain the array of players ordered by seed arrangement or
+ * by group arrangement (i.e., Groups of 4 -> Group A players will be the first 4 in the array, and so on)
+ */
+var createTournament = function(req, res) {
+	var tournament = new Object();
+	tournament.players = req.body.players;
+		
+	switch(req.body.format) {
+	case "Single Elimination":
+		tournament.bracket = new Object();
+		tournament.bracket.type = "single";
+		// tournament.bracket.numOfPlayers = tournament.players.length;
+		break;
+	case "Double Elimination":
+		tournament.bracket = new Object();
+		tournament.bracket.type = "double";
+		// tournament.bracket.numOfPlayers = tournament.players.length;
+		break;
+	case "Round Robin":
+		tournament.group = new Object();
+		break;
+	default:
+		res.status(400).send("Your mother");
+	}
+
+	if (req.body.type === "Two-Stage") {
+		tournament.groupStage = new Object();
+		tournament.groupStage.winnersPerGroup = req.body.winnersPerGroup;
+		// if (tournament.groupStage.winnersPerGroup % 2) {
+			// res.status(400).send("Winners debe ser un numero par");
+		// }
+		tournament.groupStage.playersPerGroup = req.body.playersPerGroup;
+		tournament.groupStage.numOfGroups = Math.ceil(tournament.players.length / tournament.groupStage.playersPerGroup);
+
+		generateGroupStage(tournament.groupStage, tournament.players);
+
+		if (req.body.format === "Single Elimination" || req.body.format === "Double Elimination") {
+			// tournament.bracket.numOfPlayers = tournament.groupStage.numOfGroups * tournament.groupStage.winnersPerGroup;
+			tournament.bracket.players = new Array();
+			for (var i = 0, k = 0; i < tournament.groupStage.numOfGroups; i++){
+				for (var j = 0; j < tournament.groupStage.groups[i].numOfWinners; j++){
+					console.log("Winner #" + j + " of Group " + (i+1));
+					tournament.bracket.players[k] = "Winner #" + (j+1) + " of Group " + (i+1);
+					k++;
+				}
+			}
+			tournament.bracket.numOfPlayers = tournament.bracket.players.length;
+			generateBracket(tournament.bracket, tournament.bracket.players);
+		} else {
+			// tournament.group.playersPerGroup = tournament.groupStage.numOfGroups * tournament.groupStage.winnersPerGroup;
+			tournament.group.players = new Array();
+			for (var i = 0, k = 0; i < tournament.groupStage.numOfGroups; i++){
+				for (var j = 0; j < tournament.groupStage.groups[i].numOfWinners; j++){
+					tournament.group.players[k] = "Winner #" + (j+1) + " of Group " + (i+1);
+					k++;
+				}
+			}
+			tournament.group.playersPerGroup = tournament.group.players.length;
+			generateGroupStage(tournament.group, tournament.group.players);
+		}
+	} else {
+		if (req.body.format === "Single Elimination" || req.body.format === "Double Elimination") {
+			tournament.bracket.numOfPlayers = tournament.players.length;
+			generateBracket(tournament.bracket, tournament.players);
+		}
+		else{
+			tournament.group.playersPerGroup = tournament.players.length;
+			generateGroupStage(tournament.group, tournament.players);
+		}
+	}
+	
+	res.send(tournament);
+};
+
+function generateGroupStage(groupStage, players) {
+	groupStage.numOfGroups = Math.ceil(players.length / groupStage.playersPerGroup);
+	groupStage.groups = new Array();
+
+	for (var k = 0; k < groupStage.numOfGroups; k++) {
+		groupStage.groups[k] = new Object();
+		groupStage.groups[k].name = "Group " + (k + 1);
+		groupStage.groups[k].players = new Array();
+		for (var i = k * groupStage.playersPerGroup, count = 0; i < players.length && i < (k + 1) * groupStage.playersPerGroup; i++, count++) {
+			groupStage.groups[k].players[count] = players[i];
+		}
+		groupStage.groups[k].numOfRounds = (!(groupStage.groups[k].players.length % 2)) ? (groupStage.groups[k].players.length - 1) : groupStage.groups[k].players.length;
+		groupStage.groups[k].numOfMatchesPerRound = Math.floor(groupStage.groups[k].players.length / 2);
+		groupStage.groups[k].numOfWinners = ((groupStage.groups[k].players.length < groupStage.winnersPerGroup) ? groupStage.groups[k].players.length : groupStage.winnersPerGroup);
+	}
+
+	for (var i = 0; i < groupStage.numOfGroups; i++) {
+		groupStage.groups[i].rounds = new Array();
+		for (var j = 0; j < groupStage.groups[i].numOfRounds; j++) {
+			groupStage.groups[i].rounds[j] = new Object();
+			groupStage.groups[i].rounds[j].name = "Round " + (j + 1);
+			groupStage.groups[i].rounds[j].matches = new Array();
+			for (var k = 0; k < groupStage.groups[i].numOfMatchesPerRound; k++) {
+				groupStage.groups[i].rounds[j].matches[k] = new Object();
+				groupStage.groups[i].rounds[j].matches[k].name = "Match " + (k + 1);
+			}
+			if (!(groupStage.groups[i].players.length % 2)) {
+				var count = 0;
+				for (var l = 0; l < groupStage.groups[i].numOfMatchesPerRound * 2; l++) {
+					if (!l) {
+						groupStage.groups[i].rounds[j].matches[l].player1 = groupStage.groups[i].players[l];
+					} else if (l < groupStage.groups[i].numOfMatchesPerRound) {
+						groupStage.groups[i].rounds[j].matches[l].player1 = groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)];
+					} else {
+						groupStage.groups[i].rounds[j].matches[(groupStage.groups[i].numOfMatchesPerRound * 2) - l - 1].player2 = groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)];
+					}
+				}
+			} else {
+				for (var l = 0; l < groupStage.groups[i].numOfMatchesPerRound * 2; l++) {
+					if (l < groupStage.groups[i].numOfMatchesPerRound) {
+						groupStage.groups[i].rounds[j].matches[l].player1 = groupStage.groups[i].players[(j + l) % groupStage.groups[i].players.length];
+					} else {
+						groupStage.groups[i].rounds[j].matches[(groupStage.groups[i].numOfMatchesPerRound * 2) - l - 1].player2 = groupStage.groups[i].players[(j + l) % groupStage.groups[i].players.length];
+					}
+				}
+			}
+		}
+	}
+
+	// res.json(groupStage);
+}
+
+function generateBracket(bracket, players) {
+	// bracket.numOfPlayers = req.params.numofplayers;
+	bracket.byes = getByes(bracket.numOfPlayers);
+	bracket.numOfWinnerRounds = 0;
+
+	// var players = new Array();
+	// var i = 0;
+	// for ( i = 0; i < bracket.numOfPlayers; i++) {
+	// players[i] = new Object();
+	// players[i].seed = i + 1;
+	// }
+
+	if (bracket.type == 'single') {
+		bracket.winnerRounds = new Array();
+		singleEliminationBracket(bracket, players);
+	} else if (bracket.type == 'double') {
+		bracket.winnerRounds = new Array();
+		singleEliminationBracket(bracket, players);
+		bracket.numOfLoserRounds = 0;
+		bracket.loserRounds = new Array();
+		doubleEliminationBracket(bracket);
+	} else {
+		return res.status(401);
+	}
+
+	// res.send(bracket);
+}
+
 var createBraket = function(req, res) {
 	var bracket = new Object();
 	bracket.numOfPlayers = req.params.numofplayers;
@@ -42,7 +198,7 @@ var createGroupStage = function(req, res) {
 		groupStage.groups[k] = new Object();
 		groupStage.groups[k].name = "Group " + (k + 1);
 		groupStage.groups[k].players = new Array();
-		for (var i = k*groupStage.playersPerGroup, count = 0; i < players.length && i < (k+1)*groupStage.playersPerGroup; i++, count++) {
+		for (var i = k * groupStage.playersPerGroup, count = 0; i < players.length && i < (k + 1) * groupStage.playersPerGroup; i++, count++) {
 			groupStage.groups[k].players[count] = players[i];
 		}
 		groupStage.groups[k].numOfRounds = (!(groupStage.groups[k].players.length % 2)) ? (groupStage.groups[k].players.length - 1) : groupStage.groups[k].players.length;
@@ -59,17 +215,29 @@ var createGroupStage = function(req, res) {
 				groupStage.groups[i].rounds[j].matches[k] = new Object();
 				groupStage.groups[i].rounds[j].matches[k].name = "Match " + (k + 1);
 			}
-			for (var l = 0; l < groupStage.groups[i].numOfMatchesPerRound*2; l++){
-				if(l < groupStage.groups[i].numOfMatchesPerRound){
-					groupStage.groups[i].rounds[j].matches[l].player1 = groupStage.groups[i].players[(j+l)%groupStage.groups[i].players.length];
+			if (!(groupStage.groups[i].players.length % 2)) {
+				var count = 0;
+				for (var l = 0; l < groupStage.groups[i].numOfMatchesPerRound * 2; l++) {
+					if (!l) {
+						groupStage.groups[i].rounds[j].matches[l].player1 = groupStage.groups[i].players[l];
+					} else if (l < groupStage.groups[i].numOfMatchesPerRound) {
+						groupStage.groups[i].rounds[j].matches[l].player1 = groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)];
+					} else {
+						groupStage.groups[i].rounds[j].matches[(groupStage.groups[i].numOfMatchesPerRound * 2) - l - 1].player2 = groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)];
+					}
 				}
-				else{
-					groupStage.groups[i].rounds[j].matches[(groupStage.groups[i].numOfMatchesPerRound*2)-l-1].player2 = groupStage.groups[i].players[(j+l)%groupStage.groups[i].players.length];
+			} else {
+				for (var l = 0; l < groupStage.groups[i].numOfMatchesPerRound * 2; l++) {
+					if (l < groupStage.groups[i].numOfMatchesPerRound) {
+						groupStage.groups[i].rounds[j].matches[l].player1 = groupStage.groups[i].players[(j + l) % groupStage.groups[i].players.length];
+					} else {
+						groupStage.groups[i].rounds[j].matches[(groupStage.groups[i].numOfMatchesPerRound * 2) - l - 1].player2 = groupStage.groups[i].players[(j + l) % groupStage.groups[i].players.length];
+					}
 				}
 			}
 		}
 	}
-	
+
 	res.json(groupStage);
 };
 
@@ -196,6 +364,7 @@ function doubleEliminationBracket(bracket) {
 	bracket.winnerRounds[bracket.numOfWinnerRounds].matches[0] = new Object();
 	bracket.winnerRounds[bracket.numOfWinnerRounds].matches[0].name = "Winners Round " + (bracket.numOfWinnerRounds + 1) + " Match 1";
 	bracket.numOfWinnerRounds++;
+	bracket.winnerRounds[bracket.numOfWinnerRounds-2].matches[0].winnerGoesTo = bracket.winnerRounds[bracket.numOfWinnerRounds-1].matches[0].name;
 
 	var loserRounds = new Array();
 	loserRounds[0] = new Object();
@@ -355,4 +524,5 @@ function doubleEliminationBracket(bracket) {
 }
 
 module.exports.createBraket = createBraket;
-module.exports.createGroupStage = createGroupStage; 
+module.exports.createGroupStage = createGroupStage;
+module.exports.createTournament = createTournament;

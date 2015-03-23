@@ -130,6 +130,13 @@ function createGroupStage(req, res){
 	brackets.createGroupStage(req, res);
 }
 
+function createTournament(req, res){
+	// console.log("Over here!");
+	// res.send("Hello!");
+	brackets.createTournament(req, res);
+}
+
+
 // function createTeam(req, res) {
 	// customers.createTeam(req, res, pg, conString);
 // }
@@ -143,6 +150,7 @@ app.get('/events', getEvents);
 app.get('/events/:event', getEvent);
 app.post('/create/account', createAccount);
 app.post('/groupstage', createGroupStage);
+app.post('/tournament', createTournament);
 
 ///////////////////////////////////////////////////////////////////////////////////////////// API ROUTES
 
