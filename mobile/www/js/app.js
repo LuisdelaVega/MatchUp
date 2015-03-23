@@ -414,7 +414,14 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating'])
         .state('app.writereview', {
         url: "/writereview",
         templateUrl: "templates/premiumevent/writereview.html"
-    });
+    })
+    //================================================================================
+    // Account Stuff
+    //================================================================================
+        .state('createaccount', {
+            url: "/createaccount",
+            templateUrl: "templates/profile/create-account.html"
+        });
 
     // if none of the above states are matched, use this as the fallback
     $urlRouterProvider.otherwise('/app/home');
