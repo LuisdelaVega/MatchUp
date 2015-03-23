@@ -1,10 +1,6 @@
-<ion-view view-title="Create Account">
-    <ion-nav-buttons side="left">
-        <button class="button button-icon" onclick="location.href='#/app/login'">
-            <i class="icon ion-ios-arrow-back"></i>
-        </button>
-    </ion-nav-buttons>
-    <ion-nav-buttons side="right"></ion-nav-buttons>
+<ion-view view-title="MatchUp">
+    <ion-nav-buttons side="left"></ion-nav-buttons>
+     <ion-nav-buttons side="right"></ion-nav-buttons>
     <ion-content class="padding">
         <div class="card">
             <div class="item item-text-wrap">
@@ -13,10 +9,6 @@
         </div>
         <div class="list list-inset">
             <label class="item item-input">
-                <span class="input-label">Tag</span>
-                <input type="text">
-            </label>
-            <label class="item item-input">
                 <span class="input-label">Email</span>
                 <input type="text">
             </label>
@@ -24,9 +16,12 @@
                 <span class="input-label">Password</span>
                 <input type="password">
             </label>
-            <button class="button button-block button-positive">
-                Create
-            </button>
         </div>
+            <button class="button button-block button-positive" ui-sref="app.home">
+                Login
+            </button>
+            <button class="button button-block" ui-sref="app.createaccount">
+                Create Account
+            </button>
     </ion-content>
 </ion-view>
