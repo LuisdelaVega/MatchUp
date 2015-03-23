@@ -52,7 +52,8 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating'])
         })
         .state('app.home', {
             url: "/home",
-            templateUrl: "templates/home/home.html"
+            templateUrl: "templates/home/home.html",
+            controller: "homeViewController"
         })
         //================================================================================
         // Events

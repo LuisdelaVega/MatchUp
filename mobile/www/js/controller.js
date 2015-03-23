@@ -160,3 +160,100 @@ myApp.controller('writeReviewRatingsController', ['$scope', '$http', function($s
     $scope.max = 5;
 
 }]);
+
+myApp.controller('homeViewController', ['$scope', '$http', function($scope, $http) {
+
+    var eventData = 
+        {
+            "live": [
+                {
+                    "img"   : "img/apex2015.png",
+                    "title" : "Apex 2015",
+                    "location" : "Badillo's House, Jersey"
+                },
+                {
+                    "img"    : "img/apex2015.png",
+                    "title" : "Apex 2015",
+                    "location" : "Badillo's House, Jersey"
+                },
+                {
+                    "img"    : "img/lol2.png",
+                    "title" : "Apex 2015",
+                    "location" : "Badillo's House, Jersey"
+                },
+                {
+                    "img"    : "img/lol2.png",
+                    "title" : "LOL Championship Series",
+                    "location" : "Badillo's House, Jersey"
+                },
+                {
+                    "img"    : "img/lolbr.jpeg",
+                    "title" : "LOL Championship Series Brazil",
+                    "location" : "Badillo's House, Jersey"
+                }
+            ],
+
+            "premium": [
+                {
+                    "img"   : "img/apex2015.png",
+                    "title" : "Apex 2015",
+                    "location" : "Badillo's House, Jersey"
+                },
+                {
+                    "img"    : "img/apex2015.png",
+                    "title" : "Apex 2015",
+                    "location" : "Badillo's House, Jersey"
+                },
+                {
+                    "img"    : "img/lol2.png",
+                    "title" : "Apex 2015",
+                    "location" : "Badillo's House, Jersey"
+                },
+                {
+                    "img"    : "img/lol2.png",
+                    "title" : "LOL Championship Series",
+                    "location" : "Badillo's House, Jersey"
+                },
+                {
+                    "img"    : "img/lolbr.jpeg",
+                    "title" : "LOL Championship Series Brazil",
+                    "location" : "Badillo's House, Jersey"
+                }
+            ],
+
+            "regular": [
+                {
+                    "img"   : "img/apex2015.png",
+                    "title" : "Apex 2015",
+                    "location" : "Badillo's House, Jersey"
+                },
+                {
+                    "img"    : "img/apex2015.png",
+                    "title" : "Apex 2015",
+                    "location" : "Badillo's House, Jersey"
+                },
+                {
+                    "img"    : "img/lol2.png",
+                    "title" : "Apex 2015",
+                    "location" : "Badillo's House, Jersey"
+                },
+                {
+                    "img"    : "img/lol2.png",
+                    "title" : "LOL Championship Series",
+                    "location" : "Badillo's House, Jersey"
+                },
+                {
+                    "img"    : "img/lolbr.jpeg",
+                    "title" : "LOL Championship Series Brazil",
+                    "location" : "Badillo's House, Jersey"
+                }
+            ]
+        };
+    
+    $scope.live = eventData.live;   
+    $scope.premium = eventData.premium;
+    $scope.regular = eventData.regular;
+
+    console.log($scope.live);
+    
+}]);
