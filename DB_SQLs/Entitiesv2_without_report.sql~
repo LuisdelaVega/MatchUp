@@ -21,7 +21,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "customer"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 COMMENT ON TABLE "customer"
   IS 'customer:  Can  be a competitor, team member, event organizer, or a selection of the aforementioned.';
 
@@ -42,7 +42,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "organization"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 -- Table: "sponsors"
@@ -58,7 +58,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "sponsors"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 -- Table: "game"
@@ -74,7 +74,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "game"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 -- Table: "team"
 
@@ -93,7 +93,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "team"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
   
 
@@ -110,7 +110,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "genre"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 -- Table: "request"
@@ -129,7 +129,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "request"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 -- Table: "event"
@@ -163,7 +163,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "event"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 -- Table: "review"
@@ -188,7 +188,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "review"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 
@@ -224,7 +224,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "tournament"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 -- Table: "round"
@@ -250,7 +250,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "round"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 
@@ -273,7 +273,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "station"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 
@@ -300,7 +300,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "match"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 -- Table: "spectator_fee"
@@ -321,7 +321,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "spectator_fee"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
  -- Table: "meetup"
 
@@ -344,7 +344,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "meetup"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 -- Table: to_play
 
@@ -369,7 +369,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE to_play
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 -- Table: "set"
 
@@ -392,7 +392,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "set"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 
@@ -417,7 +417,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "stream"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 
@@ -436,7 +436,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "is_of"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
  -- Table: "belongs_to"
 -- DROP TABLE "belongs_to";
@@ -452,7 +452,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "belongs_to"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 -- Table: "owns"
 -- DROP TABLE "owns";
@@ -468,7 +468,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "owns"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
  -- Table: "plays_for"
@@ -485,7 +485,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "plays_for"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
  -- Table: "captain_for"
@@ -502,7 +502,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "captain_for"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 -- Table: "shows"
@@ -521,7 +521,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "shows"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 -- Table: "subscribed_to"
 -- DROP TABLE "subscribed_to";
@@ -537,7 +537,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "subscribed_to"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 -- Table: competitor
@@ -565,7 +565,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE competitor
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 -- Table: capacity_for
 
@@ -590,7 +590,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE capacity_for
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 -- Table: capacity_for
@@ -617,7 +617,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE competes_for
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 -- Table: is_a;
@@ -643,7 +643,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE is_a
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 
@@ -673,7 +673,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE pays
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 
@@ -698,7 +698,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "hosts"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 
@@ -726,7 +726,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE posts
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 -- Table: "competes"
@@ -758,7 +758,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "competes"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 
@@ -792,7 +792,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "submits"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 
@@ -820,7 +820,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "competitor_goes_to"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 -- Table: "is_played_in"
@@ -848,7 +848,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "is_played_in"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 
@@ -874,7 +874,7 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE "news"
-  OWNER TO edwinbadillo;
+  OWNER TO papaluisre;
 
 
 
