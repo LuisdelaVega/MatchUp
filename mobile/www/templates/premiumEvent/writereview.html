@@ -9,7 +9,11 @@
             <span class="input-label">Write your review here</span>
             <textarea></textarea>
         </label>
-
+        <br>
+        <div ng-controller="writeReviewRatingsController">
+            <rating ng-model="rate" max="max" style="text-align: center;"></rating>
+        </div>
+        <br>
         <button class="button button-positive" style="width: 100vw">
             Submit
         </button>

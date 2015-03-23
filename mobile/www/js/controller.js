@@ -151,5 +151,12 @@ myApp.controller('cameraReportController', ['$scope', '$http', 'Camera', functio
             saveToPhotoAlbum: false
         });
     };
+}]);
+
+myApp.controller('writeReviewRatingsController', ['$scope', '$http', function($scope, $http) {
+
+    // set the rate and max variables
+    $scope.rate = 3;
+    $scope.max = 5;
 
 }]);
