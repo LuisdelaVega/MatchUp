@@ -65,7 +65,7 @@
                 </a>
             </div>
 
-            <div class="list list-inset">
+            <div class="list list-inset" ng-if="!isOngoing">
                 <a class="item item-thumbnail-left" href="#">
                     <img src="img/streetFighter.jpg">
                     <h2>Street Fighter Regionals</h2>
@@ -75,7 +75,7 @@
                     <h3>1st</h3>
                 </div>
                 <a class="item item-avatar" href="#/app/regulareventmatchups">
-                    <img src="img/ron.jpg" >
+                    <img src="img/ron.jpg">
                     <div class="row">
                         <div class="col col-75">
                             <h2>Ron Paul</h2>
@@ -90,7 +90,7 @@
                     <h3>2nd</h3>
                 </div>
                 <a class="item item-avatar" href="#/app/regulareventmatchups">
-                    <img src="img/ron.jpg" >
+                    <img src="img/ron.jpg">
                     <div class="row">
                         <div class="col col-75">
                             <h2>Ron Paul</h2>
@@ -105,7 +105,7 @@
                     <h3>3rd</h3>
                 </div>
                 <a class="item item-avatar" href="#/app/regulareventmatchups">
-                    <img src="img/ron.jpg" >
+                    <img src="img/ron.jpg">
                     <div class="row">
                         <div class="col col-75">
                             <h2>Ron Paul</h2>
@@ -117,7 +117,7 @@
                     </div>
                 </a>
                 <a class="item item-avatar" href="#/app/regulareventmatchups">
-                    <img src="img/ron.jpg" >
+                    <img src="img/ron.jpg">
                     <div class="row">
                         <div class="col col-75">
                             <h2>Ron Paul</h2>
@@ -134,17 +134,19 @@
                 <div class="card">
                     <div class="item">
                         <h2 style="text-align: center;">This is the review title</h2>
-                        <rating ng-model="rate" max="max" style="text-align: center;" readonly="true"></rating> 
+                        <rating ng-model="rate" max="max" style="text-align: center;" readonly="true"></rating>
                         <p style="text-align: center;"> by anonymous </p>
                     </div>
                     <div class="item item-text-wrap">
                         This is a review of the event.
                     </div>
                 </div>
+                <div class="padding">
+                    <button class="button button-block button-positive" ui-sref="app.writereview">
+                        Write a review
+                    </button>
+                </div>
             </div>
-            <button class="button button-positive" style="width: 100vw"  ui-sref="app.writereview">
-                Write a review
-            </button>
         </div>
     </ion-content>
 </ion-view>
