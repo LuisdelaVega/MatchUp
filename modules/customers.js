@@ -20,7 +20,9 @@ var getUserProfile = function(req, res, pg, conString) {
 		var profile = new Object();
 		// Query the database to find the user's account
 		var profileQuery = client.query({
-			text : "SELECT customer.customer_id, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_username, customer.customer_email, customer.customer_profile_pic, customer.customer_cover_photo, customer.customer_bio, customer.customer_country, customer.customer_region FROM customer WHERE customer_username = $1",
+			text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag," + 
+			" customer.customer_profile_pic, customer.customer_cover_photo, customer.customer_bio, customer.customer_country, of_email.email_address" + 
+			" FROM customer NATURAL JOIN of_email WHERE customer_username = $1 AND customer.customer_active",
 			values : [req.params.username]
 		});
 		profileQuery.on("row", function(row, result) {
@@ -32,7 +34,8 @@ var getUserProfile = function(req, res, pg, conString) {
 
 				// Query the database to find the user's Teams
 				var teamsQuery = client.query({
-					text : "SELECT team.* FROM customer natural join plays_for natural join team WHERE customer_username = $1",
+					text : "SELECT team.team_name, team.team_logo, team.team_bio, team.team_cover_photo" + 
+					" FROM customer NATURAL JOIN plays_for NATURAL JOIN team WHERE customer.customer_username = $1 AND team.team_active",
 					values : [req.params.username]
 				});
 				teamsQuery.on("row", function(row, result) {
@@ -43,7 +46,8 @@ var getUserProfile = function(req, res, pg, conString) {
 
 					// Query the database to find the user's Organizations
 					var organizationsQuery = client.query({
-						text : "SELECT organization.* FROM customer natural join belongs_to natural join organization WHERE customer_username = $1",
+						text : "SELECT organization.organization_name, organization.organization_logo, organization.organization_bio, organization.organization_cover_photo" + 
+						" FROM customer NATURAL JOIN belongs_to NATURAL JOIN organization WHERE customer.customer_username = $1 AND organization.organization_active",
 						values : [req.params.username]
 					});
 					organizationsQuery.on("row", function(row, result) {
@@ -54,7 +58,7 @@ var getUserProfile = function(req, res, pg, conString) {
 
 						// Query the database to find the user's created Events
 						var eventsQuery = client.query({
-							text : "select event.* from customer natural join creates natural join event where customer_username = $1",
+							text : "SELECT event.* FROM event WHERE customer_username = $1 AND event.event_visibility",
 							values : [req.params.username]
 						});
 						eventsQuery.on("row", function(row, result) {
@@ -93,81 +97,106 @@ var getUserProfile = function(req, res, pg, conString) {
 };
 
 // /create/account - Create a new user account
-var createAccount = function(req, res, pg, conString) {
+var createAccount = function(req, res, pg, conString, jwt, secret) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
-		
-		console.log(req.body.acc_info);
-		
-		//TODO Modify this a bit. The ones that have an * are required. The others can be filled out later so they dont really have to be here
-		// Query the database to find the account
+
+		//TODO Create the salt and hash the password before starting this transaction
+		client.query("START TRANSACTION");
 		client.query({
-			text : "INSERT INTO customer"+
-			" (customer_first_name, customer_last_name, customer_tag, customer_username, customer_email, customer_password, customer_salt,"+
-			" customer_paypal_info, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, customer_region)"+
-			" VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
-			values : [req.body.acc_info[0], // customer_first_name*  
-			req.body.acc_info[1], // customer_last_name*
-			req.body.acc_info[2], // customer_tag*  
-			req.body.acc_info[3], // customer_username //TODO Borrar este. username no creo que sea necesario
-			req.body.acc_info[4], // customer_email*
-			req.body.acc_info[5], // customer_password*
-			req.body.acc_info[6], // customer_salt*
-			req.body.acc_info[7], // customer_paypal_info
-			req.body.acc_info[8], // customer_profile_pic
-			req.body.acc_info[9], // customer_cover_photo
-			req.body.acc_info[10], // customer_bio
-			req.body.acc_info[11], // customer_country
-			req.body.acc_info[12] // customer_region
-			]
+			text : "INSERT INTO customer" + 
+			" (customer_username, customer_first_name, customer_last_name, customer_tag, customer_password, customer_paypal_info, customer_salt, customer_active)" + 
+			" VALUES ($1, $2, $3, $4, $5, $6, $7, TRUE)",
+			values : [req.body.info[0], // customer_username*
+			req.body.info[1], // customer_first_name*
+			req.body.info[2], // customer_last_name*
+			req.body.info[3], // customer_tag*
+			req.body.info[4], // customer_password*
+			req.body.info[5], // customer_paypal_info*,
+			"somesalt"]
 		}, function(err, result) {
 			if (err) {
-				res.status(400).send("Disaster!");
+				res.status(400).send("Oh, no! Disaster!");
 				client.end();
 			} else {
-				res.status(201).json(result);
-				client.end();
+				client.query({
+					text : "INSERT INTO of_email (customer_username, email_address) VALUES ($1, $2)",
+					values : [req.body.info[0], // customer_username*
+					req.body.info[6] // email_address*
+					]
+				}, function(err, result) {
+					if (err) {
+						res.status(400).send("Oh, no! Disaster!");
+						client.end();
+					} else {
+						var response = {
+							username : req.body.info[0]
+						};
+						// We are sending the username inside the token
+						var token = jwt.sign(response, secret);
+
+						res.status(201).json({
+							token : token
+						});
+						client.query("COMMIT");
+						client.end();
+					}
+				});
 			}
 		});
 	});
 };
 
-//TODO This is not complete at all. 
+//TODO This is not complete at all.
 var createTeam = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
-				
-		client.query("START TRANSACTION;");
+		
+		console.log(req.body.info);
+		client.query("START TRANSACTION");
 		client.query({
-			text : "INSERT INTO customer"+
-			" (customer_first_name, customer_last_name, customer_tag, customer_username, customer_email, customer_password, customer_salt,"+
-			" customer_paypal_info, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, customer_region)"+
-			" VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
-			values : [req.body.acc_info[0], // customer_first_name*  
-			req.body.acc_info[1], // customer_last_name*
-			req.body.acc_info[2], // customer_tag*  
-			req.body.acc_info[3], // customer_username //TODO Borrar este. username no creo que sea necesario
-			req.body.acc_info[4], // customer_email*
-			req.body.acc_info[5], // customer_password*
-			req.body.acc_info[6], // customer_salt*
-			req.body.acc_info[7], // customer_paypal_info
-			req.body.acc_info[8], // customer_profile_pic
-			req.body.acc_info[9], // customer_cover_photo
-			req.body.acc_info[10], // customer_bio
-			req.body.acc_info[11], // customer_country
-			req.body.acc_info[12] // customer_region
+			text : "INSERT INTO team (team_name, team_logo, team_bio, team_cover_photo, team_active) VALUES ($1, $2, $3, $4, TRUE)",
+			values : [req.body.info[0], // team_name*
+			req.body.info[1], // team_logo*
+			req.body.info[2], // team_bio*
+			req.body.info[3] // team_cover_photo*
 			]
 		}, function(err, result) {
 			if (err) {
-				res.status(400).send("Disaster!");
+				res.status(400).send("Oh, no! Disaster in INSERT INTO team!");
 				client.end();
 			} else {
-				res.status(201).json(result);
-				client.end();
+				client.query({
+					text : "INSERT INTO plays_for (customer_username, team_name) VALUES ($1, $2)",
+					values : [req.user.username,
+					req.body.info[0] // team_name
+					]
+				}, function(err, result) {
+					if (err) {
+						res.status(400).send("Oh, no! Disaster in INSERT INTO plays_for!");
+						client.end();
+					} else {
+						client.query({
+							text : "INSERT INTO captain_for (customer_username, team_name) VALUES ($1, $2)",
+							values : [req.user.username,
+							req.body.info[0] // team_name
+							]
+						}, function(err, result) {
+							if (err) {
+								res.status(400).send("Oh, no! Disaster in INSERT INTO captain_for!");
+								client.end();
+							} else {
+								res.status(201).send("HELLOOOOOO!"); //TODO Send something here if needed
+								client.query("COMMIT");
+								client.end();
+							}
+						});
+					}
+				});
 			}
 		});
 	});
@@ -176,3 +205,4 @@ var createTeam = function(req, res, pg, conString) {
 module.exports.getMyProfile = getMyProfile;
 module.exports.getUserProfile = getUserProfile;
 module.exports.createAccount = createAccount;
+module.exports.createTeam = createTeam;

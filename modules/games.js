@@ -8,7 +8,8 @@ var getPopularGames = function(res, pg, conString) {
 
 		// Look for most Popular Games
 		var queryPopularGames = client.query({
-			text : "select game.*, count(game.game_id) as popularity from tournament natural join game group by game.game_id order by popularity desc"
+			text : "SELECT game.*, count(game.game_name) as popularity"+
+			" FROM event NATURAL JOIN tournament NATURAL JOIN game WHERE event.event_visibility = TRUE GROUP BY game.game_name ORDER BY popularity DESC"
 		});
 		queryPopularGames.on("row", function(row, result) {
 			result.addRow(row);
@@ -29,7 +30,9 @@ var getPopularGenres = function(res, pg, conString) {
 
 		// Look for most Popular Genres
 		var queryPopularGenre = client.query({
-			text : "select genre.*, count(game.game_id) as popularity from tournament natural join game natural join genre group by genre.genre_id order by popularity desc"
+			text : "SELECT genre.*, count(genre.genre_name) as popularity"+
+			" FROM event NATURAL JOIN tournament NATURAL JOIN game NATURAL JOIN is_of NATURAL JOIN genre"+
+			" WHERE event.event_visibility = TRUE GROUP BY genre.genre_name ORDER BY popularity DESC"
 		});
 		queryPopularGenre.on("row", function(row, result) {
 			result.addRow(row);
@@ -51,7 +54,8 @@ var getPopularStuff = function(res, pg, conString) {
 		// Look for most Popular Games
 		var gamesList = new Object();
 		var queryPopularGames = client.query({
-			text : "select game.*, count(game.game_id) as popularity from tournament natural join game group by game.game_id order by popularity desc"
+			text : "SELECT game.*, count(game.game_name) as popularity"+
+			" FROM event NATURAL JOIN tournament NATURAL JOIN game WHERE event.event_visibility = TRUE GROUP BY game.game_name ORDER BY popularity DESC"
 		});
 		queryPopularGames.on("row", function(row, result) {
 			result.addRow(row);
@@ -62,7 +66,9 @@ var getPopularStuff = function(res, pg, conString) {
 			// Look for most Popular Games
 			var genreList = new Object();
 			var queryPopularGenre = client.query({
-				text : "select genre.*, count(game.game_id) as popularity from tournament natural join game natural join genre group by genre.genre_id order by popularity desc"
+				text : "SELECT genre.*, count(genre.genre_name) as popularity"+
+			" FROM event NATURAL JOIN tournament NATURAL JOIN game NATURAL JOIN is_of NATURAL JOIN genre"+
+			" WHERE event.event_visibility = TRUE GROUP BY genre.genre_name ORDER BY popularity DESC"
 			});
 			queryPopularGenre.on("row", function(row, result) {
 				result.addRow(row);

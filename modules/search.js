@@ -1,3 +1,5 @@
+//TODO Implement every search individually
+
 var getSearchResults = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -7,7 +9,10 @@ var getSearchResults = function(req, res, pg, conString) {
 		var searchresults = new Object();
 		// Query the database to find the accounts
 		var usersQuery = client.query({
-			text : "select * from customer where customer_first_name ||' '|| customer_last_name ilike '%" + req.params.parameter + "%' or customer_tag ilike '%" + req.params.parameter + "%'"
+			text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag,"+
+			" customer.customer_profile_pic, customer.customer_cover_photo, customer.customer_bio, customer.customer_country, of_email.email_address"+
+			" FROM customer NATURAL JOIN of_email WHERE customer.customer_first_name ||' '|| customer.customer_last_name ILIKE '%"+ req.params.parameter +
+			"%' OR customer.customer_tag ILIKE '%" + req.params.parameter + "%' AND customer.customer_active"
 		});
 		usersQuery.on("row", function(row, result) {
 			result.addRow(row);
@@ -17,7 +22,8 @@ var getSearchResults = function(req, res, pg, conString) {
 			searchresults.users = result.rows;
 			// Look for all the Events that are currently in progress
 			var queryLive = client.query({
-				text : "select * from event where event_start_date < now() at time zone 'utc' and event_end_date > now() at time zone 'utc' and event_name ilike '%" + req.params.parameter + "%' order by event_start_date desc"
+				text : "SELECT * FROM event WHERE event_start_date < now() at time zone 'utc' AND event_end_date > now() at time zone 'utc' AND event_name ILIKE '%" + 
+				req.params.parameter + "%' AND event_visibility ORDER BY event_start_date DESC"
 			});
 			queryLive.on("row", function(row, result) {
 				result.addRow(row);
@@ -27,7 +33,8 @@ var getSearchResults = function(req, res, pg, conString) {
 				searchresults.events.live = result.rows;
 				// Look for all the Events that have already ended
 				var queryPast = client.query({
-					text : "select * from event where event_end_date < now() at time zone 'utc' and event_name ilike '%" + req.params.parameter + "%' order by event_start_date desc"
+					text : "SELECT * FROM event WHERE event_end_date < now() at time zone 'utc' AND event_name ILIKE '%" + req.params.parameter + 
+					"%' AND event_visibility ORDER BY event_start_date DESC"
 				});
 				queryPast.on("row", function(row, result) {
 					result.addRow(row);
@@ -37,7 +44,9 @@ var getSearchResults = function(req, res, pg, conString) {
 
 					// Look for all the Regular Events that have not yet started
 					var queryRegular = client.query({
-						text : "select event.* from event where event_name ilike '%" + req.params.parameter + "%' and event_start_date > now() at time zone 'utc' and event_id not in (select event.event_id from event natural join hosts natural join organization) order by event.event_start_date"
+						text : "SELECT event.* FROM event WHERE event_name ILIKE '%" + req.params.parameter + 
+						"%' AND event_start_date > now() at time zone 'utc' AND event_name NOT IN (SELECT event.event_name FROM event NATURAL JOIN hosts)"+
+						" AND event_visibility ORDER BY event.event_start_date"
 					});
 					queryRegular.on("row", function(row, result) {
 						result.addRow(row);
@@ -47,7 +56,8 @@ var getSearchResults = function(req, res, pg, conString) {
 
 						// Look for all Hosted Events that have not yet started
 						var queryHosted = client.query({
-							text : "select event.*, organization.organization_id, organization.organization_name from event natural join hosts natural join organization where event_name ilike '%" + req.params.parameter + "%' and event.event_start_date > now() at time zone 'utc' order by event.event_start_date"
+							text : "SELECT event.*, organization.organization_name FROM event NATURAL JOIN hosts NATURAL JOIN organization WHERE event.event_name ILIKE '%" + 
+							req.params.parameter + "%' AND event.event_start_date > now() at time zone 'utc' AND event_visibility ORDER BY event.event_start_date"
 						});
 						queryHosted.on("row", function(row, result) {
 							result.addRow(row);
@@ -55,10 +65,9 @@ var getSearchResults = function(req, res, pg, conString) {
 						queryHosted.on("end", function(result) {
 							searchresults.events.hosted = result.rows;
 							
-							//TODO check for active/inactive
 							// Look for all relevant Teams
 							var queryTeams = client.query({
-								text : "select * from team where team_name ilike '%" + req.params.parameter + "%'"
+								text : "SELECT team_name, team_logo, team_bio, team_cover_photo FROM team WHERE team_name ILIKE '%" + req.params.parameter + "%' AND team_active"
 							});
 							queryTeams.on("row", function(row, result) {
 								result.addRow(row);
@@ -66,10 +75,10 @@ var getSearchResults = function(req, res, pg, conString) {
 							queryTeams.on("end", function(result) {
 								searchresults.teams = result.rows;
 								
-								//TODO check for active/inactive
 								// Look for all relevant Organizations
 								var queryOrganizations = client.query({
-									text : "select * from organization where organization_name ilike '%" + req.params.parameter + "%'"
+									text : "SELECT organization_name, organization_logo, organization_bio, organization_cover_photo FROM organization WHERE organization_name ILIKE '%" + 
+									req.params.parameter + "%' AND organization_active"
 								});
 								queryOrganizations.on("row", function(row, result) {
 									result.addRow(row);
@@ -79,7 +88,7 @@ var getSearchResults = function(req, res, pg, conString) {
 
 									// Look for all relevant Games
 									var queryGames = client.query({
-										text : "select * from game where game_name ilike '%" + req.params.parameter + "%'"
+										text : "SELECT * FROM game WHERE game_name ILIKE '%" + req.params.parameter + "%'"
 									});
 									queryGames.on("row", function(row, result) {
 										result.addRow(row);
@@ -89,7 +98,7 @@ var getSearchResults = function(req, res, pg, conString) {
 
 										// Look for all relevant Genres
 										var queryGenres = client.query({
-											text : "select * from genre where genre_name ilike '%" + req.params.parameter + "%'"
+											text : "SELECT * FROM genre WHERE genre_name ILIKE '%" + req.params.parameter + "%'"
 										});
 										queryGenres.on("row", function(row, result) {
 											result.addRow(row);
