@@ -120,8 +120,7 @@ CREATE TABLE "request"
     request_organization_name character varying(127) NOT NULL,
     customer_username character varying(127) NOT NULL,
     request_description character varying(255),
-    request_status  character varying(32) NOT NULL, -- Received, Verifying, Accepted
-    request_proccessed boolean,
+    request_status  character varying(32) NOT NULL, -- Received, Verifying, Accepted, Dennied
     CONSTRAINT "PK_request" PRIMARY KEY (request_organization_name, customer_username),
     CONSTRAINT "FK_request_customer" FOREIGN KEY (customer_username)
     REFERENCES "customer" (customer_username) MATCH SIMPLE
