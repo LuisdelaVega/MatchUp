@@ -1,32 +1,49 @@
-<ion-view title="Events">
+<ion-view title="Organization Members">
     <ion-nav-buttons side="left">
-        <button class="button button-icon" onclick="location.href='#/app/organizationprofile'">
+        <button class="button button-icon" ui-sref="app.organizationprofile">
             <i class="icon ion-ios-arrow-back"></i>
         </button>
     </ion-nav-buttons>
     <ion-nav-buttons side="right">
+        <button class="button button-icon" ui-sref="app.addorganizationmember">
+            <i class="ion-plus"></i>
+        </button>
         <button class="button button-icon ion-android-alert">
         </button>
     </ion-nav-buttons>
     <ion-content>
-        <div class="list">
-            <div class="item item-divider">
-                Organization Members
-            </div>
-            <a class="item item-avatar" href="#">
+        <div class="list list-inset">
+            <a class="item item-avatar item-button-right">
                 <img src="img/ron.jpg">
                 <h2>Ron Paul</h2>
                 <p>This is my info</p>
+                <button class="button button-assertive" ng-click="showConfirm('Ron',1)">
+                    <i class="icon ion-close"></i>
+                </button>
             </a>
-            <a class="item item-avatar" href="#">
+            <a class="item item-avatar item-button-right">
                 <img src="img/ron.jpg">
                 <h2>Ron Paul</h2>
                 <p>This is my info</p>
+                <button class="button button-assertive" ng-click="showConfirm('Ron',2)">
+                    <i class="icon ion-close"></i>
+                </button>
             </a>
-            <a class="item item-avatar" href="#">
+            <a class="item item-avatar item-button-right">
                 <img src="img/ron.jpg">
                 <h2>Ron Paul</h2>
                 <p>This is my info</p>
+                <button class="button button-assertive" ng-click="showConfirm('Ron',3)">
+                    <i class="icon ion-close"></i>
+                </button>
+            </a>
+            <a class="item item-avatar item-button-right">
+                <img src="img/ron.jpg">
+                <h2>Ron Paul</h2>
+                <p>This is my info</p>
+                <button class="button button-assertive"  ng-click="showConfirm('Ron',4)">
+                    <i class="icon ion-close"></i>
+                </button>
             </a>
         </div>
     </ion-content>

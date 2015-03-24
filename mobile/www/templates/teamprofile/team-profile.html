@@ -2,7 +2,7 @@
     <ion-nav-buttons side="right">
         <button class="button button-icon ion-android-alert">
         </button>
-        <button class="button button-icon">
+        <button class="button button-icon" ng-click="popover.show($event)">
             <i class="ion-android-more-vertical"></i>
         </button>
     </ion-nav-buttons>
@@ -25,7 +25,7 @@
                 </div>
             </div>
         </div>
-        <div class="list">
+        <div class="list list-inset">
             <div class="item item-divider">
                 Team Members
             </div>
@@ -47,11 +47,11 @@
             <a class="item item-icon-left dark" href="#/app/teamprofilemembers">
                 <i class="icon ion-android-arrow-forward"></i> See More
             </a>
-        </div>      
-        <div class="item item-divider">
-            Standings
         </div>
-        <div class="list">
+        <div class="list list-inset">
+            <div class="item item-divider">
+                Standings
+            </div>
             <a class="item item-avatar" href="#">
                 <img src="img/lolbr.jpeg">
                 <div class="row">
@@ -75,21 +75,22 @@
                         <h1 class="h1-username">1st</h1>
                     </div>
                 </div>
-            </a><a class="item item-avatar" href="#">
-            <img src="img/lolbr.jpeg">
-            <div class="row">
-                <div class="col col-75">
-                    <h2>Project M 2015 sdf sdfdsda</h2>
-                    <p>fecha fecha</p>
+            </a>
+            <a class="item item-avatar" href="#">
+                <img src="img/lolbr.jpeg">
+                <div class="row">
+                    <div class="col col-75">
+                        <h2>Project M 2015 sdf sdfdsda</h2>
+                        <p>fecha fecha</p>
+                    </div>
+                    <div class="col center-text">
+                        <h1 class="h1-username">1st</h1>
+                    </div>
                 </div>
-                <div class="col center-text">
-                    <h1 class="h1-username">1st</h1>
-                </div>
-            </div>
             </a>
             <a class="item item-icon-left dark" href="#/app/teamprofilestandings">
                 <i class="icon ion-android-arrow-forward"></i> See More
             </a>
-        </div>        
+        </div>
     </ion-content>
 </ion-view>
