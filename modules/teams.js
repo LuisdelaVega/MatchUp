@@ -1,3 +1,4 @@
+//TODO Edit team, delete team
 var getTeams = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -17,6 +18,7 @@ var getTeams = function(req, res, pg, conString) {
 	});
 };
 
+//TODO Look for Tournaments the team has participated and calculate their standing
 var getTeam = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -37,7 +39,9 @@ var getTeam = function(req, res, pg, conString) {
 				team.info = result.rows[0];
 				var playersQuery = client.query({
 					text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic" + 
-					" FROM customer NATURAL JOIN plays_for WHERE customer_active AND team_name = $1",
+					" FROM customer NATURAL JOIN plays_for WHERE customer.customer_username NOT IN (SELECT customer.customer_username"+
+					" FROM customer NATURAL JOIN captain_for WHERE team_name = $1)"+
+					" AND customer_active AND team_name = $1",
 					values : [req.params.team]
 				});
 				playersQuery.on("row", function(row, result) {
@@ -46,8 +50,20 @@ var getTeam = function(req, res, pg, conString) {
 				playersQuery.on("end", function(result) {
 					team.players = new Object();
 					team.players = result.rows;
-					res.json(team);
-					client.end();
+					var playersQuery = client.query({
+						text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic" + 
+						" FROM customer NATURAL JOIN captain_for WHERE customer_active AND team_name = $1",
+						values : [req.params.team]
+					});
+					playersQuery.on("row", function(row, result) {
+						result.addRow(row);
+					});
+					playersQuery.on("end", function(result) {
+						team.captain = new Object();
+						team.captain = result.rows[0];
+						res.json(team);
+						client.end();
+					});
 				});
 			} else {
 				client.end();

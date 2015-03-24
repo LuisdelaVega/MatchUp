@@ -1,4 +1,6 @@
 //TODO Calculate the matches won/lost for the profile pages
+//TODO Edit profile
+//TODO Delete profile
 var getMyProfile = function(req, res, pg, conString) {
 
 	var username = new Object();

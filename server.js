@@ -18,6 +18,7 @@ var games = require('./modules/games');
 var customers = require('./modules/customers');
 var search = require('./modules/search');
 var teams = require('./modules/teams');
+var organizations = require('./modules/organizations');
 
 // Global variables
 var conString = "pg://luis:portal1!@127.0.0.1:5432/matchupdb";
@@ -148,6 +149,18 @@ function getTeam(req, res) {
 	teams.getTeam(req, res, pg, conString);
 }
 
+function getOrganizations(req, res) {
+	organizations.getOrganizations(req, res, pg, conString);
+}
+
+function getOrganization(req, res) {
+	organizations.getOrganization(req, res, pg, conString);
+}
+
+function editOrganization(req, res) {
+	organizations.editOrganization(req, res, pg, conString);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
 app.get('/bracket/:type/:numofplayers', brackets.createBraket);
 app.get('/home', getHome);
@@ -155,11 +168,18 @@ app.get('/popularstuff', getPopularStuff);
 app.get('/search/:parameter', getSearchResults);
 app.get('/events', getEvents);
 app.get('/events/:event', getEvent);
+app.get('/teams', getTeams);
+app.get('/teams/:team', getTeam);
+app.get('/organizations', getOrganizations);
+app.get('/organizations/:organization', getOrganization);
+
 app.post('/create/account', createAccount);
 app.post('/groupstage', createGroupStage);
 app.post('/tournament', createTournament);
-app.get('/teams', getTeams);
-app.get('/teams/:team', getTeam);
+
+app.put('/organizations/:organization', editOrganization);
+
+// app.delete('/organizations/:organization', deleteOrganization);
 
 ///////////////////////////////////////////////////////////////////////////////////////////// API ROUTES
 
