@@ -17,6 +17,7 @@ var events = require('./modules/events');
 var games = require('./modules/games');
 var customers = require('./modules/customers');
 var search = require('./modules/search');
+var teams = require('./modules/teams');
 
 // Global variables
 var conString = "pg://luis:portal1!@127.0.0.1:5432/matchupdb";
@@ -139,6 +140,14 @@ function createTeam(req, res) {
 	customers.createTeam(req, res, pg, conString);
 }
 
+function getTeams(req, res) {
+	teams.getTeams(req, res, pg, conString);
+}
+
+function getTeam(req, res) {
+	teams.getTeam(req, res, pg, conString);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
 app.get('/bracket/:type/:numofplayers', brackets.createBraket);
 app.get('/home', getHome);
@@ -149,11 +158,13 @@ app.get('/events/:event', getEvent);
 app.post('/create/account', createAccount);
 app.post('/groupstage', createGroupStage);
 app.post('/tournament', createTournament);
+app.get('/teams', getTeams);
+app.get('/teams/:team', getTeam);
 
 ///////////////////////////////////////////////////////////////////////////////////////////// API ROUTES
 
 ///////////////////////////////////////////////////////////////////////////////////////////// MatchUp ROUTES
-app.post('/login', authenticate); // Get token by loging in to our service
+app.post('/login', authenticate);
 app.get('/matchup/profile', getMyProfile);
 app.get('/matchup/profile/:username', getUserProfile);
 app.post('/matchup/create/team', createTeam);
