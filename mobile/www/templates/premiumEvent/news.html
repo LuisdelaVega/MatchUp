@@ -1,21 +1,23 @@
 <ion-view view-title="Capcom Pro Tour">
     <ion-nav-buttons side="right">
+        <button class="button button-icon ion-ios-compose" ui-sref="app.postnews({ type: 'Create'})">
+        </button>
         <button class="button button-icon ion-android-alert">
         </button>
     </ion-nav-buttons>
     <ion-content>
-        <div class="list card">
+        <div class="list card" ng-repeat="new in result.news">
             <div class="item item-body">
-               <h1 class="h1-username">Venue Changed</h1>
-                <p>November 01, 2015</p>
-                <p>
-                   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                <h1 class="h1-username">{{new.title}}</h1>
+                <p>{{new.date}}</p>
             </div>
             <div class="item item-body">
-               <h1 class="h1-username">Venue Changed</h1>
-                <p>November 01, 2015</p>
-                <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                <p>{{new.content | limitTo: 300 }}{{new.content.length > 300 ? '...' : ''}}</p>
+            </div>
+            <div class="item tabs tabs-secondary tabs-icon-left">
+                <a class="tab-item" ng-click="clickEdit('{{$index}}')">
+                    <i class="icon ion-edit"></i> Edit
+                </a>
             </div>
         </div>
     </ion-content>

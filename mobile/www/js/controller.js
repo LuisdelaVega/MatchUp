@@ -91,133 +91,116 @@ myApp.controller('subscriptionsController', ['$scope', '$http', function ($scope
 
 }]);
 
-myApp.factory('searchResultsService', function() {
-    var savedData = {}
-    function set(data) {
-        savedData = data;
-    }
-    function get() {
-        return savedData;
-    }
+myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', function ($scope, $http, sharedDataService) {
 
-    return {
-        set: set,
-        get: get
-    }
-
-});
-
-myApp.controller('searchController', ['$scope', '$http', 'searchResultsService', function($scope, $http, searchResultsService) {
-
-    $scope.search = function() {
+    $scope.search = function () {
 
         //HTTP Get pidiendo del server la lista del search filtrada por $scope.query
 
     }
 
-    var searchData = 
-        {
-            "live": [
-                {
-                    "img"   : "img/evo.png",
-                    "title" : "EVO 2015",
-                    "location" : "Badillo's House, Jersey"
+    var searchData = {
+        "live": [
+            {
+                "img": "img/evo.png",
+                "title": "EVO 2015",
+                "location": "Badillo's House, Jersey"
                 },
-                {
-                    "img"    : "img/apex2015.png",
-                    "title" : "Apex 2015",
-                    "location" : "Badillo's House, Jersey"
+            {
+                "img": "img/apex2015.png",
+                "title": "Apex 2015",
+                "location": "Badillo's House, Jersey"
                 },
-                {
-                    "img"    : "img/lol2.png",
-                    "title" : "LCS 2015",
-                    "location" : "Badillo's House, Jersey"
+            {
+                "img": "img/lol2.png",
+                "title": "LCS 2015",
+                "location": "Badillo's House, Jersey"
                 }
             ],
 
-            "past": [
-                {
-                    "img"   : "img/evo.png",
-                    "title" : "EVO 2015",
-                    "location" : "Badillo's House, Jersey"
+        "past": [
+            {
+                "img": "img/evo.png",
+                "title": "EVO 2015",
+                "location": "Badillo's House, Jersey"
                 },
-                {
-                    "img"    : "img/apex2015.png",
-                    "title" : "Apex 2015",
-                    "location" : "Badillo's House, Jersey"
+            {
+                "img": "img/apex2015.png",
+                "title": "Apex 2015",
+                "location": "Badillo's House, Jersey"
                 },
-                {
-                    "img"    : "img/lol2.png",
-                    "title" : "LCS 2015",
-                    "location" : "Badillo's House, Jersey"
+            {
+                "img": "img/lol2.png",
+                "title": "LCS 2015",
+                "location": "Badillo's House, Jersey"
                 }
             ],
 
-            "premium": [
-                {
-                    "img"   : "img/evo.png",
-                    "title" : "EVO 2015",
-                    "location" : "Badillo's House, Jersey"
+        "premium": [
+            {
+                "img": "img/evo.png",
+                "title": "EVO 2015",
+                "location": "Badillo's House, Jersey"
                 },
-                {
-                    "img"    : "img/apex2015.png",
-                    "title" : "Apex 2015",
-                    "location" : "Badillo's House, Jersey"
+            {
+                "img": "img/apex2015.png",
+                "title": "Apex 2015",
+                "location": "Badillo's House, Jersey"
                 },
-                {
-                    "img"    : "img/lol2.png",
-                    "title" : "LCS 2015",
-                    "location" : "Badillo's House, Jersey"
-                }              
+            {
+                "img": "img/lol2.png",
+                "title": "LCS 2015",
+                "location": "Badillo's House, Jersey"
+                }
             ],
-            "regular": [
-                {
-                    "img"   : "img/evo.png",
-                    "title" : "EVO 2015",
-                    "location" : "Badillo's House, Jersey"
+        "regular": [
+            {
+                "img": "img/evo.png",
+                "title": "EVO 2015",
+                "location": "Badillo's House, Jersey"
                 },
-                {
-                    "img"    : "img/apex2015.png",
-                    "title" : "Apex 2015",
-                    "location" : "Badillo's House, Jersey"
+            {
+                "img": "img/apex2015.png",
+                "title": "Apex 2015",
+                "location": "Badillo's House, Jersey"
                 },
-                {
-                    "img"    : "img/lol2.png",
-                    "title" : "LCS 2015",
-                    "location" : "Badillo's House, Jersey"
-                }              
+            {
+                "img": "img/lol2.png",
+                "title": "LCS 2015",
+                "location": "Badillo's House, Jersey"
+                }
             ],
-            "users": [
-                {
-                    "img"   : "img/ron.jpg",
-                    "title" : "Roney",
-                    "location" : "Ron Paul"
-                }            
+        "users": [
+            {
+                "img": "img/ron.jpg",
+                "title": "Roney",
+                "location": "Ron Paul"
+                }
             ],
-            "teams": [
-                {
-                    "img"   : "img/cloud9logo.png",
-                    "title" : "Cloud 9"
-                }            
+        "teams": [
+            {
+                "img": "img/cloud9logo.png",
+                "title": "Cloud 9"
+                }
             ],
-            "organizations": [
-                {
-                    "img"   : "img/esportPR.png",
-                    "title" : "EsportsPR"
-                }            
+        "organizations": [
+            {
+                "img": "img/esportPR.png",
+                "title": "EsportsPR"
+                }
             ],
-            "games": [
-                {
-                    "img"   : "img/hearthstone.jpg",
-                    "title" : "Hearthstone"
-                }            
+        "games": [
+            {
+                "img": "img/hearthstone.jpg",
+                "title": "Hearthstone"
+                }
             ],
-            "genres": [
-                {
-                    "title" : "MOBA"
-                }            
-            ]          
-        };
+        "genres": [
+            {
+                "title": "MOBA"
+                }
+            ]
+    };
 
     $scope.liveEvents = searchData.live;
     $scope.pastEvents = searchData.past;
@@ -229,33 +212,33 @@ myApp.controller('searchController', ['$scope', '$http', 'searchResultsService',
     $scope.games = searchData.games;
     $scope.genres = searchData.genres;
 
-    searchResultsService.set(searchData);
+    sharedDataService.set(searchData);
 
 }]);
 
-myApp.controller('searchResultController', ['$scope', '$stateParams', 'searchResultsService', function($scope, $stateParams, searchResultsService) {
+myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDataService', function ($scope, $stateParams, sharedDataService) {
 
     $scope.resultType = $stateParams.type;
 
-    var searchData = searchResultsService.get();
+    var searchData = sharedDataService.get();
 
-    if($scope.resultType == 'Live')
+    if ($scope.resultType == 'Live')
         $scope.searchData = searchData.live;
-    else if($scope.resultType == 'Past')
+    else if ($scope.resultType == 'Past')
         $scope.searchData = searchData.past;
-    else if($scope.resultType == 'Premium')
+    else if ($scope.resultType == 'Premium')
         $scope.searchData = searchData.past;
-    else if($scope.resultType == 'Regular')
+    else if ($scope.resultType == 'Regular')
         $scope.searchData = searchData.regular;
-    else if($scope.resultType == 'Users')
+    else if ($scope.resultType == 'Users')
         $scope.searchData = searchData.users;
-    else if($scope.resultType == 'Teams')
+    else if ($scope.resultType == 'Teams')
         $scope.searchData = searchData.teams;
-    else if($scope.resultType == 'Organizations')
+    else if ($scope.resultType == 'Organizations')
         $scope.searchData = searchData.organizations;
-    else if($scope.resultType == 'Games')
+    else if ($scope.resultType == 'Games')
         $scope.searchData = searchData.games;
-    else if($scope.resultType == 'Genres')
+    else if ($scope.resultType == 'Genres')
         $scope.searchData = searchData.genres;
 }]);
 
@@ -322,96 +305,95 @@ myApp.controller('writeReviewRatingsController', ['$scope', '$http', function ($
 
 }]);
 
-myApp.controller('homeViewController', ['$scope', '$http', function($scope, $http) {
-
-    var eventData = 
-        {
-            "live": [
-                {
-                    "img"   : "img/apex2015.png",
-                    "title" : "Apex 2015",
-                    "location" : "Badillo's House, Jersey"
+myApp.controller('homeViewController', ['$scope', '$http', function ($scope, $http) {
+    console.log("homeview controlelr");
+    var eventData = {
+        "live": [
+            {
+                "img": "img/apex2015.png",
+                "title": "Apex 2015",
+                "location": "Badillo's House, Jersey"
                 },
-                {
-                    "img"    : "img/apex2015.png",
-                    "title" : "Apex 2015",
-                    "location" : "Badillo's House, Jersey"
+            {
+                "img": "img/apex2015.png",
+                "title": "Apex 2015",
+                "location": "Badillo's House, Jersey"
                 },
-                {
-                    "img"    : "img/lol2.png",
-                    "title" : "Apex 2015",
-                    "location" : "Badillo's House, Jersey"
+            {
+                "img": "img/lol2.png",
+                "title": "Apex 2015",
+                "location": "Badillo's House, Jersey"
                 },
-                {
-                    "img"    : "img/lol2.png",
-                    "title" : "LOL Championship Series",
-                    "location" : "Badillo's House, Jersey"
+            {
+                "img": "img/lol2.png",
+                "title": "LOL Championship Series",
+                "location": "Badillo's House, Jersey"
                 },
-                {
-                    "img"    : "img/lolbr.jpeg",
-                    "title" : "LOL Championship Series Brazil",
-                    "location" : "Badillo's House, Jersey"
+            {
+                "img": "img/lolbr.jpeg",
+                "title": "LOL Championship Series Brazil",
+                "location": "Badillo's House, Jersey"
                 }
             ],
 
-            "premium": [
-                {
-                    "img"   : "img/apex2015.png",
-                    "title" : "Apex 2015",
-                    "location" : "Badillo's House, Jersey"
+        "premium": [
+            {
+                "img": "img/apex2015.png",
+                "title": "Apex 2015",
+                "location": "Badillo's House, Jersey"
                 },
-                {
-                    "img"    : "img/apex2015.png",
-                    "title" : "Apex 2015",
-                    "location" : "Badillo's House, Jersey"
+            {
+                "img": "img/apex2015.png",
+                "title": "Apex 2015",
+                "location": "Badillo's House, Jersey"
                 },
-                {
-                    "img"    : "img/lol2.png",
-                    "title" : "Apex 2015",
-                    "location" : "Badillo's House, Jersey"
+            {
+                "img": "img/lol2.png",
+                "title": "Apex 2015",
+                "location": "Badillo's House, Jersey"
                 },
-                {
-                    "img"    : "img/lol2.png",
-                    "title" : "LOL Championship Series",
-                    "location" : "Badillo's House, Jersey"
+            {
+                "img": "img/lol2.png",
+                "title": "LOL Championship Series",
+                "location": "Badillo's House, Jersey"
                 },
-                {
-                    "img"    : "img/lolbr.jpeg",
-                    "title" : "LOL Championship Series Brazil",
-                    "location" : "Badillo's House, Jersey"
+            {
+                "img": "img/lolbr.jpeg",
+                "title": "LOL Championship Series Brazil",
+                "location": "Badillo's House, Jersey"
                 }
             ],
 
-            "regular": [
-                {
-                    "img"   : "img/apex2015.png",
-                    "title" : "Apex 2015",
-                    "location" : "Badillo's House, Jersey"
+        "regular": [
+            {
+                "img": "img/apex2015.png",
+                "title": "Apex 2015",
+                "location": "Badillo's House, Jersey"
                 },
-                {
-                    "img"    : "img/apex2015.png",
-                    "title" : "Apex 2015",
-                    "location" : "Badillo's House, Jersey"
+            {
+                "img": "img/apex2015.png",
+                "title": "Apex 2015",
+                "location": "Badillo's House, Jersey"
                 },
-                {
-                    "img"    : "img/lol2.png",
-                    "title" : "Apex 2015",
-                    "location" : "Badillo's House, Jersey"
+            {
+                "img": "img/lol2.png",
+                "title": "Apex 2015",
+                "location": "Badillo's House, Jersey"
                 },
-                {
-                    "img"    : "img/lol2.png",
-                    "title" : "LOL Championship Series",
-                    "location" : "Badillo's House, Jersey"
+            {
+                "img": "img/lol2.png",
+                "title": "LOL Championship Series",
+                "location": "Badillo's House, Jersey"
                 },
-                {
-                    "img"    : "img/lolbr.jpeg",
-                    "title" : "LOL Championship Series Brazil",
-                    "location" : "Badillo's House, Jersey"
+            {
+                "img": "img/lolbr.jpeg",
+                "title": "LOL Championship Series Brazil",
+                "location": "Badillo's House, Jersey"
                 }
             ]
-        };
+    };
 
-    $scope.live = eventData.live;   
+    $scope.live = eventData.live;
     $scope.premium = eventData.premium;
     $scope.regular = eventData.regular;
 
@@ -555,4 +537,65 @@ myApp.controller('organizationController', function ($scope, $ionicPopover, $sta
             }
         });
     };
-})
+});
+
+myApp.factory('sharedDataService', function () {
+    var savedData = {}
+
+    function set(data) {
+        savedData = data;
+    }
+
+    function get() {
+        return savedData;
+    }
+
+    return {
+        set: set,
+        get: get
+    }
+
+});
+
+myApp.controller('postNewsController', function ($scope, $stateParams, sharedDataService) {
+    // Change title depending on type
+    $scope.type = $stateParams.type;
+    // Gets called before entering the view
+    $scope.$on('$ionicView.beforeEnter', function () {
+        $scope.type = $stateParams.type;
+        if ($scope.type == 'Create') {
+
+        } else {
+            var result = sharedDataService.get();
+            $scope.content = result['content'];
+            $scope.title = result['title'];
+        }
+    });
+});
+
+myApp.controller('newsController', function ($scope, sharedDataService, $state, sharedDataService) {
+
+    $scope.result = {
+        "news": [
+            {
+                "title": "Venue Changed Again",
+                "date": "November 01,2015",
+                "content": "Street art pork belly stumptown farm-to-table. Disrupt chillwave tote bag occupy art party, master cleanse vegan 3 wolf moon polaroid Schlitz Austin sustainable plaid. Try-hard tattooed meditation Tumblr vinyl meh. Fanny pack freegan Schlitz Tumblr kogi. Pickled Marfa retro gastropub Blue Bottle. Drinking vinegar cray Banksy migas craft beer. Intelligentsia brunch art party flexitarian, disrupt chia normcore post-ironic leggings raw denim tote bag hella polaroid 8-bit."
+                },
+            {
+                "title": "Venue Changed",
+                "date": "November 01,2015",
+                "content": "This is a test"
+                }
+            ]
+    };
+    
+    // Send data to post news controller
+    $scope.clickEdit = function (id) {
+        sharedDataService.set($scope.result.news[id]);
+        console.log("in click");
+        $state.go("app.postnews", {
+            type: "Edit"
+        })
+    }
+});

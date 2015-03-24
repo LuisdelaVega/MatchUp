@@ -20,24 +20,6 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating'])
     });
 })
 
-.factory('Camera', ['$q', function ($q) {
-
-    return {
-        getPicture: function (options) {
-            var q = $q.defer();
-
-            navigator.camera.getPicture(function (result) {
-                // Do any magic you need
-                q.resolve(result);
-            }, function (err) {
-                q.reject(err);
-            }, options);
-
-            return q.promise;
-        }
-    }
-    }])
-
 .config(function ($stateProvider, $urlRouterProvider) {
     $stateProvider
     //================================================================================
@@ -52,7 +34,8 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating'])
         })
         .state('app.home', {
             url: "/home",
-            templateUrl: "templates/home/home.html"
+            templateUrl: "templates/home/home.html",
+            controller: "homeViewController"
         })
         //================================================================================
         // Events
@@ -385,6 +368,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating'])
             views: {
                 'event-news-tab': {
                     templateUrl: "templates/premiumEvent/news.html",
+                    controller: "newsController"
                 }
             }
         })
@@ -392,6 +376,13 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating'])
         .state('app.premiumsignup', {
             url: "/premiumsignup",
             templateUrl: "templates/premiumEvent/signup.html",
+
+        })
+        // Edit and post news
+        .state('app.postnews', {
+            url: "/postnews/:type",
+            templateUrl: "templates/premiumEvent/post-news.html",
+            controller: "postNewsController"
 
         })
 
@@ -466,4 +457,39 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating'])
 
     // if none of the above states are matched, use this as the fallback
     $urlRouterProvider.otherwise('/login');
-});
+})
+ .factory('sharedDataService', function () {
+    var savedData = {}
+
+    function set(data) {
+        savedData = data;
+    }
+
+    function get() {
+        return savedData;
+    }
+
+    return {
+        set: set,
+        get: get
+    }
+
+})
+
+.factory('Camera', ['$q', function ($q) {
+
+    return {
+        getPicture: function (options) {
+            var q = $q.defer();
+
+            navigator.camera.getPicture(function (result) {
+                // Do any magic you need
+                q.resolve(result);
+            }, function (err) {
+                q.reject(err);
+            }, options);
+
+            return q.promise;
+        }
+    }
+    }]);
