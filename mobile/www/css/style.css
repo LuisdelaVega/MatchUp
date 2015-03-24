@@ -186,3 +186,12 @@ ul.rating li {
 ul.rating li i {
   font-size: 30px;
 }
+
+
+/* Center vertical the right buttons in a list*/
+.center-item.item-button-right .item-content>.button, 
+.center-item.item-button-right .item-content>.buttons, 
+.center-item.item-button-right>.button, 
+.center-item.item-button-right>.buttons{
+  top:17px !important;
+}

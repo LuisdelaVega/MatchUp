@@ -2,7 +2,7 @@
     <ion-nav-buttons side="right">
         <button class="button button-icon ion-android-alert">
         </button>
-        <button class="button button-icon">
+        <button class="button button-icon" ng-click="popover.show($event)">
             <i class="ion-android-more-vertical"></i>
         </button>
     </ion-nav-buttons>
@@ -50,10 +50,15 @@
             <div class="item item-divider">
                 Organization Members
             </div>
-            <a class="item item-avatar" href="#">
+            <a class="item center-item item-avatar item-button-right" href="#">
                 <img src="img/ron.jpg">
                 <h2>Ron Paul</h2>
                 <p>This is my info</p>
+                <div class="buttons">
+                    <button class="button button-clear">
+                        <i class="icon ion-briefcase"></i>
+                    </button>
+                </div>
             </a>
             <a class="item item-avatar" href="#">
                 <img src="img/ron.jpg">

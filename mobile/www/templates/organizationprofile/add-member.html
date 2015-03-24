@@ -1,0 +1,32 @@
+<ion-view view-title="Add Member">
+   <ion-nav-buttons side="left">
+        <button class="button button-icon" ui-sref="app.organizationprofilemembers">
+            <i class="icon ion-ios-arrow-back"></i>
+        </button>
+    </ion-nav-buttons>
+    <ion-content>
+        <div class="list list-inset">
+            <label class="item item-input">
+                <i class="icon ion-search placeholder-icon"></i>
+                <input type="text" placeholder="Search">
+            </label>
+        </div>
+        <div class="list list-inset">
+            <a class="item item-avatar" ng-click="showConfirm('Ron',1)">
+                <img src="img/ron.jpg">
+                <h2>Ron Paul</h2>
+                <p>This is my info</p>
+            </a>
+            <a class="item item-avatar" ng-click="showConfirm('Ron',2)">
+                <img src="img/ron.jpg">
+                <h2>Ron Paul</h2>
+                <p>This is my info</p>
+            </a>
+            <a class="item item-avatar" ng-click="showConfirm('Ron',3)">
+                <img src="img/ron.jpg">
+                <h2>Ron Paul</h2>
+                <p>This is my info</p>
+            </a>
+        </div>
+    </ion-content>
+</ion-view>

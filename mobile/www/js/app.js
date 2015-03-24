@@ -292,7 +292,8 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating'])
     //================================================================================
     .state('app.organizationprofile', {
             url: "/organizationprofile",
-            templateUrl: "templates/organizationprofile/organization-profile.html"
+            templateUrl: "templates/organizationprofile/organization-profile.html",
+            controller: "organizationController"
         })
         .state('app.organizationprofileevents', {
             url: "/organizationprofileevents",
@@ -300,13 +301,23 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating'])
         })
         .state('app.organizationprofilemembers', {
             url: "/organizationprofilemembers",
-            templateUrl: "templates/organizationprofile/organization-profile-members.html"
+            templateUrl: "templates/organizationprofile/organization-profile-members.html",
+            controller: "removeOrganizationMemberController"
         })
 
     .state('app.requestorganization', {
-        url: "/requestorganization",
-        templateUrl: "templates/organizationprofile/request.html"
-    })
+            url: "/requestorganization",
+            templateUrl: "templates/organizationprofile/request.html"
+        })
+        .state('app.addorganizationmember', {
+            url: "/addorganizationmember",
+            templateUrl: "templates/organizationprofile/add-member.html",
+            controller: "addOrganizationMemberController"
+        })
+        .state('app.editorganization', {
+            url: "/editorganization",
+            templateUrl: "templates/organizationprofile/edit.html",
+        })
 
     //================================================================================
     // Team Profile
