@@ -1,19 +1,4 @@
-var myApp = angular.module('App')
-
-//Good night sweet prince. We will always remember the way you danced.  
-//myApp.controller('gameController', ['$scope', function($scope) {
-//
-//    $scope.games = ['img/csgo.jpg'];
-//    var moreImgs = ['img/dota2.jpg', 'img/hearthstone.jpg', 'img/leagueofeppa.jpg']
-//    $scope.add = function add(name) {
-//        if (moreImgs.length>0)
-//            $scope.games.push(moreImgs.pop());
-//        else {
-//            moreImgs.push($scope.games.splice(0,1)[0]);
-//        }
-//        $scope.$broadcast('scroll.infiniteScrollComplete');
-//    }
-//}]);  
+var myApp = angular.module('App'); 
 
 myApp.controller('EventController', function ($scope, $ionicPopover) {
     $ionicPopover.fromTemplateUrl('templates/events/events-popover.html', {
@@ -27,7 +12,7 @@ myApp.controller('EventController', function ($scope, $ionicPopover) {
     $scope.closePopover = function () {
         $scope.popover.hide();
     };
-})
+});
 
 myApp.controller('ProfileController', function ($scope, $ionicPopover,$state) {
     $ionicPopover.fromTemplateUrl('templates/profile/profile-popover.html', {
@@ -41,17 +26,17 @@ myApp.controller('ProfileController', function ($scope, $ionicPopover,$state) {
     $scope.closePopover = function () {
         $scope.popover.hide();
     };
-    
+
     // Close popover when clicking the popover item: Edit Profile
     $scope.goToEditProfile = function(){
         $scope.popover.hide();
         $state.go("app.editprofile");
     }
-})
+});
 
 myApp.controller('RegularEventController', function ($scope) {
 
-})
+});
 
 myApp.controller('PremiumEventController', function ($scope) {
 
@@ -92,10 +77,172 @@ myApp.controller('subscriptionsController', ['$scope', '$http', function($scope,
 
 }]);
 
-myApp.controller('searchResultController', ['$scope', '$stateParams', function($scope, $stateParams) {
+myApp.factory('searchResultsService', function() {
+    var savedData = {}
+    function set(data) {
+        savedData = data;
+    }
+    function get() {
+        return savedData;
+    }
+
+    return {
+        set: set,
+        get: get
+    }
+
+});
+
+myApp.controller('searchController', ['$scope', '$http', 'searchResultsService', function($scope, $http, searchResultsService) {
+
+    $scope.search = function() {
+
+        //HTTP Get pidiendo del server la lista del search filtrada por $scope.query
+
+    }
+
+    var searchData = 
+        {
+            "live": [
+                {
+                    "img"   : "img/evo.png",
+                    "title" : "EVO 2015",
+                    "location" : "Badillo's House, Jersey"
+                },
+                {
+                    "img"    : "img/apex2015.png",
+                    "title" : "Apex 2015",
+                    "location" : "Badillo's House, Jersey"
+                },
+                {
+                    "img"    : "img/lol2.png",
+                    "title" : "LCS 2015",
+                    "location" : "Badillo's House, Jersey"
+                }
+            ],
+
+            "past": [
+                {
+                    "img"   : "img/evo.png",
+                    "title" : "EVO 2015",
+                    "location" : "Badillo's House, Jersey"
+                },
+                {
+                    "img"    : "img/apex2015.png",
+                    "title" : "Apex 2015",
+                    "location" : "Badillo's House, Jersey"
+                },
+                {
+                    "img"    : "img/lol2.png",
+                    "title" : "LCS 2015",
+                    "location" : "Badillo's House, Jersey"
+                }
+            ],
+
+            "premium": [
+                {
+                    "img"   : "img/evo.png",
+                    "title" : "EVO 2015",
+                    "location" : "Badillo's House, Jersey"
+                },
+                {
+                    "img"    : "img/apex2015.png",
+                    "title" : "Apex 2015",
+                    "location" : "Badillo's House, Jersey"
+                },
+                {
+                    "img"    : "img/lol2.png",
+                    "title" : "LCS 2015",
+                    "location" : "Badillo's House, Jersey"
+                }              
+            ],
+            "regular": [
+                {
+                    "img"   : "img/evo.png",
+                    "title" : "EVO 2015",
+                    "location" : "Badillo's House, Jersey"
+                },
+                {
+                    "img"    : "img/apex2015.png",
+                    "title" : "Apex 2015",
+                    "location" : "Badillo's House, Jersey"
+                },
+                {
+                    "img"    : "img/lol2.png",
+                    "title" : "LCS 2015",
+                    "location" : "Badillo's House, Jersey"
+                }              
+            ],
+            "users": [
+                {
+                    "img"   : "img/ron.jpg",
+                    "title" : "Roney",
+                    "location" : "Ron Paul"
+                }            
+            ],
+            "teams": [
+                {
+                    "img"   : "img/cloud9logo.png",
+                    "title" : "Cloud 9"
+                }            
+            ],
+            "organizations": [
+                {
+                    "img"   : "img/esportPR.png",
+                    "title" : "EsportsPR"
+                }            
+            ],
+            "games": [
+                {
+                    "img"   : "img/hearthstone.jpg",
+                    "title" : "Hearthstone"
+                }            
+            ],
+            "genres": [
+                {
+                    "title" : "MOBA"
+                }            
+            ]          
+        };
+
+    $scope.liveEvents = searchData.live;
+    $scope.pastEvents = searchData.past;
+    $scope.premiumEvents = searchData.premium;
+    $scope.regularEvents = searchData.regular;
+    $scope.users = searchData.users;
+    $scope.teams = searchData.teams;
+    $scope.organizations = searchData.organizations;
+    $scope.games = searchData.games;
+    $scope.genres = searchData.genres;
+
+    searchResultsService.set(searchData);
+
+}]);
+
+myApp.controller('searchResultController', ['$scope', '$stateParams', 'searchResultsService', function($scope, $stateParams, searchResultsService) {
 
     $scope.resultType = $stateParams.type;
 
+    var searchData = searchResultsService.get();
+
+    if($scope.resultType == 'Live')
+        $scope.searchData = searchData.live;
+    else if($scope.resultType == 'Past')
+        $scope.searchData = searchData.past;
+    else if($scope.resultType == 'Premium')
+        $scope.searchData = searchData.past;
+    else if($scope.resultType == 'Regular')
+        $scope.searchData = searchData.regular;
+    else if($scope.resultType == 'Users')
+        $scope.searchData = searchData.users;
+    else if($scope.resultType == 'Teams')
+        $scope.searchData = searchData.teams;
+    else if($scope.resultType == 'Organizations')
+        $scope.searchData = searchData.organizations;
+    else if($scope.resultType == 'Games')
+        $scope.searchData = searchData.games;
+    else if($scope.resultType == 'Genres')
+        $scope.searchData = searchData.genres;
 }]); 
 
 myApp.controller('REController', ['$scope', '$http', '$ionicPopup', function($scope, $http, $ionicPopup) {
@@ -110,7 +257,7 @@ myApp.controller('REController', ['$scope', '$http', '$ionicPopup', function($sc
         });
         confirmPopup.then(function(res) {
             if(res) {
-                console.log('You');
+                console.log('Yes');
             } else {
                 console.log('No');
             }
@@ -249,11 +396,10 @@ myApp.controller('homeViewController', ['$scope', '$http', function($scope, $htt
                 }
             ]
         };
-    
+
     $scope.live = eventData.live;   
     $scope.premium = eventData.premium;
     $scope.regular = eventData.regular;
 
-    console.log($scope.live);
-    
 }]);
+

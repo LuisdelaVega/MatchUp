@@ -6,20 +6,10 @@
     </ion-nav-buttons>
     <ion-content>
         <div class="list">
-            <a class="item item-avatar" href="#">
-                <img src="img/lolbr.jpeg">
-                <h2>LOL Championship Series</h2>
-                <p>Badillo's House, Jersey</p>
-            </a>
-            <a class="item item-avatar" href="#">
-                <img src="img/lolbr.jpeg">
-                <h2>LOL Championship Series</h2>
-                <p>Badillo's House, Jersey</p>
-            </a>
-            <a class="item item-avatar" href="#">
-                <img src="img/lolbr.jpeg">
-                <h2>LOL Championship Series</h2>
-                <p>Badillo's House, Jersey</p>
+            <a class="item item-avatar" href="#" ng-repeat="data in searchData">
+                <img ng-src="{{ data.img }}">
+                <h2>{{ data.title }}</h2>
+                <p>{{ data.location }}</p>
             </a>
         </div>
     </ion-content>

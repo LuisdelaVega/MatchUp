@@ -1,119 +1,91 @@
 <ion-view view-title="">
-   <ion-nav-buttons side="left">
+    <ion-nav-buttons side="left">
         <button class="button button-icon ion-navicon" menu-toggle="left">
         </button>
     </ion-nav-buttons>
     <ion-nav-buttons side="primary">
         <label class="item item-input">
             <i class="icon ion-search placeholder-icon"></i>
-            <input type="text" placeholder="Search" />
+            <input ng-model="query" ng-change="search" type="text" placeholder="Search" />
         </label>
     </ion-nav-buttons>
     <ion-content>
-         <div class="list">
-           <a class="item item-divider " href="#/app/searchgeneral/Live">
-                Live
-                
+        <div class="list">
+            <a class="item item-divider " href="#/app/searchgeneral/Live">
+                Live          
             </a>
-            <a class="item item-avatar" href="#">
-                <img src="img/lolbr.jpeg">
-                <h2>LOL Championship Series</h2>
-                <p>Badillo's House, Jersey</p>
+            <a class="item item-avatar" href="#" ng-repeat="event in liveEvents">
+                <img ng-src="{{ event.img }}">
+                <h2>{{ event.title }}</h2>
+                <p>{{ event.location }}</p>
             </a>
-            <a class="item item-avatar" href="#">
-                <img src="img/lolbr.jpeg">
-                <h2>LOL Championship Series</h2>
-                <p>Badillo's House, Jersey</p>
+
+            <a class="item item-divider " href="#/app/searchgeneral/Past">
+                Past              
             </a>
-           <a class="item item-divider " href="#/app/searchgeneral/Past">
-                Past
-                
+            <a class="item item-avatar" href="#" ng-repeat="event in pastEvents">
+                <img ng-src="{{ event.img }}">
+                <h2>{{ event.title }}</h2>
+                <p>{{ event.location }}</p>
             </a>
-            <a class="item item-avatar" href="#">
-                <img src="img/evo.png">
-                <h2>EVO Championship Series</h2>
-                <p>Badillo's House, Jersey</p>
-            </a>
+
             <a class="item item-divider " href="#/app/searchgeneral/Premium">
-                Premium
-                
+                Premium            
             </a>
-            <a class="item item-avatar" href="#">
-                <img src="img/evo.png">
-                <h2>EVO Championship Series</h2>
-                <p>Badillo's House, Jersey</p>
+            <a class="item item-avatar" href="#" ng-repeat="event in pastEvents">
+                <img ng-src="{{ event.img }}">
+                <h2>{{ event.title }}</h2>
+                <p>{{ event.location }}</p>
             </a>
-            <a class="item item-avatar" href="#">
-                <img src="img/evo.png">
-                <h2>EVO Championship Series</h2>
-                <p>Badillo's House, Jersey</p>
-            </a>
-            <a class="item item-avatar" href="#">
-                <img src="img/evo.png">
-                <h2>EVO Championship Series</h2>
-                <p>Badillo's House, Jersey</p>
-            </a>
+
             <a class="item item-divider " href="#/app/searchgeneral/Regular">
-                Regular
-                
+                Regular               
             </a>
-            <a class="item item-avatar" href="#">
-                <img src="img/evo.png">
-                <h2>EVO Championship Series</h2>
-                <p>Badillo's House, Jersey</p>
+            <a class="item item-avatar" href="#" ng-repeat="event in regularEvents">
+                <img ng-src="{{ event.img }}">
+                <h2>{{ event.title }}</h2>
+                <p>{{ event.location }}</p>
             </a>
-            <a class="item item-avatar" href="#">
-                <img src="img/evo.png">
-                <h2>EVO Championship Series</h2>
-                <p>Badillo's House, Jersey</p>
-            </a>
+
             <a class="item item-divider " href="#/app/searchgeneral/Users">
-                Users
-                
+                Users               
             </a>
-            <a class="item item-avatar" href="#">
-                <img src="img/ron.jpg">
-                <h2>Roney</h2>
-                <p>Ron Paul</p>
+            <a class="item item-avatar" href="#" ng-repeat="user in users">
+                <img ng-src="{{ user.img }}">
+                <h2>{{ user.title }}</h2>
+                <p>{{ user.location }}</p>
             </a>
-            <a class="item item-avatar" href="#">
-                <img src="img/ron.jpg">
-                <h2>Roney</h2>
-                <p>Ron Paul</p>
-            </a>
+
             <a class="item item-divider " href="#/app/searchgeneral/Teams">
-                Teams
-                
+                Teams                
             </a>
-            <a class="item item-avatar" href="#">
-                <img src="img/cloud9logo.png">
-                <h2>Cloud 9</h2>
+            <a class="item item-avatar" href="#" ng-repeat="team in teams">
+                <img ng-src="{{ team.img }}">
+                <h2>{{ team.title }}</h2>
             </a>
+
             <a class="item item-divider " href="#/app/searchgeneral/Organizations">
-                Organizations
-                
+                Organizations               
             </a>
-            <a class="item item-avatar" href="#">
-                <img src="img/esportPR.png">
-                <h2>EsportsPR</h2>
+            <a class="item item-avatar" href="#" ng-repeat="organization in organizations">
+                <img ng-src="{{ organization.img }}">
+                <h2>{{ organization.title }}</h2>
             </a>
-            <a class="item item-divider " href="#/app/searchgeneral/Games">
-                Games
-                
+            
+            <a class="item item-divider" href="#/app/searchgeneral/Games">
+                Games         
             </a>
-            <a class="item item-avatar" href="#/app/game/summary">
-                <img src="img/hearthstone.jpg">
-                <h2>Hearthstone</h2>
+            
+            <a class="item item-avatar" href="#" ng-repeat="game in games">
+                <img ng-src="{{ game.img }}">
+                <h2>{{ game.title }}</h2>
             </a>
-             <a class="item item-avatar" href="#/app/game/summary">
-                <img src="img/lol.png">
-                <h2>League of Legends</h2>
-            </a>
+
             <a class="item item-divider " href="#/app/searchgenres">
                 Genres
             </a>
-            <a class="item" href="#/app/genre/upcoming">
-                <h2>MOBA</h2>
+            <a class="item" href="#/app/genre/upcoming" ng-repeat="genre in genres">
+                <h2>{{ genre.title }}</h2>
             </a>
         </div>
     </ion-content>
