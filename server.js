@@ -68,8 +68,9 @@ function authenticate(req, res) {
 		}
 
 		// Query the database to find the account
+		//TODO Attach the salt to the password before comparing with the DB
 		var query = client.query({
-			text : "SELECT customer.customer_username FROM customer WHERE customer_username = $1 AND customer_password = $2",
+			text : "SELECT customer_username FROM customer WHERE customer_username = $1 AND customer_password = $2",
 			values : [user.name, user.pass]
 		});
 		query.on("row", function(row, result) {

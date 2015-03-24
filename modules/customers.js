@@ -35,7 +35,7 @@ var getUserProfile = function(req, res, pg, conString) {
 				// Query the database to find the user's Teams
 				var teamsQuery = client.query({
 					text : "SELECT team.team_name, team.team_logo, team.team_bio, team.team_cover_photo" + 
-					" FROM customer NATURAL JOIN plays_for NATURAL JOIN team WHERE customer.customer_username = $1 AND team.team_active",
+					" FROM team NATURAL JOIN plays_for WHERE customer_username = $1 AND team.team_active",
 					values : [req.params.username]
 				});
 				teamsQuery.on("row", function(row, result) {
@@ -46,8 +46,8 @@ var getUserProfile = function(req, res, pg, conString) {
 
 					// Query the database to find the user's Organizations
 					var organizationsQuery = client.query({
-						text : "SELECT organization.organization_name, organization.organization_logo, organization.organization_bio, organization.organization_cover_photo" + 
-						" FROM customer NATURAL JOIN belongs_to NATURAL JOIN organization WHERE customer.customer_username = $1 AND organization.organization_active",
+						text : "SELECT organization.organization_name, organization.organization_logo" + 
+						" FROM organization NATURAL JOIN belongs_to WHERE customer_username = $1 AND organization.organization_active",
 						values : [req.params.username]
 					});
 					organizationsQuery.on("row", function(row, result) {
@@ -58,7 +58,7 @@ var getUserProfile = function(req, res, pg, conString) {
 
 						// Query the database to find the user's created Events
 						var eventsQuery = client.query({
-							text : "SELECT event.* FROM event WHERE customer_username = $1 AND event.event_visibility",
+							text : "SELECT event_name, event_start_date, event_location, event_venue FROM event WHERE customer_username = $1 AND event_visibility",
 							values : [req.params.username]
 						});
 						eventsQuery.on("row", function(row, result) {
