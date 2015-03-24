@@ -107,14 +107,13 @@ var createAccount = function(req, res, pg, conString, jwt, secret) {
 		client.query("START TRANSACTION");
 		client.query({
 			text : "INSERT INTO customer" + 
-			" (customer_username, customer_first_name, customer_last_name, customer_tag, customer_password, customer_paypal_info, customer_salt, customer_active)" + 
-			" VALUES ($1, $2, $3, $4, $5, $6, $7, TRUE)",
+			" (customer_username, customer_first_name, customer_last_name, customer_tag, customer_password, customer_salt, customer_active)" + 
+			" VALUES ($1, $2, $3, $4, $5, $6, TRUE)",
 			values : [req.body.info[0], // customer_username*
 			req.body.info[1], // customer_first_name*
 			req.body.info[2], // customer_last_name*
 			req.body.info[3], // customer_tag*
 			req.body.info[4], // customer_password*
-			req.body.info[5], // customer_paypal_info*,
 			"somesalt"]
 		}, function(err, result) {
 			if (err) {
@@ -124,7 +123,7 @@ var createAccount = function(req, res, pg, conString, jwt, secret) {
 				client.query({
 					text : "INSERT INTO of_email (customer_username, email_address) VALUES ($1, $2)",
 					values : [req.body.info[0], // customer_username*
-					req.body.info[6] // email_address*
+					req.body.info[5] // email_address*
 					]
 				}, function(err, result) {
 					if (err) {
