@@ -81,7 +81,7 @@ function authenticate(req, res) {
 				var response = {
 					username : result.rows[0].customer_username
 				};
-				// We are sending the profile inside the token
+				// We are sending the username inside the token
 				var token = jwt.sign(response, secret);
 
 				res.json({
@@ -123,7 +123,7 @@ function getEvent(req, res) {
 }
 
 function createAccount(req, res) {
-	customers.createAccount(req, res, pg, conString);
+	customers.createAccount(req, res, pg, conString, jwt, secret);
 }
 
 function createGroupStage(req, res){
@@ -131,15 +131,12 @@ function createGroupStage(req, res){
 }
 
 function createTournament(req, res){
-	// console.log("Over here!");
-	// res.send("Hello!");
 	brackets.createTournament(req, res);
 }
 
-
-// function createTeam(req, res) {
-	// customers.createTeam(req, res, pg, conString);
-// }
+function createTeam(req, res) {
+	customers.createTeam(req, res, pg, conString);
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
 app.get('/bracket/:type/:numofplayers', brackets.createBraket);
@@ -158,7 +155,7 @@ app.post('/tournament', createTournament);
 app.post('/login', authenticate); // Get token by loging in to our service
 app.get('/matchup/profile', getMyProfile);
 app.get('/matchup/profile/:username', getUserProfile);
-// app.post('/matchup/create/team', createTeam);
+app.post('/matchup/create/team', createTeam);
 
 ////////////////////////////////////////////////////////////////////////////////////// SERVER LISTEN
 var port = process.env.PORT || 5000;
