@@ -1,5 +1,3 @@
-//TODO Delete team
-
 var getTeams = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -19,7 +17,6 @@ var getTeams = function(req, res, pg, conString) {
 	});
 };
 
-//TODO Indicate the customer belongs to this Team
 //TODO Look for Tournaments the team has participated and calculate their standing
 var getTeam = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
@@ -37,35 +34,20 @@ var getTeam = function(req, res, pg, conString) {
 		teamsQuery.on("end", function(result) {
 			if (result.rows.length > 0) {
 				var team = new Object();
-				team.info = new Object();
 				team.info = result.rows[0];
 				var playersQuery = client.query({
-					text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic" + 
-					" FROM customer NATURAL JOIN plays_for WHERE customer.customer_username NOT IN (SELECT customer.customer_username"+
-					" FROM customer NATURAL JOIN captain_for WHERE team_name = $1)"+
-					" AND customer_active AND team_name = $1",
+					text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag,"+
+					" customer.customer_profile_pic, bool_and(customer.customer_username IN (SELECT customer_username FROM captain_for WHERE team_name = $1)) AS is_captain" + 
+					" FROM customer NATURAL JOIN plays_for WHERE customer_active AND team_name = $1 GROUP BY customer.customer_username",
 					values : [req.params.team]
 				});
 				playersQuery.on("row", function(row, result) {
 					result.addRow(row);
 				});
 				playersQuery.on("end", function(result) {
-					team.players = new Object();
 					team.players = result.rows;
-					var playersQuery = client.query({
-						text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic" + 
-						" FROM customer NATURAL JOIN captain_for WHERE customer_active AND team_name = $1",
-						values : [req.params.team]
-					});
-					playersQuery.on("row", function(row, result) {
-						result.addRow(row);
-					});
-					playersQuery.on("end", function(result) {
-						team.captain = new Object();
-						team.captain = result.rows[0];
-						res.json(team);
-						client.end();
-					});
+					res.json(team);
+					client.end();
 				});
 			} else {
 				client.end();
@@ -75,7 +57,7 @@ var getTeam = function(req, res, pg, conString) {
 	});
 };
 
-//TODO Check if user that wants to edit is part of this organization
+//TODO Check if user that wants to edit is part of this team
 var editTeam = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -112,6 +94,36 @@ var editTeam = function(req, res, pg, conString) {
 	});
 };
 
+var deleteTeam = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+		
+		var teamsQuery = client.query({
+			text : "UPDATE team SET team_active = FALSE"+
+			" WHERE team_name = $1 AND team_name IN (SELECT team_name FROM captain_for WHERE customer_username = $2)",
+			values : [req.params.team, req.user.username]
+		}, function(err, result) {
+			if (err) {
+				res.status(400).send("Oh, no! Disaster!");
+				client.end();
+			} else {
+				res.status(204).send('');
+			}
+		});
+	});
+};
+
+var addMember = function(req, res, pg, conString) {
+	
+};
+
+var removeMember = function(req, res, pg, conString) {
+	
+};
+
 module.exports.getTeams = getTeams;
 module.exports.getTeam = getTeam;
 module.exports.editTeam = editTeam;
+module.exports.deleteTeam = deleteTeam;

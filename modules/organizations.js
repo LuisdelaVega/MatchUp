@@ -1,4 +1,3 @@
-//TODO Edit organization, delete organization
 var getOrganizations = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -18,6 +17,7 @@ var getOrganizations = function(req, res, pg, conString) {
 	});
 };
 
+//TODO Indiate the customer is owner 
 var getOrganization = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -35,46 +35,33 @@ var getOrganization = function(req, res, pg, conString) {
 		organizationsQuery.on("end", function(result) {
 			if (result.rows.length > 0) {
 				var organization = new Object();
-				organization.info = new Object();
+				// organization.info = new Object();
 				organization.info = result.rows[0];
 				var membersQuery = client.query({
-					text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic" + 
-					" FROM customer NATURAL JOIN belongs_to WHERE customer.customer_username NOT IN (SELECT customer.customer_username" + 
-					" FROM customer NATURAL JOIN owns WHERE organization_name = $1)" + 
-					" AND customer_active AND organization_name = $1",
+					text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag,"+
+					" customer.customer_profile_pic, bool_and(customer.customer_username IN (SELECT customer_username FROM owns WHERE organization_name = $1)) as is_owner" + 
+					" FROM customer NATURAL JOIN belongs_to WHERE customer_active AND organization_name = $1 GROUP BY customer.customer_username",
 					values : [req.params.organization]
 				});
 				membersQuery.on("row", function(row, result) {
 					result.addRow(row);
 				});
 				membersQuery.on("end", function(result) {
-					organization.members = new Object();
+					// organization.members = new Object();
 					organization.members = result.rows;
-					var ownersQuery = client.query({
-						text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic" + 
-						" FROM customer NATURAL JOIN owns WHERE customer_active AND organization_name = $1",
+					var eventsQuery = client.query({
+						text : "SELECT event.event_name, event.event_location, event.event_venue, event.event_logo" + 
+						" FROM event NATURAL JOIN hosts WHERE event_visibility AND organization_name = $1",
 						values : [req.params.organization]
 					});
-					ownersQuery.on("row", function(row, result) {
+					eventsQuery.on("row", function(row, result) {
 						result.addRow(row);
 					});
-					ownersQuery.on("end", function(result) {
-						organization.owners = new Object();
-						organization.owners = result.rows;
-						var eventsQuery = client.query({
-							text : "SELECT event.event_name, event.event_location, event.event_venue, event.event_logo" + 
-							" FROM event NATURAL JOIN hosts WHERE event_visibility AND organization_name = $1",
-							values : [req.params.organization]
-						});
-						eventsQuery.on("row", function(row, result) {
-							result.addRow(row);
-						});
-						eventsQuery.on("end", function(result) {
-							organization.events = new Object();
-							organization.events = result.rows;
-							res.json(organization);
-							client.end();
-						});
+					eventsQuery.on("end", function(result) {
+						// organization.events = new Object();
+						organization.events = result.rows;
+						res.json(organization);
+						client.end();
 					});
 				});
 			} else {
@@ -122,7 +109,6 @@ var editOrganization = function(req, res, pg, conString) {
 	});
 };
 
-//TODO Check if user that wants to delete is part of this organization
 // /organizations/:organization - Turn an Organization inactive
 var deleteOrganization = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
@@ -131,8 +117,9 @@ var deleteOrganization = function(req, res, pg, conString) {
 		}
 		
 		var organizationsQuery = client.query({
-			text : "UPDATE organization SET organization_active = FALSE WHERE organization_name = $1",
-			values : [req.params.organization]
+			text : "UPDATE organization SET organization_active = FALSE"+
+			" WHERE organization_name = $1 AND organization_name IN (SELECT organization_name FROM owns WHERE customer_username = $2)",
+			values : [req.params.organization, req.user.username]
 		}, function(err, result) {
 			if (err) {
 				res.status(400).send("Oh, no! Disaster!");

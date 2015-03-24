@@ -10,12 +10,12 @@ var createTournament = function(req, res) {
 	switch(req.body.format) {
 	case "Single Elimination":
 		tournament.bracket = new Object();
-		tournament.bracket.type = "single";
+		tournament.bracket.format = "single";
 		// tournament.bracket.numOfPlayers = tournament.players.length;
 		break;
 	case "Double Elimination":
 		tournament.bracket = new Object();
-		tournament.bracket.type = "double";
+		tournament.bracket.format = "double";
 		// tournament.bracket.numOfPlayers = tournament.players.length;
 		break;
 	case "Round Robin":
@@ -138,10 +138,10 @@ function generateBracket(bracket, players) {
 	// players[i].seed = i + 1;
 	// }
 
-	if (bracket.type == 'single') {
+	if (bracket.format == 'single') {
 		bracket.winnerRounds = new Array();
 		singleEliminationBracket(bracket, players);
-	} else if (bracket.type == 'double') {
+	} else if (bracket.format == 'double') {
 		bracket.winnerRounds = new Array();
 		singleEliminationBracket(bracket, players);
 		bracket.numOfLoserRounds = 0;
@@ -167,10 +167,10 @@ var createBraket = function(req, res) {
 		players[i].seed = i + 1;
 	}
 
-	if (req.params.type == 'single') {
+	if (req.params.format == 'single') {
 		bracket.winnerRounds = new Array();
 		singleEliminationBracket(bracket, players);
-	} else if (req.params.type == 'double') {
+	} else if (req.params.format == 'double') {
 		bracket.winnerRounds = new Array();
 		singleEliminationBracket(bracket, players);
 		bracket.numOfLoserRounds = 0;

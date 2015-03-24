@@ -170,7 +170,7 @@ function deleteOrganization(req, res) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
-app.get('/bracket/:type/:numofplayers', brackets.createBraket); // *Depreciated* Used for testing of the bracket generation algorithm
+app.get('/bracket/:format/:numofplayers', brackets.createBraket); // *Depreciated* Used for testing of the bracket generation algorithm
 app.post('/groupstage', createGroupStage); // *Depreciated* Used for testing of the group stage algorithm
 app.get('/home', getHome); // Sends the data to populate the Home view. TODO Limit the amount of objects to 3 of every type
 app.get('/popularstuff', getPopularStuff); // Sends popular games and genres. Not sure if it still needed
@@ -198,7 +198,8 @@ app.route('/matchup/organizations/:organization')
 	.delete(deleteOrganization);
 app.route('/matchup/teams/:team')
 	.get(getTeam) // Get the details for a specific Team
-	.put(editTeam);
+	.put(editTeam)
+	.delete(deleteTeam);
 
 ////////////////////////////////////////////////////////////////////////////////////// SERVER LISTEN
 var port = process.env.PORT || 5000;
