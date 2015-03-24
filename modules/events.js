@@ -4,7 +4,7 @@ var getEventsParams = {
 	time : ["live", "past", "upcoming"]
 };
 
-//TODO Implement offsets like in Spruce and also limit
+//TODO Implement limit and offsets like in Spruce
 // /events - Get a list of Events filtered by given parameters
 var getEvents = function(req, res, pg, conString) {
 	// Query the DB to find the local Events

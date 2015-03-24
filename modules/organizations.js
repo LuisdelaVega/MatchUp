@@ -25,8 +25,9 @@ var getOrganization = function(req, res, pg, conString) {
 		}
 
 		var organizationsQuery = client.query({
-			text : "SELECT organization_name, organization_logo, organization_bio, organization_cover_photo FROM organization WHERE organization_active AND organization_name = $1",
-			values : [req.params.organization]
+			text : "SELECT organization_name, organization_logo, organization_bio, organization_cover_photo, bool_and(customer_username = $1) AS my_organization"+
+			" FROM organization NATURAL JOIN belongs_to WHERE organization_active AND organization_name = $2 GROUP BY organization_name",
+			values : [req.user.username, req.params.organization]
 		});
 		organizationsQuery.on("row", function(row, result) {
 			result.addRow(row);
@@ -78,7 +79,7 @@ var getOrganization = function(req, res, pg, conString) {
 				});
 			} else {
 				client.end();
-				return res.status(404).send('Oh, no! This organization does not exist');
+				res.status(404).send('Oh, no! This organization does not exist');
 			};
 		});
 	});
@@ -106,9 +107,10 @@ var editOrganization = function(req, res, pg, conString) {
 			return res.status(401).send("Tu mai");
 		}
 
-		queryText += " WHERE organization_name = '" + req.params.organization + "'";
+		queryText += " WHERE organization_name = $1 AND organization_name IN (SELECT organization_name FROM belongs_to WHERE customer_username = $2) AND organization_active";
 		var organizationsQuery = client.query({
-			text : queryText
+			text : queryText,
+			values : [req.params.organization, req.user.username]
 		}, function(err, result) {
 			if (err) {
 				res.status(400).send("Oh, no! Disaster!");
@@ -120,10 +122,37 @@ var editOrganization = function(req, res, pg, conString) {
 	});
 };
 
+//TODO Check if user that wants to delete is part of this organization
+// /organizations/:organization - Turn an Organization inactive
 var deleteOrganization = function(req, res, pg, conString) {
-	//DELETE FROM organization
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+		
+		var organizationsQuery = client.query({
+			text : "UPDATE organization SET organization_active = FALSE WHERE organization_name = $1",
+			values : [req.params.organization]
+		}, function(err, result) {
+			if (err) {
+				res.status(400).send("Oh, no! Disaster!");
+				client.end();
+			} else {
+				res.status(204).send('');
+			}
+		});
+	});
+};
+
+var addMember = function(req, res, pg, conString) {
+	
+};
+
+var removeMember = function(req, res, pg, conString) {
+	
 };
 
 module.exports.getOrganizations = getOrganizations;
 module.exports.getOrganization = getOrganization;
 module.exports.editOrganization = editOrganization;
+module.exports.deleteOrganization = deleteOrganization;

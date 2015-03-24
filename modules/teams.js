@@ -1,4 +1,5 @@
-//TODO Edit team, delete team
+//TODO Delete team
+
 var getTeams = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -18,6 +19,7 @@ var getTeams = function(req, res, pg, conString) {
 	});
 };
 
+//TODO Indicate the customer belongs to this Team
 //TODO Look for Tournaments the team has participated and calculate their standing
 var getTeam = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
@@ -73,5 +75,43 @@ var getTeam = function(req, res, pg, conString) {
 	});
 };
 
+//TODO Check if user that wants to edit is part of this organization
+var editTeam = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var queryText = "UPDATE team SET";
+		if (req.body.logo) {
+			queryText += " team_logo = '" + req.body.logo + "'";
+		}
+		if (req.body.bio) {
+			queryText += " team_bio = '" + req.body.bio + "'";
+		}
+		if (req.body.cover) {
+			queryText += " team_cover = '" + req.body.cover + "'";
+		}
+
+		if (!req.body.logo && !req.body.bio && !req.body.cover) {
+			client.end();
+			return res.status(401).send("Tu mai");
+		}
+
+		queryText += " WHERE team_name = '" + req.params.team + "'";
+		var teamsQuery = client.query({
+			text : queryText
+		}, function(err, result) {
+			if (err) {
+				res.status(400).send("Oh, no! Disaster!");
+				client.end();
+			} else {
+				res.status(204).send('');
+			}
+		});
+	});
+};
+
 module.exports.getTeams = getTeams;
 module.exports.getTeam = getTeam;
+module.exports.editTeam = editTeam;

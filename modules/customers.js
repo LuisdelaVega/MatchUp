@@ -23,9 +23,10 @@ var getUserProfile = function(req, res, pg, conString) {
 		// Query the database to find the user's account
 		var profileQuery = client.query({
 			text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag," + 
-			" customer.customer_profile_pic, customer.customer_cover_photo, customer.customer_bio, customer.customer_country, of_email.email_address" + 
-			" FROM customer NATURAL JOIN of_email WHERE customer_username = $1 AND customer.customer_active",
-			values : [req.params.username]
+			" customer.customer_profile_pic, customer.customer_cover_photo, customer.customer_bio, customer.customer_country,"+
+			" of_email.email_address, bool_and(customer_username = $1) AS my_profile" + 
+			" FROM customer NATURAL JOIN of_email WHERE customer_username = $2 AND customer.customer_active GROUP BY customer_username, email_address",
+			values : [req.user.username, req.params.username]
 		});
 		profileQuery.on("row", function(row, result) {
 			result.addRow(row);
@@ -69,23 +70,12 @@ var getUserProfile = function(req, res, pg, conString) {
 						eventsQuery.on("end", function(result) {
 							profile.events = result.rows;
 
-							if (req.params.username === req.user.username) {
-								res.json({
-									my_profile : true,
-									info : profile.info,
-									teams : profile.teams,
-									origanizations : profile.organizations,
-									events : profile.events
-								});
-							} else {
-								res.json({
-									my_profile : false,
-									info : profile.info,
-									teams : profile.teams,
-									origanizations : profile.organizations,
-									events : profile.events
-								});
-							}
+							res.json({
+								info : profile.info,
+								teams : profile.teams,
+								origanizations : profile.organizations,
+								events : profile.events
+							});
 							client.end();
 						});
 					});
@@ -150,7 +140,6 @@ var createAccount = function(req, res, pg, conString, jwt, secret) {
 	});
 };
 
-//TODO This is not complete at all.
 var createTeam = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -168,7 +157,7 @@ var createTeam = function(req, res, pg, conString) {
 			]
 		}, function(err, result) {
 			if (err) {
-				res.status(400).send("Oh, no! Disaster in INSERT INTO team!");
+				res.status(400).send("Oh, no! Disaster!");
 				client.end();
 			} else {
 				client.query({

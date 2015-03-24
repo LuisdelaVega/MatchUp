@@ -70,7 +70,7 @@ function authenticate(req, res) {
 		}
 
 		// Query the database to find the account
-		//TODO Attach the salt to the password before comparing with the DB
+		//TODO Query to find the salt and attach it to the password before comparing with the DB
 		var query = client.query({
 			text : "SELECT customer_username FROM customer WHERE customer_username = $1 AND customer_password = $2",
 			values : [user.name, user.pass]
@@ -149,6 +149,10 @@ function getTeam(req, res) {
 	teams.getTeam(req, res, pg, conString);
 }
 
+function editTeam(req, res) {
+	teams.editTeam(req, res, pg, conString);
+}
+
 function getOrganizations(req, res) {
 	organizations.getOrganizations(req, res, pg, conString);
 }
@@ -161,33 +165,40 @@ function editOrganization(req, res) {
 	organizations.editOrganization(req, res, pg, conString);
 }
 
+function deleteOrganization(req, res) {
+	organizations.deleteOrganization(req, res, pg, conString);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
-app.get('/bracket/:type/:numofplayers', brackets.createBraket);
-app.get('/home', getHome);
-app.get('/popularstuff', getPopularStuff);
-app.get('/search/:parameter', getSearchResults);
-app.get('/events', getEvents);
-app.get('/events/:event', getEvent);
-app.get('/teams', getTeams);
-app.get('/teams/:team', getTeam);
-app.get('/organizations', getOrganizations);
-app.get('/organizations/:organization', getOrganization);
+app.get('/bracket/:type/:numofplayers', brackets.createBraket); // *Depreciated* Used for testing of the bracket generation algorithm
+app.post('/groupstage', createGroupStage); // *Depreciated* Used for testing of the group stage algorithm
+app.get('/home', getHome); // Sends the data to populate the Home view. TODO Limit the amount of objects to 3 of every type
+app.get('/popularstuff', getPopularStuff); // Sends popular games and genres. Not sure if it still needed
+app.get('/search/:parameter', getSearchResults); // Searches the DB based on the search parameter. TODO Limit the amount of objects to 3 of every type
+app.get('/events', getEvents); // Sends a list of events that can be filtered by when it started, game or genre featured, and by type (regular or hosted). TODO Implement limit and offsets like in Spruce
+app.get('/events/:event', getEvent); // Get the details for a specific Event
 
-app.post('/create/account', createAccount);
-app.post('/groupstage', createGroupStage);
-app.post('/tournament', createTournament);
-
-app.put('/organizations/:organization', editOrganization);
-
-// app.delete('/organizations/:organization', deleteOrganization);
+app.post('/create/account', createAccount); // Create a new account
+app.post('/tournament', createTournament); // Generates a Tournament based on the information sent in the body. TODO Read the details from the DB and only expect the array of players
 
 ///////////////////////////////////////////////////////////////////////////////////////////// API ROUTES
+app.get('/api/teams', getTeams); // Sends a list of every Team
+app.get('/api/organizations', getOrganizations); // Sends a list of every Organization
 
 ///////////////////////////////////////////////////////////////////////////////////////////// MatchUp ROUTES
-app.post('/login', authenticate);
 app.get('/matchup/profile', getMyProfile);
 app.get('/matchup/profile/:username', getUserProfile);
+
+app.post('/login', authenticate);
 app.post('/matchup/create/team', createTeam);
+
+app.route('/matchup/organizations/:organization')
+	.get(getOrganization) // Get the details for a specific Organization
+	.put(editOrganization)
+	.delete(deleteOrganization);
+app.route('/matchup/teams/:team')
+	.get(getTeam) // Get the details for a specific Team
+	.put(editTeam);
 
 ////////////////////////////////////////////////////////////////////////////////////// SERVER LISTEN
 var port = process.env.PORT || 5000;
