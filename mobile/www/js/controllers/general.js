@@ -16,96 +16,22 @@ var myApp = angular.module('home',[]);
 //}]);  
 
 myApp.controller('homeViewController', ['$scope', '$http', function ($scope, $http) {
-    console.log("homeview controlelr");
-    var eventData = {
-        "live": [
-            {
-                "img": "img/apex2015.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/apex2015.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/lol2.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/lol2.png",
-                "title": "LOL Championship Series",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/lolbr.jpeg",
-                "title": "LOL Championship Series Brazil",
-                "location": "Badillo's House, Jersey"
-            }
-        ],
+    $http.get('http://136.145.116.232/home').
+    success(function(data, status, headers, config) {
 
-        "premium": [
-            {
-                "img": "img/apex2015.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/apex2015.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/lol2.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/lol2.png",
-                "title": "LOL Championship Series",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/lolbr.jpeg",
-                "title": "LOL Championship Series Brazil",
-                "location": "Badillo's House, Jersey"
-            }
-        ],
+        var eventData = angular.fromJson(data);
 
-        "regular": [
-            {
-                "img": "img/apex2015.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/apex2015.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/lol2.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/lol2.png",
-                "title": "LOL Championship Series",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/lolbr.jpeg",
-                "title": "LOL Championship Series Brazil",
-                "location": "Badillo's House, Jersey"
-            }
-        ]
-    };
+        $scope.liveEvents = eventData.events.live;
+        $scope.premiumEvents = eventData.events.hosted;
+        $scope.regularEvents = eventData.events.regular;
+        $scope.popularGames = eventData.popular_games;
 
-    $scope.live = eventData.live;
-    $scope.premium = eventData.premium;
-    $scope.regular = eventData.regular;
+    }).
+    error(function(data, status, headers, config) {
+        console.log("error in search controller");
+    });
+
+
 
 }]);
 
@@ -132,7 +58,7 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', fu
         success(function(data, status, headers, config) {
 
             var searchData = angular.fromJson(data);
-            
+
             $scope.liveEvents = searchData.events.live;
             $scope.pastEvents = searchData.events.past;
             $scope.premiumEvents = searchData.events.hosted;
@@ -165,7 +91,7 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
     $scope.resultType = $stateParams.type;
 
     var searchData = sharedDataService.get();
-    
+
     $scope.live = false;
     $scope.past = false;
     $scope.hosted = false;
@@ -175,7 +101,7 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
     $scope.organizations = false;
     $scope.games = false;
     $scope.genres = false;
-    
+
     if ($scope.resultType == 'Live'){
         $scope.searchData = searchData.live;
         $scope.live = true;
