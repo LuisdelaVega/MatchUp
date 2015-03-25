@@ -23,84 +23,84 @@ myApp.controller('homeViewController', ['$scope', '$http', function ($scope, $ht
                 "img": "img/apex2015.png",
                 "title": "Apex 2015",
                 "location": "Badillo's House, Jersey"
-                },
+            },
             {
                 "img": "img/apex2015.png",
                 "title": "Apex 2015",
                 "location": "Badillo's House, Jersey"
-                },
+            },
             {
                 "img": "img/lol2.png",
                 "title": "Apex 2015",
                 "location": "Badillo's House, Jersey"
-                },
+            },
             {
                 "img": "img/lol2.png",
                 "title": "LOL Championship Series",
                 "location": "Badillo's House, Jersey"
-                },
+            },
             {
                 "img": "img/lolbr.jpeg",
                 "title": "LOL Championship Series Brazil",
                 "location": "Badillo's House, Jersey"
-                }
-            ],
+            }
+        ],
 
         "premium": [
             {
                 "img": "img/apex2015.png",
                 "title": "Apex 2015",
                 "location": "Badillo's House, Jersey"
-                },
+            },
             {
                 "img": "img/apex2015.png",
                 "title": "Apex 2015",
                 "location": "Badillo's House, Jersey"
-                },
+            },
             {
                 "img": "img/lol2.png",
                 "title": "Apex 2015",
                 "location": "Badillo's House, Jersey"
-                },
+            },
             {
                 "img": "img/lol2.png",
                 "title": "LOL Championship Series",
                 "location": "Badillo's House, Jersey"
-                },
+            },
             {
                 "img": "img/lolbr.jpeg",
                 "title": "LOL Championship Series Brazil",
                 "location": "Badillo's House, Jersey"
-                }
-            ],
+            }
+        ],
 
         "regular": [
             {
                 "img": "img/apex2015.png",
                 "title": "Apex 2015",
                 "location": "Badillo's House, Jersey"
-                },
+            },
             {
                 "img": "img/apex2015.png",
                 "title": "Apex 2015",
                 "location": "Badillo's House, Jersey"
-                },
+            },
             {
                 "img": "img/lol2.png",
                 "title": "Apex 2015",
                 "location": "Badillo's House, Jersey"
-                },
+            },
             {
                 "img": "img/lol2.png",
                 "title": "LOL Championship Series",
                 "location": "Badillo's House, Jersey"
-                },
+            },
             {
                 "img": "img/lolbr.jpeg",
                 "title": "LOL Championship Series Brazil",
                 "location": "Badillo's House, Jersey"
-                }
-            ]
+            }
+        ]
     };
 
     $scope.live = eventData.live;
@@ -126,126 +126,37 @@ myApp.controller('popularGameViewController', ['$scope', '$http', function ($sco
 
 myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', function ($scope, $http, sharedDataService) {
 
-    $scope.search = function () {
+    $scope.search = function (query) {
 
-        //HTTP Get pidiendo del server la lista del search filtrada por $scope.query
+        $http.get('http://136.145.116.232/search/'+query+'').
+        success(function(data, status, headers, config) {
+
+            var searchData = angular.fromJson(data);
+            
+            $scope.liveEvents = searchData.events.live;
+            $scope.pastEvents = searchData.events.past;
+            $scope.premiumEvents = searchData.events.hosted;
+            $scope.regularEvents = searchData.events.regular;
+            $scope.users = searchData.users;
+            $scope.teams = searchData.teams;
+            $scope.organizations = searchData.organizations;
+            $scope.games = searchData.games;
+            $scope.genres = searchData.genres;
+
+            sharedDataService.set(searchData);
+
+            console.log(searchData);
+            console.log(data);
+            console.log($scope.query);
+
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in search controller");
+        });
 
     }
 
-    var searchData = {
-        "live": [
-            {
-                "img": "img/evo.png",
-                "title": "EVO 2015",
-                "location": "Badillo's House, Jersey"
-                },
-            {
-                "img": "img/apex2015.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-                },
-            {
-                "img": "img/lol2.png",
-                "title": "LCS 2015",
-                "location": "Badillo's House, Jersey"
-                }
-            ],
 
-        "past": [
-            {
-                "img": "img/evo.png",
-                "title": "EVO 2015",
-                "location": "Badillo's House, Jersey"
-                },
-            {
-                "img": "img/apex2015.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-                },
-            {
-                "img": "img/lol2.png",
-                "title": "LCS 2015",
-                "location": "Badillo's House, Jersey"
-                }
-            ],
-
-        "premium": [
-            {
-                "img": "img/evo.png",
-                "title": "EVO 2015",
-                "location": "Badillo's House, Jersey"
-                },
-            {
-                "img": "img/apex2015.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-                },
-            {
-                "img": "img/lol2.png",
-                "title": "LCS 2015",
-                "location": "Badillo's House, Jersey"
-                }
-            ],
-        "regular": [
-            {
-                "img": "img/evo.png",
-                "title": "EVO 2015",
-                "location": "Badillo's House, Jersey"
-                },
-            {
-                "img": "img/apex2015.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-                },
-            {
-                "img": "img/lol2.png",
-                "title": "LCS 2015",
-                "location": "Badillo's House, Jersey"
-                }
-            ],
-        "users": [
-            {
-                "img": "img/ron.jpg",
-                "title": "Roney",
-                "location": "Ron Paul"
-                }
-            ],
-        "teams": [
-            {
-                "img": "img/cloud9logo.png",
-                "title": "Cloud 9"
-                }
-            ],
-        "organizations": [
-            {
-                "img": "img/esportPR.png",
-                "title": "EsportsPR"
-                }
-            ],
-        "games": [
-            {
-                "img": "img/hearthstone.jpg",
-                "title": "Hearthstone"
-                }
-            ],
-        "genres": [
-            {
-                "title": "MOBA"
-                }
-            ]
-    };
-
-    $scope.liveEvents = searchData.live;
-    $scope.pastEvents = searchData.past;
-    $scope.premiumEvents = searchData.premium;
-    $scope.regularEvents = searchData.regular;
-    $scope.users = searchData.users;
-    $scope.teams = searchData.teams;
-    $scope.organizations = searchData.organizations;
-    $scope.games = searchData.games;
-    $scope.genres = searchData.genres;
-
-    sharedDataService.set(searchData);
 
 }]);
 
@@ -260,7 +171,7 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
     else if ($scope.resultType == 'Past')
         $scope.searchData = searchData.past;
     else if ($scope.resultType == 'Premium')
-        $scope.searchData = searchData.past;
+        $scope.searchData = searchData.hosted;
     else if ($scope.resultType == 'Regular')
         $scope.searchData = searchData.regular;
     else if ($scope.resultType == 'Users')

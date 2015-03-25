@@ -1,4 +1,4 @@
-<ion-view view-title="">
+ <ion-view view-title="">
     <ion-nav-buttons side="left">
         <button class="button button-icon ion-navicon" menu-toggle="left">
         </button>
@@ -6,7 +6,7 @@
     <ion-nav-buttons side="primary">
         <label class="item item-input">
             <i class="icon ion-search placeholder-icon"></i>
-            <input ng-model="query" ng-change="search" type="text" placeholder="Search" />
+            <input ng-model="query" ng-change="search(query)" type="text" placeholder="Search" />
         </label>
     </ion-nav-buttons>
     <ion-content>
@@ -15,61 +15,61 @@
                 Live          
             </a>
             <a class="item item-avatar" href="#" ng-repeat="event in liveEvents">
-                <img ng-src="{{ event.img }}">
-                <h2>{{ event.title }}</h2>
-                <p>{{ event.location }}</p>
+                <img ng-src="{{ event.event_logo }}">
+                <h2>{{ event.event_name }}</h2>
+                <p>{{ event.event_location}}</p>
             </a>
 
             <a class="item item-divider " href="#/app/searchgeneral/Past">
                 Past              
             </a>
             <a class="item item-avatar" href="#" ng-repeat="event in pastEvents">
-                <img ng-src="{{ event.img }}">
-                <h2>{{ event.title }}</h2>
-                <p>{{ event.location }}</p>
+                <img ng-src="{{ event.event_logo }}">
+                <h2>{{ event.event_name }}</h2>
+                <p>{{ event.event_location}}</p>
             </a>
 
             <a class="item item-divider " href="#/app/searchgeneral/Premium">
                 Premium            
             </a>
             <a class="item item-avatar" href="#" ng-repeat="event in pastEvents">
-                <img ng-src="{{ event.img }}">
-                <h2>{{ event.title }}</h2>
-                <p>{{ event.location }}</p>
+                <img ng-src="{{ event.event_logo }}">
+                <h2>{{ event.event_name }}</h2>
+                <p>{{ event.event_location}}</p>
             </a>
 
             <a class="item item-divider " href="#/app/searchgeneral/Regular">
                 Regular               
             </a>
             <a class="item item-avatar" href="#" ng-repeat="event in regularEvents">
-                <img ng-src="{{ event.img }}">
-                <h2>{{ event.title }}</h2>
-                <p>{{ event.location }}</p>
+                <img ng-src="{{ event.event_logo }}">
+                <h2>{{ event.event_name }}</h2>
+                <p>{{ event.event_location}}</p>
             </a>
 
             <a class="item item-divider " href="#/app/searchgeneral/Users">
                 Users               
             </a>
             <a class="item item-avatar" href="#" ng-repeat="user in users">
-                <img ng-src="{{ user.img }}">
-                <h2>{{ user.title }}</h2>
-                <p>{{ user.location }}</p>
+                <img ng-src="{{ user.customer_profile_pic }}">
+                <h2>{{ user.customer_username }}</h2>
+                <p>{{ user.customer_country }}</p>
             </a>
 
             <a class="item item-divider " href="#/app/searchgeneral/Teams">
                 Teams                
             </a>
             <a class="item item-avatar" href="#" ng-repeat="team in teams">
-                <img ng-src="{{ team.img }}">
-                <h2>{{ team.title }}</h2>
+                <img ng-src="{{ team.team_logo }}">
+                <h2>{{ team.team_name }}</h2>
             </a>
 
             <a class="item item-divider " href="#/app/searchgeneral/Organizations">
                 Organizations               
             </a>
             <a class="item item-avatar" href="#" ng-repeat="organization in organizations">
-                <img ng-src="{{ organization.img }}">
-                <h2>{{ organization.title }}</h2>
+                <img ng-src="{{ organization.organization_logo }}">
+                <h2>{{ organization.organization_name }}</h2>
             </a>
             
             <a class="item item-divider" href="#/app/searchgeneral/Games">
@@ -77,15 +77,16 @@
             </a>
             
             <a class="item item-avatar" href="#" ng-repeat="game in games">
-                <img ng-src="{{ game.img }}">
-                <h2>{{ game.title }}</h2>
+                <img ng-src="{{ game.game_image }}">
+                <h2>{{ game.game_name }}</h2>
             </a>
 
             <a class="item item-divider " href="#/app/searchgenres">
                 Genres
             </a>
-            <a class="item" href="#/app/genre/upcoming" ng-repeat="genre in genres">
-                <h2>{{ genre.title }}</h2>
+            <a class="item item-avatar" href="#/app/genre/upcoming" ng-repeat="genre in genres">
+                <img ng-src="{{ genre.genre_image }}">
+                <h2>{{ genre.genre_name }}</h2>
             </a>
         </div>
     </ion-content>
