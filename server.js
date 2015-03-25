@@ -153,6 +153,10 @@ function editTeam(req, res) {
 	teams.editTeam(req, res, pg, conString);
 }
 
+function deleteTeam(req, res){
+	teams.deleteTeam(req, res, pg, conString);
+}
+
 function getOrganizations(req, res) {
 	organizations.getOrganizations(req, res, pg, conString);
 }
