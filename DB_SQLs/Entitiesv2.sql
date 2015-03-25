@@ -924,3 +924,49 @@ WITH (
 );
 ALTER TABLE "of_email"
   OWNER TO edwinbadillo;
+
+
+-- Table: "group"
+-- DROP TABLE "group";
+CREATE TABLE "group"
+(
+    event_name character varying(127) NOT NULL,
+    event_start_date timestamp without time zone NOT NULL,
+    event_location character varying(127) NOT NULL,
+    tournament_name character varying(127) NOT NULL,
+    competitor_number integer NOT NULL,
+    group_number integer NOT NULL,
+    CONSTRAINT "PK_group" PRIMARY KEY (event_name, event_start_date, event_location, tournament_name, competitor_number, group_number),
+    CONSTRAINT "FK_group_competitor" FOREIGN KEY (event_name, event_start_date, event_location, tournament_name, competitor_number)
+    REFERENCES competitor (event_name, event_start_date, event_location, tournament_name, competitor_number) MATCH SIMPLE
+    ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE "group"
+  OWNER TO edwinbadillo;
+
+
+
+-- Table: "group_stage"
+-- DROP TABLE "group_stage";
+CREATE TABLE "group_stage"
+(
+    event_name character varying(127) NOT NULL,
+    event_start_date timestamp without time zone NOT NULL,
+    event_location character varying(127) NOT NULL,
+    tournament_name character varying(127) NOT NULL,
+    competitor_number integer NOT NULL,
+    group_number integer NOT NULL,
+    group_placing integer NOT NULL,
+    CONSTRAINT "PK_group_stage" PRIMARY KEY (event_name, event_start_date, event_location, tournament_name, competitor_number, group_number, group_placing),
+    CONSTRAINT "FK_group_stage_group" FOREIGN KEY (event_name, event_start_date, event_location, tournament_name, competitor_number, group_number)
+    REFERENCES "group" (event_name, event_start_date, event_location, tournament_name, competitor_number, group_number) MATCH SIMPLE
+    ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE "group_stage"
+  OWNER TO edwinbadillo;
