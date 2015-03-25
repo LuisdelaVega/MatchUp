@@ -12,7 +12,7 @@ var basicAuth = require('basic-auth');
 var pg = require('pg');
 
 // My modules
-var brackets = require('./modules/brackets');
+var tournaments = require('./modules/tournaments');
 var events = require('./modules/events');
 var games = require('./modules/games');
 var customers = require('./modules/customers');
@@ -130,11 +130,11 @@ function createAccount(req, res) {
 }
 
 function createGroupStage(req, res){
-	brackets.createGroupStage(req, res);
+	tournaments.createGroupStage(req, res);
 }
 
 function createTournament(req, res){
-	brackets.createTournament(req, res);
+	tournaments.createTournament(req, res);
 }
 
 function createTeam(req, res) {
@@ -174,7 +174,7 @@ function deleteOrganization(req, res) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
-app.get('/bracket/:format/:numofplayers', brackets.createBraket); // *Depreciated* Used for testing of the bracket generation algorithm
+app.get('/bracket/:format/:numofplayers', tournaments.createBraket); // *Depreciated* Used for testing of the bracket generation algorithm
 app.post('/groupstage', createGroupStage); // *Depreciated* Used for testing of the group stage algorithm
 app.get('/home', getHome); // Sends the data to populate the Home view. TODO Limit the amount of objects to 3 of every type
 app.get('/popularstuff', getPopularStuff); // Sends popular games and genres. Not sure if it still needed
