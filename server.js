@@ -47,6 +47,7 @@ app.use(cors());
 
 // Serve the Website
 app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/DB Docs/DB Report'));
 app.use('/bower_components',  express.static(__dirname + '/bower_components'));
 app.use('/dist',  express.static(__dirname + '/dist'));
 
