@@ -156,7 +156,7 @@ var getHome = function(res, pg, conString) {
 		var eventList = new Object();
 		// Look for all the Events that are currently in progress
 		var queryLive = client.query({
-			text : "SELECT * FROM event WHERE event_start_date < now() at time zone 'utc' and event_end_date > now() at time zone 'utc' AND event_visibility ORDER BY event_start_date"
+			text : "SELECT event_name, event_location, event_venue, event_logo FROM event WHERE event_start_date < now() at time zone 'utc' and event_end_date > now() at time zone 'utc' AND event_visibility ORDER BY event_start_date"
 		});
 		queryLive.on("row", function(row, result) {
 			result.addRow(row);
@@ -166,7 +166,7 @@ var getHome = function(res, pg, conString) {
 
 			// Look for all the Regular Events that have not yet started
 			var queryRegular = client.query({
-				text : "SELECT event.* FROM event WHERE event_start_date > now() at time zone 'utc' and event_name NOT IN (SELECT event.event_name FROM event NATURAL JOIN hosts) AND event_visibility ORDER BY event.event_start_date"
+				text : "SELECT event_name, event_location, event_venue, event_logo FROM event WHERE event_start_date > now() at time zone 'utc' and event_name NOT IN (SELECT event.event_name FROM event NATURAL JOIN hosts) AND event_visibility ORDER BY event.event_start_date"
 			});
 			queryRegular.on("row", function(row, result) {
 				result.addRow(row);
@@ -176,7 +176,7 @@ var getHome = function(res, pg, conString) {
 
 				// Look for all Hosted Events that have not yet started
 				var queryHosted = client.query({
-					text : "SELECT event.*, organization_name FROM event NATURAL JOIN hosts WHERE event.event_start_date > now() at time zone 'utc' AND event_visibility ORDER BY event.event_start_date"
+					text : "SELECT event_name, event_location, event_venue, event_logo, organization_name FROM event NATURAL JOIN hosts WHERE event.event_start_date > now() at time zone 'utc' AND event_visibility ORDER BY event.event_start_date"
 				});
 				queryHosted.on("row", function(row, result) {
 					result.addRow(row);
