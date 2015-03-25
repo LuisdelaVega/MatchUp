@@ -43,7 +43,29 @@
 			.frontButtons {
 				position: absolute;
 				top: 200px;
-				left: 600px;
+				left: 500px;
+			}
+			.userTag {
+				color: white;
+				position: absolute;
+				top: 150px;
+				left: 250px;
+			}
+			.countryflag {
+				position: absolute;
+				top: 205px;
+				left: 250px;
+			}
+			.usercountry {
+				color: white;
+				position: absolute;
+				top: 180px;
+				left: 280px;
+			}
+			.panel-default {
+				position: absolute;
+				top: 10px;
+				left: 230px;
 			}
 
 		</style>
@@ -245,7 +267,7 @@
 				</ul>
 				<!-- /.navbar-top-links -->
 
-				<div class="navbar-default sidebar" role="navigation">
+					<div class="navbar-default sidebar" role="navigation">
 					<div class="sidebar-nav navbar-collapse">
 						<ul class="nav" id="side-menu">
 							<li class="sidebar-search">
@@ -309,55 +331,130 @@
 
 			<!-- Page Content -->
 			<div id="page-wrapper">
-				<div class="row">
-					<div class="col-lg-12">
-						<h1 class="page-header">Home</h1>
-					</div>
-					<!-- /.col-lg-12 -->
-				</div>
-				<body>
-					<h3>Live</h3>
-					<div id="live_events" style="padding-left: 15px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-					</div>
-					<h3>Premium</h3>
-					<div id="premium_events" style="padding-left: 15px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-					</div>
-					<h3>Regular</h3>
-					<div id="regular_events" style="padding-left: 15px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px"onclick="window.location.href='tournament_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
-					</div>
-					<h3>Popular Games</h3>
-					<div id="popularGames" style="padding-left: 15px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px">
-					</div>
-				</body>
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="profileViewHeader">
+								<img src="http://neptunolabs.com/images/ckmagic.jpg" alt="Cock Magic" style="width:700px;height:250px">
+								<img class="frontImage" src="http://neptunolabs.com/images/badillo.jpg" alt="Mountain View" style="width:200px;height:200px">
+								<div id="user_tag" class="userTag" >
+									<h3>User tag</h3>
+								</div>
+								<div id="country" class="usercountry" >
+									<h3>Country: PR</h3>
+								</div>
+								<div>
+									<img src="../img/PRflag.png" alt="flag" class="countryflag" style="width: 25px">
+								</div>
+								<style>
+									.col-lg-bio {
+										position: absolute;
+										min-height: 1px;
+										padding-right: 15px;
+										padding-left: 15px;
+										width: 700px;
+									}
+								</style>
+								<div class="col-lg-bio">
+									<div class="panel panel-default">
+										<div class="panel-body">
+											<p>
+												Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur fermentum ipsum dolor, quis venenatis justo faucibus ut. Maecenas pulvinar efficitur magna, a congue enim fermentum sit amet.
+											</p>
+										</div>
+									</div>
+								</div>
 
+								<div class="frontButtons">
+									<button type="button" class="btn btn-primary  fa fa-envelope " data-toggle="modal" data-target="#messageModal">
+										Message
+									</button>
+
+									<div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="messageModalLabel" aria-hidden="true">
+										<div class="modal-dialog">
+											<div class="modal-content">
+												<div class="modal-header">
+													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+														<span aria-hidden="true">&times;</span>
+													</button>
+													<h4 class="modal-title" id="messageModalLabel">New message</h4>
+												</div>
+												<div class="modal-body">
+													<form>
+														<div class="form-group">
+															<label for="recipient-name" class="control-label">Recipient:</label>
+															<input type="text" class="form-control" id="recipient-name">
+														</div>
+														<div class="form-group">
+															<label for="message-text" class="control-label">Message:</label>
+															<textarea class="form-control" id="message-text"></textarea>
+														</div>
+													</form>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-default" data-dismiss="modal">
+														Cancel
+													</button>
+													<button type="button" class="btn btn-primary" data-dismiss="modal">
+														Send message
+													</button>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<button type="button" class="btn btn-primary btn-sm fa fa-star-o">
+										Subscribe
+									</button>
+								</div>
+								<!--<label for="profileViewPic">Ollidab</label>-->
+
+							</div>
+							<body>
+								<h2>&nbsp</h2>
+								<br />
+								<h3>Standings</h3>
+								<div id="standings" style="padding-left: 15px">
+									<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
+									<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
+									<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
+									<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
+									<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
+								</div>
+								<h3>Teams</h3>
+								<div id="teams" style="padding-left: 15px">
+									<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='team_page.html'">
+									<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='team_page.html'">
+									<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='team_page.html'">
+									<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='team_page.html'">
+									<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='team_page.html'">
+								</div>
+								<h3>User Events</h3>
+								<div id="userEvents" style="padding-left: 15px">
+									<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
+									<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
+									<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
+									<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
+									<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
+								</div>
+								<h3>Organizations</h3>
+								<div id="userOrganizations" style="padding-left: 15px">
+									<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='organization_profile.html'">
+									<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='organization_profile.html'">
+									<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='organization_profile.html'">
+									<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='organization_profile.html'">
+									<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='organization_profile.html'">
+								</div>
+							</body>
+
+						</div>
+						<!-- /.col-lg-12 -->
+					</div>
+					<!-- /.row -->
+				</div>
+				<!-- /.container-fluid -->
 			</div>
-			<!-- /.col-lg-12 -->
-		</div>
-		<!-- /.row -->
-		</div>
-		<!-- /.container-fluid -->
-		</div>
-		<!-- /#page-wrapper -->
+			<!-- /#page-wrapper -->
 
 		</div>
 		<!-- /#wrapper -->

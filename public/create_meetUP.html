@@ -29,28 +29,11 @@
 		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
 		<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
 		<![endif]-->
-		<style type="text/css">
-			.profileViewHeader {
-				position: relative;
-			}
-
-			.frontImage {
-				position: absolute;
-				border: 2px solid #FFFFFF;
-				top: 125px;
-				left: 20px;
-			}
-			.frontButtons {
-				position: absolute;
-				top: 200px;
-				left: 600px;
-			}
-
-		</style>
 
 	</head>
 
 	<body>
+
 		<div id="wrapper">
 
 			<!-- Navigation -->
@@ -262,7 +245,7 @@
 								<a href="index.html"><i class="fa fa-home fa-fw"></i> Home</a>
 							</li>
 							<li>
-								<a href="user_profile.html"><i class="fa fa-user fa-fw"></i> User Profile</a>
+								<a href="user_profile"><i class="fa fa-user fa-fw"></i> User Profile</a>
 							</li>
 							<li>
 								<a href="tables.html"><i class="fa fa-calendar fa-fw"></i> Events<span class="fa arrow"></span></a>
@@ -277,7 +260,7 @@
 										<a href="my_events.html">My Events</a>
 									</li>
 									<li>
-										<a href="create_event.html"></i>Create Event</a>
+										<a href="create_event.html"> Create Event</a>
 									</li>
 								</ul>
 								<!-- /.nav-second-level -->
@@ -307,72 +290,69 @@
 				<!-- /.navbar-static-side -->
 			</nav>
 
-			<!-- Page Content -->
 			<div id="page-wrapper">
 				<div class="row">
 					<div class="col-lg-12">
-						<h1 class="page-header">Home</h1>
+						<h1 class="page-header">Create MeetUP</h1>
 					</div>
 					<!-- /.col-lg-12 -->
 				</div>
-				<body>
-					<h3>Live</h3>
-					<div id="live_events" style="padding-left: 15px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
+				<!-- /.row -->
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="row">
+							<div class="col-lg-6">
+								<form role="form">
+									<div class="form-group">
+										<label>Location: </label>
+										<input class="form-control" placeholder="Location">
+									</div>
+									<div class="form-group">
+										<label>Add Game: </label>
+										<input class="form-control" placeholder="Enter Game Name">
+									</div>
+									<div class="form-group">
+										<label>Start Date: </label>
+										<div class='input-group date' id='datetimepicker1'>
+											<input type='text' class="form-control" placeholder="Enter Start Date"/>
+											<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span> </span>
+										</div>
+									</div>
+									<script type="text/javascript">
+										$(function() {
+											$('#datetimepicker1').datetimepicker();
+										});
+									</script>
+									<div class="form-group">
+										<label>Details:</label>
+										<textarea class="form-control" rows="3"></textarea>
+									</div>
+
+									<div class="col-md-offset-4 col-md-5" align="center">
+										<button type="button" class="btn btn-primary btn-lg btn-block" onclick="window.location.href='meetUPpage.html'">
+											Create
+										</button>
+									</div>
+								</form>
+							</div>
+						</div>
+						<!-- /.row -->
 					</div>
-					<h3>Premium</h3>
-					<div id="premium_events" style="padding-left: 15px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-					</div>
-					<h3>Regular</h3>
-					<div id="regular_events" style="padding-left: 15px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px"onclick="window.location.href='tournament_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
-					</div>
-					<h3>Popular Games</h3>
-					<div id="popularGames" style="padding-left: 15px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px">
-					</div>
-				</body>
+					<!-- /#page-wrapper -->
+				</div>
+				<!-- /#wrapper -->
 
-			</div>
-			<!-- /.col-lg-12 -->
-		</div>
-		<!-- /.row -->
-		</div>
-		<!-- /.container-fluid -->
-		</div>
-		<!-- /#page-wrapper -->
+				<!-- jQuery -->
+				<script src="../bower_components/jquery/dist/jquery.min.js"></script>
 
-		</div>
-		<!-- /#wrapper -->
+				<!-- Bootstrap Core JavaScript -->
+				<script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 
-		<!-- jQuery -->
-		<script src="../bower_components/jquery/dist/jquery.min.js"></script>
+				<!-- Metis Menu Plugin JavaScript -->
+				<script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
 
-		<!-- Bootstrap Core JavaScript -->
-		<script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-
-		<!-- Metis Menu Plugin JavaScript -->
-		<script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
-
-		<!-- Custom Theme JavaScript -->
-		<script src="../dist/js/sb-admin-2.js"></script>
+				<!-- Custom Theme JavaScript -->
+				<script src="../dist/js/sb-admin-2.js"></script>
 
 	</body>
 

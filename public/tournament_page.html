@@ -34,16 +34,20 @@
 				position: relative;
 			}
 
-			.frontImage {
+			.organizationLogo {
 				position: absolute;
 				border: 2px solid #FFFFFF;
-				top: 125px;
+				top: 410px;
 				left: 20px;
 			}
-			.frontButtons {
-				position: absolute;
-				top: 200px;
-				left: 600px;
+
+			.signupButton {
+				position: relative;
+				left: 150px;
+			}
+			.meetupButton {
+				position: relative;
+				left: 150px;
 			}
 
 		</style>
@@ -309,55 +313,210 @@
 
 			<!-- Page Content -->
 			<div id="page-wrapper">
-				<div class="row">
-					<div class="col-lg-12">
-						<h1 class="page-header">Home</h1>
-					</div>
-					<!-- /.col-lg-12 -->
-				</div>
-				<body>
-					<h3>Live</h3>
-					<div id="live_events" style="padding-left: 15px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-					</div>
-					<h3>Premium</h3>
-					<div id="premium_events" style="padding-left: 15px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-					</div>
-					<h3>Regular</h3>
-					<div id="regular_events" style="padding-left: 15px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px"onclick="window.location.href='tournament_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
-					</div>
-					<h3>Popular Games</h3>
-					<div id="popularGames" style="padding-left: 15px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px">
-					</div>
-				</body>
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="profileViewHeader">
 
+								<div align="center" id="EventCoverPhoto" class="coverPhoto">
+									<img src="http://neptunolabs.com/images/ckmagic.jpg" alt="Cock Magic" >
+								</div>
+								<div class="EventTitle" align="center" >
+									<h2> Tournament Name </h2>
+
+								</div>
+
+								<img class="organizationLogo" src="http://neptunolabs.com/images/badillo.jpg" alt="Mountain View" style="width:200px;height:200px">
+
+							</div>
+							<body>
+
+							</body>
+							<div class="panel-body">
+								<!-- Nav tabs -->
+								<div class="col-lg-8 col-md-offset-2">
+
+									<ul class="nav nav-tabs">
+										<li class="active">
+											<a href="#main" data-toggle="tab">Main</a>
+										</li>
+										<li>
+											<a href="#registeredUsers" data-toggle="tab">Registered Users</a>
+										</li>
+									</ul>
+
+									<br />
+									<!-- CUIDADO -->
+
+									<!-- Tab panes -->
+									<div class="tab-content">
+										<div class="tab-pane fade in active" id="main">
+											<div class="panel panel-default">
+												<div class="panel-body">
+													<p>
+														Hosted By:
+													</p>
+													<p>
+														Date:
+													</p>
+													<p>
+														Time:
+													</p>
+													<p>
+														Venue:
+													</p>
+													<p>
+														About:
+													</p>
+												</div>
+											</div>
+
+											<div class="row">
+												<h3>Game</h3>
+												<div id="tournamentGame" style="padding-left: 15px">
+													<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px" >
+
+												</div>
+											</div>
+
+											<br/>
+
+										</div>
+										<div class="tab-pane fade" id="registeredUsers">
+
+											<div class="panel panel-default col-lg-2" style="border: none; box-shadow: none">
+
+												<div class="panel-body" style="border: none; box-shadow: none; background-color: white">
+													<div align="center">
+														<img src="http://neptunolabs.com/images/badillo.jpg" alt="Image" class="img-thumbnail img-circle thumb128" style="width: 115px; height: 115px">
+													</div>
+												</div>
+												<div class="panel-footer" align="center" style="border: none; background-color: white; box-shadow: none">
+													<a href="user_profile.html"> usertag </a>
+												</div>
+											</div>
+
+											<div class="panel panel-default col-lg-2" style="border: none; box-shadow: none">
+
+												<div class="panel-body" style="border: none; box-shadow: none; background-color: white">
+													<div align="center">
+														<img src="http://neptunolabs.com/images/badillo.jpg" alt="Image" class="img-thumbnail img-circle thumb128" style="width: 115px; height: 115px">
+													</div>
+												</div>
+												<div class="panel-footer" align="center" style="border: none; background-color: white; box-shadow: none">
+													<a href="user_profile.html"> usertag </a>
+												</div>
+											</div>
+											<div class="panel panel-default col-lg-2" style="border: none; box-shadow: none">
+
+												<div class="panel-body" style="border: none; box-shadow: none; background-color: white">
+													<div align="center">
+														<img src="http://neptunolabs.com/images/badillo.jpg" alt="Image" class="img-thumbnail img-circle thumb128" style="width: 115px; height: 115px">
+													</div>
+												</div>
+												<div class="panel-footer" align="center" style="border: none; background-color: white; box-shadow: none">
+													<a href="user_profile.html"> usertag </a>
+												</div>
+											</div>
+											<div class="panel panel-default col-lg-2" style="border: none; box-shadow: none">
+
+												<div class="panel-body" style="border: none; box-shadow: none; background-color: white">
+													<div align="center">
+														<img src="http://neptunolabs.com/images/badillo.jpg" alt="Image" class="img-thumbnail img-circle thumb128" style="width: 115px; height: 115px">
+													</div>
+												</div>
+												<div class="panel-footer" align="center" style="border: none; background-color: white; box-shadow: none">
+													<a href="user_profile.html"> usertag </a>
+												</div>
+											</div>
+											<div class="panel panel-default col-lg-2" style="border: none; box-shadow: none">
+
+												<div class="panel-body" style="border: none; box-shadow: none; background-color: white">
+													<div align="center">
+														<img src="http://neptunolabs.com/images/badillo.jpg" alt="Image" class="img-thumbnail img-circle thumb128" style="width: 115px; height: 115px">
+													</div>
+												</div>
+												<div class="panel-footer" align="center" style="border: none; background-color: white; box-shadow: none">
+													<a href="user_profile.html"> usertag </a>
+												</div>
+											</div>
+											<div class="panel panel-default col-lg-2" style="border: none; box-shadow: none">
+
+												<div class="panel-body" style="border: none; box-shadow: none; background-color: white">
+													<div align="center">
+														<img src="http://neptunolabs.com/images/badillo.jpg" alt="Image" class="img-thumbnail img-circle thumb128" style="width: 115px; height: 115px">
+													</div>
+												</div>
+												<div class="panel-footer" align="center" style="border: none; background-color: white; box-shadow: none">
+													<a href="user_profile.html"> usertag </a>
+												</div>
+											</div>
+											<div class="row">
+												<div class="panel panel-default col-lg-2" style="border: none; box-shadow: none">
+
+													<div class="panel-body" style="border: none; box-shadow: none; background-color: white">
+														<div align="center">
+															<img src="http://neptunolabs.com/images/badillo.jpg" alt="Image" class="img-thumbnail img-circle thumb128" style="width: 115px; height: 115px">
+														</div>
+													</div>
+													<div class="panel-footer" align="center" style="border: none; background-color: white; box-shadow: none">
+														<a href="user_profile.html"> usertag </a>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<div class="row">
+											<div class="col-md-offset-4 col-md-5" align="center">
+												<button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#tournamentSignUpModal">
+													Sign UP
+												</button>
+											</div>
+
+											<div class="modal fade" id="tournamentSignUpModal" tabindex="-1" role="dialog" aria-labelledby="tournamentSignUpModalLabel" aria-hidden="true">
+												<div class="modal-dialog">
+													<div class="modal-content">
+														<div class="modal-header">
+															<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+																<span aria-hidden="true">&times;</span>
+															</button>
+															<h4 class="modal-title" id="tournamentSignUpModalLabel">Sign UP</h4>
+														</div>
+														<div class="modal-body">
+															<form>
+																<div class="form-group">
+																	<label for="recipient-name" class="control-label">Recipient:</label>
+																	<input type="text" class="form-control" id="recipient-name">
+																</div>
+																<div class="form-group">
+																	<label for="message-text" class="control-label">Message:</label>
+																	<textarea class="form-control" id="message-text"></textarea>
+																</div>
+															</form>
+														</div>
+														<div class="modal-footer">
+															<button type="button" class="btn btn-default" data-dismiss="modal">
+																Cancel
+															</button>
+															<button type="button" class="btn btn-primary" data-dismiss="modal">
+																Send message
+															</button>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- /.col-lg-12 -->
+					</div>
+					<!-- /.row -->
+				</div>
+				<!-- /.container-fluid -->
 			</div>
-			<!-- /.col-lg-12 -->
-		</div>
-		<!-- /.row -->
-		</div>
-		<!-- /.container-fluid -->
-		</div>
-		<!-- /#page-wrapper -->
+			<!-- /#page-wrapper -->
 
 		</div>
 		<!-- /#wrapper -->

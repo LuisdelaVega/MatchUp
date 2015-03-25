@@ -29,6 +29,7 @@
 		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
 		<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
 		<![endif]-->
+
 		<style type="text/css">
 			.profileViewHeader {
 				position: relative;
@@ -47,7 +48,6 @@
 			}
 
 		</style>
-
 	</head>
 
 	<body>
@@ -277,7 +277,7 @@
 										<a href="my_events.html">My Events</a>
 									</li>
 									<li>
-										<a href="create_event.html"></i>Create Event</a>
+										<a href="create_event.html"></i> Create Event</a>
 									</li>
 								</ul>
 								<!-- /.nav-second-level -->
@@ -289,7 +289,7 @@
 								<a href="popular_games.html"><i class="fa fa-gamepad fa-fw"></i> Popular Games</a>
 							</li>
 							<li>
-								<a href="my_matchups.html"><i class="fa fa-calendar-o fa-fw"></i> My MatchUps</a>
+								<a href="my_matchups.html"><i class="fa fa-calendar-o fa-fw"></i> My MatchUps</span></a>
 							</li>
 							<li>
 								<a href="my_teams.html"><i class="fa fa-group fa-fw"></i> My Teams</a>
@@ -311,49 +311,192 @@
 			<div id="page-wrapper">
 				<div class="row">
 					<div class="col-lg-12">
-						<h1 class="page-header">Home</h1>
+						<h1 class="page-header">My Events</h1>
 					</div>
-					<!-- /.col-lg-12 -->
-				</div>
-				<body>
-					<h3>Live</h3>
-					<div id="live_events" style="padding-left: 15px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-					</div>
-					<h3>Premium</h3>
-					<div id="premium_events" style="padding-left: 15px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-					</div>
-					<h3>Regular</h3>
-					<div id="regular_events" style="padding-left: 15px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px"onclick="window.location.href='tournament_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
-					</div>
-					<h3>Popular Games</h3>
-					<div id="popularGames" style="padding-left: 15px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px">
-					</div>
-				</body>
 
+						<div class="panel-body">
+							<!-- Nav tabs -->
+							<ul class="nav nav-tabs">
+								<li class="active">
+									<a href="#live" data-toggle="tab">Live</a>
+								</li>
+								<li>
+									<a href="#upcoming" data-toggle="tab">Upcoming</a>
+								</li>
+								<li>
+									<a href="#history" data-toggle="tab">History</a>
+								</li>
+							</ul>
+						</div>
+
+					<div class="tab-content">
+						<div class="tab-pane fade in active" id="live">
+							<div class="col-lg-6">
+								<div class="panel panel-primary">
+									<div class="panel-heading">
+										<a href="event_page.html" style="color: white">My Event 1</a>
+									</div>
+									<div class="panel-body">
+										<img src="http://neptunolabs.com/images/ckmagic.jpg" alt="Cock Magic" style="width:735px;height:250px">
+									</div>
+									<div class="panel-footer">
+										<p>
+											Location
+										</p>
+										<p>
+											Date
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="tab-pane fade" id="upcoming">
+							<div class="col-lg-6">
+								<div class="panel panel-primary">
+									<div class="panel-heading">
+										<a href="event_page.html" style="color: white">My Event 2</a>
+									</div>
+									<div class="panel-body">
+										<img src="http://neptunolabs.com/images/ckmagic.jpg" alt="Cock Magic" style="width:735px;height:250px">
+									</div>
+									<div class="panel-footer">
+										<p>
+											Location
+										</p>
+										<p>
+											Date
+										</p>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-lg-6">
+								<div class="panel panel-primary">
+									<div class="panel-heading">
+										<a href="event_page.html" style="color: white">My Event 3</a>
+									</div>
+									<div class="panel-body">
+										<img src="http://neptunolabs.com/images/ckmagic.jpg" alt="Cock Magic" style="width:735px;height:250px">
+									</div>
+									<div class="panel-footer">
+										<p>
+											Location
+										</p>
+										<p>
+											Date
+										</p>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-lg-6">
+								<div class="panel panel-primary">
+									<div class="panel-heading">
+										<a href="event_page.html" style="color: white">My Event 4</a>
+									</div>
+									<div class="panel-body">
+										<img src="http://neptunolabs.com/images/ckmagic.jpg" alt="Cock Magic" style="width:735px;height:250px">
+									</div>
+									<div class="panel-footer">
+										<p>
+											Location
+										</p>
+										<p>
+											Date
+										</p>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-lg-6">
+								<div class="panel panel-primary">
+									<div class="panel-heading">
+										<a href="event_page.html" style="color: white">My Event 5</a>
+									</div>
+									<div class="panel-body">
+										<img src="http://neptunolabs.com/images/ckmagic.jpg" alt="Cock Magic" style="width:735px;height:250px">
+									</div>
+									<div class="panel-footer">
+										<p>
+											Location
+										</p>
+										<p>
+											Date
+										</p>
+									</div>
+								</div>
+							</div>
+							<!-- Tab pane upcoming  -->
+						</div>
+
+						<div class="tab-pane fade" id="history">
+							<div class="col-lg-6">
+								<div class="panel panel-primary">
+									<div class="panel-heading">
+										<a href="event_page.html" style="color: white">My Event 6</a>
+									</div>
+									<div class="panel-body">
+										<img src="http://neptunolabs.com/images/ckmagic.jpg" alt="Cock Magic" style="width:735px;height:250px">
+									</div>
+									<div class="panel-footer">
+										<p>
+											Location
+										</p>
+										<p>
+											Date
+										</p>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-lg-6">
+								<div class="panel panel-primary">
+									<div class="panel-heading">
+										<a href="event_page.html" style="color: white">My Event 7</a>
+									</div>
+									<div class="panel-body">
+										<img src="http://neptunolabs.com/images/ckmagic.jpg" alt="Cock Magic" style="width:735px;height:250px">
+									</div>
+									<div class="panel-footer">
+										<p>
+											Location
+										</p>
+										<p>
+											Date
+										</p>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-lg-6">
+								<div class="panel panel-primary">
+									<div class="panel-heading">
+										<a href="event_page.html" style="color: white">My Event 8</a>
+									</div>
+									<div class="panel-body">
+										<img src="http://neptunolabs.com/images/ckmagic.jpg" alt="Cock Magic" style="width:735px;height:250px">
+									</div>
+									<div class="panel-footer">
+										<p>
+											Location
+										</p>
+										<p>
+											Date
+										</p>
+									</div>
+								</div>
+							</div>
+							<!-- Tab pane history -->
+						</div>
+					</div>
+					<!-- /.panel-body -->
+
+					<!-- /.panel -->
+
+				</div>
+				<!-- /.col-lg-12 -->
 			</div>
-			<!-- /.col-lg-12 -->
-		</div>
-		<!-- /.row -->
+			<!-- /.row -->
 		</div>
 		<!-- /.container-fluid -->
 		</div>

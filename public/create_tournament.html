@@ -29,28 +29,11 @@
 		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
 		<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
 		<![endif]-->
-		<style type="text/css">
-			.profileViewHeader {
-				position: relative;
-			}
-
-			.frontImage {
-				position: absolute;
-				border: 2px solid #FFFFFF;
-				top: 125px;
-				left: 20px;
-			}
-			.frontButtons {
-				position: absolute;
-				top: 200px;
-				left: 600px;
-			}
-
-		</style>
 
 	</head>
 
 	<body>
+
 		<div id="wrapper">
 
 			<!-- Navigation -->
@@ -277,7 +260,7 @@
 										<a href="my_events.html">My Events</a>
 									</li>
 									<li>
-										<a href="create_event.html"></i>Create Event</a>
+										<a href="create_event.html"></i> Create Event</a>
 									</li>
 								</ul>
 								<!-- /.nav-second-level -->
@@ -289,7 +272,7 @@
 								<a href="popular_games.html"><i class="fa fa-gamepad fa-fw"></i> Popular Games</a>
 							</li>
 							<li>
-								<a href="my_matchups.html"><i class="fa fa-calendar-o fa-fw"></i> My MatchUps</a>
+								<a href="my_matchups.html"><i class="fa fa-calendar-o fa-fw"></i> My MatchUps</span></a>
 							</li>
 							<li>
 								<a href="my_teams.html"><i class="fa fa-group fa-fw"></i> My Teams</a>
@@ -307,72 +290,159 @@
 				<!-- /.navbar-static-side -->
 			</nav>
 
-			<!-- Page Content -->
 			<div id="page-wrapper">
 				<div class="row">
 					<div class="col-lg-12">
-						<h1 class="page-header">Home</h1>
+						<h1 class="page-header">Create Tournament</h1>
 					</div>
 					<!-- /.col-lg-12 -->
 				</div>
-				<body>
-					<h3>Live</h3>
-					<div id="live_events" style="padding-left: 15px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
+				<!-- /.row -->
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="row">
+							<div class="col-lg-6">
+								<form role="form">
+
+									<div class="form-group">
+										<label class="">Name: Required Text</label>
+										<input type="text" name="sometext" required="" ng-model="sometext" class="form-control ng-pristine ng-invalid ng-invalid-required ng-touched" placeholder="Enter Name">
+										<span ng-show="validateInput('sometext', 'required')" class="text-danger ng-hide">This field is required</span>
+									</div>
+									<div class="form-group">
+										<label class="">Game name: Required Text</label>
+										<input type="text" name="sometext" required="" ng-model="sometext" class="form-control ng-pristine ng-invalid ng-invalid-required ng-touched" placeholder="Enter Game name">
+										<span ng-show="validateInput('sometext', 'required')" class="text-danger ng-hide">This field is required</span>
+									</div>
+									<div class="form-group">
+										<label>Start Date: </label>
+										<div class='input-group date' id='datetimepicker1'>
+											<input type='text' class="form-control" placeholder="Enter Start Date"/>
+											<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span> </span>
+										</div>
+									</div>
+
+									<div class="form-group">
+										<label>Start Date: </label>
+										<input type="text" masked="" data-inputmask="'mask': '99/99/9999'" placeholder="Enter Start Date" class="form-control">
+										<span class="help-block">data-inputmask="'mask': 'mm/dd/yyyy"'</span>
+									</div>
+
+									<div class="form-group">
+										<label>Team Based</label>
+										<div class="radio">
+											<label>
+												<input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+												Yes </label>
+										</div>
+										<div class="radio">
+											<label>
+												<input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+												No </label>
+										</div>
+									</div>
+
+									<div class="form-group">
+										<label>Team Size:</label>
+										<input type="number" id="stepper1" name="stepper1" min="1" max="10" value="2" />
+									</div>
+
+									<div class="form-group">
+										<label>Rules:</label>
+										<textarea class="form-control" rows="3"></textarea>
+									</div>
+
+									<div class="form-group">
+										<label>Check-in Deadline: </label>
+										<input type="text" masked="" data-inputmask="'mask': '99/99/9999'" placeholder="Enter Check-in deadline" class="form-control">
+										<span class="help-block">data-inputmask="'mask': 'mm/dd/yyyy"'</span>
+									</div>
+
+									<div class="form-group">
+										<label>Competitor Fee:</label>
+										<input type="number" name="number" required="" ng-model="number" value="10" class="form-control ng-dirty ng-valid-number ng-invalid ng-invalid-required ng-touched"
+										placeholder="Enter Competitor Fee">
+										<span ng-show="validateInput('number', 'number')" class="text-danger ng-hide">This field must be a valid number</span>
+									</div>
+
+									<div class="form-group">
+										<label>Type</label>
+										<select class="form-control">
+											<option>Two-stage Tournament</option>
+											<option>Single-stage Tournament</option>
+										</select>
+									</div>
+
+									<h3>Group Stage</h3>
+									<div class="form-group">
+										<label>Number of participants in group:</label>
+										<input type="number" name="number" required="" ng-model="number" value="4" class="form-control ng-dirty ng-valid-number ng-invalid ng-invalid-required ng-touched"
+										placeholder="Number of participants in group">
+										<span ng-show="validateInput('number', 'number')" class="text-danger ng-hide">This field must be a valid number</span>
+									</div>
+									<div class="form-group">
+										<label>Number of participants advance:</label>
+										<input type="number" name="number" required="" ng-model="number" value="2" class="form-control ng-dirty ng-valid-number ng-invalid ng-invalid-required ng-touched"
+										placeholder="Number of participants advance">
+										<span ng-show="validateInput('number', 'number')" class="text-danger ng-hide">This field must be a valid number</span>
+									</div>
+
+									<div class="form-group">
+										<label>Final Stage</label>
+										<select class="form-control">
+											<option>Double Elimination</option>
+											<option>Single Elimination</option>
+										</select>
+									</div>
+
+									<div class="form-group">
+										<label>Format(Single Stage Tournament)</label>
+										<select class="form-control">
+											<option>Single Elimination</option>
+											<option>Round Robin</option>
+										</select>
+									</div>
+
+									<div class="form-group">
+										<h4>Third Place</h4>
+										<div class="checkbox">
+											<label>
+												<input type="checkbox" value="">
+												Include a match for 3rd place </label>
+										</div>
+									</div>
+
+									<div class="form-group">
+										<label>Score Type</label>
+										<select class="form-control">
+											<option>Match</option>
+											<option>Win/Loss</option>
+										</select>
+									</div>
+
+									<button type="button" class="btn btn-primary btn-lg btn-block">
+										DONE
+									</button>
+								</form>
+							</div>
+						</div>
+						<!-- /.row -->
 					</div>
-					<h3>Premium</h3>
-					<div id="premium_events" style="padding-left: 15px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='event_page.html'">
-					</div>
-					<h3>Regular</h3>
-					<div id="regular_events" style="padding-left: 15px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px"onclick="window.location.href='tournament_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px" onclick="window.location.href='tournament_page.html'">
-					</div>
-					<h3>Popular Games</h3>
-					<div id="popularGames" style="padding-left: 15px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" style="padding-right: 12px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Counter-Strike:%20Global%20Offensive-140x196.jpg" style="padding-right: 12px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Hearthstone:%20Heroes%20of%20Warcraft-140x196.jpg" style="padding-right: 12px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Dota%202-140x196.jpg" style="padding-right: 12px">
-						<img src="http://static-cdn.jtvnw.net/ttv-boxart/Destiny-140x196.jpg" style="padding-right: 12px">
-					</div>
-				</body>
+					<!-- /#page-wrapper -->
+				</div>
+				<!-- /#wrapper -->
 
-			</div>
-			<!-- /.col-lg-12 -->
-		</div>
-		<!-- /.row -->
-		</div>
-		<!-- /.container-fluid -->
-		</div>
-		<!-- /#page-wrapper -->
+				<!-- jQuery -->
+				<script src="../bower_components/jquery/dist/jquery.min.js"></script>
 
-		</div>
-		<!-- /#wrapper -->
+				<!-- Bootstrap Core JavaScript -->
+				<script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 
-		<!-- jQuery -->
-		<script src="../bower_components/jquery/dist/jquery.min.js"></script>
+				<!-- Metis Menu Plugin JavaScript -->
+				<script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
 
-		<!-- Bootstrap Core JavaScript -->
-		<script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-
-		<!-- Metis Menu Plugin JavaScript -->
-		<script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
-
-		<!-- Custom Theme JavaScript -->
-		<script src="../dist/js/sb-admin-2.js"></script>
+				<!-- Custom Theme JavaScript -->
+				<script src="../dist/js/sb-admin-2.js"></script>
 
 	</body>
 
