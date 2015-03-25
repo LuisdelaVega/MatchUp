@@ -5,12 +5,49 @@
         </button>
     </ion-nav-buttons>
     <ion-content>
-        <div class="list">
+        <div class="list" ng-if="live || past || hosted || regular">
             <a class="item item-avatar" href="#" ng-repeat="data in searchData">
-                <img ng-src="{{ data.img }}">
-                <h2>{{ data.title }}</h2>
-                <p>{{ data.location }}</p>
+                <img ng-src="{{ data.event_logo }}">
+                <h2>{{ data.event_name }}</h2>
+                <p>{{ data.event_location }}</p>
             </a>
         </div>
+
+        <div class="list" ng-if="users">
+            <a class="item item-avatar" href="#" ng-repeat="data in searchData">
+                <img ng-src="{{ data.customer_profile_pic }}">
+                <h2>{{ data.customer_username }}</h2>
+                <p>{{ data.customer_country }}</p>
+            </a>
+        </div>
+        
+        <div class="list" ng-if="teams">
+            <a class="item item-avatar" href="#" ng-repeat="data in searchData">
+                <img ng-src="{{ data.team_logo }}">
+                <h2>{{ data.team_name }}</h2>
+            </a>
+        </div>
+        
+        <div class="list" ng-if="organizations">
+            <a class="item item-avatar" href="#" ng-repeat="data in searchData">
+                <img ng-src="{{ data.organization_logo }}">
+                <h2>{{ data.organization_name }}</h2>
+            </a>
+        </div>
+        
+        <div class="list" ng-if="games">
+            <a class="item item-avatar" hr1ef="#" ng-repeat="data in searchData">
+                <img ng-src="{{ data.game_image }}">
+                <h2>{{ data.game_name }}</h2>
+            </a>
+        </div>
+        
+        <div class="list" ng-if="genres">
+            <a class="item item-avatar" href="#" ng-repeat="data in searchData">
+                <img ng-src="{{ data.genre_image }}">
+                <h2>{{ data.genre_name }}</h2>
+            </a>
+        </div>
+
     </ion-content>
 </ion-view>

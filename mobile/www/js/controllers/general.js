@@ -165,25 +165,53 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
     $scope.resultType = $stateParams.type;
 
     var searchData = sharedDataService.get();
-
-    if ($scope.resultType == 'Live')
+    
+    $scope.live = false;
+    $scope.past = false;
+    $scope.hosted = false;
+    $scope.regular = false;
+    $scope.users = false;
+    $scope.teams = false;
+    $scope.organizations = false;
+    $scope.games = false;
+    $scope.genres = false;
+    
+    if ($scope.resultType == 'Live'){
         $scope.searchData = searchData.live;
-    else if ($scope.resultType == 'Past')
+        $scope.live = true;
+    }
+    else if ($scope.resultType == 'Past'){
         $scope.searchData = searchData.past;
-    else if ($scope.resultType == 'Premium')
+        $scope.past = true;
+    }
+    else if ($scope.resultType == 'Premium'){
         $scope.searchData = searchData.hosted;
-    else if ($scope.resultType == 'Regular')
+        $scope.hosted = true;
+    }
+    else if ($scope.resultType == 'Regular'){
         $scope.searchData = searchData.regular;
-    else if ($scope.resultType == 'Users')
+        $scope.regular = true;
+    }
+    else if ($scope.resultType == 'Users'){
         $scope.searchData = searchData.users;
-    else if ($scope.resultType == 'Teams')
+        $scope.users = true;
+    }
+    else if ($scope.resultType == 'Teams'){
         $scope.searchData = searchData.teams;
-    else if ($scope.resultType == 'Organizations')
+        $scope.teams = true;
+    }
+    else if ($scope.resultType == 'Organizations'){
         $scope.searchData = searchData.organizations;
-    else if ($scope.resultType == 'Games')
+        $scope.organizations = true;
+    }
+    else if ($scope.resultType == 'Games'){
         $scope.searchData = searchData.games;
-    else if ($scope.resultType == 'Genres')
+        $scope.games = true;
+    }
+    else if ($scope.resultType == 'Genres'){
         $scope.searchData = searchData.genres;
+        $scope.genres = true;
+    }
 }]);
 
 myApp.controller('cameraReportController', ['$scope', '$http', 'Camera', function ($scope, $http, Camera) {
