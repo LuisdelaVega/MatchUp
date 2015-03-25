@@ -1,0 +1,37 @@
+.PageBody {font-family: MS Sans Serif; font-size: 10pt; background-color: #FFFFFF; margin-top: 10px; margin-right: 10px; margin-bottom: 10px; margin-left: 10px;}
+.DatabaseName {font-family: Arial; font-size: 10pt;text-decoration: none; color: #808080;}
+.PageTitle {font-family: Courier New; font-size: 16pt;font-weight: bold; color: #333399;}
+.Table {font-family: MS Sans Serif; font-size: 100%; border-top: #5E7DC2 1px solid; border-left: #5E7DC2 1px solid; margin-left: 20px;}
+.TableHeader {font-family: Arial; font-size: 10pt;font-weight: bold; background-color: #C4D6F5; text-align: left; border-bottom: #5E7DC2 1px solid; border-right: #5E7DC2 1px solid; margin-top: 2px; margin-right: 2px; margin-bottom: 3px;}
+.TableCell {font-family: Arial; font-size: 8pt; border-bottom: #5E7DC2 1px solid; border-right: #5E7DC2 1px solid;}
+.TableCellImage {font-family: Arial; font-size: 8pt; text-align: center; border-bottom: #5E7DC2 1px solid; border-right: #5E7DC2 1px solid;}
+.Caption {font-family: Arial; font-size: 10pt;font-weight: bold; vertical-align: top; margin-top: 4px; margin-right: 4px; margin-bottom: 3px;}
+.BaseText {font-family: Tahoma; font-size: 8pt;}
+.Definition {font-family: Courier New; font-size: 10pt; margin-top: 4px; margin-right: 4px; margin-bottom: 3px; margin-left: 20px;}
+.Comment {font-family: Tahoma; font-size: 8pt;}
+.Copyright {font-family: Arial; font-size: 8pt;text-decoration: none; color: #808080;}
+.HeaderLine {font-family: MS Sans Serif; font-size: 10pt; background-color: #CCCCCC;}
+.ParamTable {font-family: MS Sans Serif; font-size: 10pt;}
+.ParamTableCaption {font-family: Arial; font-size: 10pt;font-weight: bold; vertical-align: top; border-bottom: #CCCCCC 1px dotted; margin-top: 4px; margin-right: 4px; margin-bottom: 3px;}
+.ParamTableText {font-family: Tahoma; font-size: 8pt; border-bottom: #CCCCCC 1px dotted;}
+.ParamTableNoValue {font-family: Tahoma; font-size: 8pt; color: #808080;}
+.dbasql1-comment { color: #000080; font-style: italic; }
+.dbasql1-conditionalcomment { font-style: italic; }
+.dbasql1-datatype { color: #000000; font-weight: bold; }
+.dbasql1-defaultpackages { font-weight: bold; }
+.dbasql1-delimitedidentifier { }
+.dbasql1-exception { font-style: italic; }
+.dbasql1-function { color: #000000; font-weight: bold; }
+.dbasql1-identifier { color: #000000; }
+.dbasql1-number { color: #000000; }
+.dbasql1-plsql-reservedword { font-weight: bold; }
+.dbasql1-reservedword { color: #000000; font-weight: bold; }
+.dbasql1-space { }
+.dbasql1-sqlplus-command { font-weight: bold; }
+.dbasql1-string { color: #000000; }
+.dbasql1-symbol { color: #000000; font-weight: bold; }
+.dbasql1-tablename { }
+.dbasql1-variable { }
+a:link {color: #0000FF;}
+a:visited {color: #0000FF;}
+a:hover {color: #3366FF;}

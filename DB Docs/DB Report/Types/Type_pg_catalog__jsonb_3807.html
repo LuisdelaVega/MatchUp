@@ -1,0 +1,103 @@
+<html>
+<head>
+<title>Type "_jsonb"</title>
+<meta content="text/html" http-equiv=Content-Type>
+<link href="../style.css" type=text/css rel=stylesheet>
+</head>
+<body  class="PageBody">
+<table  width="100%" cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td class="DatabaseName"><a href="../Matchup.html"><font  class="DatabaseName">mach at localhost</font></a></td>
+</tr>
+<tr>
+<td class="PageTitle">Type "_jsonb"</td>
+</tr>
+<tr>
+<td height="16px"  align="center"><a href="Type_pg_catalog__json_199.html"><img align="center" alt="Previous topic" src="../Images/prev.gif" border="0"></a>&nbsp;<a href="../Schemas/Schema_mach_pg_catalog_11.html"><img align="center" alt="Chapter index" src="../Images/chapter.gif" border="0"></a>&nbsp;<a href="Type_pg_catalog__line_629.html"><img align="center" alt="Next topic" src="../Images/next.gif" border="0"></a></td>
+</tr>
+<tr>
+<td class="HeaderLine" height="1px" ></td>
+</tr>
+</table>
+<br>
+<table  class="ParamTable" width="92%" cellspacing="0" cellpadding="3" border="0">
+<tr>
+<td class="ParamTableCaption" width="30%" >Schema:</td>
+<td class="ParamTableText" width="70%" ><a href="../Schemas/Schema_mach_pg_catalog_11.html">pg_catalog</a></td>
+</tr>
+<tr>
+<td class="ParamTableCaption" width="30%" >Owner:</td>
+<td class="ParamTableText" width="70%" ><a href="../Roles/Role_edwinbadillo@localhost_postgres_10.html">postgres</a></td>
+</tr>
+<tr>
+<td class="ParamTableCaption" width="30%" >System:</td>
+<td class="ParamTableText" width="70%" ><img alt="" src="../Images/yes.gif" border="0"></td>
+</tr>
+<tr>
+<td class="ParamTableCaption" width="30%" >External Length:</td>
+<td class="ParamTableText" width="70%" >0</td>
+</tr>
+<tr>
+<td class="ParamTableCaption" width="30%" >Internal Length:</td>
+<td class="ParamTableText" width="70%" >-1</td>
+</tr>
+<tr>
+<td class="ParamTableCaption" width="30%" >Variable Length:</td>
+<td class="ParamTableText" width="70%" ><img alt="" src="../Images/no.gif" border="0"></td>
+</tr>
+<tr>
+<td class="ParamTableCaption" width="30%" >Passed By Value:</td>
+<td class="ParamTableText" width="70%" ><img alt="" src="../Images/no.gif" border="0"></td>
+</tr>
+<tr>
+<td class="ParamTableCaption" width="30%" >Alignment:</td>
+<td class="ParamTableText" width="70%" >int4</td>
+</tr>
+<tr>
+<td class="ParamTableCaption" width="30%" >Storage:</td>
+<td class="ParamTableText" width="70%" >MAIN</td>
+</tr>
+<tr>
+<td class="ParamTableCaption" width="30%" >Default:</td>
+<td class="ParamTableText" width="70%" ><font  class="ParamTableNoValue">(no value)</font></td>
+</tr>
+<tr>
+<td class="ParamTableCaption" width="30%" >Element:</td>
+<td class="ParamTableText" width="70%" >pg_catalog.jsonb</td>
+</tr>
+<tr>
+<td class="ParamTableCaption" width="30%" >Delimiter:</td>
+<td class="ParamTableText" width="70%" >,</td>
+</tr>
+</table>
+<br>
+<font  class="Caption">Definition:</font><div class="Definition">
+<pre>
+<code><span style="font: 10pt Courier New;"><span class="dbasql1-reservedword">CREATE</span><span class="dbasql1-space"> </span><span class="dbasql1-reservedword">TYPE</span><span class="dbasql1-space"> pg_catalog</span><span class="dbasql1-symbol">.</span><span class="dbasql1-identifier">_jsonb </span><span class="dbasql1-symbol">(
+</span><span class="dbasql1-space">  </span><span class="dbasql1-reservedword">INPUT</span><span class="dbasql1-space"> </span><span class="dbasql1-symbol">=</span><span class="dbasql1-space"> &quot;array_in&quot;</span><span class="dbasql1-symbol">,
+</span><span class="dbasql1-space">  </span><span class="dbasql1-reservedword">OUTPUT</span><span class="dbasql1-space"> </span><span class="dbasql1-symbol">=</span><span class="dbasql1-space"> &quot;array_out&quot;</span><span class="dbasql1-symbol">,
+</span><span class="dbasql1-space">  </span><span class="dbasql1-reservedword">INTERNALLENGTH</span><span class="dbasql1-space"> </span><span class="dbasql1-symbol">=</span><span class="dbasql1-space"> </span><span class="dbasql1-reservedword">VARIABLE,
+</span><span class="dbasql1-space">  </span><span class="dbasql1-reservedword">ELEMENT</span><span class="dbasql1-space"> </span><span class="dbasql1-symbol">=</span><span class="dbasql1-space"> &quot;jsonb&quot;</span><span class="dbasql1-symbol">,
+</span><span class="dbasql1-space">  </span><span class="dbasql1-reservedword">DELIMITER</span><span class="dbasql1-space"> </span><span class="dbasql1-symbol">=</span><span class="dbasql1-space"> ','</span><span class="dbasql1-symbol">,
+</span><span class="dbasql1-space">  </span><span class="dbasql1-reservedword">SEND</span><span class="dbasql1-space"> </span><span class="dbasql1-symbol">=</span><span class="dbasql1-space"> array_send</span><span class="dbasql1-symbol">,
+</span><span class="dbasql1-space">  </span><span class="dbasql1-reservedword">RECEIVE</span><span class="dbasql1-space"> </span><span class="dbasql1-symbol">=</span><span class="dbasql1-space"> array_recv</span><span class="dbasql1-symbol">,
+</span><span class="dbasql1-space">  </span><span class="dbasql1-reservedword">ALIGNMENT</span><span class="dbasql1-space"> </span><span class="dbasql1-symbol">=</span><span class="dbasql1-space"> </span><span class="dbasql1-datatype">int4,
+</span><span class="dbasql1-space">  </span><span class="dbasql1-reservedword">STORAGE</span><span class="dbasql1-space"> </span><span class="dbasql1-symbol">=</span><span class="dbasql1-space"> </span><span class="dbasql1-reservedword">MAIN
+);
+</span></span>
+</code></pre>
+</div>
+<br>
+<table  width="100%" cellspacing="0" cellpadding="0" border="0">
+<tr>
+<td class="HeaderLine" height="1px" ></td>
+</tr>
+<tr>
+<td height="16px"  align="center"><a href="Type_pg_catalog__json_199.html"><img align="center" alt="Previous topic" src="../Images/prev.gif" border="0"></a>&nbsp;<a href="../Schemas/Schema_mach_pg_catalog_11.html"><img align="center" alt="Chapter index" src="../Images/chapter.gif" border="0"></a>&nbsp;<a href="Type_pg_catalog__line_629.html"><img align="center" alt="Next topic" src="../Images/next.gif" border="0"></a></td>
+</tr>
+<tr>
+<td><a href="http://www.sqlmaestro.com/products/postgresql/maestro/"><font  class="Copyright">Generated by ""PostgreSQL Maestro"" at 3/25/2015 10:02:51 AM</font></a></td>
+</tr>
+</table>
+</html>
+</body>
