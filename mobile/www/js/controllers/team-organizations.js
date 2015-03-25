@@ -1,4 +1,4 @@
-var myApp = angular.module('teams-organization',[]);
+var myApp = angular.module('team-organizations',[]);
 
 // Popup for adding a team member, change id to index when using ng-repeat
 myApp.controller("addTeamMemberController", ['$scope', '$ionicPopup', function ($scope, $ionicPopup) {
