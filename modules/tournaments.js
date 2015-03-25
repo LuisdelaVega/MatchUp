@@ -6,17 +6,23 @@
 var createTournament = function(req, res) {
 	var tournament = new Object();
 	tournament.players = req.body.players;
-		
+	tournament.format = req.body.format;
+	tournament.stations = req.body.stations;
+
+	for (var i = 0; i < tournament.stations.length; i++) {
+		tournament.stations[i] = new Object();
+		tournament.stations[i].station_number = (i + 1);
+		tournament.stations[i].station_in_use = false;
+	}
+
 	switch(req.body.format) {
 	case "Single Elimination":
 		tournament.bracket = new Object();
-		tournament.bracket.format = "single";
-		// tournament.bracket.numOfPlayers = tournament.players.length;
+		// tournament.bracket.format = "single";
 		break;
 	case "Double Elimination":
 		tournament.bracket = new Object();
-		tournament.bracket.format = "double";
-		// tournament.bracket.numOfPlayers = tournament.players.length;
+		// tournament.bracket.format = "double";
 		break;
 	case "Round Robin":
 		tournament.group = new Object();
@@ -25,53 +31,134 @@ var createTournament = function(req, res) {
 		res.status(400).send('');
 	}
 
+	var station = 0;
 	if (req.body.type === "Two-Stage") {
 		tournament.groupStage = new Object();
 		tournament.groupStage.winnersPerGroup = req.body.winnersPerGroup;
 		tournament.groupStage.playersPerGroup = req.body.playersPerGroup;
 		tournament.groupStage.numOfGroups = Math.ceil(tournament.players.length / tournament.groupStage.playersPerGroup);
 
-		generateGroupStage(tournament.groupStage, tournament.players);
+		generateGroupStage(tournament.groupStage, tournament.players, tournament, station, assignStationsForGroupStage);
 
 		if (req.body.format === "Single Elimination" || req.body.format === "Double Elimination") {
-			// tournament.bracket.numOfPlayers = tournament.groupStage.numOfGroups * tournament.groupStage.winnersPerGroup;
 			tournament.bracket.players = new Array();
-			for (var i = 0, k = 0; i < tournament.groupStage.numOfGroups; i++){
-				for (var j = 0; j < tournament.groupStage.groups[i].numOfWinners; j++){
-					console.log("Winner #" + j + " of Group " + (i+1));
-					tournament.bracket.players[k] = "Winner #" + (j+1) + " of Group " + (i+1);
+			for (var i = 0, k = 0; i < tournament.groupStage.numOfGroups; i++) {
+				for (var j = 0; j < tournament.groupStage.groups[i].numOfWinners; j++) {
+					tournament.bracket.players[k] = "Winner #" + (j + 1) + " of Group " + (i + 1);
 					k++;
 				}
 			}
 			tournament.bracket.numOfPlayers = tournament.bracket.players.length;
-			generateBracket(tournament.bracket, tournament.bracket.players);
+			generateBracket(tournament.bracket, tournament.bracket.players, tournament, station, assignStationsForFinalStage);
 		} else {
-			// tournament.group.playersPerGroup = tournament.groupStage.numOfGroups * tournament.groupStage.winnersPerGroup;
 			tournament.group.players = new Array();
-			for (var i = 0, k = 0; i < tournament.groupStage.numOfGroups; i++){
-				for (var j = 0; j < tournament.groupStage.groups[i].numOfWinners; j++){
-					tournament.group.players[k] = "Winner #" + (j+1) + " of Group " + (i+1);
+			for (var i = 0, k = 0; i < tournament.groupStage.numOfGroups; i++) {
+				for (var j = 0; j < tournament.groupStage.groups[i].numOfWinners; j++) {
+					tournament.group.players[k] = "Winner #" + (j + 1) + " of Group " + (i + 1);
 					k++;
 				}
 			}
 			tournament.group.playersPerGroup = tournament.group.players.length;
-			generateGroupStage(tournament.group, tournament.group.players);
+			generateGroupStage(tournament.group, tournament.group.players, tournament, station, assignStationsForFinalStage);
 		}
 	} else {
 		if (req.body.format === "Single Elimination" || req.body.format === "Double Elimination") {
 			tournament.bracket.numOfPlayers = tournament.players.length;
-			generateBracket(tournament.bracket, tournament.players);
-		}
-		else{
+			generateBracket(tournament.bracket, tournament.players, tournament, station, assignStationsForFinalStage);
+		} else {
 			tournament.group.playersPerGroup = tournament.players.length;
-			generateGroupStage(tournament.group, tournament.players);
+			generateGroupStage(tournament.group, tournament.players, tournament, station, assignStationsForFinalStage);
 		}
 	}
-	
+
 	res.send(tournament);
 };
 
-function generateGroupStage(groupStage, players) {
+function assignStationsForGroupStage(tournament, station) {
+	var iter = 0;
+	for (var i = 0; i < tournament.groupStage.groups.length && station < tournament.stations.length; i++) {
+		for (var j = 0; j < tournament.groupStage.groups[i].rounds.length && station < tournament.stations.length; j++) {
+			iter += tournament.groupStage.groups[i].rounds[j].matches.length;
+		}
+	}
+
+	var group = round = match = 0;
+	for (var i = 0; i < iter && station < tournament.stations.length; i++) {
+
+		if (match < tournament.groupStage.groups[group%tournament.groupStage.groups.length].rounds[round].matches.length) {
+			tournament.groupStage.groups[group%tournament.groupStage.groups.length].rounds[round].matches[match].is_played_in = tournament.stations[station].station_number;
+			tournament.stations[station++].station_in_use = true;
+		}
+		group = (++group % tournament.groupStage.groups.length);
+		if (!(group % tournament.groupStage.groups.length)) {
+			match++;
+			if (match == tournament.groupStage.groups[group%tournament.groupStage.groups.length].rounds[round].matches.length) {
+				match = 0;
+				round++;
+			}
+		}
+	}
+}
+
+function assignStationsForFinalStage(tournament, station) {
+	if (tournament.format === "Single Elimination" || tournament.format === "Double Elimination") {
+		if (station < tournament.stations.length) {
+			if (tournament.bracket.format === "single") {
+				for (var i = 0; i < tournament.bracket.winnerRounds.length && station < tournament.stations.length; i++) {
+					for (var j = 0; j < tournament.bracket.winnerRounds[i].matches.length && station < tournament.stations.length; j++) {
+						tournament.bracket.winnerRounds[i].matches[j].is_played_in = tournament.stations[station].station_number;
+						tournament.stations[station++].station_in_use = true;
+					}
+				}
+			} else {
+				for (var i = 0, k = 0; i < tournament.bracket.winnerRounds.length && k < tournament.bracket.loserRounds.length && station < tournament.stations.length; ) {
+					if (i <= k) {
+						for (var j = 0; j < tournament.bracket.winnerRounds[i].matches.length && station < tournament.stations.length; j++) {
+							tournament.bracket.winnerRounds[i].matches[j].is_played_in = tournament.stations[station].station_number;
+							tournament.stations[station++].station_in_use = true;
+						}
+						i++;
+						continue;
+					} else {
+						for (var j = 0; j < tournament.bracket.loserRounds[k].matches.length && station < tournament.stations.length; j++) {
+							tournament.bracket.loserRounds[k].matches[j].is_played_in = tournament.stations[station].station_number;
+							tournament.stations[station++].station_in_use = true;
+						}
+						k++;
+					}
+				}
+			}
+		}
+	} else {
+		if (station < tournament.stations.length) {
+			var iter = 0;
+			for (var i = 0; i < tournament.groupStage.groups.length && station < tournament.stations.length; i++) {
+				for (var j = 0; j < tournament.groupStage.groups[i].rounds.length && station < tournament.stations.length; j++) {
+					iter += tournament.groupStage.groups[i].rounds[j].matches.length;
+				}
+			}
+
+			var group = round = match = 0;
+			for (var i = 0; i < iter && station < tournament.stations.length; i++) {
+
+				if (match < tournament.groupStage.groups[group%tournament.groupStage.groups.length].rounds[round].matches.length) {
+					tournament.groupStage.groups[group%tournament.groupStage.groups.length].rounds[round].matches[match].is_played_in = tournament.stations[station].station_number;
+					tournament.stations[station++].station_in_use = true;
+				}
+				group = (++group % tournament.groupStage.groups.length);
+				if (!(group % tournament.groupStage.groups.length)) {
+					match++;
+					if (match == tournament.groupStage.groups[group%tournament.groupStage.groups.length].rounds[round].matches.length) {
+						match = 0;
+						round++;
+					}
+				}
+			}
+		}
+	}
+}
+
+function generateGroupStage(groupStage, players, tournament, station, assignStations) {
 	groupStage.numOfGroups = Math.ceil(players.length / groupStage.playersPerGroup);
 	groupStage.groups = new Array();
 
@@ -120,35 +207,25 @@ function generateGroupStage(groupStage, players) {
 		}
 	}
 
-	// res.json(groupStage);
+	assignStations(tournament, station);
 }
 
-function generateBracket(bracket, players) {
-	// bracket.numOfPlayers = req.params.numofplayers;
+function generateBracket(bracket, players, tournament, station, assignStations) {
 	bracket.byes = getByes(bracket.numOfPlayers);
 	bracket.numOfWinnerRounds = 0;
 
-	// var players = new Array();
-	// var i = 0;
-	// for ( i = 0; i < bracket.numOfPlayers; i++) {
-	// players[i] = new Object();
-	// players[i].seed = i + 1;
-	// }
-
-	if (bracket.format == 'single') {
+	if (tournament.format == "Single Elimination") {
 		bracket.winnerRounds = new Array();
 		singleEliminationBracket(bracket, players);
-	} else if (bracket.format == 'double') {
+	} else if (tournament.format == "Double Elimination") {
 		bracket.winnerRounds = new Array();
 		singleEliminationBracket(bracket, players);
 		bracket.numOfLoserRounds = 0;
 		bracket.loserRounds = new Array();
 		doubleEliminationBracket(bracket);
-	} else {
-		return res.status(401);
 	}
 
-	// res.send(bracket);
+	assignStations(tournament, station);
 }
 
 var createBraket = function(req, res) {
@@ -274,7 +351,7 @@ function singleEliminationBracket(bracket, players) {
 	for ( i = 0; winners > 1; i++) {
 		winnerRounds[i] = new Object();
 		winnerRounds[i].name = "Winners Round " + (i + 1);
-		//console.log(winnerRounds[i].name);
+		winnerRounds[i].best_of = 3;
 		winnerRounds[i].amountOfMatches = getWinnersRoundMatches(winners);
 		//console.log("Amount of matches: " + winnerRounds[i].amountOfMatches);
 		bracket.numOfWinnerRounds++;
@@ -376,6 +453,7 @@ function doubleEliminationBracket(bracket) {
 	if (bracket.winnerRounds[0].amountOfMatches > bracket.winnerRounds[1].amountOfMatches) {
 		loserRounds[1] = new Object();
 		loserRounds[1].name = "Losers Round 2";
+		loserRounds[1].best_of = 3;
 		//console.log(loserRounds[1].name);
 		loserRounds[1].amountOfMatches = bracket.winnerRounds[1].amountOfMatches;
 		//console.log("Amount of matches: " + loserRounds[1].amountOfMatches);
