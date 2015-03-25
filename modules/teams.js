@@ -36,7 +36,7 @@ var getTeam = function(req, res, pg, conString) {
 				var team = new Object();
 				team.info = result.rows[0];
 				var playersQuery = client.query({
-					text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag,"+
+					text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag," + 
 					" customer.customer_profile_pic, bool_and(customer.customer_username IN (SELECT customer_username FROM captain_for WHERE team_name = $1)) AS is_captain" + 
 					" FROM customer NATURAL JOIN plays_for WHERE customer_active AND team_name = $1 GROUP BY customer.customer_username",
 					values : [req.params.team]
@@ -80,7 +80,7 @@ var editTeam = function(req, res, pg, conString) {
 			return res.status(401).send('');
 		}
 
-		queryText += " WHERE team_name = '" + req.params.team + "'";
+		queryText += " WHERE team_name = '" + req.params.team + "' AND team_active";
 		var teamsQuery = client.query({
 			text : queryText
 		}, function(err, result) {
@@ -99,10 +99,9 @@ var deleteTeam = function(req, res, pg, conString) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
-		
+
 		var teamsQuery = client.query({
-			text : "UPDATE team SET team_active = FALSE"+
-			" WHERE team_name = $1 AND team_name IN (SELECT team_name FROM captain_for WHERE customer_username = $2)",
+			text : "UPDATE team SET team_active = FALSE WHERE team_name = $1 AND team_name IN (SELECT team_name FROM captain_for WHERE customer_username = $2)",
 			values : [req.params.team, req.user.username]
 		}, function(err, result) {
 			if (err) {
@@ -115,15 +114,52 @@ var deleteTeam = function(req, res, pg, conString) {
 	});
 };
 
-var addMember = function(req, res, pg, conString) {
-	
+var addTeamMember = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		client.query("START TRANSACTION");
+		var memberQuery = client.query({
+			text : "SELECT team.team_name FROM plays_for NATURAL JOIN team WHERE customer_username = $1 AND team_active AND team_name = $2",
+			values : [req.user.username, req.params.team]
+		});
+		memberQuery.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		memberQuery.on("end", function(result) {
+			if (result.rows.length > 0) {
+				client.query({
+					text : "INSERT INTO plays_for (customer_username, team_name) VALUES ($1, $2)",
+					values : [req.params.username, req.params.team]
+				}, function(err, result) {
+					if (err) {
+						res.status(400).send("Oh, no! This user already plays for this team dummy");
+						client.end();
+					} else {
+						client.query("COMMIT");
+						res.status(204).send('');
+					}
+				});
+			} else {
+				client.end();
+				return res.status(401).send('Oh, no! It seems you are not part of this team');
+			}
+		});
+	});
 };
 
-var removeMember = function(req, res, pg, conString) {
-	
+var removeTeamMember = function(req, res, pg, conString) {
+
+};
+
+var makeCaptain = function(req, res, pg, conString) {
+
 };
 
 module.exports.getTeams = getTeams;
 module.exports.getTeam = getTeam;
 module.exports.editTeam = editTeam;
 module.exports.deleteTeam = deleteTeam;
+module.exports.addTeamMember = addTeamMember;

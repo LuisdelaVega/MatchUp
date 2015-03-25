@@ -159,6 +159,10 @@ function deleteTeam(req, res){
 	teams.deleteTeam(req, res, pg, conString);
 }
 
+function addTeamMember(req, res){
+	teams.addTeamMember(req, res, pg, conString);
+}
+
 function getOrganizations(req, res) {
 	organizations.getOrganizations(req, res, pg, conString);
 }
@@ -173,6 +177,10 @@ function editOrganization(req, res) {
 
 function deleteOrganization(req, res) {
 	organizations.deleteOrganization(req, res, pg, conString);
+}
+
+function addOrganizationMember(req, res){
+	organizations.addOrganizationMember(req, res, pg, conString);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
@@ -206,6 +214,9 @@ app.route('/matchup/teams/:team')
 	.get(getTeam) // Get the details for a specific Team
 	.put(editTeam)
 	.delete(deleteTeam);
+
+app.put('/matchup/teams/:team/user/:username', addTeamMember);
+app.put('/matchup/organizations/:organization/user/:username', addOrganizationMember);
 
 ////////////////////////////////////////////////////////////////////////////////////// SERVER LISTEN
 var port = process.env.PORT || 5000;
