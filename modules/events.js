@@ -176,7 +176,7 @@ var getHome = function(res, pg, conString) {
 
 				// Look for all Hosted Events that have not yet started
 				var queryHosted = client.query({
-					text : "SELECT event.*, organization.organization_name FROM event NATURAL JOIN hosts WHERE event.event_start_date > now() at time zone 'utc' AND event_visibility ORDER BY event.event_start_date"
+					text : "SELECT event.*, organization_name FROM event NATURAL JOIN hosts WHERE event.event_start_date > now() at time zone 'utc' AND event_visibility ORDER BY event.event_start_date"
 				});
 				queryHosted.on("row", function(row, result) {
 					result.addRow(row);
