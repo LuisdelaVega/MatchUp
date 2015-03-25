@@ -91,7 +91,7 @@ var editOrganization = function(req, res, pg, conString) {
 
 		if (!req.body.logo && !req.body.bio && !req.body.cover) {
 			client.end();
-			return res.status(401).send("Tu mai");
+			return res.status(401).send('');
 		}
 
 		queryText += " WHERE organization_name = $1 AND organization_name IN (SELECT organization_name FROM belongs_to WHERE customer_username = $2) AND organization_active";

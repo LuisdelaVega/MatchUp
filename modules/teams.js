@@ -77,7 +77,7 @@ var editTeam = function(req, res, pg, conString) {
 
 		if (!req.body.logo && !req.body.bio && !req.body.cover) {
 			client.end();
-			return res.status(401).send("Tu mai");
+			return res.status(401).send('');
 		}
 
 		queryText += " WHERE team_name = '" + req.params.team + "'";

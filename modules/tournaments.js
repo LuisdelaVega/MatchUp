@@ -22,15 +22,12 @@ var createTournament = function(req, res) {
 		tournament.group = new Object();
 		break;
 	default:
-		res.status(400).send("Your mother");
+		res.status(400).send('');
 	}
 
 	if (req.body.type === "Two-Stage") {
 		tournament.groupStage = new Object();
 		tournament.groupStage.winnersPerGroup = req.body.winnersPerGroup;
-		// if (tournament.groupStage.winnersPerGroup % 2) {
-			// res.status(400).send("Winners debe ser un numero par");
-		// }
 		tournament.groupStage.playersPerGroup = req.body.playersPerGroup;
 		tournament.groupStage.numOfGroups = Math.ceil(tournament.players.length / tournament.groupStage.playersPerGroup);
 
