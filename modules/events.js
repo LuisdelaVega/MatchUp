@@ -171,7 +171,7 @@ var getEvent = function(req, res, pg, conString) {
 						queryNews.on("end", function(result) {
 							event.news = result.rows;
 							var querySponsor = client.query({
-								text : "SELECT sponsor_number, sponsor_logo, sponsor_link" + 
+								text : "SELECT sponsor_name, sponsor_logo, sponsor_link" + 
 								" FROM sponsors NATURAL JOIN shows WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
 								values : [req.params.event, event.info.event_start_date, event.info.event_location]
 							});
