@@ -129,7 +129,10 @@ var getEvent = function(req, res, pg, conString) {
 		// Query the database to find the account
 		var event = new Object();
 		var queryEvent = client.query({
-			text : "SELECT event_name, event_start_date, event_location, event_venue, event_banner, event_logo, event_max_capacity, event_end_date," + " event_registration_deadline, event_rules, event_description, event_deduction_fee, event_is_online, event_type" + " bool_and(event.event_name IN (SELECT event_name FROM hosts WHERE event_name = $1)) as is_hosted FROM event WHERE event_name = $1 AND event_visibility",
+			text : "SELECT event_name, event_start_date, event_location, event_venue, event_banner, event_logo, event_max_capacity, event_end_date," + 
+			" event_registration_deadline, event_rules, event_description, event_deduction_fee, event_is_online, event_type," + 
+			" bool_and(event_name IN (SELECT event_name FROM hosts WHERE event_name = $1)) as is_hosted FROM event WHERE event_name = $1 AND event_visibility"+
+			" GROUP BY event_name, event_start_date, event_location",
 			values : [req.params.event]
 		});
 		queryEvent.on("row", function(row, result) {
@@ -148,7 +151,9 @@ var getEvent = function(req, res, pg, conString) {
 				queryMeetup.on("end", function(result) {
 					event.meetups = result.rows;
 					var queryTournament = client.query({
-						text : "SELECT tournament_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity," + " seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group, game.*" + " FROM tournament NATURAL JOIN game WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
+						text : "SELECT tournament_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity," + 
+						" seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group, game.*" + 
+						" FROM tournament NATURAL JOIN game WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
 						values : [req.params.event, event.info.event_start_date, event.info.event_location]
 					});
 					queryTournament.on("row", function(row, result) {
@@ -166,7 +171,8 @@ var getEvent = function(req, res, pg, conString) {
 						queryNews.on("end", function(result) {
 							event.news = result.rows;
 							var querySponsor = client.query({
-								text : "SELECT sponsor_number, sponsor_logo, sponsor_link" + " FROM sponsors NATURAL JOIN shows WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
+								text : "SELECT sponsor_number, sponsor_logo, sponsor_link" + 
+								" FROM sponsors NATURAL JOIN shows WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
 								values : [req.params.event, event.info.event_start_date, event.info.event_location]
 							});
 							querySponsor.on("row", function(row, result) {
@@ -175,7 +181,8 @@ var getEvent = function(req, res, pg, conString) {
 							querySponsor.on("end", function(result) {
 								event.sponsors = result.rows;
 								var querySpectatorFee = client.query({
-									text : "SELECT spec_fee_name, spec_fee_amount, spec_fee_description" + " FROM spectator_fee WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
+									text : "SELECT spec_fee_name, spec_fee_amount, spec_fee_description" + 
+									" FROM spectator_fee WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
 									values : [req.params.event, event.info.event_start_date, event.info.event_location]
 								});
 								querySpectatorFee.on("row", function(row, result) {
@@ -184,7 +191,8 @@ var getEvent = function(req, res, pg, conString) {
 								querySpectatorFee.on("end", function(result) {
 									event.spectator_fees = result.rows;
 									var queryReview = client.query({
-										text : "SELECT review_number, review_title, review_content, star_rating, review_date_created" + " FROM review WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
+										text : "SELECT review_number, review_title, review_content, star_rating, review_date_created" + 
+										" FROM review WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
 										values : [req.params.event, event.info.event_start_date, event.info.event_location]
 									});
 									queryReview.on("row", function(row, result) {
@@ -194,7 +202,8 @@ var getEvent = function(req, res, pg, conString) {
 										event.reviews = result.rows;
 										if (event.info.is_hosted) {
 											var queryHost = client.query({
-												text : "SELECT organization_name, organization_logo, organization_active" + " FROM organization NATURAL JOIN hosts WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
+												text : "SELECT organization_name, organization_logo, organization_active" + 
+												" FROM organization NATURAL JOIN hosts WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
 												values : [req.params.event, event.info.event_start_date, event.info.event_location]
 											});
 											queryHost.on("row", function(row, result) {
