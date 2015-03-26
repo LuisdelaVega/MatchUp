@@ -5,147 +5,145 @@
     </ion-nav-buttons>
     <ion-content>
         <div class="crop-banner">
-            <img class="crop-image" src="img/Capcom-Pro-Tour.jpg">
+            <img class="crop-image" ng-src="{{ eventInfo.event_banner }}">
         </div>
         <div class="center-text">
-            <img class="profile-pic" src="img/esportPR.PNG">
+            <img class="profile-pic" ng-src="{{eventInfo.event_logo}}">
         </div>
-        <div ng-controller="promotedEventController">
+        <div class="card">
+            <div class="item item-text-wrap">
+                <div class="center-text">
+                    <h1 class="h1-username">{{ eventInfo.event_name }}</h1>
+                    <h2>{{ eventInfo.event_start_date | date: 'medium'}}</h2>
+                    <p>{{ eventInfo.event_location }}</p>
+                </div>
+                <p>
+                    <br>{{ eventInfo.event_description }}
+                </p>
+            </div>
+            <div class="item tabs tabs-secondary tabs-icon-left">
+                <a class="tab-item" href="#/app/premiumsignup" ng-if="!isOngoing">
+                    <i class="icon ion-log-in"></i> Sign Up
+                </a>
+                <a class="tab-item" href="#/app/meetups">
+                    <i class="icon ion-android-people"></i> Meetup
+                </a>
+            </div>
+        </div>
+        <div class="card">
+            <div class="item item-divider">
+                Sponsors
+            </div>
+            <div class="row">
+                <div class="col">
+                    <img class="game-cover" src="img/lol.png">
+                </div>
+                <div class="col">
+                    <img class="game-cover" src="img/lol.png">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <img class="game-cover" src="img/lol.png">
+                </div>
+            </div>
+        </div>
+        <div class="list-inset" ng-if="!isOngoing">
+            <div class="item item-divider">
+                Tournaments
+            </div>
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/streetFighter.jpg">
+                <h2>Street Fighter Regionals</h2>
+                <p>8:00PM March 2, 2015</p>
+            </a>
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/lol.png">
+                <h2>Twisted Treeline 3v3</h2>
+                <p>6:00PM March 3, 2015</p>
+            </a>
+        </div>
+
+        <div class="list list-inset" ng-if="isOngoing">
+            <a class="item item-thumbnail-left" href="#">
+                <img src="img/streetFighter.jpg">
+                <h2>Street Fighter Regionals</h2>
+                <p>8:00PM March 2, 2015</p>
+            </a>
+            <div class="item item-divider">
+                <h3>1st</h3>
+            </div>
+            <a class="item item-avatar" href="#/app/regulareventmatchups">
+                <img src="img/ron.jpg">
+                <div class="row">
+                    <div class="col col-75">
+                        <h2>Ron Paul</h2>
+                        <p>This is my info</p>
+                    </div>
+                    <div class="col center-text">
+                        <h1 class="h1-username" style="color: rgb(102, 221, 51);"> 3 - 1</h1>
+                    </div>
+                </div>
+            </a>
+            <div class="item item-divider">
+                <h3>2nd</h3>
+            </div>
+            <a class="item item-avatar" href="#/app/regulareventmatchups">
+                <img src="img/ron.jpg">
+                <div class="row">
+                    <div class="col col-75">
+                        <h2>Ron Paul</h2>
+                        <p>This is my info</p>
+                    </div>
+                    <div class="col center-text">
+                        <h1 class="h1-username" style="color: rgb(255, 102, 102);"> 2 - 2</h1>
+                    </div>
+                </div>
+            </a>
+            <div class="item item-divider">
+                <h3>3rd</h3>
+            </div>
+            <a class="item item-avatar" href="#/app/regulareventmatchups">
+                <img src="img/ron.jpg">
+                <div class="row">
+                    <div class="col col-75">
+                        <h2>Ron Paul</h2>
+                        <p>This is my info</p>
+                    </div>
+                    <div class="col center-text">
+                        <h1 class="h1-username" style="color: rgb(255, 102, 102);"> 1 - 2</h1>
+                    </div>
+                </div>
+            </a>
+            <a class="item item-avatar" href="#/app/regulareventmatchups">
+                <img src="img/ron.jpg">
+                <div class="row">
+                    <div class="col col-75">
+                        <h2>Ron Paul</h2>
+                        <p>This is my info</p>
+                    </div>
+                    <div class="col center-text">
+                        <h1 class="h1-username" style="color: rgb(255, 102, 102);"> 1 - 2</h1>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div ng-controller="ratingsController" ng-if="isOngoing">
             <div class="card">
+                <div class="item">
+                    <h2 style="text-align: center;">This is the review title</h2>
+                    <rating ng-model="rate" max="max" style="text-align: center;" readonly="true"></rating>
+                    <p style="text-align: center;"> by anonymous </p>
+                </div>
                 <div class="item item-text-wrap">
-                    <div class="center-text">
-                        <h1 class="h1-username">Capcom Pro Tour</h1>
-                        <h2>Date: 1/3/14 - 1/5/14</h2>
-                        <p>Venue: Caesar’s Palace Ball Room</p>
-                    </div>
-                    <p>
-                        <br>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    </p>
-                </div>
-                <div class="item tabs tabs-secondary tabs-icon-left">
-                    <a class="tab-item" href="#/app/premiumsignup" ng-if="isOngoing">
-                        <i class="icon ion-log-in"></i> Sign Up
-                    </a>
-                    <a class="tab-item" href="#/app/meetups">
-                        <i class="icon ion-android-people"></i> Meetup
-                    </a>
+                    This is a review of the event.
                 </div>
             </div>
-            <div class="card">
-                <div class="item item-divider">
-                    Sponsors
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <img class="game-cover" src="img/lol.png">
-                    </div>
-                    <div class="col">
-                        <img class="game-cover" src="img/lol.png">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <img class="game-cover" src="img/lol.png">
-                    </div>
-                </div>
-            </div>
-            <div class="list-inset" ng-if="isOngoing">
-                <div class="item item-divider">
-                    Tournaments
-                </div>
-                <a class="item item-thumbnail-left" href="#">
-                    <img src="img/streetFighter.jpg">
-                    <h2>Street Fighter Regionals</h2>
-                    <p>8:00PM March 2, 2015</p>
-                </a>
-                <a class="item item-thumbnail-left" href="#">
-                    <img src="img/lol.png">
-                    <h2>Twisted Treeline 3v3</h2>
-                    <p>6:00PM March 3, 2015</p>
-                </a>
-            </div>
-
-            <div class="list list-inset" ng-if="!isOngoing">
-                <a class="item item-thumbnail-left" href="#">
-                    <img src="img/streetFighter.jpg">
-                    <h2>Street Fighter Regionals</h2>
-                    <p>8:00PM March 2, 2015</p>
-                </a>
-                <div class="item item-divider">
-                    <h3>1st</h3>
-                </div>
-                <a class="item item-avatar" href="#/app/regulareventmatchups">
-                    <img src="img/ron.jpg">
-                    <div class="row">
-                        <div class="col col-75">
-                            <h2>Ron Paul</h2>
-                            <p>This is my info</p>
-                        </div>
-                        <div class="col center-text">
-                            <h1 class="h1-username" style="color: rgb(102, 221, 51);"> 3 - 1</h1>
-                        </div>
-                    </div>
-                </a>
-                <div class="item item-divider">
-                    <h3>2nd</h3>
-                </div>
-                <a class="item item-avatar" href="#/app/regulareventmatchups">
-                    <img src="img/ron.jpg">
-                    <div class="row">
-                        <div class="col col-75">
-                            <h2>Ron Paul</h2>
-                            <p>This is my info</p>
-                        </div>
-                        <div class="col center-text">
-                            <h1 class="h1-username" style="color: rgb(255, 102, 102);"> 2 - 2</h1>
-                        </div>
-                    </div>
-                </a>
-                <div class="item item-divider">
-                    <h3>3rd</h3>
-                </div>
-                <a class="item item-avatar" href="#/app/regulareventmatchups">
-                    <img src="img/ron.jpg">
-                    <div class="row">
-                        <div class="col col-75">
-                            <h2>Ron Paul</h2>
-                            <p>This is my info</p>
-                        </div>
-                        <div class="col center-text">
-                            <h1 class="h1-username" style="color: rgb(255, 102, 102);"> 1 - 2</h1>
-                        </div>
-                    </div>
-                </a>
-                <a class="item item-avatar" href="#/app/regulareventmatchups">
-                    <img src="img/ron.jpg">
-                    <div class="row">
-                        <div class="col col-75">
-                            <h2>Ron Paul</h2>
-                            <p>This is my info</p>
-                        </div>
-                        <div class="col center-text">
-                            <h1 class="h1-username" style="color: rgb(255, 102, 102);"> 1 - 2</h1>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <div ng-controller="ratingsController" ng-if="!isOngoing">
-                <div class="card">
-                    <div class="item">
-                        <h2 style="text-align: center;">This is the review title</h2>
-                        <rating ng-model="rate" max="max" style="text-align: center;" readonly="true"></rating>
-                        <p style="text-align: center;"> by anonymous </p>
-                    </div>
-                    <div class="item item-text-wrap">
-                        This is a review of the event.
-                    </div>
-                </div>
-                <div class="padding">
-                    <button class="button button-block button-positive" ui-sref="app.writereview">
-                        Write a review
-                    </button>
-                </div>
+            <div class="padding">
+                <button class="button button-block button-positive" ui-sref="app.writereview">
+                    Write a review
+                </button>
             </div>
         </div>
     </ion-content>

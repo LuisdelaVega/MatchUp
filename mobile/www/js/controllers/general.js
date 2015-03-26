@@ -15,7 +15,7 @@ var myApp = angular.module('home',[]);
 //    }
 //}]);  
 
-myApp.controller('homeViewController', ['$scope', '$http', function ($scope, $http) {
+myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedDataService', function ($scope, $http, $state, sharedDataService) {
     $http.get('http://136.145.116.232/home').
     success(function(data, status, headers, config) {
 
@@ -31,6 +31,12 @@ myApp.controller('homeViewController', ['$scope', '$http', function ($scope, $ht
         console.log("error in search controller");
     });
 
+    $scope.goToEvent = function(eventName){
+        
+        eventName = eventName.replace(" ", "%20");
+        $state.go('app.eventpremium.summary', {"eventname": eventName});
+        sharedDataService.set(eventName);
+    };
 
 
 }]);
