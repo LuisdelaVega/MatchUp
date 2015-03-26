@@ -60,7 +60,8 @@ myApp.controller('writeReviewRatingsController', ['$scope', '$http', function ($
 
 }]);
 
-myApp.controller('postNewsController', function ($scope, $stateParams, sharedDataService) {
+myApp.controller('postNewsController', function ($scope, $stateParams, $state, sharedDataService) {
+    var values = sharedDataService.get();
     // Change title depending on type
     $scope.type = $stateParams.type;
     // Gets called before entering the view
@@ -69,14 +70,24 @@ myApp.controller('postNewsController', function ($scope, $stateParams, sharedDat
         if ($scope.type == 'Create') {
 
         } else {
-            var result = sharedDataService.get();
+
+            var result = values[0];
             $scope.content = result['content'];
             $scope.title = result['title'];
         }
     });
+
+    $scope.eventName = values[1];
+
+    $scope.goToEvent = function(eventName){
+
+        eventName = eventName.replace(" ", "%20");
+        $state.go('app.eventpremium.news', {"eventname": eventName});
+        sharedDataService.set(eventName);
+    };  
 });
 
-myApp.controller('newsController', function ($scope, sharedDataService, $state) {
+myApp.controller('newsController', function ($scope, sharedDataService, $stateParams, $state) {
 
     $scope.result = {
         "news": [
@@ -95,7 +106,8 @@ myApp.controller('newsController', function ($scope, sharedDataService, $state) 
 
     // Send data to post news controller
     $scope.clickEdit = function (id) {
-        sharedDataService.set($scope.result.news[id]);
+        var values = [$scope.result.news[id], $stateParams.eventname]; 
+        sharedDataService.set(values);
         console.log("in click");
         $state.go("app.postnews", {
             type: "Edit"
@@ -105,9 +117,7 @@ myApp.controller('newsController', function ($scope, sharedDataService, $state) 
 
 
 myApp.controller('eventPremiumParentController', function ($scope, $state, $http, $stateParams, sharedDataService) {
-    $scope.$on('$ionicView.beforeEnter', function () {
-        $scope.eventName = sharedDataService.get();   
-    });
+    $scope.eventName = sharedDataService.get();   
 });
 
 myApp.controller('eventPremiumSummaryController', function ($scope, $state, $http, $stateParams, sharedDataService) {
@@ -115,7 +125,7 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
     $scope.$on('$ionicView.beforeEnter', function () {
         var result = $stateParams.eventname;
         $scope.eventName = result;
-        $scope.isOngoing = true;
+
 
         $http.get('http://136.145.116.232/events/'+result+'').
         success(function(data, status, headers, config) {
@@ -123,6 +133,7 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
             var eventPremiumData = angular.fromJson(data);
 
             $scope.eventInfo = eventPremiumData;
+            $scope.isOngoing = eventPremiumData.info.is_hosted;
 
 
         }).
@@ -131,5 +142,47 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
         });
     });
 
-    ;
+    $scope.goToMeetup = function (eventName) {
+        
+        eventName = eventName.replace(" ", "%20");
+        sharedDataService.set(eventName);
+        $state.go("app.meetups")
+    }
+    
+    $scope.goToReview = function (eventName) {
+        
+        eventName = eventName.replace(" ", "%20");
+        sharedDataService.set(eventName);
+        $state.go("app.writereview")
+    }
+});
+
+myApp.controller('meetupController', function ($scope, $state, $http, $stateParams, sharedDataService) {
+
+    $scope.eventName = sharedDataService.get();
+
+    $scope.goToSummaryFromMeetup = function (eventName) {
+        
+        eventName = eventName.replace(" ", "%20");
+        sharedDataService.set(eventName);
+        $state.go("app.eventpremium.summary", {
+            eventname: $scope.eventName
+        })
+    }
+
+});
+
+myApp.controller('writeReviewController', function ($scope, $state, $http, $stateParams, sharedDataService) {
+
+    $scope.eventName = sharedDataService.get();
+    
+    $scope.goToSummaryFromReview = function (eventName) {
+        
+        eventName = eventName.replace(" ", "%20");
+        sharedDataService.set(eventName);
+        $state.go("app.eventpremium.summary", {
+            eventname: $scope.eventName
+        })
+        
+    }
 });

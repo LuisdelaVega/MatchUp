@@ -1,4 +1,9 @@
 <ion-view view-title="Report">
+    <ion-nav-buttons side="left">
+        <button class="button button-icon" ng-click="goToSummaryFromReview(eventName)">
+            <i class="icon ion-ios-arrow-back"></i>
+        </button>
+    </ion-nav-buttons>
     <ion-content>
         <div class="list list-inset">
             <label class="item item-input item-stacked-label">
@@ -14,7 +19,7 @@
                 <rating ng-model="rate" max="max" style="text-align: center;"></rating>
             </div>
             <br>
-            <button class="button button-block button-positive">
+            <button class="button button-block button-positive" ng-click="goToSummaryFromReview(eventName)">
                 Submit
             </button>
         </div>

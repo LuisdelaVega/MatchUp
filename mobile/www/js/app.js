@@ -394,6 +394,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events',
         .state('app.meetups', {
         url: "/meetups",
         templateUrl: "templates/meetup/meetups.html",
+        controller: "meetupController"
 
     })
         .state('app.createmeetup', {
@@ -443,7 +444,8 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events',
 
         .state('app.writereview', {
         url: "/writereview",
-        templateUrl: "templates/premiumEvent/writereview.html"
+        templateUrl: "templates/premiumEvent/writereview.html",
+        controller: "writeReviewController"
     })
     //================================================================================
     // Account Stuff
