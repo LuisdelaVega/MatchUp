@@ -28,8 +28,8 @@ var getEvents = function(req, res, pg, conString) {
 			where = true;
 			break;
 		case getEventsParams.type[1]:
-			queryText += "event_name, event_start_date, event_end_date, event_location, event_venue, event_logo, organization_name FROM event NATURAL JOIN hosts";
-			queryGroupBy += ", organization_name";
+			queryText += "event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event NATURAL JOIN hosts";
+			// queryGroupBy += ", organization_name";
 			console.log(queryText);
 			break;
 		default:
@@ -252,7 +252,7 @@ var getHome = function(res, pg, conString) {
 
 				// Look for all Hosted Events that have not yet started
 				var queryHosted = client.query({
-					text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo, organization_name FROM event NATURAL JOIN hosts WHERE event.event_start_date > now() at time zone 'utc' AND event_visibility GROUP BY event_name, event_location, event_start_date, organization_name ORDER BY event_start_date"
+					text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event NATURAL JOIN hosts WHERE event.event_start_date > now() at time zone 'utc' AND event_visibility GROUP BY event_name, event_location, event_start_date ORDER BY event_start_date"
 				});
 				queryHosted.on("row", function(row, result) {
 					result.addRow(row);
