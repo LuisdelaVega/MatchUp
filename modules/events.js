@@ -5,10 +5,11 @@
 var getEventsParams = {
 	type : ["regular", "hosted"],
 	filter : ["game", "genre"],
-	time : ["live", "past", "upcoming"]
+	state : ["live", "past", "upcoming"]
 };
 
 //TODO Implement limit and offsets like in Spruce
+//TODO Remove the is hosted value here. Send it only when getting a specific event
 // /events - Get a list of Events filtered by given parameters
 var getEvents = function(req, res, pg, conString) {
 	// Query the DB to find the local Events
@@ -22,17 +23,17 @@ var getEvents = function(req, res, pg, conString) {
 		var queryGroupBy = " GROUP BY event_name, event_start_date, event_location";
 		switch (req.query.type) {
 		case getEventsParams.type[0]:
-			queryText += "event_name, event_start_date, event_location, event_venue, event_logo, bool_and(concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)) as is_hosted FROM event WHERE concat(event_name, event_location, event_start_date) NOT IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)";
+			queryText += "event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event WHERE concat(event_name, event_location, event_start_date) NOT IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)";
 			console.log(queryText);
 			where = true;
 			break;
 		case getEventsParams.type[1]:
-			queryText += "event_name, event_start_date, event_location, event_venue, event_logo, bool_and(concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)) as is_hosted, organization_name FROM event NATURAL JOIN hosts";
-			queryGroupBy += " organization_name";
+			queryText += "event_name, event_start_date, event_end_date, event_location, event_venue, event_logo, organization_name FROM event NATURAL JOIN hosts";
+			queryGroupBy += ", organization_name";
 			console.log(queryText);
 			break;
 		default:
-			queryText += "event_name, event_start_date, event_location, event_venue, event_logo, bool_and(concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)) as is_hosted FROM event";
+			queryText += "event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event";
 			console.log(queryText);
 		}
 		switch (req.query.filter) {
@@ -43,7 +44,7 @@ var getEvents = function(req, res, pg, conString) {
 				queryText += " WHERE ";
 				where = true;
 			}
-			queryText += "concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM event NATURAL JOIN tournament NATURAL JOIN game WHERE game_name = " + ((!req.query.game) ? 0 : req.query.game) + ")";
+			queryText += "concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM event NATURAL JOIN tournament NATURAL JOIN game WHERE game_name = '" + ((!req.query.value) ? 0 : req.query.value) + "')";
 			console.log(queryText);
 			break;
 		case getEventsParams.filter[1]:
@@ -53,12 +54,12 @@ var getEvents = function(req, res, pg, conString) {
 				queryText += " WHERE ";
 				where = true;
 			}
-			queryText += "concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM event NATURAL JOIN tournament NATURAL JOIN game NATURAL JOIN is_of NATURAL JOIN genre WHERE genre_name = " + ((!req.query.genre) ? 0 : req.query.genre) + ")";
+			queryText += "concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM event NATURAL JOIN tournament NATURAL JOIN game NATURAL JOIN is_of NATURAL JOIN genre WHERE genre_name = '" + ((!req.query.value) ? 0 : req.query.value) + "')";
 			console.log(queryText);
 			break;
 		}
-		switch (req.query.time) {
-		case getEventsParams.time[0]:
+		switch (req.query.state) {
+		case getEventsParams.state[0]:
 			if (where) {
 				queryText += " AND ";
 			} else {
@@ -68,7 +69,7 @@ var getEvents = function(req, res, pg, conString) {
 			queryText += "event_start_date < now() at time zone 'utc' AND event_end_date > now() at time zone 'utc'";
 			console.log(queryText);
 			break;
-		case getEventsParams.time[1]:
+		case getEventsParams.state[1]:
 			if (where) {
 				queryText += " AND ";
 			} else {
@@ -78,7 +79,7 @@ var getEvents = function(req, res, pg, conString) {
 			queryText += "event_end_date < now() at time zone 'utc'";
 			console.log(queryText);
 			break;
-		case getEventsParams.time[2]:
+		case getEventsParams.state[2]:
 			if (where) {
 				queryText += " AND ";
 			} else {
@@ -125,7 +126,7 @@ var getEvent = function(req, res, pg, conString) {
 		// Query the database to find the account
 		var event = new Object();
 		var queryEvent = client.query({
-			text : "SELECT event_name, event_start_date, event_location, event_venue, event_banner, event_logo, event_max_capacity, event_end_date, event_registration_deadline, event_rules, event_description, event_deduction_fee, event_is_online, event_type, bool_and(concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)) as is_hosted FROM event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND event_visibility GROUP BY event_name, event_start_date, event_location",
+			text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_banner, event_logo, event_max_capacity, event_end_date, event_registration_deadline, event_rules, event_description, event_deduction_fee, event_is_online, event_type, bool_and(concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)) as is_hosted FROM event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND event_visibility GROUP BY event_name, event_start_date, event_location",
 			values : [req.params.event, req.query.date, req.query.location]
 		});
 		queryEvent.on("row", function(row, result) {
@@ -220,6 +221,7 @@ var getEvent = function(req, res, pg, conString) {
 };
 
 //TODO Limit the result to a maximum of 3 or something
+//TODO Remove the is hosted value here. Send it only when getting a specific event
 // /home - Get everything MatchUp's home view needs
 var getHome = function(res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
@@ -230,7 +232,7 @@ var getHome = function(res, pg, conString) {
 		var eventList = new Object();
 		// Look for all the Events that are currently in progress
 		var queryLive = client.query({
-			text : "SELECT event_name, event_location, event_venue, event_logo, event_start_date, bool_and(concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)) as is_hosted FROM event WHERE event_start_date < now() at time zone 'utc' and event_end_date > now() at time zone 'utc' AND event_visibility GROUP BY event_name, event_location, event_start_date ORDER BY event_start_date"
+			text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event WHERE event_start_date < now() at time zone 'utc' and event_end_date > now() at time zone 'utc' AND event_visibility GROUP BY event_name, event_location, event_start_date ORDER BY event_start_date"
 		});
 		queryLive.on("row", function(row, result) {
 			result.addRow(row);
@@ -240,7 +242,7 @@ var getHome = function(res, pg, conString) {
 
 			// Look for all the Regular Events that have not yet started
 			var queryRegular = client.query({
-				text : "SELECT event_name, event_location, event_venue, event_logo, event_start_date, bool_and(concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)) as is_hosted FROM event WHERE event_start_date > now() at time zone 'utc' AND event_name NOT IN (SELECT event.event_name FROM event NATURAL JOIN hosts) AND event_visibility GROUP BY event_name, event_location, event_start_date ORDER BY event.event_start_date"
+				text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event WHERE event_start_date > now() at time zone 'utc' AND event_name NOT IN (SELECT event.event_name FROM event NATURAL JOIN hosts) AND event_visibility GROUP BY event_name, event_location, event_start_date ORDER BY event_start_date"
 			});
 			queryRegular.on("row", function(row, result) {
 				result.addRow(row);
@@ -250,7 +252,7 @@ var getHome = function(res, pg, conString) {
 
 				// Look for all Hosted Events that have not yet started
 				var queryHosted = client.query({
-					text : "SELECT event_name, event_location, event_venue, event_logo, event_start_date, organization_name, bool_and(concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)) as is_hosted FROM event NATURAL JOIN hosts WHERE event.event_start_date > now() at time zone 'utc' AND event_visibility GROUP BY event_name, event_location, event_start_date, organization_name ORDER BY event.event_start_date"
+					text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo, organization_name FROM event NATURAL JOIN hosts WHERE event.event_start_date > now() at time zone 'utc' AND event_visibility GROUP BY event_name, event_location, event_start_date, organization_name ORDER BY event_start_date"
 				});
 				queryHosted.on("row", function(row, result) {
 					result.addRow(row);
@@ -261,7 +263,7 @@ var getHome = function(res, pg, conString) {
 					// Look for most Popular Games
 					var gamesList = new Object();
 					var queryPopularGames = client.query({
-						text : "SELECT game.*, count(game.game_name) as popularity FROM event NATURAL JOIN tournament NATURAL JOIN game WHERE event_visibility GROUP BY game.game_name ORDER BY popularity DESC"
+						text : "SELECT game.*, count(game.game_name) as popularity FROM event NATURAL JOIN tournament NATURAL JOIN game WHERE event_visibility GROUP BY game_name ORDER BY popularity DESC"
 					});
 					queryPopularGames.on("row", function(row, result) {
 						result.addRow(row);
