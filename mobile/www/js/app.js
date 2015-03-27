@@ -4,7 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events', 'user', 'team-organizations'])
+angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events', 'user', 'team-organizations', 'genres'])
 
     .run(function ($ionicPlatform) {
     $ionicPlatform.ready(function () {
@@ -117,7 +117,8 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events',
     //================================================================================
         .state('app.genres', {
         url: "/genres",
-        templateUrl: "templates/genre.html"
+        templateUrl: "templates/genre.html",
+        controller: "genreController"
     })
         .state('app.populargames', {
         url: "/populargames",
@@ -243,13 +244,15 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events',
         .state('app.genre', {
         url: "/genre",
         abstract: true,
-        templateUrl: "templates/genreProfile/genre-profile.html"
+        templateUrl: "templates/genreProfile/genre-profile.html",
+        controller: "genreProfileController"
     })
         .state('app.genre.upcoming', {
         url: "/upcoming",
         views: {
             'genre-upcoming-tab': {
                 templateUrl: "templates/genreProfile/genre-upcoming.html",
+                controller: "genreUpcomingProfileController"
             }
         }
     })
@@ -258,6 +261,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events',
         views: {
             'genre-live-tab': {
                 templateUrl: "templates/genreProfile/genre-live.html",
+                controller: "genreLiveProfileController"
             }
         }
     })
@@ -266,6 +270,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events',
         views: {
             'genre-history-tab': {
                 templateUrl: "templates/genreProfile/genre-history.html",
+                controller: "genreHistoryProfileController"
             }
         }
     })
