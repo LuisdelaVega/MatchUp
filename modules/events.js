@@ -19,7 +19,7 @@ var getEvents = function(req, res, pg, conString) {
 
 		var where = false;
 		var queryText = "SELECT ";
-		var queryGroupBy = " GROUP BY";
+		var queryGroupBy = " GROUP BY event_name, event_start_date, event_location";
 		switch (req.query.type) {
 		case getEventsParams.type[0]:
 			queryText += "event_name, event_start_date, event_location, event_venue, event_logo, bool_and(concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)) as is_hosted FROM event WHERE concat(event_name, event_location, event_start_date) NOT IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)";
@@ -28,7 +28,7 @@ var getEvents = function(req, res, pg, conString) {
 			break;
 		case getEventsParams.type[1]:
 			queryText += "event_name, event_start_date, event_location, event_venue, event_logo, bool_and(concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)) as is_hosted, organization_name FROM event NATURAL JOIN hosts";
-			queryGroupBy += " event_name, event_start_date, event_location, organization_name";
+			queryGroupBy += " organization_name";
 			console.log(queryText);
 			break;
 		default:
@@ -44,9 +44,6 @@ var getEvents = function(req, res, pg, conString) {
 				where = true;
 			}
 			queryText += "concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM event NATURAL JOIN tournament NATURAL JOIN game WHERE game_name = " + ((!req.query.game) ? 0 : req.query.game) + ")";
-			if (queryGroupBy === " GROUP BY") {
-				queryGroupBy += " event_name, event_start_date, event_location";
-			}
 			console.log(queryText);
 			break;
 		case getEventsParams.filter[1]:
@@ -57,9 +54,6 @@ var getEvents = function(req, res, pg, conString) {
 				where = true;
 			}
 			queryText += "concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM event NATURAL JOIN tournament NATURAL JOIN game NATURAL JOIN is_of NATURAL JOIN genre WHERE genre_name = " + ((!req.query.genre) ? 0 : req.query.genre) + ")";
-			if (queryGroupBy === " GROUP BY") {
-				queryGroupBy += " event_name, event_start_date, event_location";
-			}
 			console.log(queryText);
 			break;
 		}
@@ -103,9 +97,7 @@ var getEvents = function(req, res, pg, conString) {
 			where = true;
 		}
 
-		if (queryGroupBy != " GROUP BY") {
-			queryText += queryGroupBy;
-		}
+		queryText += queryGroupBy;
 		queryText += " ORDER BY event_start_date";
 		console.log(queryText);
 		// Query the database to find the account
@@ -209,7 +201,7 @@ var getEvent = function(req, res, pg, conString) {
 												res.json(event);
 												client.end();
 											});
-										} else { //TODO If not hosted by an organization, send the creator of the event as the 'host'
+										} else {//TODO If not hosted by an organization, send the creator of the event as the 'host'
 											res.json(event);
 											client.end();
 										}
