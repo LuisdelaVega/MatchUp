@@ -117,17 +117,17 @@ myApp.controller('newsController', function ($scope, sharedDataService, $statePa
 
 
 myApp.controller('eventPremiumParentController', function ($scope, $state, $http, $stateParams, sharedDataService) {
-    $scope.eventName = sharedDataService.get();   
+    var params = sharedDataService.get();   
+    $scope.eventName = params[0];
+    $scope.date = params[1];
+    $scope.location = params[2];
 });
 
 myApp.controller('eventPremiumSummaryController', function ($scope, $state, $http, $stateParams, sharedDataService) {
 
     $scope.$on('$ionicView.beforeEnter', function () {
-        var result = $stateParams.eventname;
-        $scope.eventName = result;
 
-
-        $http.get('http://136.145.116.232/events/'+result+'').
+        $http.get('http://136.145.116.232/events/'+$scope.eventName+'?date='+$scope.date+'&location='+$scope.location+'').
         success(function(data, status, headers, config) {
 
             var eventPremiumData = angular.fromJson(data);

@@ -362,7 +362,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events',
         controller: "eventPremiumParentController"
     })
         .state('app.eventpremium.summary', {
-        url: "/summary/:eventname",
+        url: "/summary/:eventname/:date/:location",
         views: {
             'event-summary-tab': {
                 templateUrl: "templates/premiumEvent/summary.html",
@@ -371,7 +371,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events',
         }
     })
         .state('app.eventpremium.news', {
-        url: "/news/:eventname",
+        url: "/news/:eventname/:date/:location",
         views: {
             'event-news-tab': {
                 templateUrl: "templates/premiumEvent/news.html",

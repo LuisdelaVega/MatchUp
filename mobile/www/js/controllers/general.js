@@ -31,11 +31,12 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
         console.log("error in search controller");
     });
 
-    $scope.goToEvent = function(eventName){
+    $scope.goToEvent = function(eventName, date, location){
         
         eventName = eventName.replace(" ", "%20");
-        $state.go('app.eventpremium.summary', {"eventname": eventName});
-        sharedDataService.set(eventName);
+        var params = [eventName, date, location]
+        $state.go('app.eventpremium.summary', {"eventname": eventName, "date": date, "location": location});
+        sharedDataService.set(params);
     };
 
 
