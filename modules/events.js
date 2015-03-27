@@ -1,6 +1,24 @@
-//TODO Get a specific news for an event
-//TODO Get a specific review for an event
-//TODO Send if event is hosted in home view
+//TODO Get specific News for an event
+//TODO Get specific Review for an event
+//TODO Add Tournamet
+//TODO Add Station
+//TODO Add News
+//TODO Add Sponsor
+//TODO Edit Event details
+//TODO Edit Tournament details
+//TODO Edit Station details
+//TODO Edit Sponsors details
+//TODO Edit News details
+//TODO Delete Event
+//TODO Delete Tournament
+//TODO Delete Sponsor
+//TODO Delete Meetup
+//TODO Delete Review
+//TODO Delete News
+//TODO Register for Event
+//TODO Register for Tournament
+//TODO Create Meetup
+//TODO Create Review
 
 var getEventsParams = {
 	type : ["regular", "hosted"],
@@ -9,7 +27,6 @@ var getEventsParams = {
 };
 
 //TODO Implement limit and offsets like in Spruce
-//TODO Remove the is hosted value here. Send it only when getting a specific event
 // /events - Get a list of Events filtered by given parameters
 var getEvents = function(req, res, pg, conString) {
 	// Query the DB to find the local Events
@@ -92,9 +109,9 @@ var getEvents = function(req, res, pg, conString) {
 		}
 
 		if (where) {
-			queryText += " AND event_visibility";
+			queryText += " AND event_active";
 		} else {
-			queryText += " WHERE event_visibility";
+			queryText += " WHERE event_active";
 			where = true;
 		}
 
@@ -115,19 +132,20 @@ var getEvents = function(req, res, pg, conString) {
 	});
 };
 
-// /events/:event - Get a specific Event
+//TODO Send if I am an organizer
 var getEvent = function(req, res, pg, conString) {
 	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
-
+		
+		var date = new Date(req.query.date);
 		// Query the database to find the account
 		var event = new Object();
 		var queryEvent = client.query({
-			text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_banner, event_logo, event_max_capacity, event_end_date, event_registration_deadline, event_rules, event_description, event_deduction_fee, event_is_online, event_type, bool_and(concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)) as is_hosted FROM event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND event_visibility GROUP BY event_name, event_start_date, event_location",
-			values : [req.params.event, req.query.date, req.query.location]
+			text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_banner, event_logo, event_max_capacity, event_end_date, event_registration_deadline, event_rules, event_description, event_deduction_fee, event_is_online, event_type, bool_and(concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)) as is_hosted FROM event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND event_active GROUP BY event_name, event_start_date, event_location",
+			values : [req.params.event, (!(date.getTime()) ? "0000-00-00T00:00:00.000Z" : req.query.date), req.query.location] //TODO REGEX this shit
 		});
 		queryEvent.on("row", function(row, result) {
 			result.addRow(row);
@@ -221,7 +239,6 @@ var getEvent = function(req, res, pg, conString) {
 };
 
 //TODO Limit the result to a maximum of 3 or something
-//TODO Remove the is hosted value here. Send it only when getting a specific event
 // /home - Get everything MatchUp's home view needs
 var getHome = function(res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
@@ -232,7 +249,7 @@ var getHome = function(res, pg, conString) {
 		var eventList = new Object();
 		// Look for all the Events that are currently in progress
 		var queryLive = client.query({
-			text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event WHERE event_start_date < now() at time zone 'utc' and event_end_date > now() at time zone 'utc' AND event_visibility GROUP BY event_name, event_location, event_start_date ORDER BY event_start_date"
+			text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event WHERE event_start_date < now() at time zone 'utc' and event_end_date > now() at time zone 'utc' AND event_active GROUP BY event_name, event_location, event_start_date ORDER BY event_start_date"
 		});
 		queryLive.on("row", function(row, result) {
 			result.addRow(row);
@@ -242,7 +259,7 @@ var getHome = function(res, pg, conString) {
 
 			// Look for all the Regular Events that have not yet started
 			var queryRegular = client.query({
-				text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event WHERE event_start_date > now() at time zone 'utc' AND event_name NOT IN (SELECT event.event_name FROM event NATURAL JOIN hosts) AND event_visibility GROUP BY event_name, event_location, event_start_date ORDER BY event_start_date"
+				text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event WHERE event_start_date > now() at time zone 'utc' AND event_name NOT IN (SELECT event.event_name FROM event NATURAL JOIN hosts) AND event_active GROUP BY event_name, event_location, event_start_date ORDER BY event_start_date"
 			});
 			queryRegular.on("row", function(row, result) {
 				result.addRow(row);
@@ -252,7 +269,7 @@ var getHome = function(res, pg, conString) {
 
 				// Look for all Hosted Events that have not yet started
 				var queryHosted = client.query({
-					text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event NATURAL JOIN hosts WHERE event.event_start_date > now() at time zone 'utc' AND event_visibility GROUP BY event_name, event_location, event_start_date ORDER BY event_start_date"
+					text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event NATURAL JOIN hosts WHERE event.event_start_date > now() at time zone 'utc' AND event_active GROUP BY event_name, event_location, event_start_date ORDER BY event_start_date"
 				});
 				queryHosted.on("row", function(row, result) {
 					result.addRow(row);
@@ -263,7 +280,7 @@ var getHome = function(res, pg, conString) {
 					// Look for most Popular Games
 					var gamesList = new Object();
 					var queryPopularGames = client.query({
-						text : "SELECT game.*, count(game.game_name) as popularity FROM event NATURAL JOIN tournament NATURAL JOIN game WHERE event_visibility GROUP BY game.game_name ORDER BY popularity DESC"
+						text : "SELECT game.*, count(game.game_name) as popularity FROM event NATURAL JOIN tournament NATURAL JOIN game WHERE event_active GROUP BY game.game_name ORDER BY popularity DESC"
 					});
 					queryPopularGames.on("row", function(row, result) {
 						result.addRow(row);
