@@ -1,3 +1,5 @@
+//TODO Make captain
+//TODO Get Team Members
 var getTeams = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -148,6 +150,7 @@ var addTeamMember = function(req, res, pg, conString) {
 	});
 };
 
+//TODO I can remove myself here and thus leave the team without a captain. That's bad
 var removeTeamMember = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
