@@ -111,6 +111,14 @@ function getUserProfile(req, res) {
 	customers.getUserProfile(req, res, pg, conString);
 }
 
+function getPopularGames(req, res) {
+	games.getPopularGames(res, pg, conString);
+}
+
+function getPopularGenres(req, res) {
+	games.getPopularGenres(res, pg, conString);
+}
+
 function getPopularStuff(req, res) {
 	games.getPopularStuff(res, pg, conString);
 }
@@ -187,17 +195,22 @@ function addOrganizationMember(req, res){
 app.get('/bracket/:format/:numofplayers', tournaments.createBraket); // *Depreciated* Used for testing of the bracket generation algorithm
 app.post('/groupstage', createGroupStage); // *Depreciated* Used for testing of the group stage algorithm
 app.get('/home', getHome); // Sends the data to populate the Home view. TODO Limit the amount of objects to 3 of every type
-app.get('/popularstuff', getPopularStuff); // Sends popular games and genres. Not sure if it still needed
 app.get('/search/:parameter', getSearchResults); // Searches the DB based on the search parameter. TODO Limit the amount of objects to 3 of every type
 app.get('/events', getEvents); // Sends a list of events that can be filtered by when it started, game or genre featured, and by type (regular or hosted). TODO Implement limit and offsets like in Spruce
 app.get('/events/:event', getEvent); // Get the details for a specific Event
+app.get('/teams', getTeams); // Sends a list of every Team
+app.get('/organizations', getOrganizations); // Sends a list of every Organization
+app.get('/popular/games', getPopularGames); // Sends a list of every Organization
+app.get('/popular/genres', getPopularGenres); // Sends a list of every Organization
+app.get('/popular/stuff', getPopularStuff); // Sends popular games and genres. Not sure if it still needed
 
 app.post('/create/account', createAccount); // Create a new account
 app.post('/tournament', createTournament); // Generates a Tournament based on the information sent in the body. TODO Read the details from the DB and only expect the array of players
 
-///////////////////////////////////////////////////////////////////////////////////////////// API ROUTES
-app.get('/api/teams', getTeams); // Sends a list of every Team
-app.get('/api/organizations', getOrganizations); // Sends a list of every Organization
+///////////////////////////////////////////////////////////////////////////////////////////// API ROUTE
+app.get('/api', function(req, res){
+	res.redirect('http://docs.neptunolabsmatchup.apiary.io');
+});
 
 ///////////////////////////////////////////////////////////////////////////////////////////// MatchUp ROUTES
 app.get('/matchup/profile', getMyProfile);
