@@ -15,97 +15,29 @@ var myApp = angular.module('home',[]);
 //    }
 //}]);  
 
-myApp.controller('homeViewController', ['$scope', '$http', function ($scope, $http) {
-    console.log("homeview controlelr");
-    var eventData = {
-        "live": [
-            {
-                "img": "img/apex2015.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/apex2015.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/lol2.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/lol2.png",
-                "title": "LOL Championship Series",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/lolbr.jpeg",
-                "title": "LOL Championship Series Brazil",
-                "location": "Badillo's House, Jersey"
-            }
-        ],
+myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedDataService', function ($scope, $http, $state, sharedDataService) {
+    $http.get('http://136.145.116.232/home').
+    success(function(data, status, headers, config) {
 
-        "premium": [
-            {
-                "img": "img/apex2015.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/apex2015.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/lol2.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/lol2.png",
-                "title": "LOL Championship Series",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/lolbr.jpeg",
-                "title": "LOL Championship Series Brazil",
-                "location": "Badillo's House, Jersey"
-            }
-        ],
+        var eventData = angular.fromJson(data);
 
-        "regular": [
-            {
-                "img": "img/apex2015.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/apex2015.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/lol2.png",
-                "title": "Apex 2015",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/lol2.png",
-                "title": "LOL Championship Series",
-                "location": "Badillo's House, Jersey"
-            },
-            {
-                "img": "img/lolbr.jpeg",
-                "title": "LOL Championship Series Brazil",
-                "location": "Badillo's House, Jersey"
-            }
-        ]
+        $scope.liveEvents = eventData.events.live;
+        $scope.premiumEvents = eventData.events.hosted;
+        $scope.regularEvents = eventData.events.regular;
+        $scope.popularGames = eventData.popular_games;
+
+    }).
+    error(function(data, status, headers, config) {
+        console.log("error in search controller");
+    });
+
+    $scope.goToEvent = function(eventName){
+        
+        eventName = eventName.replace(" ", "%20");
+        $state.go('app.eventpremium.summary', {"eventname": eventName});
+        sharedDataService.set(eventName);
     };
 
-    $scope.live = eventData.live;
-    $scope.premium = eventData.premium;
-    $scope.regular = eventData.regular;
 
 }]);
 
@@ -132,7 +64,7 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', fu
         success(function(data, status, headers, config) {
 
             var searchData = angular.fromJson(data);
-            
+
             $scope.liveEvents = searchData.events.live;
             $scope.pastEvents = searchData.events.past;
             $scope.premiumEvents = searchData.events.hosted;
@@ -166,24 +98,52 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
 
     var searchData = sharedDataService.get();
 
-    if ($scope.resultType == 'Live')
+    $scope.live = false;
+    $scope.past = false;
+    $scope.hosted = false;
+    $scope.regular = false;
+    $scope.users = false;
+    $scope.teams = false;
+    $scope.organizations = false;
+    $scope.games = false;
+    $scope.genres = false;
+
+    if ($scope.resultType == 'Live'){
         $scope.searchData = searchData.live;
-    else if ($scope.resultType == 'Past')
+        $scope.live = true;
+    }
+    else if ($scope.resultType == 'Past'){
         $scope.searchData = searchData.past;
-    else if ($scope.resultType == 'Premium')
+        $scope.past = true;
+    }
+    else if ($scope.resultType == 'Premium'){
         $scope.searchData = searchData.hosted;
-    else if ($scope.resultType == 'Regular')
+        $scope.hosted = true;
+    }
+    else if ($scope.resultType == 'Regular'){
         $scope.searchData = searchData.regular;
-    else if ($scope.resultType == 'Users')
+        $scope.regular = true;
+    }
+    else if ($scope.resultType == 'Users'){
         $scope.searchData = searchData.users;
-    else if ($scope.resultType == 'Teams')
+        $scope.users = true;
+    }
+    else if ($scope.resultType == 'Teams'){
         $scope.searchData = searchData.teams;
-    else if ($scope.resultType == 'Organizations')
+        $scope.teams = true;
+    }
+    else if ($scope.resultType == 'Organizations'){
         $scope.searchData = searchData.organizations;
-    else if ($scope.resultType == 'Games')
+        $scope.organizations = true;
+    }
+    else if ($scope.resultType == 'Games'){
         $scope.searchData = searchData.games;
-    else if ($scope.resultType == 'Genres')
+        $scope.games = true;
+    }
+    else if ($scope.resultType == 'Genres'){
         $scope.searchData = searchData.genres;
+        $scope.genres = true;
+    }
 }]);
 
 myApp.controller('cameraReportController', ['$scope', '$http', 'Camera', function ($scope, $http, Camera) {
