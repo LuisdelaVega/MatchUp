@@ -263,7 +263,7 @@ var getHome = function(res, pg, conString) {
 					// Look for most Popular Games
 					var gamesList = new Object();
 					var queryPopularGames = client.query({
-						text : "SELECT game.*, count(game.game_name) as popularity FROM event NATURAL JOIN tournament NATURAL JOIN game WHERE event_visibility GROUP BY game_name ORDER BY popularity DESC"
+						text : "SELECT game.*, count(game.game_name) as popularity FROM event NATURAL JOIN tournament NATURAL JOIN game WHERE event_visibility GROUP BY game.game_name ORDER BY popularity DESC"
 					});
 					queryPopularGames.on("row", function(row, result) {
 						result.addRow(row);
