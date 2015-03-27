@@ -22,17 +22,17 @@ var getEvents = function(req, res, pg, conString) {
 		var queryGroupBy = " GROUP BY";
 		switch (req.query.type) {
 		case getEventsParams.type[0]:
-			queryText += "event_name, event_start_date, event_location, event_venue FROM event WHERE event_name NOT IN (SELECT event.event_name FROM event NATURAL JOIN hosts)";
+			queryText += "event_name, event_start_date, event_location, event_venue, event_logo, bool_and(concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)) as is_hosted FROM event WHERE concat(event_name, event_location, event_start_date) NOT IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)";
 			console.log(queryText);
 			where = true;
 			break;
 		case getEventsParams.type[1]:
-			queryText += "event_name, event_start_date, event_location, event_venue, organization_name FROM event NATURAL JOIN hosts";
+			queryText += "event_name, event_start_date, event_location, event_venue, event_logo, bool_and(concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)) as is_hosted, organization_name FROM event NATURAL JOIN hosts";
 			queryGroupBy += " event_name, event_start_date, event_location, organization_name";
 			console.log(queryText);
 			break;
 		default:
-			queryText += "event_name, event_start_date, event_location, event_venue FROM event";
+			queryText += "event_name, event_start_date, event_location, event_venue, event_logo, bool_and(concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)) as is_hosted FROM event";
 			console.log(queryText);
 		}
 		switch (req.query.filter) {
@@ -43,7 +43,7 @@ var getEvents = function(req, res, pg, conString) {
 				queryText += " WHERE ";
 				where = true;
 			}
-			queryText += "event_name IN (SELECT event.event_name FROM event NATURAL JOIN has NATURAL JOIN tournament NATURAL JOIN game WHERE game_name = " + ((!req.query.game) ? 0 : req.query.game) + ")";
+			queryText += "concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM event NATURAL JOIN tournament NATURAL JOIN game WHERE game_name = " + ((!req.query.game) ? 0 : req.query.game) + ")";
 			if (queryGroupBy === " GROUP BY") {
 				queryGroupBy += " event_name, event_start_date, event_location";
 			}
@@ -56,7 +56,7 @@ var getEvents = function(req, res, pg, conString) {
 				queryText += " WHERE ";
 				where = true;
 			}
-			queryText += "event_name IN (SELECT event.event_name FROM event NATURAL JOIN tournament NATURAL JOIN game NATURAL JOIN is_of NATURAL JOIN genre WHERE genre_name = " + ((!req.query.genre) ? 0 : req.query.genre) + ")";
+			queryText += "concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM event NATURAL JOIN tournament NATURAL JOIN game NATURAL JOIN is_of NATURAL JOIN genre WHERE genre_name = " + ((!req.query.genre) ? 0 : req.query.genre) + ")";
 			if (queryGroupBy === " GROUP BY") {
 				queryGroupBy += " event_name, event_start_date, event_location";
 			}
@@ -122,7 +122,6 @@ var getEvents = function(req, res, pg, conString) {
 	});
 };
 
-//TODO Add event_start_date and event_location as query parameters
 // /events/:event - Get a specific Event
 var getEvent = function(req, res, pg, conString) {
 	// Query the DB to find the local Events
@@ -134,7 +133,7 @@ var getEvent = function(req, res, pg, conString) {
 		// Query the database to find the account
 		var event = new Object();
 		var queryEvent = client.query({
-			text : "SELECT event_name, event_start_date, event_location, event_venue, event_banner, event_logo, event_max_capacity, event_end_date, event_registration_deadline, event_rules, event_description, event_deduction_fee, event_is_online, event_type, bool_and(event_name IN (SELECT event_name FROM hosts WHERE event_name = $1)) as is_hosted FROM event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND event_visibility GROUP BY event_name, event_start_date, event_location",
+			text : "SELECT event_name, event_start_date, event_location, event_venue, event_banner, event_logo, event_max_capacity, event_end_date, event_registration_deadline, event_rules, event_description, event_deduction_fee, event_is_online, event_type, bool_and(concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)) as is_hosted FROM event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND event_visibility GROUP BY event_name, event_start_date, event_location",
 			values : [req.params.event, req.query.date, req.query.location]
 		});
 		queryEvent.on("row", function(row, result) {
@@ -210,7 +209,7 @@ var getEvent = function(req, res, pg, conString) {
 												res.json(event);
 												client.end();
 											});
-										} else {
+										} else { //TODO If not hosted by an organization, send the creator of the event as the 'host'
 											res.json(event);
 											client.end();
 										}
