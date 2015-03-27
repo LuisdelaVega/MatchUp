@@ -99,139 +99,110 @@ function authenticate(req, res) {
 	});
 }
 
-function getHome(req, res) {
-	events.getHome(res, pg, conString);
-}
-
-function getMyProfile(req, res) {
-	customers.getMyProfile(req, res, pg, conString);
-}
-
-function getUserProfile(req, res) {
-	customers.getUserProfile(req, res, pg, conString);
-}
-
-function getPopularGames(req, res) {
-	games.getPopularGames(res, pg, conString);
-}
-
-function getPopularGenres(req, res) {
-	games.getPopularGenres(res, pg, conString);
-}
-
-function getPopularStuff(req, res) {
-	games.getPopularStuff(res, pg, conString);
-}
-
-function getSearchResults(req, res) {
-	search.getSearchResults(req, res, pg, conString);
-}
-
-function getEvents(req, res) {
-	events.getEvents(req, res, pg, conString);
-}
-
-function getEvent(req, res) {
-	events.getEvent(req, res, pg, conString);
-}
-
-function createAccount(req, res) {
-	customers.createAccount(req, res, pg, conString, jwt, secret);
-}
-
-function createGroupStage(req, res){
-	tournaments.createGroupStage(req, res);
-}
-
-function createTournament(req, res){
-	tournaments.createTournament(req, res);
-}
-
-function createTeam(req, res) {
-	customers.createTeam(req, res, pg, conString);
-}
-
-function getTeams(req, res) {
-	teams.getTeams(req, res, pg, conString);
-}
-
-function getTeam(req, res) {
-	teams.getTeam(req, res, pg, conString);
-}
-
-function editTeam(req, res) {
-	teams.editTeam(req, res, pg, conString);
-}
-
-function deleteTeam(req, res){
-	teams.deleteTeam(req, res, pg, conString);
-}
-
-function addTeamMember(req, res){
-	teams.addTeamMember(req, res, pg, conString);
-}
-
-function getOrganizations(req, res) {
-	organizations.getOrganizations(req, res, pg, conString);
-}
-
-function getOrganization(req, res) {
-	organizations.getOrganization(req, res, pg, conString);
-}
-
-function editOrganization(req, res) {
-	organizations.editOrganization(req, res, pg, conString);
-}
-
-function deleteOrganization(req, res) {
-	organizations.deleteOrganization(req, res, pg, conString);
-}
-
-function addOrganizationMember(req, res){
-	organizations.addOrganizationMember(req, res, pg, conString);
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
-app.get('/bracket/:format/:numofplayers', tournaments.createBraket); // *Depreciated* Used for testing of the bracket generation algorithm
-app.post('/groupstage', createGroupStage); // *Depreciated* Used for testing of the group stage algorithm
-app.get('/home', getHome); // Sends the data to populate the Home view. TODO Limit the amount of objects to 3 of every type
-app.get('/search/:parameter', getSearchResults); // Searches the DB based on the search parameter. TODO Limit the amount of objects to 3 of every type
-app.get('/events', getEvents); // Sends a list of events that can be filtered by when it started, game or genre featured, and by type (regular or hosted). TODO Implement limit and offsets like in Spruce
-app.get('/events/:event', getEvent); // Get the details for a specific Event
-app.get('/teams', getTeams); // Sends a list of every Team
-app.get('/organizations', getOrganizations); // Sends a list of every Organization
-app.get('/popular/games', getPopularGames); // Sends a list of every Organization
-app.get('/popular/genres', getPopularGenres); // Sends a list of every Organization
-app.get('/popular/stuff', getPopularStuff); // Sends popular games and genres. Not sure if it still needed
+// *Depreciated* Used for testing of the bracket generation algorithm
+app.get('/bracket/:format/:numofplayers', tournaments.createBraket);
+// *Depreciated* Used for testing of the group stage algorithm
+app.post('/groupstage', tournaments.createGroupStage);
+//TODO Read the details from the DB and only expect the array of players
+app.post('/tournament', tournaments.createTournament);
 
-app.post('/create/account', createAccount); // Create a new account
-app.post('/tournament', createTournament); // Generates a Tournament based on the information sent in the body. TODO Read the details from the DB and only expect the array of players
-
-///////////////////////////////////////////////////////////////////////////////////////////// API ROUTE
-app.get('/api', function(req, res){
+///////////////////////////////////////////////////////////////////////////////////////////// API
+app.get('/api', function(req, res) {
 	res.redirect('http://docs.neptunolabsmatchup.apiary.io');
 });
 
-///////////////////////////////////////////////////////////////////////////////////////////// MatchUp ROUTES
-app.get('/matchup/profile', getMyProfile);
-app.get('/matchup/profile/:username', getUserProfile);
-
+///////////////////////////////////////////////////////////////////////////////////////////// AUTHENTICATION
+app.post('/create/account', function(req, res){
+	customers.createAccount(req, res, pg, conString, jwt, secret);
+});
 app.post('/login', authenticate);
-app.post('/matchup/create/team', createTeam);
 
+///////////////////////////////////////////////////////////////////////////////////////////// EVENTS
+app.get('/events', function(req, res){
+	events.getEvents(req, res, pg, conString);
+});
+app.get('/events/:event', function(req, res){
+	events.getEvent(req, res, pg, conString);
+});
+
+///////////////////////////////////////////////////////////////////////////////////////////// HOME
+app.get('/home', function(req, res){
+	events.getHome(res, pg, conString);
+});
+
+///////////////////////////////////////////////////////////////////////////////////////////// ORGANIZATIONS
+app.get('/organizations', function(req, res){
+	organizations.getOrganizations(req, res, pg, conString);
+});
 app.route('/matchup/organizations/:organization')
-	.get(getOrganization) // Get the details for a specific Organization
-	.put(editOrganization)
-	.delete(deleteOrganization);
+	.get(function(req, res){
+		organizations.getOrganization(req, res, pg, conString);
+	})
+	.put(function(req, res){
+		organizations.editOrganization(req, res, pg, conString);
+	})
+	.delete(function(req, res){
+		organizations.deleteOrganization(req, res, pg, conString);
+	});
+app.route('/matchup/organizations/:organization/user/:username')
+	.put(function(req, res){
+		organizations.addOrganizationMember(req, res, pg, conString);
+	})
+	.delete(function(req, res){
+		organizations.removeOrganizationMember(req, res, pg, conString);
+	});
+
+///////////////////////////////////////////////////////////////////////////////////////////// POPULAR
+app.get('/popular', function(req, res){
+	games.getPopularStuff(res, pg, conString);
+});
+app.get('/popular/games', function(req, res){
+	games.getPopularGames(res, pg, conString);
+});
+app.get('/popular/genres', function(req, res){
+	games.getPopularGenres(res, pg, conString);
+});
+
+///////////////////////////////////////////////////////////////////////////////////////////// PROFILE
+app.get('/matchup/profile', function(req, res){
+	customers.getMyProfile(req, res, pg, conString);
+});
+app.get('/matchup/profile/:username', function(req, res){
+	customers.getUserProfile(req, res, pg, conString);
+});
+
+///////////////////////////////////////////////////////////////////////////////////////////// SEARCH
+app.get('/search/:parameter', function(req, res){
+	search.getSearchResults(req, res, pg, conString);
+});
+
+///////////////////////////////////////////////////////////////////////////////////////////// TEAMS
+app.get('/teams', function(req, res){
+	teams.getTeams(req, res, pg, conString);
+});
+app.post('/matchup/create/team', function(req, res){
+	customers.createTeam(req, res, pg, conString);
+});
 app.route('/matchup/teams/:team')
-	.get(getTeam) // Get the details for a specific Team
-	.put(editTeam)
-	.delete(deleteTeam);
+	.get(function(req, res){
+		teams.getTeam(req, res, pg, conString);
+	})
+	.put(function(req, res){
+		teams.editTeam(req, res, pg, conString);
+	})
+	.delete(function(req, res){
+		teams.deleteTeam(req, res, pg, conString);
+	});
+app.route('/matchup/teams/:team/user/:username')
+	.put(function(req, res){
+		teams.addTeamMember(req, res, pg, conString);
+	})
+	.delete(function(req, res){
+		teams.removeTeamMember(req, res, pg, conString);
+	});
 
-app.put('/matchup/teams/:team/user/:username', addTeamMember);
-app.put('/matchup/organizations/:organization/user/:username', addOrganizationMember);
-
-////////////////////////////////////////////////////////////////////////////////////// SERVER LISTEN
+///////////////////////////////////////////////// SERVER LISTEN
 var port = process.env.PORT || 5000;
 app.listen(port, function() {
 	console.log("Listening on port " + port);

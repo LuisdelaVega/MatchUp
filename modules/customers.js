@@ -1,6 +1,9 @@
 //TODO Calculate the matches won/lost for the profile pages
 //TODO Edit profile
 //TODO Delete profile
+//TODO Create Organization
+//TODO Leave Organization
+//TODO Leave Team
 var getMyProfile = function(req, res, pg, conString) {
 
 	var username = new Object();
@@ -22,10 +25,7 @@ var getUserProfile = function(req, res, pg, conString) {
 		var profile = new Object();
 		// Query the database to find the user's account
 		var profileQuery = client.query({
-			text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag," + 
-			" customer.customer_profile_pic, customer.customer_cover_photo, customer.customer_bio, customer.customer_country,"+
-			" of_email.email_address, bool_and(customer_username = $1) AS my_profile" + 
-			" FROM customer NATURAL JOIN of_email WHERE customer_username = $2 AND customer.customer_active GROUP BY customer_username, email_address",
+			text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic, customer.customer_cover_photo, customer.customer_bio, customer.customer_country, of_email.email_address, bool_and(customer_username = $1) AS my_profile FROM customer NATURAL JOIN of_email WHERE customer_username = $2 AND customer.customer_active GROUP BY customer_username, email_address",
 			values : [req.user.username, req.params.username]
 		});
 		profileQuery.on("row", function(row, result) {
@@ -37,8 +37,7 @@ var getUserProfile = function(req, res, pg, conString) {
 
 				// Query the database to find the user's Teams
 				var teamsQuery = client.query({
-					text : "SELECT team.team_name, team.team_logo, team.team_bio, team.team_cover_photo" + 
-					" FROM team NATURAL JOIN plays_for WHERE customer_username = $1 AND team.team_active",
+					text : "SELECT team.team_name, team.team_logo, team.team_bio, team.team_cover_photo FROM team NATURAL JOIN plays_for WHERE customer_username = $1 AND team.team_active",
 					values : [req.params.username]
 				});
 				teamsQuery.on("row", function(row, result) {
@@ -49,8 +48,7 @@ var getUserProfile = function(req, res, pg, conString) {
 
 					// Query the database to find the user's Organizations
 					var organizationsQuery = client.query({
-						text : "SELECT organization.organization_name, organization.organization_logo" + 
-						" FROM organization NATURAL JOIN belongs_to WHERE customer_username = $1 AND organization.organization_active",
+						text : "SELECT organization.organization_name, organization.organization_logo FROM organization NATURAL JOIN belongs_to WHERE customer_username = $1 AND organization.organization_active",
 						values : [req.params.username]
 					});
 					organizationsQuery.on("row", function(row, result) {
@@ -98,9 +96,7 @@ var createAccount = function(req, res, pg, conString, jwt, secret) {
 		//TODO Create the salt and hash the password before starting this transaction
 		client.query("START TRANSACTION");
 		client.query({
-			text : "INSERT INTO customer" + 
-			" (customer_username, customer_first_name, customer_last_name, customer_tag, customer_password, customer_salt, customer_active)" + 
-			" VALUES ($1, $2, $3, $4, $5, $6, TRUE)",
+			text : "INSERT INTO customer (customer_username, customer_first_name, customer_last_name, customer_tag, customer_password, customer_salt, customer_active) VALUES ($1, $2, $3, $4, $5, $6, TRUE)",
 			values : [req.body.info[0], // customer_username*
 			req.body.info[1], // customer_first_name*
 			req.body.info[2], // customer_last_name*
@@ -145,15 +141,15 @@ var createTeam = function(req, res, pg, conString) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
-		
+
 		console.log(req.body.info);
 		client.query("START TRANSACTION");
 		client.query({
 			text : "INSERT INTO team (team_name, team_logo, team_bio, team_cover_photo, team_active) VALUES ($1, $2, $3, $4, TRUE)",
-			values : [req.body.info[0], // team_name*
-			req.body.info[1], // team_logo*
-			req.body.info[2], // team_bio*
-			req.body.info[3] // team_cover_photo*
+			values : [req.body.name, // team_name*
+			req.body.logo, // team_logo*
+			req.body.bio, // team_bio*
+			req.body.cover // team_cover_photo*
 			]
 		}, function(err, result) {
 			if (err) {
@@ -162,8 +158,7 @@ var createTeam = function(req, res, pg, conString) {
 			} else {
 				client.query({
 					text : "INSERT INTO plays_for (customer_username, team_name) VALUES ($1, $2)",
-					values : [req.user.username,
-					req.body.info[0] // team_name
+					values : [req.user.username, req.body.name // team_name
 					]
 				}, function(err, result) {
 					if (err) {
@@ -172,15 +167,15 @@ var createTeam = function(req, res, pg, conString) {
 					} else {
 						client.query({
 							text : "INSERT INTO captain_for (customer_username, team_name) VALUES ($1, $2)",
-							values : [req.user.username,
-							req.body.info[0] // team_name
+							values : [req.user.username, req.body.name // team_name
 							]
 						}, function(err, result) {
 							if (err) {
 								res.status(400).send("Oh, no! Disaster in INSERT INTO captain_for!");
 								client.end();
 							} else {
-								res.status(201).send("HELLOOOOOO!"); //TODO Send something here if needed
+								res.status(201).send("HELLOOOOOO!");
+								//TODO Send something here if needed
 								client.query("COMMIT");
 								client.end();
 							}
