@@ -1,4 +1,3 @@
-//TODO Edit profile
 //TODO Create Organization
 //TODO Create Event
 //TODO Delete Account
@@ -15,6 +14,8 @@ var getMyProfile = function(req, res, pg, conString) {
 	username.user.username = req.user.username;
 
 	getUserProfile(username, res, pg, conString);
+	
+	console.log(req.user);
 };
 
 var getUserProfile = function(req, res, pg, conString) {
@@ -84,6 +85,80 @@ var getUserProfile = function(req, res, pg, conString) {
 				client.end();
 				return res.status(404).send('Oh, no! This user does not exist');
 			};
+		});
+	});
+};
+
+var editAccount = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var queryText = "UPDATE customer SET";
+		if (req.body.firstname) {
+			queryText += ((queryText === "UPDATE customer SET") ? "": ",") + " customer_first_name = '" + req.body.firstname + "'";
+		}
+		if (req.body.lastname) {
+			queryText += ((queryText === "UPDATE customer SET") ? "": ",") + " customer_last_name = '" + req.body.lastname + "'";
+		}
+		if (req.body.tag) {
+			queryText += ((queryText === "UPDATE customer SET") ? "": ",") + " customer_tag = '" + req.body.tag + "'";
+		}
+		if (req.body.paypal) {
+			queryText += ((queryText === "UPDATE customer SET") ? "": ",") + " customer_paypal_info = '" + req.body.paypal + "'";
+		}
+		if (req.body.profilepic) {
+			queryText += ((queryText === "UPDATE customer SET") ? "": ",") + " customer_profile_pic = '" + req.body.profilepic + "'";
+		}
+		if (req.body.cover) {
+			queryText += ((queryText === "UPDATE customer SET") ? "": ",") + " customer_cover_photo = '" + req.body.cover + "'";
+		}
+		if (req.body.bio) {
+			queryText += ((queryText === "UPDATE customer SET") ? "": ",") + " customer_bio = '" + req.body.bio + "'";
+		}
+		if (req.body.country) {
+			queryText += ((queryText === "UPDATE customer SET") ? "": ",") + " customer_country = '" + req.body.country + "'";
+		}
+
+		if (!req.body.firstname && !req.body.lastname && !req.body.tag && !req.body.paypal && !req.body.profilepic && !req.body.cover && !req.body.bio && !req.body.country) {
+			client.end();
+			return res.status(401).send("Oh no! Disaster");
+		}
+
+		queryText += " WHERE customer_username = '" + req.user.username + "' AND customer_active";
+		console.log(queryText);
+		var teamsQuery = client.query({
+			text : queryText
+		}, function(err, result) {
+			if (err) {
+				res.status(400).send("Oh, no! Disaster!");
+				client.end();
+			} else {
+				res.status(204).send('');
+			}
+		});
+	});
+};
+
+// Turn an Organization inactive
+var deleteAccount = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var deleteQuery = client.query({
+			text : "UPDATE customer SET customer_active = FALSE WHERE customer_username = $1",
+			values : [req.user.username]
+		}, function(err, result) {
+			if (err) {
+				res.status(400).send("Oh, no! Disaster!");
+				client.end();
+			} else {
+				req.user = null; //TODO This doesn't work
+				res.status(204).send('');
+			}
 		});
 	});
 };
@@ -192,4 +267,5 @@ var createTeam = function(req, res, pg, conString) {
 module.exports.getMyProfile = getMyProfile;
 module.exports.getUserProfile = getUserProfile;
 module.exports.createAccount = createAccount;
+module.exports.deleteAccount = deleteAccount;
 module.exports.createTeam = createTeam;

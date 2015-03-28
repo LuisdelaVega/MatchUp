@@ -16,7 +16,7 @@ INSERT INTO "event"
     event_registration_deadline,
     event_rules,
     event_description,
-    event_visibility,
+    event_active,
     event_deduction_fee,
     event_is_online,
     event_type

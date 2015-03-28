@@ -46,7 +46,6 @@ var getEvents = function(req, res, pg, conString) {
 			break;
 		case getEventsParams.type[1]:
 			queryText += "event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event NATURAL JOIN hosts";
-			// queryGroupBy += ", organization_name";
 			console.log(queryText);
 			break;
 		default:
@@ -61,7 +60,7 @@ var getEvents = function(req, res, pg, conString) {
 				queryText += " WHERE ";
 				where = true;
 			}
-			queryText += "concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM event NATURAL JOIN tournament NATURAL JOIN game WHERE game_name = '" + ((!req.query.value) ? 0 : req.query.value) + "')";
+			queryText += "concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM event NATURAL JOIN tournament NATURAL JOIN game WHERE game_name ILIKE '" + ((!req.query.value) ? 0 : req.query.value) + "')";
 			console.log(queryText);
 			break;
 		case getEventsParams.filter[1]:
@@ -71,7 +70,7 @@ var getEvents = function(req, res, pg, conString) {
 				queryText += " WHERE ";
 				where = true;
 			}
-			queryText += "concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM event NATURAL JOIN tournament NATURAL JOIN game NATURAL JOIN is_of NATURAL JOIN genre WHERE genre_name = '" + ((!req.query.value) ? 0 : req.query.value) + "')";
+			queryText += "concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM event NATURAL JOIN tournament NATURAL JOIN game NATURAL JOIN is_of NATURAL JOIN genre WHERE genre_name ILIKE '" + ((!req.query.value) ? 0 : req.query.value) + "')";
 			console.log(queryText);
 			break;
 		}
@@ -139,7 +138,7 @@ var getEvent = function(req, res, pg, conString) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
-		
+
 		var date = new Date(req.query.date);
 		// Query the database to find the account
 		var event = new Object();
