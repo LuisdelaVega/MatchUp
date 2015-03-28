@@ -45,7 +45,8 @@ var getEvents = function(req, res, pg, conString) {
 			where = true;
 			break;
 		case getEventsParams.type[1]:
-			queryText += "event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event NATURAL JOIN hosts";
+			queryText += "event_name, event_start_date, event_end_date, event_location, event_venue, event_logo, organization_name, organization_logo FROM event NATURAL JOIN hosts NATURAL JOIN organization";
+			queryGroupBy+= ", organization_name";
 			console.log(queryText);
 			break;
 		default:
