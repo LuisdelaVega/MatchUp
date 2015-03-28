@@ -380,10 +380,11 @@
                                 <label class="">Upload Banner:</label>
                                 <div class="input-group">
                                     <span class="group-span-filestyle input-group-btn" tabindex="0"> <label  class="btn btn-default btn-file"> <span class="glyphicon glyphicon-picture">   Browse&hellip;
-                           <input type="file"  id="createEventBanner" onchange="upload(this.files[0],'sellitemimg')"> </span>
+                           <input type="file"  id="createEventBanner" onchange="upload(this.files[0], this.id + 'Label')"> </span>
                                     </span>
-                                    <input type="text" class="form-control" readonly>
+                                    <input id ="createEventBannerLabel" type="text" class="form-control" readonly>
                                 </div>
+                                   
                                 <span class="help-block">img resolution herem.....        </span>
 
                                 <label class="">Upload Logo:</label>

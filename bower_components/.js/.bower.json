@@ -1,0 +1,14 @@
+{
+  "name": ".js",
+  "homepage": "https://github.com/gdi2290/script.js",
+  "_release": "c29530159a",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "c29530159a5723b2b1247896dadb8e7be9e1018a"
+  },
+  "_source": "git://github.com/gdi2290/script.js.git",
+  "_target": "*",
+  "_originalSource": ".js",
+  "_direct": true
+}
