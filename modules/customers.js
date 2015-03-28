@@ -1,9 +1,11 @@
-//TODO Calculate the matches won/lost for the profile pages
 //TODO Edit profile
-//TODO Delete profile
 //TODO Create Organization
-//TODO Leave Organization
-//TODO Leave Team
+//TODO Create Event
+//TODO Delete Account
+//TODO Subscribe to user
+//TODO Unsubscribe to user
+
+//TODO Calculate the matches won/lost for the profile pages
 var getMyProfile = function(req, res, pg, conString) {
 
 	var username = new Object();
@@ -59,7 +61,7 @@ var getUserProfile = function(req, res, pg, conString) {
 
 						// Query the database to find the user's created Events
 						var eventsQuery = client.query({
-							text : "SELECT event_name, event_start_date, event_location, event_venue FROM event WHERE customer_username = $1 AND event_visibility",
+							text : "SELECT event_name, event_start_date, event_location, event_venue FROM event WHERE customer_username = $1 AND event_active",
 							values : [req.params.username]
 						});
 						eventsQuery.on("row", function(row, result) {

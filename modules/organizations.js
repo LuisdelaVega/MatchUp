@@ -46,7 +46,7 @@ var getOrganization = function(req, res, pg, conString) {
 					// organization.members = new Object();
 					organization.members = result.rows;
 					var queryEvents = client.query({
-						text : "SELECT event.event_name, event.event_location, event.event_venue, event_start_date, event.event_logo FROM event NATURAL JOIN hosts WHERE event_visibility AND organization_name = $1",
+						text : "SELECT event.event_name, event.event_location, event.event_venue, event_start_date, event.event_logo FROM event NATURAL JOIN hosts WHERE event_active AND organization_name = $1",
 						values : [req.params.organization]
 					});
 					queryEvents.on("row", function(row, result) {
@@ -158,7 +158,8 @@ var addOrganizationMember = function(req, res, pg, conString) {
 								result.addRow(row);
 							});
 							queryMember.on("end", function(result) {
-								if (result.rows.length < 0) {
+								// Add the user as a member if he/she wasn't a member already
+								if (!result.rows.length) {
 									client.query({
 										text : "INSERT INTO belongs_to (customer_username, organization_name) VALUES ($1, $2)",
 										values : [req.params.username, req.params.organization]
@@ -168,7 +169,7 @@ var addOrganizationMember = function(req, res, pg, conString) {
 											client.end();
 										} else {
 											client.query("COMMIT");
-											res.status(204).send('');
+											res.status(201).send('This user has been added! Yay!');
 											client.end();
 										}
 									});
@@ -232,46 +233,85 @@ var removeOrganizationMember = function(req, res, pg, conString) {
 				queryMember.on("end", function(result) {
 					if (result.rows.length > 0) {
 						var member = result.rows[0];
-						// A member can't remove owners. Owners can remove who they want
-						if (member.is_owner && reqMember.is_owner) {
-							client.query({
-								text : "DELETE FROM owns WHERE customer_username = $1 AND organization_name = $2",
-								values : [member.customer_username, req.params.organization]
-							}, function(err, result) {
-								if (err) {
-									res.status(400).send("Oh, no! This user is already an owner of this organization dummy");
+						if (member.customer_username === reqMember.customer_username && reqMember.is_owner) {
+							var queryMember = client.query({
+								text : "SELECT customer_username FROM owns NATURAL JOIN organization WHERE organization_name = $1 AND customer_username <> $2 AND organization_active GROUP BY customer_username",
+								values : [req.params.organization, reqMember.customer_username]
+							});
+							queryMember.on("row", function(row, result) {
+								result.addRow(row);
+							});
+							queryMember.on("end", function(result) {
+								if (!result.rows.length) {
+									res.status(403).send("Oh, no! You can't leave an organization without an owner dummy");
 									client.end();
 								} else {
 									client.query({
-										text : "DELETE FROM belongs_to WHERE customer_username = $1 AND organization_name = $2",
+										text : "DELETE FROM owns WHERE customer_username = $1 AND organization_name = $2",
 										values : [member.customer_username, req.params.organization]
 									}, function(err, result) {
 										if (err) {
-											res.status(400).send("Oh, no! Disaster!");
+											res.status(400).send("Oh, no! Disaster");
 											client.end();
 										} else {
-											client.query("COMMIT");
-											res.status(204).send('');
+											client.query({
+												text : "DELETE FROM belongs_to WHERE customer_username = $1 AND organization_name = $2",
+												values : [member.customer_username, req.params.organization]
+											}, function(err, result) {
+												if (err) {
+													res.status(400).send("Oh, no! Disaster!");
+													client.end();
+												} else {
+													client.query("COMMIT");
+													res.status(204).send('');
+												}
+											});
 										}
 									});
 								}
 							});
-						} else if (!member.is_owner) {
-							client.query({
-								text : "DELETE FROM belongs_to WHERE customer_username = $1 AND organization_name = $2",
-								values : [member.customer_username, req.params.organization]
-							}, function(err, result) {
-								if (err) {
-									res.status(400).send("Oh, no! Disaster!");
-									client.end();
-								} else {
-									client.query("COMMIT");
-									res.status(204).send('');
-								}
-							});
 						} else {
-							client.end();
-							return res.status(401).send('Oh, no! It seems you are do not have enough privileges to do this');
+							// A member can't remove owners. Owners can remove who they want
+							if (member.is_owner && reqMember.is_owner) {
+								client.query({
+									text : "DELETE FROM owns WHERE customer_username = $1 AND organization_name = $2",
+									values : [member.customer_username, req.params.organization]
+								}, function(err, result) {
+									if (err) {
+										res.status(400).send("Oh, no! Disaster");
+										client.end();
+									} else {
+										client.query({
+											text : "DELETE FROM belongs_to WHERE customer_username = $1 AND organization_name = $2",
+											values : [member.customer_username, req.params.organization]
+										}, function(err, result) {
+											if (err) {
+												res.status(400).send("Oh, no! Disaster!");
+												client.end();
+											} else {
+												client.query("COMMIT");
+												res.status(204).send('');
+											}
+										});
+									}
+								});
+							} else if (!member.is_owner) {
+								client.query({
+									text : "DELETE FROM belongs_to WHERE customer_username = $1 AND organization_name = $2",
+									values : [member.customer_username, req.params.organization]
+								}, function(err, result) {
+									if (err) {
+										res.status(400).send("Oh, no! Disaster!");
+										client.end();
+									} else {
+										client.query("COMMIT");
+										res.status(204).send('');
+									}
+								});
+							} else {
+								client.end();
+								return res.status(401).send('Oh, no! It seems you are do not have enough privileges to do this');
+							}
 						}
 					} else {
 						client.end();
