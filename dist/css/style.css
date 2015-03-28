@@ -33,7 +33,7 @@
 }
 
 .custom-padding {
-	padding: 5px;
+	padding: 15px;
 }
 
 .event-logo {
@@ -47,6 +47,21 @@
 
 .panel-padding{
 	padding: 10px;
+}
+
+.hr-custom-padding{
+	margin-top: 10px;
+	margin-bottom: 0px;
+}
+
+.thumbnail-title{
+	font-size: 20px;
+}
+
+.thumbnail-paragraph{
+	font-size: 20px;
+	color: #717171;
+	font-size: 14px;
 }
 
 /*Snippets*/
@@ -252,14 +267,24 @@
     font-size: 13px;
 }
 
+.widget-header>.widget-title {
+    line-height: 45px;
+    padding: 0;
+    margin: 0;
+    float: left;
+    text-align: left;
+    font-weight: 400!important;
+    
+}
+
 .widget-header .widget-icon {
     display: block;
     width: 30px;
     height: 32px;
     position: relative;
     float: left;
-    font-size: 111%;
-    line-height: 32px;
+    font-size: 200%;
+    line-height: 45px;
     text-align: center;
     margin-left: -10px;
 }
@@ -269,9 +294,10 @@
 .widget-header.bordered-bottom {
     border-bottom: 3px solid #fff;
 }
+
 .widget-header {
     position: relative;
-    min-height: 35px;
+    min-height: 50px;
     background: #fff;
     -webkit-box-shadow: 0 0 4px rgba(0,0,0,.3);
     -moz-box-shadow: 0 0 4px rgba(0,0,0,.3);
@@ -280,6 +306,7 @@
     padding-left: 12px;
     text-align: right;
 }
+
 .bordered-themesecondary {
     border-color: #428bca !important;
 }
