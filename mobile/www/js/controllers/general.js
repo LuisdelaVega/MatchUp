@@ -1,41 +1,63 @@
 var myApp = angular.module('home',[]);
 
-//Good night sweet prince. We will always remember the way you danced.  
-//myApp.controller('gameController', ['$scope', function($scope) {
-//
-//    $scope.games = ['img/csgo.jpg'];
-//    var moreImgs = ['img/dota2.jpg', 'img/hearthstone.jpg', 'img/leagueofeppa.jpg']
-//    $scope.add = function add(name) {
-//        if (moreImgs.length>0)
-//            $scope.games.push(moreImgs.pop());
-//        else {
-//            moreImgs.push($scope.games.splice(0,1)[0]);
-//        }
-//        $scope.$broadcast('scroll.infiniteScrollComplete');
-//    }
-//}]);  
-
 myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedDataService', function ($scope, $http, $state, sharedDataService) {
-    $http.get('http://136.145.116.232/home').
+    $http.get('http://matchup.neptunolabs.com/events?type=hosted&state=upcoming').
     success(function(data, status, headers, config) {
 
-        var eventData = angular.fromJson(data);
-
-        $scope.liveEvents = eventData.events.live;
-        $scope.premiumEvents = eventData.events.hosted;
-        $scope.regularEvents = eventData.events.regular;
-        $scope.popularGames = eventData.popular_games;
+        $scope.hostedEvents = angular.fromJson(data);
 
     }).
     error(function(data, status, headers, config) {
-        console.log("error in search controller");
+        console.log("error in home controller. obtaining hosted upcoming events");
+    });
+    
+    $http.get('http://matchup.neptunolabs.com/events?type=regular&state=upcoming').
+    success(function(data, status, headers, config) {
+
+       $scope.regularEvents = angular.fromJson(data);
+        
+    }).
+    error(function(data, status, headers, config) {
+        console.log("error in home controller. obtaining hosted upcoming events");
+    });
+    
+    $http.get('http://matchup.neptunolabs.com/events?state=live').
+    success(function(data, status, headers, config) {
+
+       $scope.liveEvents = angular.fromJson(data);
+        
+    }).
+    error(function(data, status, headers, config) {
+        console.log("error in home controller. obtaining hosted upcoming events");
     });
 
-    $scope.goToEvent = function(eventName){
-        
+    $scope.goToEvent = function(eventName, date, location){
+
         eventName = eventName.replace(" ", "%20");
-        $state.go('app.eventpremium.summary', {"eventname": eventName});
-        sharedDataService.set(eventName);
+        var params = [eventName, date, location]
+
+        $http.get('http://136.145.116.232/events/'+eventName+'?date='+date+'&location='+location+'').
+        success(function(data, status, headers, config) {
+
+            var eventData = angular.fromJson(data);
+
+            var isHosted = eventData.info.is_hosted;
+            
+            sharedDataService.set(params);
+            
+            if(isHosted){
+                $state.go('app.eventpremium.summary', {"eventname": eventName, "date": date, "location": location});
+                
+            }
+            else{
+                 $state.go('app.regularevent', {"eventname": eventName, "date": date, "location": location});
+            }
+
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in goToEvent");
+        });
+        
     };
 
 

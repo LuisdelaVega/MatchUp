@@ -4,7 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events', 'user', 'team-organizations'])
+angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-events', 'user', 'team-organizations', 'genres', 'regular-events', 'events'])
 
     .run(function ($ionicPlatform) {
     $ionicPlatform.ready(function () {
@@ -117,7 +117,8 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events',
     //================================================================================
         .state('app.genres', {
         url: "/genres",
-        templateUrl: "templates/genre.html"
+        templateUrl: "templates/genre.html",
+        controller: "genreController"
     })
         .state('app.populargames', {
         url: "/populargames",
@@ -243,13 +244,15 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events',
         .state('app.genre', {
         url: "/genre",
         abstract: true,
-        templateUrl: "templates/genreProfile/genre-profile.html"
+        templateUrl: "templates/genreProfile/genre-profile.html",
+        controller: "genreProfileController"
     })
         .state('app.genre.upcoming', {
         url: "/upcoming",
         views: {
             'genre-upcoming-tab': {
                 templateUrl: "templates/genreProfile/genre-upcoming.html",
+                controller: "genreUpcomingProfileController"
             }
         }
     })
@@ -258,6 +261,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events',
         views: {
             'genre-live-tab': {
                 templateUrl: "templates/genreProfile/genre-live.html",
+                controller: "genreLiveProfileController"
             }
         }
     })
@@ -266,6 +270,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events',
         views: {
             'genre-history-tab': {
                 templateUrl: "templates/genreProfile/genre-history.html",
+                controller: "genreHistoryProfileController"
             }
         }
     })
@@ -339,7 +344,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events',
     //================================================================================
 
         .state('app.regularevent', {
-        url: "/regularevent",
+        url: "/regularevent/:eventname/:date/:location",
         templateUrl: "templates/regularevent/regular-event.html"
     })
         .state('app.regulareventmatchups', {
@@ -357,7 +362,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events',
         controller: "eventPremiumParentController"
     })
         .state('app.eventpremium.summary', {
-        url: "/summary/:eventname",
+        url: "/summary/:eventname/:date/:location",
         views: {
             'event-summary-tab': {
                 templateUrl: "templates/premiumEvent/summary.html",
@@ -366,7 +371,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events',
         }
     })
         .state('app.eventpremium.news', {
-        url: "/news/:eventname",
+        url: "/news/:eventname/:date/:location",
         views: {
             'event-news-tab': {
                 templateUrl: "templates/premiumEvent/news.html",
@@ -378,6 +383,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events',
         .state('app.premiumsignup', {
         url: "/premiumsignup",
         templateUrl: "templates/premiumEvent/signup.html",
+        controller: "premiumSignUpController"
 
     })
     // Edit and post news

@@ -22,10 +22,10 @@
                 </p>
             </div>
             <div class="item tabs tabs-secondary tabs-icon-left">
-                <a class="tab-item" href="#/app/premiumsignup" ng-if="!isOngoing">
+                <a class="tab-item" ng-click="goToSignUp(eventInfo.info.event_name, eventInfo.info.event_start_date, eventInfo.info.event_location)" ng-if="!isOngoing">
                     <i class="icon ion-log-in"></i> Sign Up
                 </a>
-                <a class="tab-item" ng-click="goToMeetup(eventInfo.info.event_name)">
+                <a class="tab-item" ng-click="goToMeetup(eventInfo.info.event_name, eventInfo.info.event_start_date, eventInfo.info.event_location)">
                     <i class="icon ion-android-people"></i> Meetup
                 </a>
             </div>
@@ -34,41 +34,35 @@
             <div class="item item-divider">
                 Sponsors
             </div>
-            <div class="row">
-                <div class="col">
-                    <img class="game-cover" src="img/lol.png">
-                </div>
-                <div class="col">
-                    <img class="game-cover" src="img/lol.png">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <img class="game-cover" src="img/lol.png">
-                </div>
+            <div ng-repeat="sponsor in eventInfo.sponsors">
+                <span ng-if="$index%2 == 0"> 
+                    <div class="row">
+                        <div class="col" ng-if="eventInfo.sponsors[$index + 0]">
+                            <img class="game-cover" ng-src="{{ sponsor.sponsor_logo }}">
+                        </div>
+                        <div class="col" ng-if="eventInfo.sponsors[$index + 1]">
+                            <img class="game-cover" ng-src="{{ sponsor.sponsor_logo }}">
+                        </div>
+                    </div>
+                </span>
             </div>
         </div>
         <div class="list-inset" ng-if="!isOngoing">
             <div class="item item-divider">
                 Tournaments
             </div>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Street Fighter Regionals</h2>
-                <p>8:00PM March 2, 2015</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/lol.png">
-                <h2>Twisted Treeline 3v3</h2>
-                <p>6:00PM March 3, 2015</p>
+            <a class="item item-thumbnail-left" href="#" ng-repeat="tournament in eventInfo.tournaments">
+                <img ng-src="{{ tournament.game_image }}">
+                <h2>{{tournament.tournament_name}}</h2>
+                <p>{{tournament.tournament_start_date | date: 'medium'}}</p>
             </a>
         </div>
 
-        <div class="list list-inset" ng-if="isOngoing">
+        <div class="list list-inset" ng-if="isOngoing" ng-repeat="tournament in eventInfo.tournaments">
             <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Street Fighter Regionals</h2>
-                <p>8:00PM March 2, 2015</p>
+                <img ng-src="{{ tournament.game_image }}">
+                <h2>{{tournament.tournament_name}}</h2>
+                <p>{{tournament.tournament_start_date | date: 'medium'}}</p>
             </a>
             <div class="item item-divider">
                 <h3>1st</h3>
@@ -141,7 +135,7 @@
                 </div>
             </div>
             <div class="padding">
-                <button class="button button-block button-positive" ng-click="goToReview(eventInfo.info.event_name)">
+                <button class="button button-block button-positive" ng-click="goToReview(eventInfo.info.event_name, eventInfo.info.event_start_date, eventInfo.info.event_location)">
                     Write a review
                 </button>
             </div>
