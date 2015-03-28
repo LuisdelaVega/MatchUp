@@ -10,25 +10,35 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
     error(function(data, status, headers, config) {
         console.log("error in home controller. obtaining hosted upcoming events");
     });
-    
+
     $http.get('http://matchup.neptunolabs.com/events?type=regular&state=upcoming').
     success(function(data, status, headers, config) {
 
-       $scope.regularEvents = angular.fromJson(data);
-        
+        $scope.regularEvents = angular.fromJson(data);
+
     }).
     error(function(data, status, headers, config) {
         console.log("error in home controller. obtaining hosted upcoming events");
     });
-    
+
     $http.get('http://matchup.neptunolabs.com/events?state=live').
     success(function(data, status, headers, config) {
 
-       $scope.liveEvents = angular.fromJson(data);
-        
+        $scope.liveEvents = angular.fromJson(data);
+
     }).
     error(function(data, status, headers, config) {
         console.log("error in home controller. obtaining hosted upcoming events");
+    });
+
+    $http.get('http://matchup.neptunolabs.com/popular/games').
+    success(function(data, status, headers, config) {
+
+        $scope.popularGames = angular.fromJson(data);
+
+    }).
+    error(function(data, status, headers, config) {
+        console.log("error in popular games home view");
     });
 
     $scope.goToEvent = function(eventName, date, location){
@@ -42,22 +52,22 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
             var eventData = angular.fromJson(data);
 
             var isHosted = eventData.info.is_hosted;
-            
+
             sharedDataService.set(params);
-            
+
             if(isHosted){
                 $state.go('app.eventpremium.summary', {"eventname": eventName, "date": date, "location": location});
-                
+
             }
             else{
-                 $state.go('app.regularevent', {"eventname": eventName, "date": date, "location": location});
+                $state.go('app.regularevent', {"eventname": eventName, "date": date, "location": location});
             }
 
         }).
         error(function(data, status, headers, config) {
             console.log("error in goToEvent");
         });
-        
+
     };
 
 
@@ -186,4 +196,38 @@ myApp.controller('cameraReportController', ['$scope', '$http', 'Camera', functio
             saveToPhotoAlbum: false
         });
     };
+}]);
+
+myApp.controller('popularGameViewController', ['$scope', '$http', 'Camera', function ($scope, $http, Camera, $ionicLoading) {
+
+    var allGames = [ ];
+    $scope.popularGames = [];
+
+
+    $http.get('http://matchup.neptunolabs.com/popular/games').
+    success(function(data, status, headers, config) {
+
+        allGames = angular.fromJson(data);
+
+        for(var i = 0; i <= 6; i++){
+            if(allGames.length > 0)
+                $scope.popularGames.push(allGames.pop());
+        }
+
+        console.log($scope.popularGames);
+    }).
+    error(function(data, status, headers, config) {
+        console.log("error in popular games. popular game view");
+    });
+
+
+        $scope.add = function () {
+            if(allGames.length > 0)
+                $scope.popularGames.push(allGames.pop());  
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+        };
+
+        $scope.allGamesIsEmpty = function () {
+            return allGames.length > 0;    
+        };
 }]);

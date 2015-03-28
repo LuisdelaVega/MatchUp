@@ -4,7 +4,7 @@
             <div class="item item-divider">
                 Live
             </div>
-            <a class="item item-thumbnail-left" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)" ng-repeat="event in liveEvents">
+            <a class="item item-thumbnail-left" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)" ng-repeat="event in liveEvents | limitTo: 3">
                 <img ng-src="{{event.event_logo}}">
                 <h2>{{event.event_name}}</h2>
                 <p>{{event.event_location}}</p>
@@ -15,7 +15,7 @@
             <div class="item item-divider">
                 Premium
             </div>
-            <a class="item item-thumbnail-left" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)" ng-repeat="event in hostedEvents">
+            <a class="item item-thumbnail-left" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)" ng-repeat="event in hostedEvents | limitTo: 3">
                 <img ng-src="{{event.event_logo}}">
                 <h2>{{event.event_name}}</h2>
                 <p>{{event.event_location}}</p>
@@ -26,7 +26,7 @@
             <div class="item item-divider">
                 Regular
             </div>
-            <a class="item item-thumbnail-left" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)" ng-repeat="event in regularEvents">
+            <a class="item item-thumbnail-left" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)" ng-repeat="event in regularEvents | limitTo: 3">
                 <img ng-src="{{event.event_logo}}">
                 <h2>{{event.event_name}}</h2>
                 <p>{{event.event_location}}</p>
@@ -38,7 +38,7 @@
                 Popular Games
             </div>
             <div class="pad-sides" masonry="{columnWidth: 60}">
-                <div class="masonry-brick" ng-repeat="game in popularGames">
+                <div class="masonry-brick" ng-repeat="game in popularGames | limitTo: 6">
                     <img ng-src="{{ game.game_image }}" class="game-cover">
                 </div>
             </div>

@@ -110,7 +110,7 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
         $scope.eventInfo = angular.fromJson(data);
         var startDate = new Date($scope.eventInfo.info.event_start_date);
 
-        if(startDate < now_utc)
+        if(startDate > now_utc)
             $scope.isOngoing = false;
         else
             $scope.isOngoing = true;
