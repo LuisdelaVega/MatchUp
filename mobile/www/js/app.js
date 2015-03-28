@@ -122,7 +122,8 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     })
         .state('app.populargames', {
         url: "/populargames",
-        templateUrl: "templates/popular-games.html"
+        templateUrl: "templates/popular-games.html",
+        controller: "popularGameViewController"
     })
     //================================================================================
     // Search

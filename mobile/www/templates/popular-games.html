@@ -2,13 +2,13 @@
     <ion-content>
         <div ng-controller="popularGameViewController">
             <div class="pad-sides" masonry="{columnWidth: 60}">
-                <div class="masonry-brick" ng-repeat="game in games track by $index">
+                <div class="masonry-brick" ng-repeat="game in popularGames">
                     <a href="#/app/game/summary">
-                        <img ng-src="{{ game }}" class="game-cover" alt="game discription">
+                        <img ng-src="{{ game.game_image }}" class="game-cover" alt="game discription">
                     </a>
                 </div>
             </div>
-            <ion-infinite-scroll
+            <ion-infinite-scroll ng-if="allGamesIsEmpty()"
                                  on-infinite="add()"
                                  distance="1%">
             </ion-infinite-scroll>
