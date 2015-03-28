@@ -20,15 +20,10 @@
 	<!-- Custom CSS -->
 	<link href="../dist/css/sb-admin-2.css" rel="stylesheet">
 
+	<link href="../dist/css/style.css" rel="stylesheet">
+
 	<!-- Custom Fonts -->
 	<link href="../bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-
-	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-	<!--[if lt IE 9]>
-		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-		<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-		<![endif]-->
 
 </head>
 
@@ -49,6 +44,24 @@
 		<!-- /.navbar-header -->
 
 		<ul class="nav navbar-top-links navbar-right">
+			<li class="dropdown">
+				<div class="dropdown">
+					<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+						Search by
+						<span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">All</a>
+						</li>
+						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Local</a>
+						</li>
+						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Regional</a>
+						</li>
+						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">National</a>
+						</li>
+					</ul>
+				</div>
+			</li>
 			<li class="dropdown">
 				<a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-envelope fa-fw"></i> <i class="fa fa-caret-down"></i> </a>
 				<ul class="dropdown-menu dropdown-messages">
@@ -304,74 +317,166 @@
 
 	<!-- Page Content -->
 	<div id="page-wrapper">
-		<div class="container-fluid custom-padding">
-
+		<div class="container-fluid">
 			<!-- Nav tabs -->
-			<ul class="nav nav-tabs nav-justified">
+			<ul class="nav nav-tabs nav-justified tab-padding-top">
 				<li class="active">
-					<a href="#regular" data-toggle="tab">REGULAR</a>
+					<a href="#premium" data-toggle="tab">Premium</a>
 				</li>
 				<li>
-					<a href="#premium" data-toggle="tab">PREMIUM</a>
-				</li>
-				<li>
-					<a href="#national" data-toggle="tab">NATIONAL</a>
-				</li>
-				<li>
-					<a href="#regional" data-toggle="tab">REGIONAL</a>
+					<a href="#regular" data-toggle="tab">Regular</a>
 				</li>
 			</ul>
-
-
-			<div class="form-group">
-				<label>Filter by Genre</label>
-				<select class="form-control">
-					<option>MOBA</option>
-					<option>FPS</option>
-					<option>CCG</option>
-					<option>Action</option>
-					<option>Role-Playing</option>
-				</select>
-			</div>
 			<!-- Tab panes -->
-			<div class="tab-content">
-				<div class="tab-pane fade in active" id="regular">
-					<div class="panel panel-primary">
-						<div class="panel-heading">
-							<a href="event_page.html" style="color: white">Nombre del Evento</a>
+			<div class="tab-content panel-padding">
+				<div class="tab-pane fade in active" id="premium">
+					<div class="row">
+						<div class="col-lg-6 col-md-12 col-sm-12">
+							<div class="panel">
+								<div class="panel-body">
+									<img style="width:100%;" src="http://neptunolabs.com/images/ckmagic.jpg" alt="Cock Magic">
+								</div>
+								<div class="panel-footer">
+									<div class="row">
+										<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+											<img class="event-organizer-thumbnail  center-block" src="http://neptunolabs.com/images/badillo.jpg">
+										</div>
+										<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9">
+											<h3 class="event-footer-title">Event Name</h3>
+											<p>
+												June 8, 8:00PM - June 9, 9:00PM 2015
+											</p>
+											<p>
+												Madison Square Garden
+											</p>
+											<p>
+												Hosted by EsportsPR
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
-						<div class="panel-body">
-							<img src="http://neptunolabs.com/images/ckmagic.jpg" alt="Cock Magic" style="width:480px;height:250px">
+						<div class="col-lg-6 col-md-12 col-sm-12">
+							<div class="panel">
+								<div class="panel-body">
+									<img style="width:100%;" src="http://neptunolabs.com/images/ckmagic.jpg" alt="Cock Magic">
+								</div>
+								<div class="panel-footer">
+									<div class="row">
+										<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+											<img class="event-organizer-thumbnail  center-block" src="http://neptunolabs.com/images/badillo.jpg">
+										</div>
+										<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9">
+											<h3 class="event-footer-title">Event Name</h3>
+											<p>
+												June 8, 8:00PM - June 9, 9:00PM 2015
+											</p>
+											<p>
+												Madison Square Garden
+											</p>
+											<p>
+												Hosted by EsportsPR
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
-						<div class="panel-footer">
-							<p>
-								Location
-							</p>
-							<p>
-								Creator
-							</p>
-							<p>
-								Date
-							</p>
+						<div class="col-lg-6 col-md-12 col-sm-12">
+							<div class="panel">
+								<div class="panel-body">
+									<img style="width:100%;" src="http://neptunolabs.com/images/ckmagic.jpg" alt="Cock Magic">
+								</div>
+								<div class="panel-footer">
+									<div class="row">
+										<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+											<img class="event-organizer-thumbnail  center-block" src="http://neptunolabs.com/images/badillo.jpg">
+										</div>
+										<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9">
+											<h3 class="event-footer-title">Event Name</h3>
+											<p>
+												June 8, 8:00PM - June 9, 9:00PM 2015
+											</p>
+											<p>
+												Madison Square Garden
+											</p>
+											<p>
+												Hosted by EsportsPR
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-6 col-md-12 col-sm-12">
+							<div class="panel">
+								<div class="panel-body">
+									<img style="width:100%;" src="http://neptunolabs.com/images/ckmagic.jpg" alt="Cock Magic">
+								</div>
+								<div class="panel-footer">
+									<div class="row">
+										<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+											<img class="event-organizer-thumbnail  center-block" src="http://neptunolabs.com/images/badillo.jpg">
+										</div>
+										<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9">
+											<h3 class="event-footer-title">Event Name</h3>
+											<p>
+												June 8, 8:00PM - June 9, 9:00PM 2015
+											</p>
+											<p>
+												Madison Square Garden
+											</p>
+											<p>
+												Hosted by EsportsPR
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
-					<div class="panel panel-primary">
-						<div class="panel-heading">
-							<a href="event_page.html" style="color: white">Nombre del Evento 2</a>
+				</div>
+				<div class="tab-pane fade" id="regular">
+					<div class="row">
+						<div class="col-lg-6 col-md-12 col-sm-12 regular-event-card">
+							<div class="box">
+								<div class="media">
+									<img class="pull-left event-organizer-thumbnail center-block" src="http://neptunolabs.com/images/badillo.jpg">
+									<div class="media-body">
+										<h3 class="event-footer-title">Event Name</h3>
+										<p>April 2, 7:30PM 2015
+											<br> Centro de Estudiante de Mayaguez
+											<br> Created by odillab</p>
+									</div>
+								</div>
+							</div>
 						</div>
-						<div class="panel-body">
-							<img src="http://neptunolabs.com/images/ckmagic.jpg" alt="Cock Magic" style="width:480px;height:250px">
+						<div class="col-lg-6 col-md-12 col-sm-12 regular-event-card">
+							<div class="box">
+								<div class="media">
+									<img class="pull-left event-organizer-thumbnail center-block" src="http://neptunolabs.com/images/badillo.jpg">
+									<div class="media-body">
+										<h3 class="event-footer-title">Event Name</h3>
+										<p>April 2, 7:30PM 2015
+											<br> Centro de Estudiante de Mayaguez
+											<br> Created by odillab</p>
+									</div>
+								</div>
+							</div>
 						</div>
-						<div class="panel-footer">
-							<p>
-								Location
-							</p>
-							<p>
-								Creator
-							</p>
-							<p>
-								Date
-							</p>
+						<div class="col-lg-6 col-md-12 col-sm-12 regular-event-card">
+							<div class="box">
+								<div class="media">
+									<img class="pull-left event-organizer-thumbnail center-block" src="http://neptunolabs.com/images/badillo.jpg">
+									<div class="media-body">
+										<h3 class="event-footer-title">Event Name</h3>
+										<p>April 2, 7:30PM 2015
+											<br> Centro de Estudiante de Mayaguez
+											<br> Created by odillab</p>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
