@@ -2,7 +2,7 @@
     <ion-nav-buttons side="left">
         <button class="button button-icon button-clear ion-navicon" menu-toggle="left">
         </button>
-        <a class="button icon-right ion-android-arrow-dropdown button-clear" ng-click="popover.show($event)">All</a>
+<!--        <a class="button icon-right ion-android-arrow-dropdown button-clear" ng-click="popover.show($event)">All</a>-->
     </ion-nav-buttons>
     <ion-nav-buttons side="right">
         <button class="button button-icon ion-android-alert">
@@ -13,40 +13,10 @@
     </ion-nav-buttons>
     <ion-content>
         <div class="list-inset">
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Gamers Guild</h2>
-                <p>March 2, 2015<br>Centro de Estudiante</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Gamers Guild</h2>
-                <p>March 2, 2015<br>Centro de Estudiante</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Street Fighter 1v1</h2>
-                <p>March 2, 2015<br>Casa de Papi</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Gamers Guild</h2>
-                <p>March 2, 2015<br>Centro de Estudiante</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Gamers Guild</h2>
-                <p>March 2, 2015<br>Centro de Estudiante</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Gamers Guild</h2>
-                <p>March 2, 2015<br>Centro de Estudiante</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Gamers Guild</h2>
-                <p>March 2, 2015<br>Centro de Estudiante</p>
+            <a class="item item-thumbnail-left" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="event in regularEvents">
+                <img ng-src="{{ event.event_logo }}">
+                <h2>{{ event.event_name }}</h2>
+                <p>{{ event.event_start_date | date: 'medium'}}<br>{{ event.event_location }}</p>
             </a>
         </div>
     </ion-content>
