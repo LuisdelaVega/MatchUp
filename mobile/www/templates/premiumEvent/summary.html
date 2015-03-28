@@ -51,7 +51,7 @@
             <div class="item item-divider">
                 Tournaments
             </div>
-            <a class="item item-thumbnail-left" href="#" ng-repeat="tournament in eventInfo.tournaments">
+            <a class="item item-thumbnail-left" ng-click="goToTournament(eventInfo.info.event_name, eventInfo.info.event_start_date, eventInfo.info.event_location, tournament)" ng-repeat="tournament in eventInfo.tournaments">
                 <img ng-src="{{ tournament.game_image }}">
                 <h2>{{tournament.tournament_name}}</h2>
                 <p>{{tournament.tournament_start_date | date: 'medium'}}</p>
@@ -59,7 +59,7 @@
         </div>
 
         <div class="list list-inset" ng-if="isOngoing" ng-repeat="tournament in eventInfo.tournaments">
-            <a class="item item-thumbnail-left" href="#">
+            <a class="item item-thumbnail-left" ng-click="goToTournament(eventInfo.info.event_name, eventInfo.info.event_start_date, eventInfo.info.event_location)">
                 <img ng-src="{{ tournament.game_image }}">
                 <h2>{{tournament.tournament_name}}</h2>
                 <p>{{tournament.tournament_start_date | date: 'medium'}}</p>

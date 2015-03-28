@@ -346,7 +346,8 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
 
         .state('app.regularevent', {
         url: "/regularevent/:eventname/:date/:location",
-        templateUrl: "templates/regularevent/regular-event.html"
+        templateUrl: "templates/regularevent/regular-event.html",
+        controller: "regularEventController"
     })
         .state('app.regulareventmatchups', {
         url: "/regulareventmatchups",

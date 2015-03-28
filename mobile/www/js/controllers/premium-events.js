@@ -141,13 +141,25 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
         $state.go("app.meetups")
     }
 
-    $scope.goToReview = function (eventName, eventDate, eventLocation) {
+    $scope.goToReview = function (eventName, eventDate, eventLocation, selectedTournament) {
+
+        eventName = eventName.replace(" ", "%20");
+        sharedDataService.set(selectedTournament);
+        $state.go("app.writereview")
+    }
+    
+    $scope.goToTournament = function (eventName, eventDate, eventLocation, selectedTournament) {
 
         eventName = eventName.replace(" ", "%20");
         var params = [eventName, eventDate, eventLocation];
-        sharedDataService.set(params);
-        $state.go("app.writereview")
+        sharedDataService.set(selectedTournament);
+        $state.go("app.regularevent", {
+            eventname: eventName,
+            date: eventDate,
+            location: eventLocation
+        })
     }
+    
 });
 
 myApp.controller('meetupController', function ($scope, $state, $http, $stateParams, sharedDataService) {
