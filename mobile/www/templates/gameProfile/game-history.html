@@ -1,53 +1,11 @@
 <ion-view view-title="Tournament">
     <ion-content>
         <div class="list">
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Street Fighter 1v1</h2>
-                <p>March 2, 2015
-                    <br>Casa de Papi</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Street Fighter 1v1</h2>
-                <p>March 2, 2015
-                    <br>Casa de Papi</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Street Fighter 1v1</h2>
-                <p>March 2, 2015
-                    <br>Casa de Papi</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Street Fighter 1v1</h2>
-                <p>March 2, 2015
-                    <br>Casa de Papi</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Street Fighter 1v1</h2>
-                <p>March 2, 2015
-                    <br>Casa de Papi</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Street Fighter 1v1</h2>
-                <p>March 2, 2015
-                    <br>Casa de Papi</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Street Fighter 1v1</h2>
-                <p>March 2, 2015
-                    <br>Casa de Papi</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Street Fighter 1v1</h2>
-                <p>March 2, 2015
-                    <br>Casa de Papi</p>
+            <a class="item item-thumbnail-left" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="event in pastEvents">
+                <img ng-src="{{ event.event_logo }}">
+                <h2>{{ event.event_name }}</h2>
+                <p>{{ event.event_start_date | date: 'medium' }}
+                    <br>{{ event.event_location }}</p>
             </a>
         </div>
 

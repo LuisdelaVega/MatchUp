@@ -4,7 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-events', 'user', 'team-organizations', 'genres', 'regular-events', 'events'])
+angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-events', 'user', 'team-organizations', 'genres', 'regular-events', 'events', 'game-profile'])
 
     .run(function ($ionicPlatform) {
     $ionicPlatform.ready(function () {
@@ -150,8 +150,6 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
         templateUrl: "templates/myStuff/my-matchups.html"
     })
     //================================================================================
-    // My Stuff
-    //
     // My Events
     //================================================================================
         .state('app.myevents', {
@@ -213,29 +211,42 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
         .state('app.game', {
         url: "/game",
         abstract: true,
-        templateUrl: "templates/gameProfile/game-profile.html"
+        templateUrl: "templates/gameProfile/game-profile.html",
+        controller: "gameProfileParentController"
     })
         .state('app.game.summary', {
-        url: "/summary",
+        url: "/summary/:gamename",
         views: {
             'game-summary-tab': {
                 templateUrl: "templates/gameProfile/game-summary.html",
+                controller: "gameProfileSummaryController"
             }
         }
     })
         .state('app.game.upcoming', {
-        url: "/upcoming",
+        url: "/upcoming/:gamename",
         views: {
             'game-upcoming-tab': {
                 templateUrl: "templates/gameProfile/game-upcoming.html",
+                controller: "gameProfileUpcomingController"
+            }
+        }
+    })
+        .state('app.game.live', {
+        url: "/live/:gamename",
+        views: {
+            'game-live-tab': {
+                templateUrl: "templates/gameProfile/game-live.html",
+                controller: "gameProfileLiveController"
             }
         }
     })
         .state('app.game.history', {
-        url: "/history",
+        url: "/history/:gamename",
         views: {
             'game-history-tab': {
                 templateUrl: "templates/gameProfile/game-history.html",
+                controller: "gameProfileHistoryController"
             }
         }
     })
@@ -339,7 +350,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
         url: "/editteam",
         templateUrl: "templates/teamprofile/edit.html",
     })
-    
+
     //================================================================================
     // Regular Event
     //================================================================================

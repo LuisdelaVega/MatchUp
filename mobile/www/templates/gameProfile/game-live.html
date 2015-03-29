@@ -1,7 +1,7 @@
 <ion-view view-title="Tournament">
     <ion-content>
         <div class="list">
-            <a class="item item-thumbnail-left" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="event in upcomingEvents">
+            <a class="item item-thumbnail-left" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="event in liveEvents">
                 <img ng-src="{{ event.event_logo }}">
                 <h2>{{ event.event_name }}</h2>
                 <p>{{ event.event_start_date | date: 'medium' }}

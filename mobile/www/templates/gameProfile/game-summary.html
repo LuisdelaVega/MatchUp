@@ -2,29 +2,19 @@
     <ion-content>
         <div class="card">
             <div class="item center-text">
-                <img class="game-cover" src="img/hearthstone.jpg">
-                <h1>Hearthstone</h1>
-                <h2>Card Game</h2>
+                <img class="game-cover" ng-src="{{ gameImage }}">
+                <h1>{{ gameName }}</h1>
             </div>
         </div>
          <div class="list list-inset">
             <div class="item item-divider">
                 Promoted
             </div>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/apex2015.png">
-                <h2>Apex 2015</h2>
-                <p>Badillo's House, Jersey</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/evo.png">
-                <h2>EVO Championship Series</h2>
-                <p>Badillo's House, Jersey</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/lol2.png">
-                <h2>LOL Championship Series</h2>
-                <p>Badillo's House, Jersey</p>
+            <a class="item item-thumbnail-left" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="event in promotedEvents">
+                <img ng-src="{{ event.event_logo }}">
+                <h2>{{ event.event_name }}</h2>
+                <p>{{ event.event_start_date | date: 'medium' }}</p>
+                <p>{{ event.event_location }}</p>
             </a>
         </div>
     </ion-content>
