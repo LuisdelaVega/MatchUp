@@ -483,7 +483,7 @@ var createReview = function(req, res, pg, conString) {
 			res.status(400).send('Invalid date');
 		} else {
 			var queryReview = client.query({
-				text : "SELECT bool_and(customer_username IN (SELECT customer_username FROM review WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $5)) as is_writer FROM review WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $4",
+				text : "SELECT bool_and(customer_username IN (SELECT customer_username FROM pays WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3) OR customer_username IN (SELECT DISTINCT customer_username FROM is_a WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3)) AS participates FROM customer WHERE customer_username = $4",
 				values : [req.params.event, req.query.date, req.query.location, req.user.username]
 			});
 			queryReview.on("row", function(row, result) {
@@ -491,32 +491,23 @@ var createReview = function(req, res, pg, conString) {
 			});
 			queryReview.on("end", function(result) {
 				if (result.rows.length > 0) {
-					if (result.rows[0].is_organizer) {
+					if (result.rows[0].participates) {
 						var date = new Date(req.body.date);
 						if (!(date.getTime())) {
 							client.end();
 							res.status(400).send('Invalid date');
 						} else {
-							var queryReview = client.query({
-								text : "SELECT max(news_number)+1 AS next_news FROM news WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
-								values : [req.params.event, req.query.date, req.query.location]
-							});
-							queryReview.on("row", function(row, result) {
-								result.addRow(row);
-							});
-							queryReview.on("end", function(result) {
-								client.query({
-									text : "INSERT INTO news (event_name, event_start_date, event_location, news_number, news_title, news_content, news_date_posted) VALUES($1, $2, $3, $7, $4, $5, $6)",
-									values : [req.params.event, req.query.date, req.query.location, req.body.title, req.body.content, req.body.date, result.rows[0].next_news]
-								}, function(err, result) {
-									if (err) {
-										res.status(500).send("Oh, no! Disaster!");
-										client.end();
-									} else {
-										client.end();
-										res.status(204).send('');
-									}
-								});
+							client.query({
+								text : "INSERT INTO review (event_name, event_start_date, event_location, customer_username, review_title, review_content, star_rating, review_date_created) VALUES ( $1, $2, $3, $4, $5, $6, $7, $8)",
+								values : [req.params.event, req.query.date, req.query.location, req.user.username, req.body.title, req.body.content, req.body.rating, req.body.date]
+							}, function(err, result) {
+								if (err) {
+									res.status(500).send("Oh, no! Disaster!");
+									client.end();
+								} else {
+									client.end();
+									res.status(204).send('');
+								}
 							});
 						}
 					} else {
@@ -727,5 +718,6 @@ module.exports.deleteNews = deleteNews;
 module.exports.createNews = createNews;
 module.exports.getReview = getReview;
 module.exports.deleteReview = deleteReview;
+module.exports.createReview = createReview;
 module.exports.getMeetup = getMeetup;
 module.exports.deleteMeetup = deleteMeetup;
