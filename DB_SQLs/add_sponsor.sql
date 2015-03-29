@@ -12,6 +12,6 @@ VALUES
 ( 
     'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'E-Sports PR'
 ); 

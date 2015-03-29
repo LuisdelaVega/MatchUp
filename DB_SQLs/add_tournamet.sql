@@ -24,7 +24,7 @@ INSERT INTO "tournament"
   (
     'Event 04',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Super Smash Bros. Melee Qualifiers',
     'Super Smash Bros. Melee',
     'Rules of the rules with rules comprised of rules',

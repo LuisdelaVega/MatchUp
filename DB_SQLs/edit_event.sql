@@ -23,7 +23,7 @@ SET (
 (
     'First Test',
     '2015-10-19 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'S-113',
     'http://neptunolabs.com/images/logoPlain.png',
     'http://neptunolabs.com/images/matchup-logo.png',
@@ -38,7 +38,7 @@ SET (
 WHERE
     event_name = 'First Test' AND
     event_start_date = '2015-10-19 09:00:00' AND -- check that event_start_date < event_end_date
-    event_location =  'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042';
+    event_location =  'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042';
 
 
 ---------------------------------------------------
@@ -58,7 +58,7 @@ WHERE
  (
     'First Test',
     '2015-10-19 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     '3-day Pass',
     25.00,
     'General Admission to the first three days. Note: Final Round does not included seating area',
@@ -73,7 +73,7 @@ SET ( spec_fee_amount, spec_fee_amount_available )= ( 25.00, 200) -- new amount_
 WHERE
     event_name = 'First Test' AND
     event_start_date = '2015-10-19 09:00:00' AND -- check that event_start_date < event_end_date
-    event_location =  'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042';
+    event_location =  'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042';
 
 ---------------------------------------------------
 -- remove a SPECTATOR FEE
@@ -81,10 +81,10 @@ WHERE
 
 UPDATE "spectator_fee"
 SET (spec_fee_amount_available)=
- ((SELECT count(spec_fee_name) AS tickets_bought FROM pays WHERE event_name = 'Event 01' AND event_start_date = '2015-03-25 09:00:00' AND event_location = 'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042' AND spec_fee_name = '3-day Pass'))
+ ((SELECT count(spec_fee_name) AS tickets_bought FROM pays WHERE event_name = 'Event 01' AND event_start_date = '2015-03-25 09:00:00' AND event_location = 'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042' AND spec_fee_name = '3-day Pass'))
 WHERE
     event_name = 'First Test' AND
     event_start_date = '2015-10-19 09:00:00' AND -- check that event_start_date < event_end_date
-    event_location =  'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042';
+    event_location =  'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042';
 
 COMMIT;
