@@ -21,7 +21,7 @@ START TRANSACTION;
   (
      'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Ultra Street Fighter IV Qualifiers',
     1, -- Round 01
     TRUE, -- is winners round?
@@ -48,7 +48,7 @@ START TRANSACTION;
   (
     'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Ultra Street Fighter IV Qualifiers',
     1, -- Round 01
     1, -- Match 01
@@ -73,7 +73,7 @@ VALUES
 (
     'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Ultra Street Fighter IV Qualifiers',
     1, -- Round 01
     1, -- Match 01
@@ -100,7 +100,7 @@ INSERT INTO "competes"
   (
      'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Ultra Street Fighter IV Qualifiers',
     1, -- Round 01
     1, -- Match 01
@@ -123,7 +123,7 @@ INSERT INTO "competes"
   (
      'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Ultra Street Fighter IV Qualifiers',
     1, -- Round 01
     1, -- Match 01
@@ -151,7 +151,7 @@ INSERT INTO "round"
   (
      'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Ultra Street Fighter IV Qualifiers',
     2, -- Round 
     TRUE, -- is winners round?
@@ -179,7 +179,7 @@ INSERT INTO "match"
   (
      'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Ultra Street Fighter IV Qualifiers',
     2, -- Round 
     1, -- Match 
@@ -206,7 +206,7 @@ VALUES
 (
     'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Ultra Street Fighter IV Qualifiers',
     2, -- Round
     1, -- Match
@@ -231,7 +231,7 @@ INSERT INTO "competes"
   (
      'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Ultra Street Fighter IV Qualifiers',
     2, -- Round  
     1, -- Match  
@@ -260,7 +260,7 @@ INSERT INTO "competes"
   (
      'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Ultra Street Fighter IV Qualifiers',
     2, -- Round 
     2, -- Match  
@@ -287,7 +287,7 @@ VALUES
 (
     'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Ultra Street Fighter IV Qualifiers',
     2, -- Round
     2, -- Match
@@ -311,7 +311,7 @@ VALUES
   (
      'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Ultra Street Fighter IV Qualifiers',
     2, -- Round
     2, -- Match 
@@ -334,7 +334,7 @@ VALUES
   (
      'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Ultra Street Fighter IV Qualifiers',
     2, -- Round  
     2, -- Match 
@@ -362,7 +362,7 @@ VALUES
   (
      'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Ultra Street Fighter IV Qualifiers',
     3, -- Round 03
     TRUE, -- is winners round?
@@ -390,7 +390,7 @@ VALUES
   (
      'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Ultra Street Fighter IV Qualifiers',
     3, -- Round 01
     1, -- Match 01
@@ -417,7 +417,7 @@ VALUES
 (
     'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Ultra Street Fighter IV Qualifiers',
     3, -- Round
     1, -- Match
@@ -448,7 +448,7 @@ VALUES
   (
      'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Ultra Street Fighter IV Qualifiers',
     1, -- past Round 01
     1, -- past Match 01
@@ -476,7 +476,7 @@ VALUES
   (
      'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Ultra Street Fighter IV Qualifiers',
     2, -- past Round 01
     1, -- past Match 01
@@ -504,7 +504,7 @@ VALUES
   (
      'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Ultra Street Fighter IV Qualifiers',
     2, -- past Round  
     2, -- past Match 

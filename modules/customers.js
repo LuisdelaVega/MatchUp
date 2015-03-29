@@ -12,8 +12,6 @@ var getMyProfile = function(req, res, pg, conString) {
 	username.user.username = req.user.username;
 
 	getUserProfile(username, res, pg, conString);
-
-	console.log(req.user);
 };
 
 var getUserProfile = function(req, res, pg, conString) {
@@ -126,13 +124,14 @@ var editAccount = function(req, res, pg, conString) {
 
 		queryText += " WHERE customer_username = '" + req.user.username + "' AND customer_active";
 		console.log(queryText);
-		var teamsQuery = client.query({
+		client.query({
 			text : queryText
 		}, function(err, result) {
 			if (err) {
-				res.status(400).send("Oh, no! Disaster!");
+				res.status(500).send("Oh, no! Disaster!");
 				client.end();
 			} else {
+				client.end();
 				res.status(204).send('');
 			}
 		});
@@ -154,7 +153,7 @@ var deleteAccount = function(req, res, pg, conString) {
 		});
 		profileQuery.on("end", function(result) {
 			if (result.rows.length > 0) {
-				var deleteQuery = client.query({
+				client.query({
 					text : "UPDATE customer SET customer_active = FALSE WHERE customer_username = $1",
 					values : [req.user.username]
 				}, function(err, result) {
@@ -174,51 +173,58 @@ var deleteAccount = function(req, res, pg, conString) {
 };
 
 // /create/account - Create a new user account
-var createAccount = function(req, res, pg, conString, jwt, secret) {
+var createAccount = function(req, res, pg, conString, jwt, secret, crypto) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
 
 		//TODO Create the salt and hash the password before starting this transaction
-		client.query("START TRANSACTION");
-		client.query({
-			text : "INSERT INTO customer (customer_username, customer_first_name, customer_last_name, customer_tag, customer_password, customer_salt, customer_active) VALUES ($1, $2, $3, $4, $5, $6, TRUE)",
-			values : [req.body.info[0], // customer_username*
-			req.body.info[1], // customer_first_name*
-			req.body.info[2], // customer_last_name*
-			req.body.info[3], // customer_tag*
-			req.body.info[4], // customer_password*
-			"somesalt"]
-		}, function(err, result) {
-			if (err) {
-				res.status(400).send("Oh, no! Disaster!");
-				client.end();
-			} else {
-				client.query({
-					text : "INSERT INTO of_email (customer_username, email_address) VALUES ($1, $2)",
-					values : [req.body.info[0], // customer_username*
-					req.body.info[5] // email_address*
-					]
-				}, function(err, result) {
-					if (err) {
-						res.status(400).send("Oh, no! Disaster!");
-						client.end();
-					} else {
-						var response = {
-							username : req.body.info[0]
-						};
-						// We are sending the username inside the token
-						var token = jwt.sign(response, secret);
+		var salt = crypto.randomBytes(189).toString('base64');
+		crypto.pbkdf2(req.body.password, salt, 4096, 127, 'sha256', function(err, key) {
+			if (err)
+				throw err;
+			// var password = key.toString('hex');
+			// console.log("password: " + key.toString('hex'));
+			client.query("START TRANSACTION");
+			client.query({
+				text : "INSERT INTO customer (customer_username, customer_first_name, customer_last_name, customer_tag, customer_password, customer_salt, customer_active) VALUES ($1, $2, $3, $4, $5, $6, TRUE)",
+				values : [req.body.username, // customer_username*
+				req.body.firstname, // customer_first_name*
+				req.body.lastname, // customer_last_name*
+				req.body.tag, // customer_tag*
+				key.toString('hex'), // customer_password*
+				salt] // customer_salt
+			}, function(err, result) {
+				if (err) {
+					res.status(500).send("Oh, no! Disaster!");
+					client.end();
+				} else {
+					client.query({
+						text : "INSERT INTO of_email (customer_username, email_address) VALUES ($1, $2)",
+						values : [req.body.username, // customer_username*
+						req.body.email // email_address*
+						]
+					}, function(err, result) {
+						if (err) {
+							res.status(400).send("Oh, no! Disaster!");
+							client.end();
+						} else {
+							var response = {
+								username : req.body.username
+							};
+							// We are sending the username inside the token
+							var token = jwt.sign(response, secret);
 
-						res.status(201).json({
-							token : token
-						});
-						client.query("COMMIT");
-						client.end();
-					}
-				});
-			}
+							res.status(201).json({
+								token : token
+							});
+							client.query("COMMIT");
+							client.end();
+						}
+					});
+				}
+			});
 		});
 	});
 };

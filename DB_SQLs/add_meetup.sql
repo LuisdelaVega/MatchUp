@@ -12,7 +12,7 @@ INSERT INTO "meetup"
  (
     'First Test',
     '2015-10-19 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     '3-day Pass',
     25.00,
     'General Admission to the first three days. Note: Final Round does not included seating area'

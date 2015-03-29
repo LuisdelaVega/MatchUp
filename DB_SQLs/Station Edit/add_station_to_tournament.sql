@@ -13,7 +13,7 @@ VALUES
   (
     'First Test',
     '2015-10-19 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Super Smash Bros. Melee Qualifiers',
     5
 );

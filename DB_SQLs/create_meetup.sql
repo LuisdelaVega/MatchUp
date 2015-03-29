@@ -16,8 +16,8 @@ VALUES
   (
     'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
-    'Room 301, Mayaguez Resort and Casino, Mayagüez, Puerto Rico',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
+    'Room 301, Mayaguez Resort and Casino, Mayaguez, Puerto Rico',
     'Puertoricans Party',
     '2015-03-24 13:00:00',
     '2015-03-24 22:05:06',
@@ -39,8 +39,8 @@ VALUES
   (
     'Event 01',
     '2015-03-25 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
-    'Room 301, Mayaguez Resort and Casino, Mayagüez, Puerto Rico',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
+    'Room 301, Mayaguez Resort and Casino, Mayaguez, Puerto Rico',
     '2015-03-24 13:00:00',
     'Super Smash Bros. Melee'
 );

@@ -10,6 +10,7 @@ var expressJwt = require('express-jwt');
 var bodyParser = require('body-parser');
 var basicAuth = require('basic-auth');
 var pg = require('pg');
+var crypto = require('crypto');
 
 // My modules
 var tournaments = require('./modules/tournaments');
@@ -74,8 +75,8 @@ function authenticate(req, res) {
 		// Query the database to find the account
 		//TODO Query to find the salt and attach it to the password before comparing with the DB
 		var query = client.query({
-			text : "SELECT customer_username FROM customer WHERE customer_username = $1 AND customer_password = $2 AND customer_active",
-			values : [user.name, user.pass]
+			text : "SELECT customer_username, customer_password, customer_salt FROM customer WHERE customer_username = $1 AND customer_active",
+			values : [user.name]
 		});
 		query.on("row", function(row, result) {
 			result.addRow(row);
@@ -83,14 +84,22 @@ function authenticate(req, res) {
 		query.on("end", function(result) {
 			// Create the token with just the username
 			if (result.rows.length > 0) {
-				var response = {
-					username : result.rows[0].customer_username
-				};
-				// We are sending the username inside the token
-				var token = jwt.sign(response, secret);
+				crypto.pbkdf2(user.pass, result.rows[0].customer_salt, 4096, 127, 'sha256', function(err, key) {
+					if (err)
+						throw err;
+					if (result.rows[0].customer_password === key.toString('hex')) {
+						var response = {
+							username : result.rows[0].customer_username
+						};
+						// We are sending the username inside the token
+						var token = jwt.sign(response, secret);
 
-				res.json({
-					token : token
+						res.json({
+							token : token
+						});
+					} else {
+						return unauthorized(res);
+					}
 				});
 			} else {
 				return unauthorized(res);
@@ -112,105 +121,120 @@ app.get('/api', function(req, res) {
 	res.redirect('http://docs.neptunolabsmatchup.apiary.io');
 });
 
-///////////////////////////////////////////////////////////////////////////////////////////// AUTHENTICATION
-app.post('/create/account', function(req, res){
-	customers.createAccount(req, res, pg, conString, jwt, secret);
+///////////////////////////////////////////////////////////////////////////////////////////// ACCOUNTS
+app.post('/create/account', function(req, res) {
+	customers.createAccount(req, res, pg, conString, jwt, secret, crypto);
 });
 app.post('/login', authenticate);
 
 ///////////////////////////////////////////////////////////////////////////////////////////// EVENTS
-app.get('/events', function(req, res){
+app.get('/events', function(req, res) {
 	events.getEvents(req, res, pg, conString);
 });
-app.get('/events/:event', function(req, res){
+app.get('/events/:event', function(req, res) {
 	events.getEvent(req, res, pg, conString);
 });
+app.post('/matchup/events/:event/news', function(req, res) {
+	events.createNews(req, res, pg, conString);
+});
+app.post('/matchup/events/:event/reviews', function(req, res) {
+	events.createReview(req, res, pg, conString);
+});
+app.route('/matchup/events/:event/news/:news')
+	.get(function(req, res) {
+		events.getNews(req, res, pg, conString);
+	})
+	.delete(function(req, res){
+		events.deleteNews(req, res, pg, conString);
+	});
+app.route('/matchup/events/:event/reviews/:username')
+	.get(function(req, res) {
+		events.getReview(req, res, pg, conString);
+	})
+	.delete(function(req, res){
+		events.deleteReview(req, res, pg, conString);
+	});
+app.route('/matchup/events/:event/meetups/:username')
+	.get(function(req, res) {
+		events.getMeetup(req, res, pg, conString);
+	})
+	.delete(function(req, res){
+		events.deleteMeetup(req, res, pg, conString);
+	});
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////// HOME
-app.get('/home', function(req, res){
+app.get('/home', function(req, res) {
 	events.getHome(res, pg, conString);
 });
 
 ///////////////////////////////////////////////////////////////////////////////////////////// ORGANIZATIONS
-app.get('/organizations', function(req, res){
+app.get('/organizations', function(req, res) {
 	organizations.getOrganizations(req, res, pg, conString);
 });
-app.route('/matchup/organizations/:organization')
-	.get(function(req, res){
-		organizations.getOrganization(req, res, pg, conString);
-	})
-	.put(function(req, res){
-		organizations.editOrganization(req, res, pg, conString);
-	})
-	.delete(function(req, res){
-		organizations.deleteOrganization(req, res, pg, conString);
-	});
-app.route('/matchup/organizations/:organization/user/:username')
-	.put(function(req, res){
-		organizations.addOrganizationMember(req, res, pg, conString);
-	})
-	.delete(function(req, res){
-		organizations.removeOrganizationMember(req, res, pg, conString);
-	});
+app.route('/matchup/organizations/:organization').get(function(req, res) {
+	organizations.getOrganization(req, res, pg, conString);
+}).put(function(req, res) {
+	organizations.editOrganization(req, res, pg, conString);
+}).delete(function(req, res) {
+	organizations.deleteOrganization(req, res, pg, conString);
+});
+app.route('/matchup/organizations/:organization/user/:username').put(function(req, res) {
+	organizations.addOrganizationMember(req, res, pg, conString);
+}).delete(function(req, res) {
+	organizations.removeOrganizationMember(req, res, pg, conString);
+});
 
 ///////////////////////////////////////////////////////////////////////////////////////////// POPULAR
-app.get('/popular', function(req, res){
+app.get('/popular', function(req, res) {
 	games.getPopularStuff(res, pg, conString);
 });
-app.get('/popular/games', function(req, res){
+app.get('/popular/games', function(req, res) {
 	games.getPopularGames(res, pg, conString);
 });
-app.get('/popular/genres', function(req, res){
+app.get('/popular/genres', function(req, res) {
 	games.getPopularGenres(res, pg, conString);
 });
 
 ///////////////////////////////////////////////////////////////////////////////////////////// PROFILE
-app.route('/matchup/profile')
-	.get(function(req, res){
-		customers.getMyProfile(req, res, pg, conString);
-	})
-	.delete(function(req, res){
-		customers.deleteAccount(req, res, pg, conString);
-	});
-app.get('/matchup/profile/:username', function(req, res){
+app.route('/matchup/profile').get(function(req, res) {
+	customers.getMyProfile(req, res, pg, conString);
+}).delete(function(req, res) {
+	customers.deleteAccount(req, res, pg, conString);
+});
+app.get('/matchup/profile/:username', function(req, res) {
 	customers.getUserProfile(req, res, pg, conString);
 });
 
 ///////////////////////////////////////////////////////////////////////////////////////////// SEARCH
-app.get('/search/:parameter', function(req, res){
+app.get('/search/:parameter', function(req, res) {
 	search.getSearchResults(req, res, pg, conString);
 });
 
 ///////////////////////////////////////////////////////////////////////////////////////////// TEAMS
-app.get('/teams', function(req, res){
+app.get('/teams', function(req, res) {
 	teams.getTeams(req, res, pg, conString);
 });
-app.get('/teams/:team/members', function(req, res){
+app.get('/teams/:team/members', function(req, res) {
 	teams.getTeamMembers(req, res, pg, conString);
 });
-app.post('/matchup/create/team', function(req, res){
+app.post('/matchup/create/team', function(req, res) {
 	customers.createTeam(req, res, pg, conString);
 });
-app.route('/matchup/teams/:team')
-	.get(function(req, res){
-		teams.getTeam(req, res, pg, conString);
-	})
-	.put(function(req, res){
-		teams.editTeam(req, res, pg, conString);
-	})
-	.delete(function(req, res){
-		teams.deleteTeam(req, res, pg, conString);
-	});
-app.route('/matchup/teams/:team/user/:username')
-	.post(function(req, res){
-		teams.addTeamMember(req, res, pg, conString);
-	})
-	.put(function(req, res){
-		teams.makeCaptain(req, res, pg, conString);
-	})
-	.delete(function(req, res){
-		teams.removeTeamMember(req, res, pg, conString);
-	});
+app.route('/matchup/teams/:team').get(function(req, res) {
+	teams.getTeam(req, res, pg, conString);
+}).put(function(req, res) {
+	teams.editTeam(req, res, pg, conString);
+}).delete(function(req, res) {
+	teams.deleteTeam(req, res, pg, conString);
+});
+app.route('/matchup/teams/:team/user/:username').post(function(req, res) {
+	teams.addTeamMember(req, res, pg, conString);
+}).put(function(req, res) {
+	teams.makeCaptain(req, res, pg, conString);
+}).delete(function(req, res) {
+	teams.removeTeamMember(req, res, pg, conString);
+});
 
 ///////////////////////////////////////////////// SERVER LISTEN
 var port = process.env.PORT || 5000;

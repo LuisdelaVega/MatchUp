@@ -44,7 +44,7 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
     $scope.goToEvent = function(eventName, date, location){
 
         eventName = eventName.replace(" ", "%20");
-        var params = [eventName, date, location]
+        var params = [eventName, date, location];
 
         $http.get('http://136.145.116.232/events/'+eventName+'?date='+date+'&location='+location+'').
         success(function(data, status, headers, config) {
@@ -57,7 +57,6 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
 
             if(isHosted){
                 $state.go('app.eventpremium.summary', {"eventname": eventName, "date": date, "location": location});
-
             }
             else{
                 $state.go('app.regularevent', {"eventname": eventName, "date": date, "location": location});
@@ -198,11 +197,10 @@ myApp.controller('cameraReportController', ['$scope', '$http', 'Camera', functio
     };
 }]);
 
-myApp.controller('popularGameViewController', ['$scope', '$http', 'Camera', function ($scope, $http, Camera, $ionicLoading) {
+myApp.controller('popularGameViewController', ['$scope', '$http', '$state', 'sharedDataService', function ($scope, $http, $state, sharedDataService) {
 
     var allGames = [ ];
     $scope.popularGames = [];
-
 
     $http.get('http://matchup.neptunolabs.com/popular/games').
     success(function(data, status, headers, config) {
@@ -221,13 +219,20 @@ myApp.controller('popularGameViewController', ['$scope', '$http', 'Camera', func
     });
 
 
-        $scope.add = function () {
-            if(allGames.length > 0)
-                $scope.popularGames.push(allGames.pop());  
-            $scope.$broadcast('scroll.infiniteScrollComplete');
-        };
+    $scope.add = function () {
+        if(allGames.length > 0)
+            $scope.popularGames.push(allGames.pop());  
+        $scope.$broadcast('scroll.infiniteScrollComplete');
+    };
 
-        $scope.allGamesIsEmpty = function () {
-            return allGames.length > 0;    
-        };
+    $scope.allGamesIsEmpty = function () {
+        return allGames.length > 0;    
+    };
+    
+    $scope.goToGameProfile = function (gameName, gameImage) {
+        var params = [gameName, gameImage];
+        sharedDataService.set(params);
+        $state.go('app.game.summary', {"gamename": gameName});
+    };
+    
 }]);
