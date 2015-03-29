@@ -68,7 +68,12 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
         });
 
     };
-
+    
+    $scope.goToGameProfile = function (gameName, gameImage) {
+        var params = [gameName, gameImage];
+        sharedDataService.set(params);
+        $state.go('app.game.summary', {"gamename": gameName});
+    };
 
 }]);
 
@@ -87,7 +92,7 @@ myApp.controller('popularGameViewController', ['$scope', '$http', function ($sco
 
 }]);
 
-myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', function ($scope, $http, sharedDataService) {
+myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$state', function ($scope, $http, sharedDataService, $state) {
 
     $scope.search = function (query) {
 
@@ -118,12 +123,46 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', fu
         });
 
     }
+    
+    $scope.goToEvent = function(eventName, date, location){
+
+        eventName = eventName.replace(" ", "%20");
+        var params = [eventName, date, location];
+
+        $http.get('http://136.145.116.232/events/'+eventName+'?date='+date+'&location='+location+'').
+        success(function(data, status, headers, config) {
+
+            var eventData = angular.fromJson(data);
+
+            var isHosted = eventData.info.is_hosted;
+
+            sharedDataService.set(params);
+
+            if(isHosted){
+                $state.go('app.eventpremium.summary', {"eventname": eventName, "date": date, "location": location});
+            }
+            else{
+                $state.go('app.regularevent', {"eventname": eventName, "date": date, "location": location});
+            }
+
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in goToEvent");
+        });
+
+    };
+    
+    $scope.goToGameProfile = function (gameName, gameImage) {
+        var params = [gameName, gameImage];
+        sharedDataService.set(params);
+        $state.go('app.game.summary', {"gamename": gameName});
+    };
 
 
 
 }]);
 
-myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDataService', function ($scope, $stateParams, sharedDataService) {
+myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDataService', '$state', function ($scope, $stateParams, sharedDataService, $state) {
 
     $scope.resultType = $stateParams.type;
 
@@ -175,6 +214,43 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
         $scope.searchData = searchData.genres;
         $scope.genres = true;
     }
+    
+    
+    $scope.goToEvent = function(eventName, date, location){
+
+        eventName = eventName.replace(" ", "%20");
+        var params = [eventName, date, location];
+
+        $http.get('http://136.145.116.232/events/'+eventName+'?date='+date+'&location='+location+'').
+        success(function(data, status, headers, config) {
+
+            var eventData = angular.fromJson(data);
+
+            var isHosted = eventData.info.is_hosted;
+
+            sharedDataService.set(params);
+
+            if(isHosted){
+                $state.go('app.eventpremium.summary', {"eventname": eventName, "date": date, "location": location});
+            }
+            else{
+                $state.go('app.regularevent', {"eventname": eventName, "date": date, "location": location});
+            }
+
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in goToEvent");
+        });
+
+    };
+    
+    $scope.goToGameProfile = function (gameName, gameImage) {
+        var params = [gameName, gameImage];
+        sharedDataService.set(params);
+        $state.go('app.game.summary', {"gamename": gameName});
+    };
+    
+    
 }]);
 
 myApp.controller('cameraReportController', ['$scope', '$http', 'Camera', function ($scope, $http, Camera) {

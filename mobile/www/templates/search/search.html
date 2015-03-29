@@ -14,37 +14,41 @@
             <a class="item item-divider " href="#/app/searchgeneral/Live">
                 Live          
             </a>
-            <a class="item item-avatar" href="#" ng-repeat="event in liveEvents | limitTo: 3">
+            <a class="item item-avatar" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="event in liveEvents | limitTo: 3">
                 <img ng-src="{{ event.event_logo }}">
                 <h2>{{ event.event_name }}</h2>
                 <p>{{ event.event_location}}</p>
+                <p>{{event.event_start_date | date: 'medium'}}</p>
             </a>
 
             <a class="item item-divider " href="#/app/searchgeneral/Past">
                 Past              
             </a>
-            <a class="item item-avatar" href="#" ng-repeat="event in pastEvents | limitTo: 3">
+            <a class="item item-avatar" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="event in pastEvents | limitTo: 3">
                 <img ng-src="{{ event.event_logo }}">
                 <h2>{{ event.event_name }}</h2>
                 <p>{{ event.event_location}}</p>
+                <p>{{event.event_start_date | date: 'medium'}}</p>
             </a>
 
             <a class="item item-divider " href="#/app/searchgeneral/Premium">
                 Premium            
             </a>
-            <a class="item item-avatar" href="#" ng-repeat="event in pastEvents | limitTo: 3">
+            <a class="item item-avatar" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="event in pastEvents | limitTo: 3">
                 <img ng-src="{{ event.event_logo }}">
                 <h2>{{ event.event_name }}</h2>
                 <p>{{ event.event_location}}</p>
+                <p>{{event.event_start_date | date: 'medium'}}</p>
             </a>
 
             <a class="item item-divider " href="#/app/searchgeneral/Regular">
                 Regular               
             </a>
-            <a class="item item-avatar" href="#" ng-repeat="event in regularEvents | limitTo: 3">
+            <a class="item item-avatar" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="event in regularEvents | limitTo: 3">
                 <img ng-src="{{ event.event_logo }}">
                 <h2>{{ event.event_name }}</h2>
                 <p>{{ event.event_location}}</p>
+                <p>{{event.event_start_date | date: 'medium'}}</p>
             </a>
 
             <a class="item item-divider " href="#/app/searchgeneral/Users">
@@ -76,7 +80,7 @@
                 Games         
             </a>
             
-            <a class="item item-avatar" href="#" ng-repeat="game in games | limitTo: 3">
+            <a class="item item-avatar" ng-click="goToGameProfile(game.game_name, game.game_image)" ng-repeat="game in games | limitTo: 3">
                 <img ng-src="{{ game.game_image }}">
                 <h2>{{ game.game_name }}</h2>
             </a>

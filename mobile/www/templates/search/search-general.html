@@ -6,10 +6,11 @@
     </ion-nav-buttons>
     <ion-content>
         <div class="list" ng-if="live || past || hosted || regular">
-            <a class="item item-avatar" href="#" ng-repeat="data in searchData">
+            <a class="item item-avatar" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="data in searchData">
                 <img ng-src="{{ data.event_logo }}">
                 <h2>{{ data.event_name }}</h2>
                 <p>{{ data.event_location }}</p>
+                <p>{{event.event_start_date | date: 'medium'}}</p>
             </a>
         </div>
 
@@ -36,7 +37,7 @@
         </div>
         
         <div class="list" ng-if="games">
-            <a class="item item-avatar" hr1ef="#" ng-repeat="data in searchData">
+            <a class="item item-avatar" ng-click="goToGameProfile(game.game_name, game.game_image)" ng-repeat="data in searchData">
                 <img ng-src="{{ data.game_image }}">
                 <h2>{{ data.game_name }}</h2>
             </a>
