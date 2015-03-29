@@ -11,6 +11,10 @@
 //TODO Register for Event
 //TODO Register for Tournament
 
+//TODO Regular events can't have: News, Reviews, Meetups
+//TODO Check all the dates for (News, Reviews, Meetups) are within the correct boundaries
+//TODO Check for visibility of event when posting (News, Reviews, Meetups)
+
 var getEventsParams = {
 	type : ["regular", "hosted"],
 	filter : ["game", "genre"],
@@ -145,7 +149,7 @@ var getEvent = function(req, res, pg, conString) {
 			if (result.rows.length > 0) {
 				event.info = result.rows[0];
 				var queryMeetup = client.query({
-					text : "SELECT meetup_name, meetup_sart_date, meetup_end_date, meetup_location, meetup_description, customer_username FROM meetup WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
+					text : "SELECT meetup_name, meetup_start_date, meetup_end_date, meetup_location, meetup_description, customer_username FROM meetup WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
 					values : [event.info.event_name, event.info.event_start_date, event.info.event_location]
 				});
 				queryMeetup.on("row", function(row, result) {
@@ -316,6 +320,7 @@ var deleteNews = function(req, res, pg, conString) {
 	});
 };
 
+//TODO Needs update
 var createNews = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -337,33 +342,27 @@ var createNews = function(req, res, pg, conString) {
 			queryNews.on("end", function(result) {
 				if (result.rows.length > 0) {
 					if (result.rows[0].is_organizer) {
-						var date = new Date(req.body.date);
-						if (!(date.getTime())) {
-							client.end();
-							res.status(400).send('Invalid date');
-						} else {
-							var queryNews = client.query({
-								text : "SELECT max(news_number)+1 AS next_news FROM news WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
-								values : [req.params.event, req.query.date, req.query.location]
+						var queryNews = client.query({
+							text : "SELECT max(news_number)+1 AS next_news FROM news WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
+							values : [req.params.event, req.query.date, req.query.location]
+						});
+						queryNews.on("row", function(row, result) {
+							result.addRow(row);
+						});
+						queryNews.on("end", function(result) {
+							client.query({
+								text : "INSERT INTO news (event_name, event_start_date, event_location, news_number, news_title, news_content, news_date_posted) VALUES($1, $2, $3, $7, $4, $5, $6)",
+								values : [req.params.event, req.query.date, req.query.location, req.body.title, req.body.content, (new Date()).toUTCString(), result.rows[0].next_news]
+							}, function(err, result) {
+								if (err) {
+									res.status(500).send("Oh, no! Disaster!");
+									client.end();
+								} else {
+									client.end();
+									res.status(204).send('');
+								}
 							});
-							queryNews.on("row", function(row, result) {
-								result.addRow(row);
-							});
-							queryNews.on("end", function(result) {
-								client.query({
-									text : "INSERT INTO news (event_name, event_start_date, event_location, news_number, news_title, news_content, news_date_posted) VALUES($1, $2, $3, $7, $4, $5, $6)",
-									values : [req.params.event, req.query.date, req.query.location, req.body.title, req.body.content, req.body.date, result.rows[0].next_news]
-								}, function(err, result) {
-									if (err) {
-										res.status(500).send("Oh, no! Disaster!");
-										client.end();
-									} else {
-										client.end();
-										res.status(204).send('');
-									}
-								});
-							});
-						}
+						});
 					} else {
 						client.end();
 						res.status(403).send('');
@@ -383,12 +382,41 @@ var updateNews = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var date = new Date(req.query.date);
-		if (!(date.getTime())) {
+		var eventStartDate = new Date(req.query.date);
+		if (!(eventStartDate.getTime())) {
 			client.end();
 			res.status(400).send('Invalid date');
 		} else {
-
+			client.query("START TRANSACTION");
+			// Check if the user is registered for this event
+			var queryCustomer = client.query({
+				text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
+				values : [req.params.event, req.query.date, req.query.location, req.user.username]
+			});
+			queryCustomer.on("row", function(row, result) {
+				result.addRow(row);
+			});
+			queryCustomer.on("end", function(result) {
+				if (result.rows.length > 0) {
+					console.log(req.body);
+					client.query({
+						text : "UPDATE news SET (news_title, news_content) = ($5, $6) WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND news_number = $4",
+						values : [req.params.event, req.query.date, req.query.location, req.params.news, req.body.title, req.body.content]
+					}, function(err, result) {
+						if (err) {
+							res.status(500).send("Oh, no! Disaster!");
+							client.end();
+						} else {
+							client.query("COMMIT");
+							client.end();
+							res.status(201).send("News updated");
+						}
+					});
+				} else {
+					client.end();
+					res.status(403).send("You can't create a Meetup for this event");
+				}
+			});
 		}
 	});
 };
@@ -482,14 +510,14 @@ var createReview = function(req, res, pg, conString) {
 			client.end();
 			res.status(400).send('Invalid date');
 		} else {
-			var queryReview = client.query({
+			var queryCustomer = client.query({
 				text : "SELECT bool_and(customer_username IN (SELECT customer_username FROM pays WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3) OR customer_username IN (SELECT DISTINCT customer_username FROM is_a WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3)) AS participates FROM customer WHERE customer_username = $4",
 				values : [req.params.event, req.query.date, req.query.location, req.user.username]
 			});
-			queryReview.on("row", function(row, result) {
+			queryCustomer.on("row", function(row, result) {
 				result.addRow(row);
 			});
-			queryReview.on("end", function(result) {
+			queryCustomer.on("end", function(result) {
 				if (result.rows.length > 0) {
 					if (result.rows[0].participates) {
 						var date = new Date(req.body.date);
@@ -516,7 +544,7 @@ var createReview = function(req, res, pg, conString) {
 					}
 				} else {
 					client.end();
-					res.status(404).send("News not found");
+					res.status(403).send("You can't post a review for this event");
 				}
 			});
 		}
@@ -609,7 +637,7 @@ var deleteMeetup = function(req, res, pg, conString) {
 					}
 				} else {
 					client.end();
-					res.status(404).send("News not found");
+					res.status(403).send("You can't delete this Meetup");
 				}
 			});
 		}
@@ -622,12 +650,48 @@ var createMeetup = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var date = new Date(req.query.date);
-		if (!(date.getTime())) {
+		var eventStartDate = new Date(req.query.date);
+		var meetupStartDate = new Date(req.body.start_date);
+		var meetupEndDate = new Date(req.body.end_date);
+		if (!(eventStartDate.getTime()) || !(meetupStartDate.getTime()) || !(meetupEndDate.getTime()) || meetupStartDate.getTime() > meetupEndDate.getTime()) {
 			client.end();
 			res.status(400).send('Invalid date');
 		} else {
-
+			client.query("START TRANSACTION");
+			// Check if the user is registered for this event
+			var queryCustomer = client.query({
+				text : "SELECT distinct customer.customer_username, event.event_end_date FROM is_a JOIN event ON is_a.event_name = event.event_name AND is_a.event_start_date = event.event_start_date AND is_a.event_location = event.event_location JOIN pays ON pays.event_name = event.event_name AND pays.event_start_date = event.event_start_date AND pays.event_location = event.event_location JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = pays.customer_username OR customer.customer_username = is_a.customer_username OR customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
+				values : [req.params.event, req.query.date, req.query.location, req.user.username]
+			});
+			queryCustomer.on("row", function(row, result) {
+				result.addRow(row);
+			});
+			queryCustomer.on("end", function(result) {
+				if (result.rows.length > 0) {
+					var eventEndDate = new Date(result.rows[0].event_end_date);
+					if (meetupStartDate.getTime() > eventEndDate.getTime() || meetupEndDate.getTime() > eventEndDate.getTime()) {
+						client.end();
+						res.status(400).send('Invalid date');
+					} else {
+						client.query({
+							text : "INSERT INTO meetup (event_name, event_start_date, event_location, meetup_location, meetup_name, meetup_start_date, meetup_end_date, meetup_description, customer_username) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							values : [req.params.event, req.query.date, req.query.location, req.body.location, req.body.name, req.body.start_date, req.body.end_date, req.body.description, req.user.username]
+						}, function(err, result) {
+							if (err) {
+								res.status(500).send("Oh, no! Disaster!");
+								client.end();
+							} else {
+								client.query("COMMIT");
+								client.end();
+								res.status(201).send("Meetup Created");
+							}
+						});
+					}
+				} else {
+					client.end();
+					res.status(403).send("You can't create a Meetup for this event");
+				}
+			});
 		}
 	});
 };
@@ -716,8 +780,10 @@ module.exports.getHome = getHome;
 module.exports.getNews = getNews;
 module.exports.deleteNews = deleteNews;
 module.exports.createNews = createNews;
+module.exports.updateNews = updateNews;
 module.exports.getReview = getReview;
 module.exports.deleteReview = deleteReview;
 module.exports.createReview = createReview;
 module.exports.getMeetup = getMeetup;
 module.exports.deleteMeetup = deleteMeetup;
+module.exports.createMeetup = createMeetup;

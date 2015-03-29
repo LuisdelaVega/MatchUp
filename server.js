@@ -140,9 +140,15 @@ app.post('/matchup/events/:event/news', function(req, res) {
 app.post('/matchup/events/:event/reviews', function(req, res) {
 	events.createReview(req, res, pg, conString);
 });
+app.post('/matchup/events/:event/meetups', function(req, res) {
+	events.createMeetup(req, res, pg, conString);
+});
 app.route('/matchup/events/:event/news/:news')
 	.get(function(req, res) {
 		events.getNews(req, res, pg, conString);
+	})
+	.put(function(req, res) {
+		events.updateNews(req, res, pg, conString);
 	})
 	.delete(function(req, res){
 		events.deleteNews(req, res, pg, conString);
@@ -172,18 +178,23 @@ app.get('/home', function(req, res) {
 app.get('/organizations', function(req, res) {
 	organizations.getOrganizations(req, res, pg, conString);
 });
-app.route('/matchup/organizations/:organization').get(function(req, res) {
-	organizations.getOrganization(req, res, pg, conString);
-}).put(function(req, res) {
-	organizations.editOrganization(req, res, pg, conString);
-}).delete(function(req, res) {
-	organizations.deleteOrganization(req, res, pg, conString);
-});
-app.route('/matchup/organizations/:organization/user/:username').put(function(req, res) {
-	organizations.addOrganizationMember(req, res, pg, conString);
-}).delete(function(req, res) {
-	organizations.removeOrganizationMember(req, res, pg, conString);
-});
+app.route('/matchup/organizations/:organization')
+	.get(function(req, res) {
+		organizations.getOrganization(req, res, pg, conString);
+	})
+	.put(function(req, res) {
+		organizations.editOrganization(req, res, pg, conString);
+	})
+	.delete(function(req, res) {
+		organizations.deleteOrganization(req, res, pg, conString);
+	});
+app.route('/matchup/organizations/:organization/user/:username')
+	.put(function(req, res) {
+		organizations.addOrganizationMember(req, res, pg, conString);
+	})
+	.delete(function(req, res) {
+		organizations.removeOrganizationMember(req, res, pg, conString);
+	});
 
 ///////////////////////////////////////////////////////////////////////////////////////////// POPULAR
 app.get('/popular', function(req, res) {
