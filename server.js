@@ -74,7 +74,7 @@ function authenticate(req, res) {
 		// Query the database to find the account
 		//TODO Query to find the salt and attach it to the password before comparing with the DB
 		var query = client.query({
-			text : "SELECT customer_username FROM customer WHERE customer_username = $1 AND customer_password = $2",
+			text : "SELECT customer_username FROM customer WHERE customer_username = $1 AND customer_password = $2 AND customer_active",
 			values : [user.name, user.pass]
 		});
 		query.on("row", function(row, result) {
@@ -165,9 +165,13 @@ app.get('/popular/genres', function(req, res){
 });
 
 ///////////////////////////////////////////////////////////////////////////////////////////// PROFILE
-app.get('/matchup/profile', function(req, res){
-	customers.getMyProfile(req, res, pg, conString);
-});
+app.route('/matchup/profile')
+	.get(function(req, res){
+		customers.getMyProfile(req, res, pg, conString);
+	})
+	.delete(function(req, res){
+		customers.deleteAccount(req, res, pg, conString);
+	});
 app.get('/matchup/profile/:username', function(req, res){
 	customers.getUserProfile(req, res, pg, conString);
 });
@@ -180,6 +184,9 @@ app.get('/search/:parameter', function(req, res){
 ///////////////////////////////////////////////////////////////////////////////////////////// TEAMS
 app.get('/teams', function(req, res){
 	teams.getTeams(req, res, pg, conString);
+});
+app.get('/teams/:team/members', function(req, res){
+	teams.getTeamMembers(req, res, pg, conString);
 });
 app.post('/matchup/create/team', function(req, res){
 	customers.createTeam(req, res, pg, conString);
@@ -195,8 +202,11 @@ app.route('/matchup/teams/:team')
 		teams.deleteTeam(req, res, pg, conString);
 	});
 app.route('/matchup/teams/:team/user/:username')
-	.put(function(req, res){
+	.post(function(req, res){
 		teams.addTeamMember(req, res, pg, conString);
+	})
+	.put(function(req, res){
+		teams.makeCaptain(req, res, pg, conString);
 	})
 	.delete(function(req, res){
 		teams.removeTeamMember(req, res, pg, conString);

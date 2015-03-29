@@ -5,12 +5,17 @@ $(function () {
     console.log("I'm Alive");
 });
 
+var images =[];
 // Imgur api!
-function upload(file, imgtag) {
+function upload(file, imglabel) {
     if (!file || !file.type.match(/image.*/))
         return;
+    
+    $("#" + imglabel+"Label").val(file.name);
+    
 
-    console.log(file.type);
+    console.log("Image Name: " + file.name + "\nFile type: " + file.type );
+    console.log();
 
     document.body.className = "uploading";
 
@@ -20,9 +25,13 @@ function upload(file, imgtag) {
     var xhr = new XMLHttpRequest();
     xhr.open("POST", "http://api.imgur.com/2/upload.json");
     xhr.onload = function () {
-        link = JSON.parse(xhr.responseText).upload.links.imgur_page;
-        link = link + ".png";
-        console.log(link);
+    link = JSON.parse(xhr.responseText).upload.links.imgur_page;
+    link = link + ".png";
+    images.push({"id":imglabel,"image": link});
+        
+
+        
+        console.log(images);
 
     };
     xhr.send(fd);

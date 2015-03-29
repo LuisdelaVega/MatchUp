@@ -16,7 +16,7 @@ INSERT INTO "event"
     event_registration_deadline,
     event_rules,
     event_description,
-    event_visibility,
+    event_active,
     event_deduction_fee,
     event_is_online,
     event_type
@@ -25,7 +25,7 @@ VALUES
 (
     'First Test',
     '2015-10-19 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'ollidab',
     'S-113',
     'http://neptunolabs.com/images/logoPlain.png',
@@ -54,7 +54,7 @@ VALUES
 ( 
     'First Test',
     '2015-10-19 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'E-Sports PR'
 ); 
 
@@ -73,7 +73,7 @@ VALUES
 ( 
     'First Test',
     '2015-10-19 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'NeptunoLabs'
 ); 
 
@@ -93,7 +93,7 @@ VALUES
  (
     'First Test',
     '2015-10-19 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     '3-day Pass',
     25.00,
     'General Admission to the first three days. Note: Final Round does not included seating area'
@@ -125,7 +125,7 @@ VALUES
   (
     'First Test',
     '2015-10-19 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Super Smash Bros. Melee Qualifiers',
     'Super Smash Bros. Melee',
     'Rules of the rules with rules comprised of rules',
@@ -175,7 +175,7 @@ VALUES
   (
     'First Test',
     '2015-10-19 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
      5,
     FALSE
 );
@@ -197,7 +197,7 @@ VALUES
   (
     'First Test',
     '2015-10-19 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
      2,
     'http://www.twitch.tv/ollidab'
 );
@@ -219,7 +219,7 @@ VALUES
   (
     'First Test',
     '2015-10-19 09:00:00',
-    'University of Puerto Rico at Mayagüez, Mayaguez, PR 00681-9042',
+    'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     'Super Smash Bros. Melee Qualifiers',
     5
 );

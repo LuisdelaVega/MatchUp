@@ -24,7 +24,7 @@ var getOrganization = function(req, res, pg, conString) {
 		}
 
 		var queryOrganization = client.query({
-			text : "SELECT organization_name, organization_logo, organization_bio, organization_cover_photo, bool_and(customer_username = $1) AS my_organization FROM organization NATURAL JOIN belongs_to WHERE organization_active AND organization_name = $2 GROUP BY organization_name",
+			text : "SELECT organization_name, organization_logo, organization_bio, organization_cover_photo, bool_and(customer_username = $1) AS my_organization FROM organization NATURAL JOIN belongs_to NATURAL JOIN customer WHERE organization_active AND customer_active AND organization_name = $2 GROUP BY organization_name",
 			values : [req.user.username, req.params.organization]
 		});
 		queryOrganization.on("row", function(row, result) {
@@ -36,7 +36,7 @@ var getOrganization = function(req, res, pg, conString) {
 				// organization.info = new Object();
 				organization.info = result.rows[0];
 				var queryMembers = client.query({
-					text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic, bool_and(customer.customer_username IN (SELECT customer_username FROM owns WHERE organization_name = $1)) as is_owner FROM customer NATURAL JOIN belongs_to WHERE customer_active AND organization_name = $1 GROUP BY customer.customer_username",
+					text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, bool_and(customer_username IN (SELECT customer_username FROM owns WHERE organization_name = $1)) as is_owner FROM customer NATURAL JOIN belongs_to WHERE customer_active AND organization_name = $1 GROUP BY customer_username",
 					values : [req.params.organization]
 				});
 				queryMembers.on("row", function(row, result) {
@@ -46,7 +46,7 @@ var getOrganization = function(req, res, pg, conString) {
 					// organization.members = new Object();
 					organization.members = result.rows;
 					var queryEvents = client.query({
-						text : "SELECT event.event_name, event.event_location, event.event_venue, event_start_date, event.event_logo FROM event NATURAL JOIN hosts WHERE event_active AND organization_name = $1",
+						text : "SELECT event_name, event_location, event_venue, event_start_date, event_logo FROM event NATURAL JOIN hosts WHERE event_active AND organization_name = $1",
 						values : [req.params.organization]
 					});
 					queryEvents.on("row", function(row, result) {
@@ -89,7 +89,7 @@ var editOrganization = function(req, res, pg, conString) {
 			return res.status(401).send('');
 		}
 
-		queryText += " WHERE organization_name = $1 AND organization_name IN (SELECT organization_name FROM belongs_to WHERE customer_username = $2) AND organization_active";
+		queryText += " WHERE organization_name = $1 AND organization_name IN (SELECT organization_name FROM belongs_to NATURAL JOIN customer WHERE customer_username = $2 AND customer_active) AND organization_active";
 		var editQuery = client.query({
 			text : queryText,
 			values : [req.params.organization, req.user.username]
@@ -112,7 +112,7 @@ var deleteOrganization = function(req, res, pg, conString) {
 		}
 
 		var deleteQuery = client.query({
-			text : "UPDATE organization SET organization_active = FALSE WHERE organization_name = $1 AND organization_name IN (SELECT organization_name FROM owns WHERE customer_username = $2)",
+			text : "UPDATE organization SET organization_active = FALSE WHERE organization_name = $1 AND organization_name IN (SELECT organization_name FROM owns NATURAL JOIN customer WHERE customer_username = $2 AND customer_active)",
 			values : [req.params.organization, req.user.username]
 		}, function(err, result) {
 			if (err) {
@@ -133,7 +133,7 @@ var addOrganizationMember = function(req, res, pg, conString) {
 
 		client.query("START TRANSACTION");
 		var queryMe = client.query({
-			text : "SELECT organization.organization_name FROM belongs_to NATURAL JOIN organization" + (!(req.query.owner) ? "" : " NATURAL JOIN owns") + " WHERE customer_username = $1 AND organization_active AND organization_name = $2",
+			text : "SELECT organization_name FROM customer NATURAL JOIN belongs_to NATURAL JOIN organization" + (!(req.query.owner) ? "" : " NATURAL JOIN owns") + " WHERE customer_username = $1 AND organization_active AND customer_active AND organization_name = $2",
 			values : [req.user.username, req.params.organization]
 		});
 		queryMe.on("row", function(row, result) {
@@ -142,43 +142,57 @@ var addOrganizationMember = function(req, res, pg, conString) {
 		queryMe.on("end", function(result) {
 			if (result.rows.length > 0) {
 				if (req.query.owner) {
-					client.query({
-						text : "INSERT INTO owns (customer_username, organization_name) VALUES ($1, $2)",
-						values : [req.params.username, req.params.organization]
-					}, function(err, result) {
-						if (err) {
-							res.status(400).send("Oh, no! This user is already an owner of this organization dummy");
-							client.end();
-						} else {
-							var queryMember = client.query({
-								text : "SELECT organization.organization_name FROM belongs_to NATURAL JOIN organization WHERE customer_username = $1 AND organization_active AND organization_name = $2",
+					var queryMember = client.query({
+						text : "SELECT customer_username FROM customer WHERE customer_username = $1 AND customer_active",
+						values : [req.params.username]
+					});
+					queryMember.on("row", function(row, result) {
+						result.addRow(row);
+					});
+					queryMember.on("end", function(result) {
+						if (result.rows.length > 0) {
+							client.query({
+								text : "INSERT INTO owns (customer_username, organization_name) VALUES ($1, $2)",
 								values : [req.params.username, req.params.organization]
-							});
-							queryMember.on("row", function(row, result) {
-								result.addRow(row);
-							});
-							queryMember.on("end", function(result) {
-								// Add the user as a member if he/she wasn't a member already
-								if (!result.rows.length) {
-									client.query({
-										text : "INSERT INTO belongs_to (customer_username, organization_name) VALUES ($1, $2)",
+							}, function(err, result) {
+								if (err) {
+									res.status(400).send("Oh, no! This user is already an owner of this organization dummy");
+									client.end();
+								} else {
+									var queryMember = client.query({
+										text : "SELECT organization_name FROM belongs_to NATURAL JOIN organization WHERE customer_username = $1 AND organization_active AND organization_name = $2",
 										values : [req.params.username, req.params.organization]
-									}, function(err, result) {
-										if (err) {
-											res.status(401).send("Oh, no! Disaster!");
-											client.end();
+									});
+									queryMember.on("row", function(row, result) {
+										result.addRow(row);
+									});
+									queryMember.on("end", function(result) {
+										// Add the user as a member if he/she wasn't a member already
+										if (!result.rows.length) {
+											client.query({
+												text : "INSERT INTO belongs_to (customer_username, organization_name) VALUES ($1, $2)",
+												values : [req.params.username, req.params.organization]
+											}, function(err, result) {
+												if (err) {
+													res.status(500).send("Oh, no! Disaster!");
+													client.end();
+												} else {
+													client.query("COMMIT");
+													res.status(201).send('This user has been added! Yay!');
+													client.end();
+												}
+											});
 										} else {
 											client.query("COMMIT");
-											res.status(201).send('This user has been added! Yay!');
+											res.status(201).send("This member has been promoted! Yay!");
 											client.end();
 										}
 									});
-								} else {
-									client.query("COMMIT");
-									res.status(201).send("This member has been promoted! Yay!");
-									client.end();
 								}
 							});
+						} else {
+							res.status(400).send("Oh, no! This user does not exist");
+							client.end();
 						}
 					});
 				} else {
@@ -191,13 +205,13 @@ var addOrganizationMember = function(req, res, pg, conString) {
 							client.end();
 						} else {
 							client.query("COMMIT");
-							res.status(204).send('');
+							res.status(201).send("This member has been promoted! Yay!");
 						}
 					});
 				}
 			} else {
 				client.end();
-				return res.status(401).send('Oh, no! It seems you are do not have enough privileges to do this');
+				res.status(401).send('Oh, no! It seems you are do not have enough privileges to do this');
 			}
 		});
 	});
@@ -213,7 +227,7 @@ var removeOrganizationMember = function(req, res, pg, conString) {
 		client.query("START TRANSACTION");
 		// Look for whether or not the user that issued the request belongs to this organization and if he/she owns the organization
 		var queryMe = client.query({
-			text : "SELECT customer_username, bool_and(customer_username IN (SELECT customer_username FROM owns WHERE organization_name = $1)) AS is_owner FROM belongs_to NATURAL JOIN organization WHERE organization_name = $1 AND customer_username = $2 AND organization_active GROUP BY customer_username",
+			text : "SELECT customer_username, bool_and(customer_username IN (SELECT customer_username FROM owns WHERE organization_name = $1)) AS is_owner FROM customer NATURAL JOIN belongs_to NATURAL JOIN organization WHERE organization_name = $1 AND customer_username = $2 AND organization_active AND customer_active GROUP BY customer_username",
 			values : [req.params.organization, req.user.username]
 		});
 		queryMe.on("row", function(row, result) {
@@ -224,7 +238,7 @@ var removeOrganizationMember = function(req, res, pg, conString) {
 				var reqMember = result.rows[0];
 				// Do the same for the user that is to be removed
 				var queryMember = client.query({
-					text : "SELECT customer_username, bool_and(customer_username IN (SELECT customer_username FROM owns WHERE organization_name = $1)) AS is_owner FROM belongs_to NATURAL JOIN organization WHERE organization_name = $1 AND customer_username = $2 AND organization_active GROUP BY customer_username",
+					text : "SELECT customer_username, bool_and(customer_username IN (SELECT customer_username FROM owns WHERE organization_name = $1)) AS is_owner FROM customer NATURAL JOIN belongs_to NATURAL JOIN organization WHERE organization_name = $1 AND customer_username = $2 AND organization_active AND customer_active GROUP BY customer_username",
 					values : [req.params.organization, req.params.username]
 				});
 				queryMember.on("row", function(row, result) {
@@ -251,7 +265,7 @@ var removeOrganizationMember = function(req, res, pg, conString) {
 										values : [member.customer_username, req.params.organization]
 									}, function(err, result) {
 										if (err) {
-											res.status(400).send("Oh, no! Disaster");
+											res.status(500).send("Oh, no! Disaster!");
 											client.end();
 										} else {
 											client.query({
@@ -259,7 +273,7 @@ var removeOrganizationMember = function(req, res, pg, conString) {
 												values : [member.customer_username, req.params.organization]
 											}, function(err, result) {
 												if (err) {
-													res.status(400).send("Oh, no! Disaster!");
+													res.status(500).send("Oh, no! Disaster!");
 													client.end();
 												} else {
 													client.query("COMMIT");

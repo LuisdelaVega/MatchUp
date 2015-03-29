@@ -1,0 +1,1 @@
+DELETE FROM sponsors WHERE sponsor_name = 'Test';

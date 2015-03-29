@@ -1,0 +1,2 @@
+-- may turn this entity into a relation
+-- need to read more on multi attribute relations

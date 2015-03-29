@@ -17,18 +17,21 @@
             <div class="card">
                 <div class="item item-text-wrap">
                     <div class="center-text">
-                        <h1 class="h1-username">Tournament Game</h1>
+                        <h1 class="h1-username">{{ currentTournament.tournament_name }}</h1>
+                    </div>
+                    <div class="center-text">
+                        <h2 class="h1-username">{{ eventInfo.info.event_name }}</h2>
                     </div>
                     <div class="row">
                         <div class="col">
                             <div class=" center-text">
                                 <h2 class="h1-username">Schedule<br><br></h2>
-                                <span>Date, Hour</span>
+                                <span>{{ currentTournament.tournament_start_date | date: 'medium' }}</span>
                             </div>
                         </div>
                         <div class="col center-text">
                             <h2 class="h1-username">Location<br><br></h2>
-                            <span>Address</span>
+                            <span>{{ eventInfo.info.event_location }}</span>
                         </div>
                     </div>            
                     <p>

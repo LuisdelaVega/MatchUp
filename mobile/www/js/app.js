@@ -4,7 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events', 'user', 'team-organizations', 'genres'])
+angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-events', 'user', 'team-organizations', 'genres', 'regular-events', 'events'])
 
     .run(function ($ionicPlatform) {
     $ionicPlatform.ready(function () {
@@ -122,7 +122,8 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events',
     })
         .state('app.populargames', {
         url: "/populargames",
-        templateUrl: "templates/popular-games.html"
+        templateUrl: "templates/popular-games.html",
+        controller: "popularGameViewController"
     })
     //================================================================================
     // Search
@@ -344,8 +345,9 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events',
     //================================================================================
 
         .state('app.regularevent', {
-        url: "/regularevent",
-        templateUrl: "templates/regularevent/regular-event.html"
+        url: "/regularevent/:eventname/:date/:location",
+        templateUrl: "templates/regularevent/regular-event.html",
+        controller: "regularEventController"
     })
         .state('app.regulareventmatchups', {
         url: "/regulareventmatchups",
@@ -383,6 +385,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'events',
         .state('app.premiumsignup', {
         url: "/premiumsignup",
         templateUrl: "templates/premiumEvent/signup.html",
+        controller: "premiumSignUpController"
 
     })
     // Edit and post news
