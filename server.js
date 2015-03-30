@@ -24,6 +24,7 @@ var organizations = require('./modules/organizations');
 // Global variables
 var conString = "pg://luis:portal1!@127.0.0.1:5432/matchupdb";
 var secret = '7h1s h6Re i5 th6 p6rf6c7 plac6 t0 m4kE 4 Nyx A5s4s51n j0k6!';
+var adminSecret = '1I04-o ^4D66r joR5e h!dR4 60nk3y 5hr6kt C0u^3rt!69 #&Lp@3ce.U9Rm.eDu';
 
 // Most Valuable Player
 var app = express();
@@ -31,6 +32,10 @@ var app = express();
 // We are going to protect /matchup/ routes with JWT
 app.use('/matchup', expressJwt({
 	secret : secret
+}));
+
+app.use('/admin', expressJwt({
+	secret : adminSecret
 }));
 
 // Needed to handle JSON posts
@@ -134,6 +139,9 @@ app.get('/events', function(req, res) {
 app.get('/events/:event', function(req, res) {
 	events.getEvent(req, res, pg, conString);
 });
+app.post('/matchup/events', function(req, res) {
+	customers.createEvent(req, res, pg, conString);
+});
 app.post('/matchup/events/:event/news', function(req, res) {
 	events.createNews(req, res, pg, conString);
 });
@@ -176,6 +184,7 @@ app.route('/matchup/events/:event/meetups/:username')
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////// HOME
+// *Depreciated*
 app.get('/home', function(req, res) {
 	events.getHome(res, pg, conString);
 });
@@ -183,6 +192,9 @@ app.get('/home', function(req, res) {
 ///////////////////////////////////////////////////////////////////////////////////////////// ORGANIZATIONS
 app.get('/organizations', function(req, res) {
 	organizations.getOrganizations(req, res, pg, conString);
+});
+app.post('/matchup/organizations', function(req, res) {
+	customers.requestOrganization(req, res, pg, conString);
 });
 app.route('/matchup/organizations/:organization')
 	.get(function(req, res) {
@@ -237,7 +249,7 @@ app.get('/teams', function(req, res) {
 app.get('/teams/:team/members', function(req, res) {
 	teams.getTeamMembers(req, res, pg, conString);
 });
-app.post('/matchup/create/team', function(req, res) {
+app.post('/matchup/teams', function(req, res) {
 	customers.createTeam(req, res, pg, conString);
 });
 app.route('/matchup/teams/:team')

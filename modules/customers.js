@@ -1,4 +1,3 @@
-//TODO Create Organization
 //TODO Create Event
 //TODO Subscribe to user
 //TODO Unsubscribe to user
@@ -20,7 +19,7 @@ var getUserProfile = function(req, res, pg, conString) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
-		
+
 		client.query("START TRANSACTION");
 		var profile = new Object();
 		// Query the database to find the user's account
@@ -59,7 +58,7 @@ var getUserProfile = function(req, res, pg, conString) {
 
 						// Query the database to find the user's created Events
 						var eventsQuery = client.query({
-							text : "SELECT event_name, event_start_date, event_location, event_venue FROM event WHERE customer_username = $1 AND event_active",
+							text : "SELECT event_name, event_start_date, event_location, event_venue, event_logo FROM event WHERE customer_username = $1 AND event_active",
 							values : [req.params.username]
 						});
 						eventsQuery.on("row", function(row, result) {
@@ -71,7 +70,7 @@ var getUserProfile = function(req, res, pg, conString) {
 							res.json({
 								info : profile.info,
 								teams : profile.teams,
-								origanizations : profile.organizations,
+								organizations : profile.organizations,
 								events : profile.events
 							});
 							client.query("COMMIT");
@@ -296,8 +295,119 @@ var createTeam = function(req, res, pg, conString) {
 	});
 };
 
+var requestOrganization = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		client.query("START TRANSACTION");
+		client.query({
+			text : "INSERT INTO request (request_organization_name, customer_username, request_description) VALUES ($1, $2, $3)",
+			values : [req.body.name, req.user.username, req.body.description]
+		}, function(err, result) {
+			if (err) {
+				res.status(500).send("Oh, no! Disaster!");
+				client.end();
+			} else {
+				client.query("COMMIT");
+				client.end();
+				res.status(202).send("Request sent");
+			}
+		});
+	});
+};
+
+var createEvent = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+		// var date = new Date(req.query.date);
+		// if (!(date.getTime())) {
+		// client.end();
+		// res.status(400).send('Invalid date');
+		// } else {
+		// }
+		client.query("START TRANSACTION");
+		var eventStartDate = new Date(req.body.event.start_date);
+		var eventEndDate = new Date(req.body.event.end_date);
+		var eventRegistrationDeadline = new Date(req.body.event.registration_deadline);
+		if (!(eventStartDate.getTime()) || !(eventEndDate.getTime()) || !(eventRegistrationDeadline.getTime())) {
+			client.end();
+			res.status(400).send('Invalid date');
+		} else {//Math.floor(num * 100) / 100
+			client.query({
+				text : "INSERT INTO event (event_name, event_start_date, event_location, customer_username, event_venue, event_banner, event_logo, event_end_date, event_registration_deadline, event_rules, event_description, event_deduction_fee, event_is_online, event_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+				values : [req.body.event.name, req.body.event.start_date, req.body.event.location, req.user.username, req.body.event.venue, req.body.event.banner, req.body.event.logo, req.body.event.end_date, req.body.event.registration_deadline, req.body.event.rules, req.body.event.description, req.body.event.deduction_fee, req.body.event.is_online, req.body.event.type]
+			}, function(err, result) {
+				if (err) {
+					res.status(500).send("Oh, no! Disaster!");
+					client.end();
+				} else {
+					if (!req.query.hosted) {
+						client.query({
+							text : "INSERT INTO tournament (event_name, event_start_date, event_location, tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
+							values : [req.body.event.name, req.body.event.start_date, req.body.event.location, req.body.tournament[0].name, req.body.tournament[0].game, req.body.tournament[0].rules, req.body.tournament[0].teams, req.body.tournament[0].start_date, req.body.tournament[0].deadline, 0, 32, 0, req.body.tournament[0].type, req.body.tournament[0].format, req.body.tournament[0].scoring, ((req.body.tournament[0].type === "Two-Stage") ? req.body.tournament[0].group_players : 0), ((req.body.tournament[0].type === "Two-Stage") ? req.body.tournament[0].group_winners : 0)]
+						}, function(err, result) {
+							if (err) {
+								res.status(500).send("Oh, no! Disaster!");
+								client.end();
+							} else {
+								client.query("COMMIT");
+								client.end();
+								res.status(201).json({
+									name : req.body.event.name,
+									start_date : req.body.event.start_date,
+									location : req.body.event.location
+								});
+							}
+						});
+					} else {
+						var tournament = req.body.tournament;
+						for (var i = 0; i < tournament.length; i++) {
+							client.query({
+								text : "INSERT INTO tournament (event_name, event_start_date, event_location, tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
+								values : [req.body.event.name, req.body.event.start_date, req.body.event.location, tournament[i].name, tournament[i].game, tournament[i].rules, tournament[i].teams, tournament[i].start_date, tournament[i].deadline, Math.floor(tournament[i].fee * 100) / 100, tournament[i].capacity, Math.floor(tournament[i].seed_money * 100) / 100, tournament[i].type, tournament[i].format, tournament[i].scoring, ((tournament[i].type === "Two-Stage") ? tournament[i].group_players : 0), ((tournament[i].type === "Two-Stage") ? tournament[i].group_winners : 0)]
+							}, function(err, result) {
+								if (err) {
+									res.status(500).send("Oh, no! Disaster!");
+									client.end();
+								}
+							});
+						}
+						if (i == tournament.length) {
+							client.query("COMMIT");
+							client.end();
+							res.status(201).json({
+								name : req.body.event.name,
+								start_date : req.body.event.start_date,
+								location : req.body.event.location
+							});
+						}
+					}
+				}
+			});
+		}
+	});
+};
+
+/*
+ else {
+ client.query("COMMIT");
+ client.end();
+ res.status(201).json({
+ name : req.body.event.name,
+ start_date : req.body.event.start_date,
+ location : req.body.event.location
+ });
+ }
+ * */
+
 module.exports.getMyProfile = getMyProfile;
 module.exports.getUserProfile = getUserProfile;
 module.exports.createAccount = createAccount;
 module.exports.deleteAccount = deleteAccount;
 module.exports.createTeam = createTeam;
+module.exports.requestOrganization = requestOrganization;
+module.exports.createEvent = createEvent;
