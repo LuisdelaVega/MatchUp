@@ -11,7 +11,6 @@ INSERT INTO "event"
     event_venue,
     event_banner,
     event_logo,
-    event_max_capacity,
     event_end_date,
     event_registration_deadline,
     event_rules,
@@ -30,7 +29,6 @@ VALUES
     'S-113',
     'http://neptunolabs.com/images/logoPlain.png',
     'http://neptunolabs.com/images/matchup-logo.png',
-    '1024',
     '2015-10-22 22:00:00',
     '2015-10-15 09:00:00',
     'Rules, rules, rules, rules, rules, rules, rules, and rules',
@@ -87,7 +85,8 @@ VALUES
     event_location,
     spec_fee_name,
     spec_fee_amount,
-    spec_fee_description
+    spec_fee_description,
+    spec_fee_amount_available
  )
  VALUES
  (
@@ -96,7 +95,8 @@ VALUES
     'University of Puerto Rico at Mayaguez, Mayaguez, PR 00681-9042',
     '3-day Pass',
     25.00,
-    'General Admission to the first three days. Note: Final Round does not included seating area'
+    'General Admission to the first three days. Note: Final Round does not included seating area',
+    200
  );
 
 ---------------------------------------------------
