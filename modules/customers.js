@@ -20,7 +20,8 @@ var getUserProfile = function(req, res, pg, conString) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
-
+		
+		client.query("START TRANSACTION");
 		var profile = new Object();
 		// Query the database to find the user's account
 		var profileQuery = client.query({
@@ -73,6 +74,7 @@ var getUserProfile = function(req, res, pg, conString) {
 								origanizations : profile.organizations,
 								events : profile.events
 							});
+							client.query("COMMIT");
 							client.end();
 						});
 					});

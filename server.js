@@ -157,12 +157,18 @@ app.route('/matchup/events/:event/reviews/:username')
 	.get(function(req, res) {
 		events.getReview(req, res, pg, conString);
 	})
+	.put(function(req, res) {
+		events.updateReview(req, res, pg, conString);
+	})
 	.delete(function(req, res){
 		events.deleteReview(req, res, pg, conString);
 	});
 app.route('/matchup/events/:event/meetups/:username')
 	.get(function(req, res) {
 		events.getMeetup(req, res, pg, conString);
+	})
+	.put(function(req, res) {
+		events.updateMeetup(req, res, pg, conString);
 	})
 	.delete(function(req, res){
 		events.deleteMeetup(req, res, pg, conString);
@@ -208,11 +214,13 @@ app.get('/popular/genres', function(req, res) {
 });
 
 ///////////////////////////////////////////////////////////////////////////////////////////// PROFILE
-app.route('/matchup/profile').get(function(req, res) {
-	customers.getMyProfile(req, res, pg, conString);
-}).delete(function(req, res) {
-	customers.deleteAccount(req, res, pg, conString);
-});
+app.route('/matchup/profile')
+	.get(function(req, res) {
+		customers.getMyProfile(req, res, pg, conString);
+	})
+	.delete(function(req, res) {
+		customers.deleteAccount(req, res, pg, conString);
+	});
 app.get('/matchup/profile/:username', function(req, res) {
 	customers.getUserProfile(req, res, pg, conString);
 });
@@ -232,20 +240,26 @@ app.get('/teams/:team/members', function(req, res) {
 app.post('/matchup/create/team', function(req, res) {
 	customers.createTeam(req, res, pg, conString);
 });
-app.route('/matchup/teams/:team').get(function(req, res) {
-	teams.getTeam(req, res, pg, conString);
-}).put(function(req, res) {
-	teams.editTeam(req, res, pg, conString);
-}).delete(function(req, res) {
-	teams.deleteTeam(req, res, pg, conString);
-});
-app.route('/matchup/teams/:team/user/:username').post(function(req, res) {
-	teams.addTeamMember(req, res, pg, conString);
-}).put(function(req, res) {
-	teams.makeCaptain(req, res, pg, conString);
-}).delete(function(req, res) {
-	teams.removeTeamMember(req, res, pg, conString);
-});
+app.route('/matchup/teams/:team')
+	.get(function(req, res) {
+		teams.getTeam(req, res, pg, conString);
+	})
+	.put(function(req, res) {
+		teams.editTeam(req, res, pg, conString);
+	})
+	.delete(function(req, res) {
+		teams.deleteTeam(req, res, pg, conString);
+	});
+app.route('/matchup/teams/:team/user/:username')
+	.post(function(req, res) {
+		teams.addTeamMember(req, res, pg, conString);
+	})
+	.put(function(req, res) {
+		teams.makeCaptain(req, res, pg, conString);
+	})
+	.delete(function(req, res) {
+		teams.removeTeamMember(req, res, pg, conString);
+	});
 
 ///////////////////////////////////////////////// SERVER LISTEN
 var port = process.env.PORT || 5000;

@@ -491,7 +491,7 @@ var deleteReview = function(req, res, pg, conString) {
 					}
 				} else {
 					client.end();
-					res.status(404).send("News not found");
+					res.status(404).send("Review not found");
 				}
 			});
 		}
@@ -527,7 +527,7 @@ var createReview = function(req, res, pg, conString) {
 						} else {
 							client.query({
 								text : "INSERT INTO review (event_name, event_start_date, event_location, customer_username, review_title, review_content, star_rating, review_date_created) VALUES ( $1, $2, $3, $4, $5, $6, $7, $8)",
-								values : [req.params.event, req.query.date, req.query.location, req.user.username, req.body.title, req.body.content, req.body.rating, req.body.date]
+								values : [req.params.event, req.query.date, req.query.location, req.user.username, req.body.title, req.body.content, req.body.rating, (new Date()).toUTCString()]
 							}, function(err, result) {
 								if (err) {
 									res.status(500).send("Oh, no! Disaster!");
@@ -557,12 +557,41 @@ var updateReview = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var date = new Date(req.query.date);
-		if (!(date.getTime())) {
+		var eventStartDate = new Date(req.query.date);
+		if (!(eventStartDate.getTime())) {
 			client.end();
 			res.status(400).send('Invalid date');
 		} else {
-
+			client.query("START TRANSACTION");
+			// Check if the user is registered for this event
+			var queryCustomer = client.query({
+				text : "SELECT distinct customer.customer_username FROM review JOIN event ON review.event_name = event.event_name AND review.event_start_date = event.event_start_date AND review.event_location = event.event_location JOIN customer ON customer.customer_username = review.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND review.customer_username = $5 AND event.event_active",
+				values : [req.params.event, req.query.date, req.query.location, req.user.username, req.params.username]
+			});
+			queryCustomer.on("row", function(row, result) {
+				result.addRow(row);
+			});
+			queryCustomer.on("end", function(result) {
+				if (result.rows.length > 0) {
+					console.log(req.body);
+					client.query({
+						text : "UPDATE review SET (review_title, review_content, star_rating) = ($5, $6, $7) WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $4",
+						values : [req.params.event, req.query.date, req.query.location, req.params.username, req.body.title, req.body.content, req.body.rating]
+					}, function(err, result) {
+						if (err) {
+							res.status(500).send("Oh, no! Disaster!");
+							client.end();
+						} else {
+							client.query("COMMIT");
+							client.end();
+							res.status(201).send("Review updated");
+						}
+					});
+				} else {
+					client.end();
+					res.status(403).send("You can't update this review");
+				}
+			});
 		}
 	});
 };
@@ -702,12 +731,49 @@ var updateMeetup = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var date = new Date(req.query.date);
-		if (!(date.getTime())) {
+		var eventStartDate = new Date(req.query.date);
+		var meetupStartDate = new Date(req.body.start_date);
+		var meetupEndDate = new Date(req.body.end_date);
+		if (!(eventStartDate.getTime()) || !(meetupStartDate.getTime()) || !(meetupEndDate.getTime()) || meetupStartDate.getTime() > meetupEndDate.getTime()) {
 			client.end();
 			res.status(400).send('Invalid date');
 		} else {
-
+			client.query("START TRANSACTION");
+			// Check if the user is registered for this event
+			var queryCustomer = client.query({
+				text : "SELECT distinct customer.customer_username, event.event_end_date FROM meetup JOIN event ON meetup.event_name = event.event_name AND meetup.event_start_date = event.event_start_date AND meetup.event_location = event.event_location JOIN customer ON customer.customer_username = meetup.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND meetup.customer_username = $5 AND event.event_active",
+				values : [req.params.event, req.query.date, req.query.location, req.user.username, req.params.username]
+			});
+			queryCustomer.on("row", function(row, result) {
+				result.addRow(row);
+			});
+			queryCustomer.on("end", function(result) {
+				if (result.rows.length > 0) {
+					var eventEndDate = new Date(result.rows[0].event_end_date);
+					if (meetupStartDate.getTime() > eventEndDate.getTime() || meetupEndDate.getTime() > eventEndDate.getTime()) {
+						client.end();
+						res.status(400).send('Invalid date');
+					} else {
+						console.log(req.body);
+						client.query({
+							text : "UPDATE meetup SET (meetup_name, meetup_location, meetup_start_date, meetup_end_date, meetup_description) = ($7, $8, $9, $10, $11) WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $4 AND meetup_location = $5 AND meetup_start_date = $6",
+							values : [req.params.event, req.query.date, req.query.location, req.user.username, req.query.mlocation, req.query.mdate, req.body.name, req.body.location, req.body.start_date, req.body.end_date, req.body.description]
+						}, function(err, result) {
+							if (err) {
+								res.status(500).send("Oh, no! Disaster!");
+								client.end();
+							} else {
+								client.query("COMMIT");
+								client.end();
+								res.status(201).send("Meetup updated");
+							}
+						});
+					}
+				} else {
+					client.end();
+					res.status(403).send("You can't update this review");
+				}
+			});
 		}
 	});
 };
@@ -784,6 +850,8 @@ module.exports.updateNews = updateNews;
 module.exports.getReview = getReview;
 module.exports.deleteReview = deleteReview;
 module.exports.createReview = createReview;
+module.exports.updateReview = updateReview;
 module.exports.getMeetup = getMeetup;
 module.exports.deleteMeetup = deleteMeetup;
 module.exports.createMeetup = createMeetup;
+module.exports.updateMeetup = updateMeetup;
