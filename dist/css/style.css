@@ -137,6 +137,26 @@
     height: 240px;
 }
 
+.event-creator {
+	background-image: url('http://neptunolabs.com/images/badillo.jpg');
+	background-size: cover;
+	border-radius: 3px;
+	box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+	width: 120px;
+	height: 120px;
+}
+
+.match-avatar {
+    width: 100px;
+    height: 100px;
+    -webkit-border-radius: 3px;
+    -webkit-background-clip: padding-box;
+    -moz-border-radius: 3px;
+    -moz-background-clip: padding;
+    border-radius: 3px;
+    background-clip: padding-box;
+}
+
 .box-icon {
 	margin: 0 auto;
 	margin-top: -61px;
