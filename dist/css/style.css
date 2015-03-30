@@ -82,7 +82,7 @@
 
 @import url(//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css);
 .box-margin {
-	margin-top: 10px;
+	margin-top: 10px !important;
 }
 
 .box {
