@@ -139,7 +139,7 @@ var getEvent = function(req, res, pg, conString) {
 		// Query the database to find the account
 		var event = new Object();
 		var queryEvent = client.query({
-			text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_banner, event_logo, event_max_capacity, event_end_date, event_registration_deadline, event_rules, event_description, event_deduction_fee, event_is_online, event_type, bool_and(concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)) as is_hosted FROM event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND event_active GROUP BY event_name, event_start_date, event_location",
+			text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_banner, event_logo, event_end_date, event_registration_deadline, event_rules, event_description, event_deduction_fee, event_is_online, event_type, bool_and(concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)) as is_hosted FROM event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND event_active GROUP BY event_name, event_start_date, event_location",
 			values : [req.params.event, (!(date.getTime()) ? "1991-11-11T00:00:00.000Z" : req.query.date), req.query.location]
 		});
 		queryEvent.on("row", function(row, result) {
