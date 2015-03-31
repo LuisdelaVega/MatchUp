@@ -308,7 +308,7 @@
 			<h1>My Matchups</h1>
 			<div class="row">
 				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding">
-					<div class="box">
+					<div class="box cursor" data-toggle="modal" data-target="#matchupModal">
 						<div class="media">
 							<div class="media-left">
 								<a href="#">
@@ -319,7 +319,8 @@
 								<div class="row">
 									<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
 										<h4>Apex 2015</h4>
-										<p>Round 3<br>Opponent odillab</p>
+										<p>Round 3
+											<br>Opponent odillab</p>
 									</div>
 									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 										<h1 style="text-align:center">2-3</h1>
@@ -330,7 +331,7 @@
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding">
-					<div class="box">
+					<div class="box cursor" data-toggle="modal" data-target="#matchupSetModal">
 						<div class="media">
 							<div class="media-left">
 								<a href="#">
@@ -341,7 +342,8 @@
 								<div class="row">
 									<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
 										<h4>Apex 2015</h4>
-										<p>Round 3<br>Opponent odillab</p>
+										<p>Round 3
+											<br>Opponent odillab</p>
 									</div>
 									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 										<h1 style="text-align:center">2-3</h1>
@@ -352,7 +354,7 @@
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding">
-					<div class="box">
+					<div class="box cursor" data-toggle="modal" data-target="#matchupSetModal">
 						<div class="media">
 							<div class="media-left">
 								<a href="#">
@@ -363,73 +365,8 @@
 								<div class="row">
 									<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
 										<h4>Apex 2015</h4>
-										<p>Round 3<br>Opponent odillab</p>
-									</div>
-									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
-										<h1 style="text-align:center">2-3</h1>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding">
-					<div class="box">
-						<div class="media">
-							<div class="media-left">
-								<a href="#">
-									<img class="media-object match-avatar" src="http://neptunolabs.com/images/badillo.jpg">
-								</a>
-							</div>
-							<div class="media-body">
-								<div class="row">
-									<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-										<h4>Apex 2015</h4>
-										<p>Round 3<br>Opponent odillab</p>
-									</div>
-									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
-										<h1 style="text-align:center">2-3</h1>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding">
-					<div class="box">
-						<div class="media">
-							<div class="media-left">
-								<a href="#">
-									<img class="media-object match-avatar" src="http://neptunolabs.com/images/badillo.jpg">
-								</a>
-							</div>
-							<div class="media-body">
-								<div class="row">
-									<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-										<h4>Apex 2015</h4>
-										<p>Round 3<br>Opponent odillab</p>
-									</div>
-									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
-										<h1 style="text-align:center">2-3</h1>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding">
-					<div class="box">
-						<div class="media">
-							<div class="media-left">
-								<a href="#">
-									<img class="media-object match-avatar" src="http://neptunolabs.com/images/badillo.jpg">
-								</a>
-							</div>
-							<div class="media-body">
-								<div class="row">
-									<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-										<h4>Apex 2015</h4>
-										<p>Round 3<br>Opponent odillab</p>
+										<p>Round 3
+											<br>Opponent odillab</p>
 									</div>
 									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 										<h1 style="text-align:center">2-3</h1>
@@ -445,96 +382,146 @@
 	</div>
 	<!-- /#page-wrapper -->
 
-	<!-- modal 1 -->
-	<div class="modal fade" id="matchUP1Modal" tabindex="-1" role="dialog" aria-labelledby="matchUPLabel" aria-hidden="true">
+	<!-- modal matchup-->
+	<div class="modal fade" id="matchupModal">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
 					</button>
-					<h4 class="modal-title" id="matchUP1Modal">MatchUP</h4>
+					<h4 class="modal-title">Round 1 Match 2<br><small>Station 2</small></h4>
 				</div>
 				<div class="modal-body">
-					<form>
-						<!-- match start modal -->
-						<div class="row">
-							<div class="col-lg-12" align="center">
-								<div class="panel panel-primary" style="border:none; box-shadow: none" align="center">
-									<div class="panel-heading">
-										<h5>Round #</h5>
-									</div>
-									<div class="panel-body">
-										<!-- player 1 of match modal -->
-										<div align="left">
-											<div class="panel panel-default col-lg-4" style="border:none; box-shadow: none">
-												<div class="panel-body" style="border: none; box-shadow: none; background-color: white">
-													<div align="center">
-														<img src="http://neptunolabs.com/images/badillo.jpg" alt="Image" class="img-thumbnail img-circle thumb128" style="width: 115px; height: 115px">
-													</div>
-												</div>
-											</div>
-										</div>
-										<!-- end of player 1 of match modal -->
-
-										<!-- Match Score modal-->
-										<div class="panel panel-default col-lg-4" style="border:none; box-shadow: none">
-											<div class="panel-body" style="border: none; box-shadow: none; background-color: white">
-												<div align="center">
-													<br />
-													<h2>1-4</h2>
-												</div>
-											</div>
-										</div>
-										<!-- end match score modal-->
-
-										<!-- player 2 of match modal -->
-										<div class="panel panel-default col-lg-4" style="border:none; box-shadow: none">
-											<div class="panel-body" style="border: none; box-shadow: none; background-color: white">
-												<div align="center">
-													<img src="http://neptunolabs.com/images/badillo.jpg" alt="Image" class="img-thumbnail img-circle thumb128" style="width: 115px; height: 115px">
-												</div>
-											</div>
-
-										</div>
-										<!-- end of player 2 of match modal -->
-									</div>
-								</div>
-							</div>
+					<div class="row">
+						<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5 ">
+							<div class="img-circular player-1 large center-block"></div>
 						</div>
-						<!-- end of match Modal -->
-						<div class="row">
-							<img src="http://neptunolabs.com/images/badillo.jpg" alt="Image" class="img-thumbnail img-circle thumb128" style="width: 115px; height: 115px">
-							<img src="http://neptunolabs.com/images/badillo.jpg" alt="Image" class="img-thumbnail img-circle thumb128" style="width: 115px; height: 115px">
-							<img src="http://neptunolabs.com/images/badillo.jpg" alt="Image" class="img-thumbnail img-circle thumb128" style="width: 115px; height: 115px">
-							<img src="http://neptunolabs.com/images/badillo.jpg" alt="Image" class="img-thumbnail img-circle thumb128" style="width: 115px; height: 115px">
-							<img src="http://neptunolabs.com/images/badillo.jpg" alt="Image" class="img-thumbnail img-circle thumb128" style="width: 115px; height: 115px">
+						<div class="col-xs-4 col-sm-2 col-md-2 col-lg-2">
+							<h1 style="text-align:center">3-2</h1>
 						</div>
-					</form>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-primary" data-dismiss="modal">
-						Close
-					</button>
+						<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5">
+							<div class="img-circular player-2 large center-block"></div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5 ">
+							<h3 style="text-align:center">Player 1</h3>
+						</div>
+						<div class="col-xs-4 col-sm-2 col-md-2 col-lg-2">
+							<h4 style="text-align:center">Best of 3</h4>
+						</div>
+						<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5">
+							<h3 style="text-align:center">Player 2</h3>
+						</div>
+					</div>
+					<div style="text-align: center">
+						<div class="set-circular player-1"></div>
+						<div class="set-circular player-1 set-margin"></div>
+						<div class="set-circular player-2 set-margin"></div>
+						<div class="set-circular player-1"></div>
+					</div>
 				</div>
 			</div>
-			<!-- modal content -->
+			<!-- /.modal-content -->
 		</div>
-		<!-- modal dialog -->
+		<!-- /.modal-dialog -->
 	</div>
-	<!-- modal -->
 
-	<!-- jQuery -->
-	<script src="../bower_components/jquery/dist/jquery.min.js"></script>
+	<!-- modal matchup with sets-->
+	<div class="modal fade" id="matchupSetModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">Round 1 Match 2<br><small>Station 2</small></h4>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5 ">
+							<div class="img-circular player-1 large center-block"></div>
+						</div>
+						<div class="col-xs-4 col-sm-2 col-md-2 col-lg-2">
+							<h1 style="text-align:center">3-2</h1>
+						</div>
+						<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5">
+							<div class="img-circular player-2 large center-block"></div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5 ">
+							<h3 style="text-align:center">Player 1</h3>
+						</div>
+						<div class="col-xs-4 col-sm-2 col-md-2 col-lg-2">
+							<h4 style="text-align:center">Best of 3</h4>
+						</div>
+						<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5">
+							<h3 style="text-align:center">Player 2</h3>
+						</div>
+					</div>
+					<div style="text-align: center">
+						<div class="set-circular player-1"></div>
+						<div class="set-circular player-2 set-margin"></div>
+						<div class="set-circular player-1"></div>
+					</div>
+					<div class=" box-margin">
+						<p>Set 1</p>
+						<div class="row">
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+								<div class="img-circular player-1 mini center-block"></div>
+							</div>
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+								<h2 style="text-align:center">45-30</h2>
+							</div>
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+								<div class="img-circular player-2 mini center-block"></div>
+							</div>
+						</div>
+						<hr>
+						<p>Set 2</p>
+						<div class="row">
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+								<div class="img-circular player-1 mini center-block"></div>
+							</div>
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+								<h2 style="text-align:center">45-30</h2>
+							</div>
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+								<div class="img-circular player-2 mini center-block"></div>
+							</div>
+						</div>
+						<hr>
+						<p>Set 3</p>
+						<div class="row">
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+								<div class="img-circular player-1 mini center-block"></div>
+							</div>
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+								<h2 style="text-align:center">45-30</h2>
+							</div>
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+								<div class="img-circular player-2 mini center-block"></div>
+							</div>
+						</div>
+					</div>
 
-	<!-- Bootstrap Core JavaScript -->
-	<script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal-dialog -->
+		</div>
 
-	<!-- Metis Menu Plugin JavaScript -->
-	<script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
+		<!-- jQuery -->
+		<script src="../bower_components/jquery/dist/jquery.min.js"></script>
 
-	<!-- Custom Theme JavaScript -->
-	<script src="../dist/js/sb-admin-2.js"></script>
+		<!-- Bootstrap Core JavaScript -->
+		<script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+		<!-- Metis Menu Plugin JavaScript -->
+		<script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
+
+		<!-- Custom Theme JavaScript -->
+		<script src="../dist/js/sb-admin-2.js"></script>
 
 </body>
 
