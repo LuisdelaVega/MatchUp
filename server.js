@@ -142,6 +142,17 @@ app.get('/events/:event', function(req, res) {
 app.post('/matchup/events', function(req, res) {
 	customers.createEvent(req, res, pg, conString);
 });
+app.route('/matchup/events/:event')
+	.delete(function(req, res){
+		events.deleteEvent(req, res, pg, conString);
+	});
+app.route('/matchup/events/:event/tournaments')
+	.put(function(req, res){
+		events.addTournament(req, res, pg, conString);
+	})
+	.delete(function(req, res){
+		events.removeTournament(req, res, pg, conString);
+	});
 app.post('/matchup/events/:event/news', function(req, res) {
 	events.createNews(req, res, pg, conString);
 });

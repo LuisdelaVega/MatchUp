@@ -322,6 +322,7 @@ var requestOrganization = function(req, res, pg, conString) {
 //TODO Comparar los deadlines con las fechas de torneos y eventos
 //TODO Comparar los dates de torneos con eventos
 //TODO Check if game is in DB
+//TODO You forgot sponsors nigga
 var createEvent = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
