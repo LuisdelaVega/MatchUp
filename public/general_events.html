@@ -44,17 +44,24 @@
 		<!-- /.navbar-header -->
 
 		<ul class="nav navbar-top-links navbar-right">
-			<li>
-				<form class="navbar-form" role="search">
-					<div class="input-group">
-						<input type="text" class="form-control" placeholder="Filter by Games" name="srch-term" id="srch-term">
-						<div class="input-group-btn">
-							<button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i>
-							</button>
-						</div>
-					</div>
-				</form>
-			</li>
+			<li class="dropdown">
+				<div class="dropdown">
+					<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+						Filter by
+						<span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">All</a>
+						</li>
+						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Live</a>
+						</li>
+						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Upcoming</a>
+						</li>
+						<li role="presentation"><a role="menuitem" tabindex="-1" href="#">History</a>
+						</li>
+					</ul>
+				</div>
+			</li>			
 			<li class="dropdown">
 				<a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-envelope fa-fw"></i> <i class="fa fa-caret-down"></i> </a>
 				<ul class="dropdown-menu dropdown-messages">
@@ -262,7 +269,7 @@
 						<a href="index.html"><i class="fa fa-home fa-fw"></i> Home</a>
 					</li>
 					<li>
-						<a href="user_profile.html"><i class="fa fa-user fa-fw"></i> User Profile</a>
+						<a href="my_profile.html"><i class="fa fa-user fa-fw"></i> User Profile</a>
 					</li>
 					<li>
 						<a href="tables.html"><i class="fa fa-calendar fa-fw"></i> Events<span class="fa arrow"></span></a>
@@ -325,7 +332,7 @@
 				<div class="tab-pane fade in active" id="premium">
 					<div class="row">
 						<div class="col-lg-6 col-md-12 col-sm-12">
-							<div class="panel">
+							<div class="panel cursor" onclick="window.location.href='premium_event_page.html'">
 								<div class="panel-body">
 									<img style="width:100%;" src="http://neptunolabs.com/images/ckmagic.jpg" alt="Cock Magic">
 								</div>
@@ -351,7 +358,7 @@
 							</div>
 						</div>
 						<div class="col-lg-6 col-md-12 col-sm-12">
-							<div class="panel">
+							<div class="panel cursor" onclick="window.location.href='premium_event_page.html'">
 								<div class="panel-body">
 									<img style="width:100%;" src="http://neptunolabs.com/images/ckmagic.jpg" alt="Cock Magic">
 								</div>
@@ -377,7 +384,7 @@
 							</div>
 						</div>
 						<div class="col-lg-6 col-md-12 col-sm-12">
-							<div class="panel">
+							<div class="panel cursor" onclick="window.location.href='premium_event_page.html'">
 								<div class="panel-body">
 									<img style="width:100%;" src="http://neptunolabs.com/images/ckmagic.jpg" alt="Cock Magic">
 								</div>
@@ -403,7 +410,7 @@
 							</div>
 						</div>
 						<div class="col-lg-6 col-md-12 col-sm-12">
-							<div class="panel">
+							<div class="panel cursor" onclick="window.location.href='premium_event_page.html'">
 								<div class="panel-body">
 									<img style="width:100%;" src="http://neptunolabs.com/images/ckmagic.jpg" alt="Cock Magic">
 								</div>
@@ -433,7 +440,7 @@
 				<div class="tab-pane fade" id="regular">
 					<div class="row">
 						<div class="col-lg-6 col-md-12 col-sm-12 regular-event-card">
-							<div class="box">
+							<div class="box cursor" onclick="window.location.href='tournament_page.html'">
 								<div class="media">
 									<img class="pull-left event-organizer-thumbnail center-block" src="http://neptunolabs.com/images/badillo.jpg">
 									<div class="media-body">
@@ -446,7 +453,7 @@
 							</div>
 						</div>
 						<div class="col-lg-6 col-md-12 col-sm-12 regular-event-card">
-							<div class="box">
+							<div class="box cursor" onclick="window.location.href='tournament_page.html'">
 								<div class="media">
 									<img class="pull-left event-organizer-thumbnail center-block" src="http://neptunolabs.com/images/badillo.jpg">
 									<div class="media-body">
@@ -459,7 +466,7 @@
 							</div>
 						</div>
 						<div class="col-lg-6 col-md-12 col-sm-12 regular-event-card">
-							<div class="box">
+							<div class="box cursor" onclick="window.location.href='tournament_page.html'">
 								<div class="media">
 									<img class="pull-left event-organizer-thumbnail center-block" src="http://neptunolabs.com/images/badillo.jpg">
 									<div class="media-body">

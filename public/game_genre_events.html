@@ -256,7 +256,7 @@
 						<a href="index.html"><i class="fa fa-home fa-fw"></i> Home</a>
 					</li>
 					<li>
-						<a href="user_profile.html"><i class="fa fa-user fa-fw"></i> User Profile</a>
+						<a href="my_profile.html"><i class="fa fa-user fa-fw"></i> User Profile</a>
 					</li>
 					<li>
 						<a href="tables.html"><i class="fa fa-calendar fa-fw"></i> Events<span class="fa arrow"></span></a>
@@ -304,92 +304,212 @@
 
 	<!-- Page Content -->
 	<div id="page-wrapper">
-		<div class="container-fluid custom-padding">
-			<h1 class="page-header">Events by Genres: Genre name</h1>
-			<div class="row">
-				<!-- Events based by a game -->
-				<div class="col-md-3 col-sm-4 col-xs-6">
-					<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
-						<hr class="hr-custom-padding">
-						<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+		<div class="container-fluid">
+			<!-- Events based by a game -->
+			<h1>Genre</h1>
+			<!-- Nav tabs -->
+			<ul class="nav nav-tabs nav-justified tab-padding-top">
+				<li class="active">
+					<a href="#upcomingGenre" data-toggle="tab">Upcoming</a>
+				</li>
+				<li>
+					<a href="#liveGenre" data-toggle="tab">Live</a>
+				</li>
+				<li>
+					<a href="#historyGenre" data-toggle="tab">History</a>
+				</li>
+			</ul>
+			<!-- Tab panes -->
+			<div class="tab-content panel-padding">
+				<div class="tab-pane fade in active" id="upcomingGenre">
+					<div class="row">
+						<div class="col-md-3 col-sm-4 col-xs-6">
+							<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
+								<hr class="hr-custom-padding">
+								<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 						overflow: hidden;">
-							<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
-								Event Name
-							</p>
-							<p class="thumbnail-paragraph">
-								Staples Center
-							</p>
-							<p class="thumbnail-paragraph">
-								January 2, 8:00PM
-							</p>
+									<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
+										Event Name
+									</p>
+									<p class="thumbnail-paragraph">
+										Staples Center
+									</p>
+									<p class="thumbnail-paragraph">
+										January 2, 8:00PM
+									</p>
+								</div>
+							</a>
 						</div>
-					</a>
-				</div>
 
-				<div class="col-md-3 col-sm-4 col-xs-6">
-					<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
-						<hr class="hr-custom-padding">
-						<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+						<div class="col-md-3 col-sm-4 col-xs-6">
+							<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
+								<hr class="hr-custom-padding">
+								<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 						overflow: hidden;">
-							<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
-								Event Name
-							</p>
-							<p class="thumbnail-paragraph">
-								Staples Center
-							</p>
-							<p class="thumbnail-paragraph">
-								January 2, 8:00PM
-							</p>
+									<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
+										Event Name
+									</p>
+									<p class="thumbnail-paragraph">
+										Staples Center
+									</p>
+									<p class="thumbnail-paragraph">
+										January 2, 8:00PM
+									</p>
+								</div>
+							</a>
 						</div>
-					</a>
-				</div>
 
-				<div class="col-md-3 col-sm-4 col-xs-6">
-					<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
-						<hr class="hr-custom-padding">
-						<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+						<div class="col-md-3 col-sm-4 col-xs-6">
+							<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
+								<hr class="hr-custom-padding">
+								<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 						overflow: hidden;">
-							<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
-								Event Name
-							</p>
-							<p class="thumbnail-paragraph">
-								Staples Center
-							</p>
-							<p class="thumbnail-paragraph">
-								January 2, 8:00PM
-							</p>
+									<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
+										Event Name
+									</p>
+									<p class="thumbnail-paragraph">
+										Staples Center
+									</p>
+									<p class="thumbnail-paragraph">
+										January 2, 8:00PM
+									</p>
+								</div>
+							</a>
 						</div>
-					</a>
+						<!-- Events based by a Genre -->
+					</div>
+					<!-- row -->
 				</div>
-
-				<div class="col-md-3 col-sm-4 col-xs-6">
-					<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
-						<hr class="hr-custom-padding">
-						<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+				<div class="tab-pane fade" id="liveGenre">
+					<div class="col-md-3 col-sm-4 col-xs-6">
+						<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
+							<hr class="hr-custom-padding">
+							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 						overflow: hidden;">
-							<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
-								Event Name
-							</p>
-							<p class="thumbnail-paragraph">
-								Staples Center
-							</p>
-							<p class="thumbnail-paragraph">
-								January 2, 8:00PM
-							</p>
-						</div>
-					</a>
+								<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
+									Event Name
+								</p>
+								<p class="thumbnail-paragraph">
+									Staples Center
+								</p>
+								<p class="thumbnail-paragraph">
+									January 2, 8:00PM
+								</p>
+							</div>
+						</a>
+					</div>
 				</div>
-				<!-- Events based by a game -->
+				<div class="tab-pane fade" id="historyGenre">
+					<div class="col-md-3 col-sm-4 col-xs-6">
+						<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
+							<hr class="hr-custom-padding">
+							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+						overflow: hidden;">
+								<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
+									Event Name
+								</p>
+								<p class="thumbnail-paragraph">
+									Staples Center
+								</p>
+								<p class="thumbnail-paragraph">
+									January 2, 8:00PM
+								</p>
+							</div>
+						</a>
+					</div>
+					<div class="col-md-3 col-sm-4 col-xs-6">
+						<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
+							<hr class="hr-custom-padding">
+							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+						overflow: hidden;">
+								<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
+									Event Name
+								</p>
+								<p class="thumbnail-paragraph">
+									Staples Center
+								</p>
+								<p class="thumbnail-paragraph">
+									January 2, 8:00PM
+								</p>
+							</div>
+						</a>
+					</div>
+					<div class="col-md-3 col-sm-4 col-xs-6">
+						<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
+							<hr class="hr-custom-padding">
+							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+						overflow: hidden;">
+								<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
+									Event Name
+								</p>
+								<p class="thumbnail-paragraph">
+									Staples Center
+								</p>
+								<p class="thumbnail-paragraph">
+									January 2, 8:00PM
+								</p>
+							</div>
+						</a>
+					</div>
+					<div class="col-md-3 col-sm-4 col-xs-6">
+						<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
+							<hr class="hr-custom-padding">
+							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+						overflow: hidden;">
+								<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
+									Event Name
+								</p>
+								<p class="thumbnail-paragraph">
+									Staples Center
+								</p>
+								<p class="thumbnail-paragraph">
+									January 2, 8:00PM
+								</p>
+							</div>
+						</a>
+					</div>
+					<div class="col-md-3 col-sm-4 col-xs-6">
+						<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
+							<hr class="hr-custom-padding">
+							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+						overflow: hidden;">
+								<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
+									Event Name
+								</p>
+								<p class="thumbnail-paragraph">
+									Staples Center
+								</p>
+								<p class="thumbnail-paragraph">
+									January 2, 8:00PM
+								</p>
+							</div>
+						</a>
+					</div>
+					<div class="col-md-3 col-sm-4 col-xs-6">
+						<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
+							<hr class="hr-custom-padding">
+							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+						overflow: hidden;">
+								<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
+									Event Name
+								</p>
+								<p class="thumbnail-paragraph">
+									Staples Center
+								</p>
+								<p class="thumbnail-paragraph">
+									January 2, 8:00PM
+								</p>
+							</div>
+						</a>
+					</div>
+				</div>
 			</div>
-			<!-- row -->
-
 			<!-- /.panel -->
-
 		</div>
 		<!-- contianer -->
 	</div>
 	<!-- wrapper -->
-	
+
 	<!-- jQuery -->
 	<script src="../bower_components/jquery/dist/jquery.min.js"></script>
 

@@ -254,7 +254,7 @@
 						<a href="index.html"><i class="fa fa-home fa-fw"></i> Home</a>
 					</li>
 					<li>
-						<a href="user_profile1.0.html"><i class="fa fa-user fa-fw"></i> User Profile</a>
+						<a href="my_profile.html"><i class="fa fa-user fa-fw"></i> User Profile</a>
 					</li>
 					<li>
 						<a href="tables.html"><i class="fa fa-calendar fa-fw"></i> Events<span class="fa arrow"></span></a>
@@ -325,9 +325,14 @@
 						</div>
 					</div>
 				</div>
+				<div class="row">
+					<div  class="col-md-3 col-md-offset-9">
+						<a class="btn btn-primary btn-block" onclick="window.location.href='edit_organization.html'">Edit</a>
+					</div>
+				</div>
 			</div>
 			<!-- Owners widget -->
-			<div class="widget-box">
+			<div class="widget-box box-margin">
 				<div class="widget-header bordered-bottom bordered-themesecondary">
 					<h3 class="widget-title themesecondary">Owners</h3>
 				</div>
@@ -341,7 +346,7 @@
 										<li class="ticket-item">
 											<div class="ticket-user">
 												<img src="http://neptunolabs.com/images/badillo.jpg" class="user-avatar">
-												<span class="user-name" onclick="window.location.href='user_profile.html'">Edwin Badillo</span>
+												<span class="user-name" onclick="window.location.href='my_profile.html'">Edwin Badillo</span>
 											</div>
 										</li>
 									</div>
@@ -349,7 +354,7 @@
 										<li class="ticket-item">
 											<div class="ticket-user">
 												<img src="http://bootdey.com/img/Content/user_1.jpg" class="user-avatar">
-												<span class="user-name" onclick="window.location.href='user_profile.html'">Rafael Pol</span>
+												<span class="user-name" onclick="window.location.href='my_profile.html'">Rafael Pol</span>
 											</div>
 										</li>
 									</div>
@@ -357,7 +362,7 @@
 										<li class="ticket-item">
 											<div class="ticket-user">
 												<img src="http://bootdey.com/img/Content/user_1.jpg" class="user-avatar">
-												<span class="user-name" onclick="window.location.href='user_profile.html'">Sam De la Torre</span>
+												<span class="user-name" onclick="window.location.href='my_profile.html'">Sam De la Torre</span>
 											</div>
 										</li>
 									</div>
@@ -365,7 +370,7 @@
 										<li class="ticket-item">
 											<div class="ticket-user">
 												<img src="http://bootdey.com/img/Content/user_1.jpg" class="user-avatar">
-												<span class="user-name" onclick="window.location.href='user_profile.html'">Luis de la Vega</span>
+												<span class="user-name" onclick="window.location.href='my_profile.html'">Luis de la Vega</span>
 											</div>
 										</li>
 									</div>
@@ -373,7 +378,7 @@
 										<li class="ticket-item">
 											<div class="ticket-user">
 												<img src="http://bootdey.com/img/Content/user_1.jpg" class="user-avatar">
-												<span class="user-name" onclick="window.location.href='user_profile.html'">Juan Miranda</span>
+												<span class="user-name" onclick="window.location.href='my_profile.html'">Juan Miranda</span>
 											</div>
 										</li>
 									</div>
@@ -389,6 +394,9 @@
 			<div class="widget-box">
 				<div class="widget-header bordered-bottom bordered-themesecondary">
 					<h3 class="widget-title themesecondary">Events</h3>
+					<a class="widget-more" onclick="window.location.href='organization_events.html'">
+						See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
+					</a>
 				</div>
 				<!--Widget Header-->
 				<div class="widget-body">
@@ -469,79 +477,6 @@
 				</div>
 			</div>
 			<!-- Organization Events widget-->
-
-			<!-- Teams widget -->
-			<div class="widget-box">
-				<div class="widget-header bordered-bottom bordered-themesecondary">
-					<h3 class="widget-title themesecondary">Teams</h3>
-				</div>
-				<!--Widget Header-->
-				<div class="widget-body">
-					<div class="widget-main no-padding">
-						<div class="tickets-container">
-							<div class="row" style="padding-left: 15px">
-								<div class="col-md-3 col-sm-4 col-xs-6">
-									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='team_page.html'">
-										<hr class="hr-custom-padding">
-										<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-										overflow: hidden;">
-											<p class="thumbnail-title" onclick="window.location.href='team_page.html'">
-												Team Name
-											</p>
-											<p class="thumbnail-paragraph">
-												Captain: Name
-											</p>
-										</div>
-									</a>
-								</div>
-								<div class="col-md-3 col-sm-4 col-xs-6">
-									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='team_page.html'">
-										<hr class="hr-custom-padding">
-										<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-										overflow: hidden;">
-											<p class="thumbnail-title" onclick="window.location.href='team_page.html'">
-												Team Name
-											</p>
-											<p class="thumbnail-paragraph">
-												Captain: Name
-											</p>
-										</div>
-									</a>
-								</div>
-								<div class="col-md-3 col-sm-4 col-xs-6">
-									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='team_page.html'">
-										<hr class="hr-custom-padding">
-										<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-										overflow: hidden;">
-											<p class="thumbnail-title" onclick="window.location.href='team_page.html'">
-												Team Name
-											</p>
-											<p class="thumbnail-paragraph">
-												Captain: Name
-											</p>
-										</div>
-									</a>
-								</div>
-								<div class="col-md-3 col-sm-4 col-xs-6">
-									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='team_page.html'">
-										<hr class="hr-custom-padding">
-										<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-										overflow: hidden;">
-											<p class="thumbnail-title" onclick="window.location.href='team_page.html'">
-												Team Name
-											</p>
-											<p class="thumbnail-paragraph">
-												Captain: Name
-											</p>
-										</div>
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<!-- Teams widget -->
 		</div>
 		<!-- /.container-fluid -->
 	</div>

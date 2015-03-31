@@ -11,10 +11,16 @@
 
 	<title>MatchUP by Neptuno Labs</title>
 
-	<!-- Bootstrap Core CSS -->
-	<link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+	<!-- jQuery -->
+	<script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
 
-	<!-- MetisMenu CSS -->
+
+	<!-- Bootstrap Core-->
+	<link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+	<!-- MetisMenu CSS/JS -->
+	<script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
 	<link href="../bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
 
 	<!-- Custom CSS -->
@@ -24,12 +30,53 @@
 	<!-- Custom Fonts -->
 	<link href="../bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
+
+	<!-- Custom Theme JavaScript -->
+	<script src="../dist/js/sb-admin-2.js"></script>
+	<script type="text/javascript" src="../dist/js/app.js"></script>
+
+	<!-- Moment JS needed for DatePicker -->
+	<script type="text/javascript" src="../bower_components/moment/min/moment.min.js"></script>
+
+	<!-- DateTime Picker CSS/JS -->
+	<script type="text/javascript" src="../bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+	<link rel="stylesheet" href="../bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" />
+
+
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>
 		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
 		<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
 		<![endif]-->
+
+
+	<style>
+		.btn-file {
+			position: relative;
+			overflow: hidden;
+		}
+		
+		.btn-file input[type=file] {
+			position: absolute;
+			top: 0;
+			right: 0;
+			min-width: 100%;
+			min-height: 100%;
+			font-size: 100px;
+			text-align: right;
+			filter: alpha(opacity=0);
+			opacity: 0;
+			background: red;
+			cursor: inherit;
+			display: block;
+		}
+		
+		input[readonly] {
+			background-color: white !important;
+			cursor: text !important;
+		}
+	</style>
 
 </head>
 
@@ -245,7 +292,7 @@
 						<div class="input-group custom-search-form">
 							<input type="text" class="form-control" placeholder="Search...">
 							<span class="input-group-btn">
-										<button class="btn btn-default" type="button" onclick="window.location.href='search_page.html'">
+										<button class="btn btn-default" type="button">
 											<i class="fa fa-search"></i>
 										</button> </span>
 						</div>
@@ -261,17 +308,17 @@
 						<a href="tables.html"><i class="fa fa-calendar fa-fw"></i> Events<span class="fa arrow"></span></a>
 						<ul class="nav nav-second-level">
 							<li>
-								<a href="general_events.html">General Events</a>
+								<a href="index.html">General Events</a>
 							</li>
 							<li>
-								<a href="registered_events.html">Registered Events</a>
+								<a href="index.html">Registered Events</a>
 							</li>
 							<li>
-								<a href="my_events.html">My Events</a>
+								<a href="index.html">My Events</a>
 							</li>
 							<li>
 								<a href="create_event.html">
-									</i> Create Event</a>
+                                        Create Event</a>
 							</li>
 						</ul>
 						<!-- /.nav-second-level -->
@@ -283,7 +330,7 @@
 						<a href="popular_games.html"><i class="fa fa-gamepad fa-fw"></i> Popular Games</a>
 					</li>
 					<li>
-						<a href="my_matchups.html"><i class="fa fa-calendar-o fa-fw"></i> My MatchUps</span></a>
+						<a href="my_matchups.html"><i class="fa fa-calendar-o fa-fw"></i> My MatchUps</a>
 					</li>
 					<li>
 						<a href="my_teams.html"><i class="fa fa-group fa-fw"></i> My Teams</a>
@@ -301,68 +348,31 @@
 		<!-- /.navbar-static-side -->
 	</nav>
 
-	<!-- Page Content -->
 	<div id="page-wrapper">
-		<div class="container-fluid">
-			<h3 class="page-header">Search Results</h3>
+		<div class="container-fluid custom-padding">
+			<h3>Request Organization</h3>
 			<div class="row">
-				<div class="col-lg-8 col-md-12 col-sm-12 regular-event-card">
+				<div class="col-md-8">
 					<div class="box">
-						<div class="media">
-							<img class="pull-left event-organizer-thumbnail center-block" src="http://neptunolabs.com/images/badillo.jpg">
-							<div class="media-body">
-								<h3 class="event-footer-title">Event Name</h3>
-								<p>April 2, 7:30PM 2015
-									<br> Centro de Estudiante de Mayaguez
-									<br> Created by odillab</p>
+						<form>
+							<legend>General Info</legend>
+							<div class="form-group">
+								<label>Organization Name: </label>
+								<input class="form-control" placeholder="Enter Name" id="createOrganizationName">
 							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-8 col-md-12 col-sm-12 regular-event-card">
-					<div class="box">
-						<div class="media">
-							<img class="pull-left event-organizer-thumbnail center-block" src="http://neptunolabs.com/images/badillo.jpg">
-							<div class="media-body">
-								<h3 class="event-footer-title">Event Name</h3>
-								<p>April 2, 7:30PM 2015
-									<br> Centro de Estudiante de Mayaguez
-									<br> Created by odillab</p>
+							<div class="form-group">
+								<label>Decription:</label>
+								<textarea class="form-control" rows="4" id="createOrganizationDescription"></textarea>
 							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-8 col-md-12 col-sm-12 regular-event-card">
-					<div class="box">
-						<div class="media">
-							<img class="pull-left event-organizer-thumbnail center-block" src="http://neptunolabs.com/images/badillo.jpg">
-							<div class="media-body">
-								<h3 class="event-footer-title">Event Name</h3>
-								<p>April 2, 7:30PM 2015
-									<br> Centro de Estudiante de Mayaguez
-									<br> Created by odillab</p>
-							</div>
-						</div>
+							<a class="btn btn-primary btn-block">Create</a>
+						</form>
 					</div>
 				</div>
 			</div>
 		</div>
-		<!-- /.container-fluid -->
+		<!-- container -->
 	</div>
-	<!-- /#page-wrapper -->
-
-
-	<!-- jQuery -->
-	<script src="../bower_components/jquery/dist/jquery.min.js"></script>
-
-	<!-- Bootstrap Core JavaScript -->
-	<script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-
-	<!-- Metis Menu Plugin JavaScript -->
-	<script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
-
-	<!-- Custom Theme JavaScript -->
-	<script src="../dist/js/sb-admin-2.js"></script>
+	<!-- wrapper -->
 
 </body>
 

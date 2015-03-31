@@ -1,3 +1,11 @@
+a:hover {
+	cursor: pointer;
+}
+
+.cursor:hover {
+	cursor: pointer;
+}
+
 .cover-photo {
 	width: 100%;
 }
@@ -45,44 +53,60 @@
 	padding-top: 5px;
 }
 
-.regular-event-card{
+.regular-event-card {
 	padding-bottom: 10px;
 }
 
-.panel-padding{
+.panel-padding {
 	padding: 10px;
 }
 
-.hr-custom-padding{
+.second-button-ticket{
+	margin-right: 8px;
+}
+
+.hr-custom-padding {
 	margin-top: 10px;
 	margin-bottom: 0px;
 }
 
-.thumbnail-title{
+.thumbnail-title {
 	font-size: 20px;
 }
 
-.thumbnail-paragraph{
+.thumbnail-paragraph {
 	font-size: 20px;
 	color: #717171;
 	font-size: 14px;
 }
 
-.event-organizer-thumbnail{
+.event-organizer-thumbnail {
 	height: 100px;
 	width: 100px;
 }
 
-.event-footer-title{
+.event-footer-title {
 	margin-top: 0px;
-	margin-bottom: 10px 
+	margin-bottom: 10px
 }
 
+.game-cover {
+	max-width: 40vw;
+	max-height: 50vh;
+	width: 100%;
+	display: block;
+	margin-left: auto;
+	margin-right: auto
+}
 /*Snippets*/
 
 @import url(//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css);
 .box-margin {
 	margin-top: 10px !important;
+}
+
+.box-margin-bottom {
+	margin-bottom: 10px !important;
 }
 
 .box {
@@ -102,39 +126,39 @@
 }
 
 .profile-picture {
-    background-image: url('http://neptunolabs.com/images/badillo.jpg');
-    background-size: cover;
-    border-radius: 3px;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
-    width: 240px;
-    height: 240px;
+	background-image: url('http://neptunolabs.com/images/badillo.jpg');
+	background-size: cover;
+	border-radius: 3px;
+	box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+	width: 240px;
+	height: 240px;
 }
 
 .countryflag {
-    background-image: url('http://neptunolabs.com/images/badillo.jpg');
-    background-size: cover;
-    border-radius: 3px;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
-    width: 45px;
-    height: 35px;
+	background-image: url('http://neptunolabs.com/images/badillo.jpg');
+	background-size: cover;
+	border-radius: 3px;
+	box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+	width: 45px;
+	height: 35px;
 }
 
 .organization-logo {
-    background-image: url('http://neptunolabs.com/images/badillo.jpg');
-    background-size: cover;
-    border-radius: 3px;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
-    width: 240px;
-    height: 240px;
+	background-image: url('http://neptunolabs.com/images/badillo.jpg');
+	background-size: cover;
+	border-radius: 3px;
+	box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+	width: 240px;
+	height: 240px;
 }
 
 .team-logo {
-    background-image: url('http://neptunolabs.com/images/badillo.jpg');
-    background-size: cover;
-    border-radius: 3px;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
-    width: 240px;
-    height: 240px;
+	background-image: url('http://neptunolabs.com/images/badillo.jpg');
+	background-size: cover;
+	border-radius: 3px;
+	box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+	width: 240px;
+	height: 240px;
 }
 
 .event-creator {
@@ -147,14 +171,14 @@
 }
 
 .match-avatar {
-    width: 100px;
-    height: 100px;
-    -webkit-border-radius: 3px;
-    -webkit-background-clip: padding-box;
-    -moz-border-radius: 3px;
-    -moz-background-clip: padding;
-    border-radius: 3px;
-    background-clip: padding-box;
+	width: 100px;
+	height: 100px;
+	-webkit-border-radius: 3px;
+	-webkit-background-clip: padding-box;
+	-moz-border-radius: 3px;
+	-moz-background-clip: padding;
+	border-radius: 3px;
+	background-clip: padding-box;
 }
 
 .box-icon {
@@ -195,195 +219,229 @@
 	color: #fff;
 	transition: all 0.5s ease 0s;
 }
-
 /*List snippe*/
 
-
 .tickets-container .tickets-list .ticket-item .ticket-state i {
-    font-size: 13px;
-    color: #fff;
-    line-height: 20px;
+	font-size: 13px;
+	color: #fff;
+	line-height: 20px;
 }
+
 .tickets-container .tickets-list .ticket-item .ticket-state {
-    position: absolute;
-    top: 13px;
-    right: -12px;
-    height: 24px;
-    width: 24px;
-    -webkit-border-radius: 50%;
-    -webkit-background-clip: padding-box;
-    -moz-border-radius: 50%;
-    -moz-background-clip: padding;
-    border-radius: 50%;
-    background-clip: padding-box;
-    background-color: #e5e5e5;
-    text-align: center;
-    -webkit-box-shadow: 0 0 3px rgba(0,0,0,.2);
-    -moz-box-shadow: 0 0 3px rgba(0,0,0,.2);
-    box-shadow: 0 0 3px rgba(0,0,0,.2);
-    border: 2px solid #fff;
+	position: absolute;
+	top: 13px;
+	right: -12px;
+	height: 24px;
+	width: 24px;
+	-webkit-border-radius: 50%;
+	-webkit-background-clip: padding-box;
+	-moz-border-radius: 50%;
+	-moz-background-clip: padding;
+	border-radius: 50%;
+	background-clip: padding-box;
+	background-color: #e5e5e5;
+	text-align: center;
+	-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, .2);
+	-moz-box-shadow: 0 0 3px rgba(0, 0, 0, .2);
+	box-shadow: 0 0 3px rgba(0, 0, 0, .2);
+	border: 2px solid #fff;
 }
+
 .bg-palegreen {
-    background-color: #a0d468!important;
+	background-color: #a0d468!important;
 }
+
 .tickets-container .tickets-list .ticket-item .ticket-type .type {
-    color: #999;
-    font-size: 11px;
-    text-transform: uppercase;
+	color: #999;
+	font-size: 11px;
+	text-transform: uppercase;
 }
+
 .tickets-container .tickets-list .ticket-item .ticket-type {
-    line-height: 30px;
-    height: 50px;
-    padding: 10px;
+	line-height: 30px;
+	height: 50px;
+	padding: 10px;
 }
+
 .tickets-container .tickets-list .ticket-item .ticket-time i {
-    color: #ccc;
-    width:50px;
+	color: #ccc;
+	width: 50px;
 }
 
 .tickets-container .tickets-list .ticket-item .divider {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 50px;
-    width: 1px;
-    background-color: #eee;
-    display: inline-block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 50px;
+	width: 1px;
+	background-color: #eee;
+	display: inline-block;
 }
+
 .tickets-container .tickets-list .ticket-item .ticket-time {
-    line-height: 30px;
-    height: 50px;
-    padding: 10px;
+	line-height: 30px;
+	height: 50px;
+	padding: 10px;
 }
+
 .tickets-container .tickets-list .ticket-item .ticket-user .user-company {
-    margin-left: 2px;
-    color: #999;
+	margin-left: 2px;
+	color: #999;
 }
+
 .tickets-container .tickets-list .ticket-item .ticket-user .user-at {
-    margin-left: 2px;
-    color: #ccc;
-    font-size: 13px;
+	margin-left: 2px;
+	color: #ccc;
+	font-size: 13px;
 }
+
 .tickets-container .tickets-list .ticket-item .ticket-user .user-name {
-    margin-left: 5px;
-    font-size: 13px;
+	margin-left: 5px;
+	font-size: 13px;
 }
+
 .tickets-container .tickets-list .ticket-item .ticket-user .user-avatar {
-    width: 60px;
-    height: 60px;
-    -webkit-border-radius: 3px;
-    -webkit-background-clip: padding-box;
-    -moz-border-radius: 3px;
-    -moz-background-clip: padding;
-    border-radius: 3px;
-    background-clip: padding-box;
+	width: 60px;
+	height: 60px;
+	-webkit-border-radius: 3px;
+	-webkit-background-clip: padding-box;
+	-moz-border-radius: 3px;
+	-moz-background-clip: padding;
+	border-radius: 3px;
+	background-clip: padding-box;
 }
+
 .tickets-container .tickets-list .ticket-item .ticket-user {
-    height: 80px;
-    padding: 10px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
+	height: 80px;
+	padding: 10px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
+
 .tickets-container .tickets-list .ticket-item {
-    position: relative;
-    background-color: #fff;
-    -webkit-box-shadow: 0 0 3px rgba(0,0,0,.2);
-    -moz-box-shadow: 0 0 3px rgba(0,0,0,.2);
-    box-shadow: 0 0 3px rgba(0,0,0,.2);
-    -webkit-border-radius: 3px;
-    -webkit-background-clip: padding-box;
-    -moz-border-radius: 3px;
-    -moz-background-clip: padding;
-    border-radius: 3px;
-    background-clip: padding-box;
-    margin-bottom: 8px;
-    padding: 0 15px;
-    vertical-align: top;
+	position: relative;
+	background-color: #fff;
+	-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, .2);
+	-moz-box-shadow: 0 0 3px rgba(0, 0, 0, .2);
+	box-shadow: 0 0 3px rgba(0, 0, 0, .2);
+	-webkit-border-radius: 3px;
+	-webkit-background-clip: padding-box;
+	-moz-border-radius: 3px;
+	-moz-background-clip: padding;
+	border-radius: 3px;
+	background-clip: padding-box;
+	margin-bottom: 8px;
+	padding: 0 15px;
+	vertical-align: top;
 }
+
+.tickets-container .tickets-list .ticket-item:hover {
+	color: #158cba;
+	-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, .4);
+	-moz-box-shadow: 0 0 3px rgba(0, 0, 0, .4);
+	box-shadow: 0 0 3px rgba(0, 0, 0, .4);
+	cursor: pointer;
+}
+
 .tickets-container .tickets-list {
-    list-style: none;
-    padding: 0;
-    margin-bottom: 0;
+	list-style: none;
+	padding: 0;
+	margin-bottom: 0;
 }
+
 .tickets-container {
-    position: relative;
-    padding: 25px 25px;
-    background-color: #f5f5f5;
+	position: relative;
+	padding: 25px 25px;
 }
+
 .widget-main.no-padding {
-    padding: 0;
+	padding: 0;
 }
+
 .widget-main {
-    padding: 12px;
+	padding: 12px;
 }
+
 .no-padding {
-    padding: 0!important;
+	padding: 0!important;
 }
+
 .widget-body {
-    background-color: #fbfbfb;
-    -webkit-box-shadow: 1px 0 10px 1px rgba(0,0,0,.3);
-    -moz-box-shadow: 1px 0 10px 1px rgba(0,0,0,.3);
-    box-shadow: 1px 0 10px 1px rgba(0,0,0,.3);
+	-webkit-box-shadow: 1px 0 10px 1px rgba(0, 0, 0, .3);
+	-moz-box-shadow: 1px 0 10px 1px rgba(0, 0, 0, .3);
+	box-shadow: 1px 0 10px 1px rgba(0, 0, 0, .3);
 }
 
 .widget-header>.widget-caption {
-    line-height: 33px;
-    padding: 0;
-    margin: 0;
-    float: left;
-    text-align: left;
-    font-weight: 400!important;
-    font-size: 13px;
+	line-height: 33px;
+	padding: 0;
+	margin: 0;
+	float: left;
+	text-align: left;
+	font-weight: 400!important;
+	font-size: 13px;
 }
 
 .widget-header>.widget-title {
-    line-height: 45px;
-    padding: 0;
-    margin: 0;
-    float: left;
-    text-align: left;
-    font-weight: 400!important;
-    
+	line-height: 45px;
+	padding: 0;
+	margin: 0;
+	float: left;
+	text-align: left;
+	display: block;
+	font-weight: 400!important;
+}
+
+.widget-header>.widget-more {
+	line-height: 45px;
+	padding-right: 15px;
+	margin: 0;
+	float: right;
+	text-align: right;
+	font-size: 20px
 }
 
 .widget-header .widget-icon {
-    display: block;
-    width: 30px;
-    height: 32px;
-    position: relative;
-    float: left;
-    font-size: 200%;
-    line-height: 45px;
-    text-align: center;
-    margin-left: -10px;
+	display: block;
+	width: 30px;
+	height: 32px;
+	position: relative;
+	float: left;
+	font-size: 200%;
+	line-height: 45px;
+	text-align: center;
+	margin-left: -10px;
 }
+
 .themesecondary {
-    color: #158cba !important;
+	color: #158cba !important;
 }
+
 .widget-header.bordered-bottom {
-    border-bottom: 3px solid #fff;
+	border-bottom: 3px solid #fff;
 }
 
 .widget-header {
-    position: relative;
-    min-height: 50px;
-    background: #fff;
-    -webkit-box-shadow: 0 0 4px rgba(0,0,0,.3);
-    -moz-box-shadow: 0 0 4px rgba(0,0,0,.3);
-    box-shadow: 0 0 4px rgba(0,0,0,.3);
-    color: #555;
-    padding-left: 12px;
-    text-align: right;
+	position: relative;
+	min-height: 50px;
+	background: #fff;
+	-webkit-box-shadow: 0 0 4px rgba(0, 0, 0, .3);
+	-moz-box-shadow: 0 0 4px rgba(0, 0, 0, .3);
+	box-shadow: 0 0 4px rgba(0, 0, 0, .3);
+	color: #555;
+	padding-left: 12px;
+	text-align: right;
 }
 
 .bordered-themesecondary {
-    border-color: #158cba !important;
+	border-color: #158cba !important;
 }
+
 .widget-box {
-    padding: 0;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-    margin: 3px 0 30px 0;
-}                    
+	padding: 0;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+	margin: 3px 0 30px 0;
+}

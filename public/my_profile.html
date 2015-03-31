@@ -24,6 +24,12 @@
 	<!-- Custom Fonts -->
 	<link href="../bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+		<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
 </head>
 
 <body>
@@ -238,9 +244,9 @@
 						<div class="input-group custom-search-form">
 							<input type="text" class="form-control" placeholder="Search...">
 							<span class="input-group-btn">
-									<button class="btn btn-default" type="button" onclick="window.location.href='search_page.html'">
-										<i class="fa fa-search"></i>
-									</button> </span>
+										<button class="btn btn-default" type="button" onclick="window.location.href='search_page.html'">
+											<i class="fa fa-search"></i>
+										</button> </span>
 						</div>
 						<!-- /input-group -->
 					</li>
@@ -297,9 +303,174 @@
 	<!-- Page Content -->
 	<div id="page-wrapper">
 		<div class="container-fluid custom-padding">
+			<div class="blur-cover"></div>
+			<div class="box box-margin">
+				<div class="row">
+					<div class="col-xs-12 col-md-6 col-lg-6">
+						<p class="info-title">
+							User Name
+						</p>
+						<div class="row" align="center">
+							<div class="profile-picture"></div>
+							<p class="info-title">
+								User tag
+							</p>
+							<p class="info-paragraph">
+								Country Name
+							</p>
+							<div class="countryflag"></div>
+							<br />
+						</div>
+					</div>
+					<div class="col-xs-12 col-md-6 col-lg-6">
+						<div class="row" align="center">
+							<h3>About</h3>
+							<div class="center">
+								<p class="info-paragraph">
+									Raw denim Truffaut proident wolf, asymmetrical mollit exercitation. Tousled est art party wayfarers. Cupidatat ullamco gluten-free Schlitz listicle. Fixie literally normcore, DIY eu jean shorts Truffaut Helvetica actually mlkshk put a bird on it cold-pressed tilde. Tempor biodiesel Shoreditch ennui assumenda skateboard. Literally fixie fanny pack commodo organic, plaid raw denim viral delectus cornhole church-key tofu master cleanse pariatur. Food truck viral anim tilde aute PBR consequat leggings, aliqua single-origin coffee salvia quinoa enim qui wayfarers.
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div  class="col-md-3 col-md-offset-9">
+						<a class="btn btn-primary btn-block" onclick="window.location.href='edit_profile.html'">Edit</a>
+					</div>
+				</div>				
+			</div>
+
+			<!-- Standings widget -->
+			<div class="widget-box box-margin">
+				<div class="widget-header bordered-bottom bordered-themesecondary">
+					<h3 class="widget-title themesecondary">Standings</h3>
+					<a class="widget-more" onclick="window.location.href='user_standings.html'">
+						See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
+					</a>
+				</div>
+				<!--Widget Header-->
+				<div class="widget-body">
+					<div class="widget-main no-padding">
+						<div class="tickets-container">
+							<table class="table table-striped table-hover">
+								<thead>
+									<tr>
+										<th>Placing</th>
+										<th>Event</th>
+										<th>Tournament</th>
+										<th>Date</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="cursor" onclick="window.location.href='tournament_page.html'">
+										<td>5th</td>
+										<td>Apex 2015</td>
+										<td>Halo 4</td>
+										<td>March 1, 2015</td>
+									</tr>
+									<tr class="cursor" onclick="window.location.href='tournament_page.html'">
+										<td>5th</td>
+										<td>Apex 2015</td>
+										<td>Halo 4</td>
+										<td>March 1, 2015</td>
+									</tr>
+									<tr class="cursor" onclick="window.location.href='tournament_page.html'">
+										<td>5th</td>
+										<td>Apex 2015</td>
+										<td>Halo 4</td>
+										<td>March 1, 2015</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Standings widget -->
+
+			<!-- Teams widget -->
 			<div class="widget-box">
 				<div class="widget-header bordered-bottom bordered-themesecondary">
-					<h3 class="widget-title themesecondary">Live</h3>
+					<h3 class="widget-title themesecondary">Teams</h3>
+					<a class="widget-more" onclick="window.location.href='user_teams.html'">
+						See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
+					</a>
+				</div>
+				<!--Widget Header-->
+				<div class="widget-body">
+					<div class="widget-main no-padding">
+						<div class="tickets-container">
+							<div class="row" style="padding-left: 15px">
+								<div class="col-md-3 col-sm-4 col-xs-6">
+									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='team_page.html'">
+										<hr class="hr-custom-padding">
+										<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+											overflow: hidden;">
+											<p class="thumbnail-title" onclick="window.location.href='team_page.html'">
+												Team Name
+											</p>
+											<p class="thumbnail-paragraph">
+												Captain: Name
+											</p>
+										</div>
+									</a>
+								</div>
+								<div class="col-md-3 col-sm-4 col-xs-6">
+									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='team_page.html'">
+										<hr class="hr-custom-padding">
+										<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+											overflow: hidden;">
+											<p class="thumbnail-title" onclick="window.location.href='team_page.html'">
+												Team Name
+											</p>
+											<p class="thumbnail-paragraph">
+												Captain: Name
+											</p>
+										</div>
+									</a>
+								</div>
+								<div class="col-md-3 col-sm-4 col-xs-6">
+									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='team_page.html'">
+										<hr class="hr-custom-padding">
+										<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+											overflow: hidden;">
+											<p class="thumbnail-title" onclick="window.location.href='team_page.html'">
+												Team Name
+											</p>
+											<p class="thumbnail-paragraph">
+												Captain: Name
+											</p>
+										</div>
+									</a>
+								</div>
+								<div class="col-md-3 col-sm-4 col-xs-6">
+									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='team_page.html'">
+										<hr class="hr-custom-padding">
+										<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+											overflow: hidden;">
+											<p class="thumbnail-title" onclick="window.location.href='team_page.html'">
+												Team Name
+											</p>
+											<p class="thumbnail-paragraph">
+												Captain: Name
+											</p>
+										</div>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Teams widget -->
+
+			<!-- User Events widget -->
+			<div class="widget-box">
+				<div class="widget-header bordered-bottom bordered-themesecondary">
+					<h3 class="widget-title themesecondary">User Events</h3>
+					<a class="widget-more" onclick="window.location.href='user_events.html'">
+						See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
+					</a>
 				</div>
 				<!--Widget Header-->
 				<div class="widget-body">
@@ -310,12 +481,12 @@
 									<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
 										<hr class="hr-custom-padding">
 										<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-										overflow: hidden;">
+											overflow: hidden;">
 											<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
 												Event Name
 											</p>
 											<p class="thumbnail-paragraph">
-												Staples Center
+												Staple Centersdafdfgdfgsdfgsdfgsdfgdfgsdfgasdfasdf
 											</p>
 											<p class="thumbnail-paragraph">
 												January 2, 8:00PM
@@ -327,12 +498,12 @@
 									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
 										<hr class="hr-custom-padding">
 										<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-										overflow: hidden;">
+											overflow: hidden;">
 											<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
 												Event Name
 											</p>
 											<p class="thumbnail-paragraph">
-												Staples Center
+												Staple Centersdafdfgdfgsdfgsdfgsdfgdfgsdfgasdfasdf
 											</p>
 											<p class="thumbnail-paragraph">
 												January 2, 8:00PM
@@ -344,12 +515,12 @@
 									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
 										<hr class="hr-custom-padding">
 										<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-										overflow: hidden;">
+											overflow: hidden;">
 											<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
 												Event Name
 											</p>
 											<p class="thumbnail-paragraph">
-												Staples Center
+												Staple Centersdafdfgdfgsdfgsdfgsdfgdfgsdfgasdfasdf
 											</p>
 											<p class="thumbnail-paragraph">
 												January 2, 8:00PM
@@ -361,12 +532,12 @@
 									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
 										<hr class="hr-custom-padding">
 										<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-										overflow: hidden;">
+											overflow: hidden;">
 											<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
 												Event Name
 											</p>
 											<p class="thumbnail-paragraph">
-												Staples Center
+												Staple Centersdafdfgdfgsdfgsdfgsdfgdfgsdfgasdfasdf
 											</p>
 											<p class="thumbnail-paragraph">
 												January 2, 8:00PM
@@ -379,9 +550,15 @@
 					</div>
 				</div>
 			</div>
+			<!-- User Events widget-->
+
+			<!-- Organizations widget-->
 			<div class="widget-box">
 				<div class="widget-header bordered-bottom bordered-themesecondary">
-					<h3 class="widget-title themesecondary">Premium</h3>
+					<h3 class="widget-title themesecondary">Organizations</h3>
+					<a class="widget-more" onclick="window.location.href='user_organizations.html'">
+						See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
+					</a>
 				</div>
 				<!--Widget Header-->
 				<div class="widget-body">
@@ -389,69 +566,45 @@
 						<div class="tickets-container">
 							<div class="row" style="padding-left: 15px">
 								<div class="col-md-3 col-sm-4 col-xs-6">
-									<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
+									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='organization_profile1.0.html'">
 										<hr class="hr-custom-padding">
 										<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-										overflow: hidden;">
-											<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
-												Event Name
-											</p>
-											<p class="thumbnail-paragraph">
-												Staples Center
-											</p>
-											<p class="thumbnail-paragraph">
-												January 2, 8:00PM
+											overflow: hidden;">
+											<p class="thumbnail-title" align="center" onclick="window.location.href='organization_profile1.0.html'">
+												Organization Name
 											</p>
 										</div>
 									</a>
 								</div>
 								<div class="col-md-3 col-sm-4 col-xs-6">
-									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
+									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='organization_profile1.0.html'">
 										<hr class="hr-custom-padding">
 										<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-										overflow: hidden;">
-											<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
-												Event Name
-											</p>
-											<p class="thumbnail-paragraph">
-												Staples Center
-											</p>
-											<p class="thumbnail-paragraph">
-												January 2, 8:00PM
+											overflow: hidden;">
+											<p class="thumbnail-title" align="center" onclick="window.location.href='organization_profile1.0.html'">
+												Organization Name
 											</p>
 										</div>
 									</a>
 								</div>
 								<div class="col-md-3 col-sm-4 col-xs-6">
-									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
+									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='organization_profile1.0.html'">
 										<hr class="hr-custom-padding">
 										<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-										overflow: hidden;">
-											<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
-												Event Name
-											</p>
-											<p class="thumbnail-paragraph">
-												Staples Center
-											</p>
-											<p class="thumbnail-paragraph">
-												January 2, 8:00PM
+											overflow: hidden;">
+											<p class="thumbnail-title" align="center" onclick="window.location.href='organization_profile1.0.html'">
+												Organization Name
 											</p>
 										</div>
 									</a>
 								</div>
 								<div class="col-md-3 col-sm-4 col-xs-6">
-									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
+									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='organization_profile1.0.html'">
 										<hr class="hr-custom-padding">
 										<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-										overflow: hidden;">
-											<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
-												Event Name
-											</p>
-											<p class="thumbnail-paragraph">
-												Staples Center
-											</p>
-											<p class="thumbnail-paragraph">
-												January 2, 8:00PM
+											overflow: hidden;">
+											<p class="thumbnail-title" align="center" onclick="window.location.href='organization_profile1.0.html'">
+												Organization Name
 											</p>
 										</div>
 									</a>
@@ -461,118 +614,8 @@
 					</div>
 				</div>
 			</div>
-			<div class="widget-box">
-				<div class="widget-header bordered-bottom bordered-themesecondary">
-					<h3 class="widget-title themesecondary">Regular</h3>
-				</div>
-				<!--Widget Header-->
-				<div class="widget-body">
-					<div class="widget-main no-padding">
-						<div class="tickets-container">
-							<div class="row" style="padding-left: 15px">
-								<div class="col-md-3 col-sm-4 col-xs-6">
-									<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." onclick="window.location.href='tournament_page.html'">
-										<hr class="hr-custom-padding">
-										<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-										overflow: hidden;">
-											<p class="thumbnail-title" onclick="window.location.href='tournament_page.html'">
-												Event Name
-											</p>
-											<p class="thumbnail-paragraph">
-												Staples Center
-											</p>
-											<p class="thumbnail-paragraph">
-												January 2, 8:00PM
-											</p>
-										</div>
-									</a>
-								</div>
-								<div class="col-md-3 col-sm-4 col-xs-6">
-									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='tournament_page.html'">
-										<hr class="hr-custom-padding">
-										<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-										overflow: hidden;">
-											<p class="thumbnail-title" onclick="window.location.href='tournament_page.html'">
-												Event Name
-											</p>
-											<p class="thumbnail-paragraph">
-												Staples Center
-											</p>
-											<p class="thumbnail-paragraph">
-												January 2, 8:00PM
-											</p>
-										</div>
-									</a>
-								</div>
-								<div class="col-md-3 col-sm-4 col-xs-6">
-									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='tournament_page.html'">
-										<hr class="hr-custom-padding">
-										<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-										overflow: hidden;">
-											<p class="thumbnail-title" onclick="window.location.href='tournament_page.html'">
-												Event Name
-											</p>
-											<p class="thumbnail-paragraph">
-												Staples Center
-											</p>
-											<p class="thumbnail-paragraph">
-												January 2, 8:00PM
-											</p>
-										</div>
-									</a>
-								</div>
-								<div class="col-md-3 col-sm-4 col-xs-6">
-									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='tournament_page.html'">
-										<hr class="hr-custom-padding">
-										<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-										overflow: hidden;">
-											<p class="thumbnail-title" onclick="window.location.href='tournament_page.html'">
-												Event Name
-											</p>
-											<p class="thumbnail-paragraph">
-												Staples Center
-											</p>
-											<p class="thumbnail-paragraph">
-												January 2, 8:00PM
-											</p>
-										</div>
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="widget-box">
-				<div class="widget-header bordered-bottom bordered-themesecondary">
-					<h3 class="widget-title themesecondary">Popular Games</h3>
-				</div>
-				<!--Widget Header-->
-				<div class="widget-body">
-					<div class="widget-main no-padding">
-						<div class="tickets-container">
-							<div class="row" style="padding-left: 15px">
-								<div class="col-md-3 col-sm-4 col-xs-6">
-									<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." onclick="window.location.href='game_events.html'">
-									</a>
-								</div>
-								<div class="col-md-3 col-sm-4 col-xs-6">
-									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='game_events.html'">
-									</a>
-								</div>
-								<div class="col-md-3 col-sm-4 col-xs-6">
-									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='game_events.html'">
-									</a>
-								</div>
-								<div class="col-md-3 col-sm-4 col-xs-6">
-									<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='game_events.html'">
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+			<!-- Organizations widget -->
+
 		</div>
 		<!-- /.container-fluid -->
 	</div>
