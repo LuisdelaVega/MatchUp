@@ -132,23 +132,23 @@ function assignStationsForFinalStage(tournament, station) {
 	} else {
 		if (station < tournament.stations.length) {
 			var iter = 0;
-			for (var i = 0; i < tournament.groupStage.groups.length && station < tournament.stations.length; i++) {
-				for (var j = 0; j < tournament.groupStage.groups[i].rounds.length && station < tournament.stations.length; j++) {
-					iter += tournament.groupStage.groups[i].rounds[j].matches.length;
+			for (var i = 0; i < tournament.group.groups.length && station < tournament.stations.length; i++) {
+				for (var j = 0; j < tournament.group.groups[i].rounds.length && station < tournament.stations.length; j++) {
+					iter += tournament.group.groups[i].rounds[j].matches.length;
 				}
 			}
 
 			var group = round = match = 0;
 			for (var i = 0; i < iter && station < tournament.stations.length; i++) {
 
-				if (match < tournament.groupStage.groups[group%tournament.groupStage.groups.length].rounds[round].matches.length) {
-					tournament.groupStage.groups[group%tournament.groupStage.groups.length].rounds[round].matches[match].is_played_in = tournament.stations[station].station_number;
+				if (match < tournament.group.groups[group%tournament.group.groups.length].rounds[round].matches.length) {
+					tournament.group.groups[group%tournament.group.groups.length].rounds[round].matches[match].is_played_in = tournament.stations[station].station_number;
 					tournament.stations[station++].station_in_use = true;
 				}
-				group = (++group % tournament.groupStage.groups.length);
-				if (!(group % tournament.groupStage.groups.length)) {
+				group = (++group % tournament.group.groups.length);
+				if (!(group % tournament.group.groups.length)) {
 					match++;
-					if (match == tournament.groupStage.groups[group%tournament.groupStage.groups.length].rounds[round].matches.length) {
+					if (match == tournament.group.groups[group%tournament.group.groups.length].rounds[round].matches.length) {
 						match = 0;
 						round++;
 					}
