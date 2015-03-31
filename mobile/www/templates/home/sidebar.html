@@ -16,11 +16,11 @@
     <ion-side-menu side="left">
         <ion-content>
             <div class="list list-cover">
-                <a class="full-width" href="#/app/profile/summary" nav-clear menu-close>
-                    <div class="blur-cover">
+                <a class="full-width" ng-click="goToProfile(loggedInUserProfileData.info.customer_username)" nav-clear menu-close>
+                    <div class="blur-cover" ng-style="{'background': coverPhotoCSS}">
                         <header class="padding">
-                            <div class="img-circular no-border mini"></div>
-                            <h4>Rapol</h4>
+                            <div class="img-circular no-border mini" ng-style="{'background-image': profilePictureCSS}"></div>
+                            <h4>{{loggedInUserProfileData.info.customer_tag}}</h4>
                         </header>
                     </div>
                 </a>

@@ -20,7 +20,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     });
 })
 
-    .config(function ($stateProvider, $urlRouterProvider) {
+    .config(function ($stateProvider, $urlRouterProvider, $httpProvider) {
     $stateProvider
     //================================================================================
     // Parent Home View
@@ -31,6 +31,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
                                 that can't be transitioned to. It is activated implicitly when one of its descendants are activated*/
         abstract: true,
         templateUrl: "templates/home/sidebar.html",
+        controller: "sidebarController"
     })
         .state('app.home', {
         url: "/home",
@@ -69,47 +70,46 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
         controller: "ProfileController"
     })
         .state('app.profile.summary', {
-        url: "/summary",
+        url: "/summary/:username",
         views: {
             'profile-summary-tab': {
                 templateUrl: "templates/profile/profile-summary.html",
+                controller: "profileSummaryController"
             }
         }
     })
         .state('app.profile.standings', {
-        url: "/standings",
+        url: "/standings/:username",
         views: {
             'profile-standings-tab': {
                 templateUrl: "templates/profile/profile-standings.html",
             }
         }
     })
-        .state('app.profile.teams', {
-        url: "/teams",
-        views: {
-            'profile-summary-tab': {
-                templateUrl: "templates/team/teams-list.html"
-            }
-        }
+        .state('app.teams', {
+        url: "/teams/:username",
+        templateUrl: "templates/team/teams-list.html",
+        controller: "profileTeamsController"
+
+
     })
-        .state('app.profile.organizations', {
-        url: "/organizations",
-        views: {
-            'profile-summary-tab': {
-                templateUrl: "templates/organization/organizations-list.html"
-            }
-        }
+        .state('app.organizations', {
+        url: "/organizations/:username",
+        templateUrl: "templates/organization/organizations-list.html",
+        controller: "profileOrganizationsController"
+
     })
         .state('app.profile.events', {
-        url: "/events",
+        url: "/events/:username",
         views: {
             'profile-events-tab': {
-                templateUrl: "templates/profile/profile-events.html",
+                templateUrl: "templates/profile/profile-events.html",               
+                controller: "profileEventsController"
             }
         }
     })
         .state('app.editprofile', {
-        url: "/editprofile",
+        url: "/editprofile/:username",
         templateUrl: "templates/profile/edit-profile.html",
     })
     //================================================================================
@@ -475,11 +475,20 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     })
         .state('login', {
         url: "/login",
-        templateUrl: "templates/profile/login.html"
+        templateUrl: "templates/profile/login.html",
+        controller: "loginController"     
     });
 
     // if none of the above states are matched, use this as the fallback
     $urlRouterProvider.otherwise('/login');
+
+
+
+    //Authentication stuff
+    $httpProvider.defaults.useXDomain = true;
+
+    delete $httpProvider.defaults.headers.common["X-Requested-With"];
+
 })
     .factory('sharedDataService', function () {
     var savedData = {}

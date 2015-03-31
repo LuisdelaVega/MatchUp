@@ -8,35 +8,11 @@
     </ion-nav-buttons>
     <ion-content>
         <div class="list list-inset">
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Street Fighter 1v1</h2>
-                <p>March 2, 2015
-                    <br>In my house</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Street Fighter 1v1</h2>
-                <p>March 2, 2015
-                    <br>In my house</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Street Fighter 1v1</h2>
-                <p>March 2, 2015
-                    <br>In my house</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Street Fighter 1v1</h2>
-                <p>March 2, 2015
-                    <br>In my house</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/streetFighter.jpg">
-                <h2>Street Fighter 1v1</h2>
-                <p>March 2, 2015
-                    <br>In my house</p>
+            <a class="item item-thumbnail-left" href="#" ng-repeat="event in eventsData">
+                <img ng-src="{{event.event_logo}}">
+                <h2>{{ event.event_name }}</h2>
+                <p>{{ event_start_date | date: 'medium' }}
+                    <br>{{ event.event_location }}</p>
             </a>
         </div>
     </ion-content>

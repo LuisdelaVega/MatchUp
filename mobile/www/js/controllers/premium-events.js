@@ -37,6 +37,7 @@ myApp.controller('postNewsController', function ($scope, $stateParams, $state, s
 
     $scope.eventName = values[1];
 
+    //Might require change remember to look into
     $scope.goToEvent = function(eventName){
 
         eventName = eventName.replace(" ", "%20");

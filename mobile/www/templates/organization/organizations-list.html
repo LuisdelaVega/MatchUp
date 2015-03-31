@@ -1,6 +1,6 @@
 <ion-view title="Organizations">
     <ion-nav-buttons side="left">
-        <button class="button button-icon" onclick="location.href='#/app/profile/summary'">
+        <button class="button button-icon" ng-click="gotToProfile(customerUsername)">
             <i class="icon ion-ios-arrow-back"></i>
         </button>
     </ion-nav-buttons>
@@ -10,20 +10,9 @@
     </ion-nav-buttons>
     <ion-content>
         <div class="list list-inset">
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/esportPR.png">
-                <h2>EsportsPR</h2>
-                <p>Owners: Maricarmen Vargas, Mono</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/esportPR.png">
-                <h2>EsportsPR</h2>
-                <p>Owners: Maricarmen Vargas, Mono</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/esportPR.png">
-                <h2>EsportsPR</h2>
-                <p>Owners: Maricarmen Vargas, Mono</p>
+            <a class="item item-thumbnail-left" href="#" ng-repeat="organization in organizationsData">
+                <img ng-src="{{organization.organization_logo}}">
+                <h2>{{ organization.organization_name }}</h2>
             </a>
         </div>
     </ion-content>

@@ -68,7 +68,7 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
         });
 
     };
-    
+
     $scope.goToGameProfile = function (gameName, gameImage) {
         var params = [gameName, gameImage];
         sharedDataService.set(params);
@@ -123,7 +123,7 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$
         });
 
     }
-    
+
     $scope.goToEvent = function(eventName, date, location){
 
         eventName = eventName.replace(" ", "%20");
@@ -151,7 +151,7 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$
         });
 
     };
-    
+
     $scope.goToGameProfile = function (gameName, gameImage) {
         var params = [gameName, gameImage];
         sharedDataService.set(params);
@@ -214,8 +214,8 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
         $scope.searchData = searchData.genres;
         $scope.genres = true;
     }
-    
-    
+
+
     $scope.goToEvent = function(eventName, date, location){
 
         eventName = eventName.replace(" ", "%20");
@@ -243,14 +243,14 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
         });
 
     };
-    
+
     $scope.goToGameProfile = function (gameName, gameImage) {
         var params = [gameName, gameImage];
         sharedDataService.set(params);
         $state.go('app.game.summary', {"gamename": gameName});
     };
-    
-    
+
+
 }]);
 
 myApp.controller('cameraReportController', ['$scope', '$http', 'Camera', function ($scope, $http, Camera) {
@@ -304,11 +304,75 @@ myApp.controller('popularGameViewController', ['$scope', '$http', '$state', 'sha
     $scope.allGamesIsEmpty = function () {
         return allGames.length > 0;    
     };
-    
+
     $scope.goToGameProfile = function (gameName, gameImage) {
         var params = [gameName, gameImage];
         sharedDataService.set(params);
         $state.go('app.game.summary', {"gamename": gameName});
     };
-    
+
+}]);
+
+myApp.controller('loginController', ['$scope', '$http', '$state', 'sharedDataService', '$window', function ($scope, $http, $state, sharedDataService, $window) {
+
+    $scope.credentials = { };
+
+    $scope.error = false;
+    $scope.login = function () {
+
+        // Base 64 encoding
+        var AuHeader = 'Basic ' + btoa($scope.credentials.userEmail + ':' + $scope.credentials.userPassword);
+        var config = {
+            headers: {
+                'Authorization': AuHeader
+            }
+        }; 
+
+        $http.post('http://136.145.116.232/login', {}, config).success(function (data) {
+            var tokenObj = angular.fromJson(data);
+            // save token in session
+            $window.sessionStorage.token = tokenObj.token;
+            console.log($window.sessionStorage.token);
+            // reset error variable
+            $scope.error = false;
+            // change view
+            $state.go('app.home');
+        }).error(function (err) {
+            $scope.error = true;
+        });
+    };
+}]);
+
+myApp.controller('sidebarController', ['$scope', '$http', '$state', 'sharedDataService', '$window', function ($scope, $http, $state, sharedDataService, $window) {
+
+    $scope.$on('$ionicView.enter', function () {
+
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+
+        $scope.goToProfile = function (customer_username) {
+
+            sharedDataService.set(customer_username);
+            $state.go('app.profile.summary', { "username":  customer_username});
+            
+        };
+
+        $http.get('http://136.145.116.232/matchup/profile', config).success(function (data) {
+
+            $scope.profileData = data;
+            $scope.loggedInUserProfileData = angular.fromJson(data);
+            $scope.coverPhotoCSS = "linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.6)), url("+data.info.customer_cover_photo+")";
+            $scope.profilePictureCSS =  "url("+data.info.customer_profile_pic+")";
+
+            console.log($scope.loggedInUserProfileData);
+
+        }).error(function (err) {
+            console.log(err);
+
+        });
+    });
 }]);

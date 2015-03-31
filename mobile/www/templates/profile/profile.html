@@ -1,12 +1,12 @@
 <ion-view>
     <ion-tabs class="tabs-positive">
-        <ion-tab title="Summary" href="#/app/profile/summary">
+        <ion-tab title="Summary" href="#/app/profile/summary/{{ customerUsername }}">
             <ion-nav-view name="profile-summary-tab"></ion-nav-view>
         </ion-tab>
-        <ion-tab title="Standings" href="#/app/profile/standings">
+        <ion-tab title="Standings" href="#/app/profile/standings/{{ customerUsername }}">
             <ion-nav-view name="profile-standings-tab"></ion-nav-view>
         </ion-tab>
-        <ion-tab title="Events" href="#/app/profile/events">
+        <ion-tab title="Events" href="#/app/profile/events/{{ customerUsername }}">
             <ion-nav-view name="profile-events-tab"></ion-nav-view>
         </ion-tab>
     </ion-tabs>
