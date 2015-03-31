@@ -1,6 +1,7 @@
-//TODO Create Event
 //TODO Subscribe to user
 //TODO Unsubscribe to user
+//TODO Register for Event
+//TODO Register for Tournament
 
 //TODO Calculate the matches won/lost for the profile pages
 var getMyProfile = function(req, res, pg, conString) {
@@ -318,17 +319,15 @@ var requestOrganization = function(req, res, pg, conString) {
 	});
 };
 
+//TODO Comparar los deadlines con las fechas de torneos y eventos
+//TODO Comparar los dates de torneos con eventos
+//TODO Check if game is in DB
 var createEvent = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
-		// var date = new Date(req.query.date);
-		// if (!(date.getTime())) {
-		// client.end();
-		// res.status(400).send('Invalid date');
-		// } else {
-		// }
+
 		client.query("START TRANSACTION");
 		var eventStartDate = new Date(req.body.event.start_date);
 		var eventEndDate = new Date(req.body.event.end_date);
@@ -336,7 +335,7 @@ var createEvent = function(req, res, pg, conString) {
 		if (!(eventStartDate.getTime()) || !(eventEndDate.getTime()) || !(eventRegistrationDeadline.getTime())) {
 			client.end();
 			res.status(400).send('Invalid date');
-		} else {//Math.floor(num * 100) / 100
+		} else {
 			client.query({
 				text : "INSERT INTO event (event_name, event_start_date, event_location, customer_username, event_venue, event_banner, event_logo, event_end_date, event_registration_deadline, event_rules, event_description, event_deduction_fee, event_is_online, event_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 				values : [req.body.event.name, req.body.event.start_date, req.body.event.location, req.user.username, req.body.event.venue, req.body.event.banner, req.body.event.logo, req.body.event.end_date, req.body.event.registration_deadline, req.body.event.rules, req.body.event.description, req.body.event.deduction_fee, req.body.event.is_online, req.body.event.type]
@@ -346,44 +345,98 @@ var createEvent = function(req, res, pg, conString) {
 					client.end();
 				} else {
 					if (!req.query.hosted) {
-						client.query({
-							text : "INSERT INTO tournament (event_name, event_start_date, event_location, tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
-							values : [req.body.event.name, req.body.event.start_date, req.body.event.location, req.body.tournament[0].name, req.body.tournament[0].game, req.body.tournament[0].rules, req.body.tournament[0].teams, req.body.tournament[0].start_date, req.body.tournament[0].deadline, 0, 32, 0, req.body.tournament[0].type, req.body.tournament[0].format, req.body.tournament[0].scoring, ((req.body.tournament[0].type === "Two-Stage") ? req.body.tournament[0].group_players : 0), ((req.body.tournament[0].type === "Two-Stage") ? req.body.tournament[0].group_winners : 0)]
-						}, function(err, result) {
-							if (err) {
-								res.status(500).send("Oh, no! Disaster!");
-								client.end();
-							} else {
-								client.query("COMMIT");
-								client.end();
-								res.status(201).json({
-									name : req.body.event.name,
-									start_date : req.body.event.start_date,
-									location : req.body.event.location
-								});
-							}
-						});
-					} else {
-						var tournament = req.body.tournament;
-						for (var i = 0; i < tournament.length; i++) {
+						var startDate = new Date(req.body.tournament[0].start_date);
+						var checkInDeadline = new Date(req.body.tournament[0].deadline);
+						if (!(startDate.getTime()) || !(checkInDeadline.getTime())) {
+							client.end();
+							res.status(400).send('Invalid date');
+						} else {
 							client.query({
 								text : "INSERT INTO tournament (event_name, event_start_date, event_location, tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
-								values : [req.body.event.name, req.body.event.start_date, req.body.event.location, tournament[i].name, tournament[i].game, tournament[i].rules, tournament[i].teams, tournament[i].start_date, tournament[i].deadline, Math.floor(tournament[i].fee * 100) / 100, tournament[i].capacity, Math.floor(tournament[i].seed_money * 100) / 100, tournament[i].type, tournament[i].format, tournament[i].scoring, ((tournament[i].type === "Two-Stage") ? tournament[i].group_players : 0), ((tournament[i].type === "Two-Stage") ? tournament[i].group_winners : 0)]
+								values : [req.body.event.name, req.body.event.start_date, req.body.event.location, req.body.tournament[0].name, req.body.tournament[0].game, req.body.tournament[0].rules, req.body.tournament[0].teams, req.body.tournament[0].start_date, req.body.tournament[0].deadline, 0, 32, 0, req.body.tournament[0].type, req.body.tournament[0].format, req.body.tournament[0].scoring, ((req.body.tournament[0].type === "Two-Stage") ? req.body.tournament[0].group_players : 0), ((req.body.tournament[0].type === "Two-Stage") ? req.body.tournament[0].group_winners : 0)]
 							}, function(err, result) {
 								if (err) {
 									res.status(500).send("Oh, no! Disaster!");
 									client.end();
+								} else {
+									client.query("COMMIT");
+									client.end();
+									res.status(201).json({
+										name : req.body.event.name,
+										start_date : req.body.event.start_date,
+										location : req.body.event.location
+									});
 								}
 							});
 						}
+					} else {
+						var tournament = req.body.tournament;
+						var i = 0;
+						for (i = 0; i < tournament.length; i++) {
+							if (!((new Date(req.body.tournament[i].start_date)).getTime()) || !((new Date(req.body.tournament[i].deadline)).getTime())) {
+								client.end();
+								res.status(400).send('Invalid date');
+							} else {
+								// console.log(tournament[i]);
+								client.query({
+									text : "INSERT INTO tournament (event_name, event_start_date, event_location, tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
+									values : [req.body.event.name, req.body.event.start_date, req.body.event.location, tournament[i].name, tournament[i].game, tournament[i].rules, tournament[i].teams, tournament[i].start_date, tournament[i].deadline, Math.floor(tournament[i].fee * 100) / 100, tournament[i].capacity, Math.floor(tournament[i].seed_money * 100) / 100, tournament[i].type, tournament[i].format, tournament[i].scoring, ((tournament[i].type === "Two-Stage") ? tournament[i].group_players : 0), ((tournament[i].type === "Two-Stage") ? tournament[i].group_winners : 0)]
+								}, function(err, result) {
+									if (err) {
+										res.status(500).send("Oh, no! Disaster in tournament!");
+										client.end();
+									}
+								});
+							}
+						}
 						if (i == tournament.length) {
-							client.query("COMMIT");
-							client.end();
-							res.status(201).json({
-								name : req.body.event.name,
-								start_date : req.body.event.start_date,
-								location : req.body.event.location
-							});
+							var fees = req.body.fees;
+							var j = 0;
+							for (j = 0; j < fees.length; j++) {
+								// console.log(fees[j]);
+								client.query({
+									text : "INSERT INTO spectator_fee (event_name, event_start_date, event_location, spec_fee_name, spec_fee_amount, spec_fee_description, spec_fee_amount_available) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+									values : [req.body.event.name, req.body.event.start_date, req.body.event.location, fees[j].name, Math.floor(fees[j].amount * 100) / 100, fees[j].description, fees[j].available]
+								}, function(err, result) {
+									if (err) {
+										res.status(500).send("Oh, no! Disaster in fees!");
+										client.end();
+									}
+								});
+							}
+							if (j == fees.length) {
+								var profileQuery = client.query({
+									text : "SELECT customer_username FROM customer NATURAL JOIN belongs_to NATURAL JOIN organization WHERE customer_username = $1 AND organization_name = $2 AND customer_active AND organization_active",
+									values : [req.user.username, req.body.host]
+								});
+								profileQuery.on("row", function(row, result) {
+									result.addRow(row);
+								});
+								profileQuery.on("end", function(result) {
+									if (result.rows.length > 0) {
+										client.query({
+											text : "INSERT INTO hosts (event_name, event_start_date, event_location, organization_name) VALUES ($1, $2, $3, $4)",
+											values : [req.body.event.name, req.body.event.start_date, req.body.event.location, req.body.host]
+										}, function(err, result) {
+											if (err) {
+												res.status(500).send("Oh, no! Disaster!");
+												client.end();
+											} else {
+												client.query("COMMIT");
+												client.end();
+												res.status(201).json({
+													name : req.body.event.name,
+													start_date : req.body.event.start_date,
+													location : req.body.event.location
+												});
+											}
+										});
+									} else {
+										client.end();
+										res.status(403).send("You are not a member of " + req.body.host);
+									}
+								});
+							}
 						}
 					}
 				}
@@ -391,18 +444,6 @@ var createEvent = function(req, res, pg, conString) {
 		}
 	});
 };
-
-/*
- else {
- client.query("COMMIT");
- client.end();
- res.status(201).json({
- name : req.body.event.name,
- start_date : req.body.event.start_date,
- location : req.body.event.location
- });
- }
- * */
 
 module.exports.getMyProfile = getMyProfile;
 module.exports.getUserProfile = getUserProfile;

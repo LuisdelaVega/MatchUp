@@ -6,10 +6,8 @@
 //TODO Edit Station details
 //TODO Edit Sponsors details
 //TODO Delete Event
-//TODO Delete Tournament
-//TODO Delete Sponsor
-//TODO Register for Event
-//TODO Register for Tournament
+//TODO Remove Tournament
+//TODO Remove Sponsor
 
 //TODO Regular events can't have: News, Reviews, Meetups
 //TODO Check for visibility of event when posting (News, Reviews, Meetups)
