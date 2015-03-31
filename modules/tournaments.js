@@ -103,7 +103,7 @@ function assignStationsForGroupStage(tournament, station) {
 function assignStationsForFinalStage(tournament, station) {
 	if (tournament.format === "Single Elimination" || tournament.format === "Double Elimination") {
 		if (station < tournament.stations.length) {
-			if (tournament.bracket.format === "single") {
+			if (tournament.bracket.format === "Single Elimination") {
 				for (var i = 0; i < tournament.bracket.winnerRounds.length && station < tournament.stations.length; i++) {
 					for (var j = 0; j < tournament.bracket.winnerRounds[i].matches.length && station < tournament.stations.length; j++) {
 						tournament.bracket.winnerRounds[i].matches[j].is_played_in = tournament.stations[station].station_number;
