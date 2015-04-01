@@ -1,3 +1,6 @@
+//TODO Request to add Sponsor
+//TODO Remove Sponsor
+
 var getOrganizations = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -144,7 +147,7 @@ var addOrganizationMember = function(req, res, pg, conString) {
 				if (req.query.owner) {
 					var queryMember = client.query({
 						text : "SELECT customer_username FROM customer WHERE customer_username = $1 AND customer_active",
-						values : [req.params.username]
+						values : [req.query.username]
 					});
 					queryMember.on("row", function(row, result) {
 						result.addRow(row);
@@ -153,7 +156,7 @@ var addOrganizationMember = function(req, res, pg, conString) {
 						if (result.rows.length > 0) {
 							client.query({
 								text : "INSERT INTO owns (customer_username, organization_name) VALUES ($1, $2)",
-								values : [req.params.username, req.params.organization]
+								values : [req.query.username, req.params.organization]
 							}, function(err, result) {
 								if (err) {
 									res.status(400).send("Oh, no! This user is already an owner of this organization dummy");
@@ -161,7 +164,7 @@ var addOrganizationMember = function(req, res, pg, conString) {
 								} else {
 									var queryMember = client.query({
 										text : "SELECT organization_name FROM belongs_to NATURAL JOIN organization WHERE customer_username = $1 AND organization_active AND organization_name = $2",
-										values : [req.params.username, req.params.organization]
+										values : [req.query.username, req.params.organization]
 									});
 									queryMember.on("row", function(row, result) {
 										result.addRow(row);
@@ -171,7 +174,7 @@ var addOrganizationMember = function(req, res, pg, conString) {
 										if (!result.rows.length) {
 											client.query({
 												text : "INSERT INTO belongs_to (customer_username, organization_name) VALUES ($1, $2)",
-												values : [req.params.username, req.params.organization]
+												values : [req.query.username, req.params.organization]
 											}, function(err, result) {
 												if (err) {
 													res.status(500).send("Oh, no! Disaster!");
@@ -198,7 +201,7 @@ var addOrganizationMember = function(req, res, pg, conString) {
 				} else {
 					client.query({
 						text : "INSERT INTO belongs_to (customer_username, organization_name) VALUES ($1, $2)",
-						values : [req.params.username, req.params.organization]
+						values : [req.query.username, req.params.organization]
 					}, function(err, result) {
 						if (err) {
 							res.status(400).send("Oh, no! This user is already a member of this organization dummy");
@@ -239,7 +242,7 @@ var removeOrganizationMember = function(req, res, pg, conString) {
 				// Do the same for the user that is to be removed
 				var queryMember = client.query({
 					text : "SELECT customer_username, bool_and(customer_username IN (SELECT customer_username FROM owns WHERE organization_name = $1)) AS is_owner FROM customer NATURAL JOIN belongs_to NATURAL JOIN organization WHERE organization_name = $1 AND customer_username = $2 AND organization_active AND customer_active GROUP BY customer_username",
-					values : [req.params.organization, req.params.username]
+					values : [req.params.organization, req.query.username]
 				});
 				queryMember.on("row", function(row, result) {
 					result.addRow(row);

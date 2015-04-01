@@ -19,11 +19,17 @@ SELECT distinct customer.customer_username, event.event_end_date FROM is_a JOIN 
 -- Get event_pk
 SELECT event_name, event_start_date, event_location, customer_username FROM event;
 
--- vvvvvvv Check if Event Organizer (for regular Events)
+-- vvvvvvv Check if Event Organizer (for regular Events) [Not really needed]
 SELECT distinct customer.customer_username FROM customer JOIN event ON customer.customer_username = event.customer_username WHERE event.event_name = 'Event 02' AND event.event_start_date = '2015-05-05 09:00:00' AND event.event_location = 'miradero' AND customer.customer_username = 'rapol' AND event.event_active;
 
 SELECT distinct customer.customer_username FROM customer JOIN event ON customer.customer_username = event.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active;
--- ^^^^^^^ Check if Event Organizer (for regular Events)
+-- ^^^^^^^ Check if Event Organizer (for regular Events) [Not really needed]
+
+-- vvvvvvv Check if Event Organizer (For every type of Event)
+SELECT distinct customer.customer_username FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location LEFT OUTER JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = 'HELLOOOO!!!' AND event.event_start_date = '2015-04-27 22:00:00' AND event.event_location = 'La Serrania' AND customer.customer_username = 'papaluisre' AND event.event_active;
+
+SELECT distinct customer.customer_username FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location LEFT OUTER JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active;
+-- ^^^^^^^ Check if Event Organizer (For every type of Event)
 
 -- vvvvvvv Check if Event Organizer (for hosted Events)
 SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = 'Event 01' AND event.event_start_date = '2015-03-25 09:00:00' AND event.event_location = 'miradero' AND customer.customer_username = 'papaluisre' AND event.event_active;
@@ -64,3 +70,9 @@ SELECT distinct customer.customer_username FROM meetup JOIN event ON meetup.even
 
 SELECT distinct customer.customer_username, event.event_end_date FROM meetup JOIN event ON meetup.event_name = event.event_name AND meetup.event_start_date = event.event_start_date AND meetup.event_location = event.event_location JOIN customer ON customer.customer_username = meetup.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND meetup.customer_username = $5 AND meetup.meetup_start_date = $6 AND meetup.meetup_location = $7 AND event.event_active;
 -- ^^^^^^^ Check if your Meetup
+
+ select news_number, news_title, news_content, news_date_posted, bool_and(news_number IN (SELECT news.news_number FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username JOIN news ON news.event_name = event.event_name AND news.event_start_date = event.event_start_date AND news.event_location = event.event_location WHERE event.event_name = 'Event 01' AND event.event_start_date = '2015-03-25 09:00:00' AND event.event_location = 'miradero' AND customer.customer_username = 'papaluisre' AND event.event_active)) AS can_edit from news GROUP BY news_number, news_title, news_content, news_date_posted;
+
+SELECT distinct customer.customer_username FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location LEFT OUTER JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = 'HELLOOOO!!!' AND event.event_start_date = '2015-04-27 22:00:00' AND event.event_location = 'La Serrania' AND event.event_active;
+
+SELECT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_venue, event.event_banner, event.event_logo, event.event_end_date, event.event_registration_deadline, event.event_rules, event.event_description, event.event_deduction_fee, event.event_is_online, event.event_type, bool_and(concat(event.event_name, event.event_location, event.event_start_date) IN (SELECT concat(event.event_name, event.event_location, event.event_start_date) FROM hosts)) as is_hosted FROM event WHERE event.event_name = 'HELLOOOO!!!' AND event.event_start_date = '2015-04-27 22:00:00' AND event.event_location = 'La Serrania' AND event_active GROUP BY event_name, event_start_date, event_location;

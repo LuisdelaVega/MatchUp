@@ -158,6 +158,26 @@ function assignStationsForFinalStage(tournament, station) {
 	}
 }
 
+//TODO Arreglar naming scheme de los matches
+/*
+ * G1
+ * 	R1
+ * 		M1 M2 M3
+ * 	R2
+ * 		M1 M2 M3
+ * 	R3
+ * 		M1 M2 M3
+ * G2
+ * 	R1
+ * 		M4 M5 M6
+ * 	R2
+ * 		M4 M5 M6
+ * 	R3
+ * 		M4 M5 M6
+ * G3
+ * 	R1
+ * 		M7
+ */
 function generateGroupStage(groupStage, players, tournament, station, assignStations) {
 	groupStage.numOfGroups = Math.ceil(players.length / groupStage.playersPerGroup);
 	groupStage.groups = new Array();

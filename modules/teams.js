@@ -149,7 +149,7 @@ var addTeamMember = function(req, res, pg, conString) {
 			if (result.rows.length > 0) {
 				var memberQuery = client.query({
 					text : "SELECT customer_username FROM customer WHERE customer_username = $1 AND customer_active",
-					values : [req.params.username, req.params.team]
+					values : [req.query.username, req.params.team]
 				});
 				memberQuery.on("row", function(row, result) {
 					result.addRow(row);
@@ -158,7 +158,7 @@ var addTeamMember = function(req, res, pg, conString) {
 					if (result.rows.length > 0) {
 						client.query({
 							text : "INSERT INTO plays_for (customer_username, team_name) VALUES ($1, $2)",
-							values : [req.params.username, req.params.team]
+							values : [req.query.username, req.params.team]
 						}, function(err, result) {
 							if (err) {
 								res.status(400).send("Oh, no! This user already plays for this team dummy");
@@ -202,7 +202,7 @@ var removeTeamMember = function(req, res, pg, conString) {
 				// Do the same for the user that is to be removed
 				var queryMember = client.query({
 					text : "SELECT customer_username, bool_and(customer_username IN (SELECT customer_username FROM captain_for WHERE team_name = $1)) AS is_captain FROM customer NATURAL JOIN plays_for NATURAL JOIN team WHERE team_name = $1 AND customer_username = $2 AND team_active AND customer_active GROUP BY customer_username",
-					values : [req.params.team, req.params.username]
+					values : [req.params.team, req.query.username]
 				});
 				queryMember.on("row", function(row, result) {
 					result.addRow(row);
@@ -260,7 +260,7 @@ var makeCaptain = function(req, res, pg, conString) {
 				var reqMember = result.rows[0];
 				var queryMember = client.query({
 					text : "SELECT customer_username FROM customer NATURAL JOIN plays_for NATURAL JOIN team WHERE team_name = $1 AND customer_username = $2 AND team_active AND customer_active GROUP BY customer_username",
-					values : [req.params.team, req.params.username]
+					values : [req.params.team, req.query.username]
 				});
 				queryMember.on("row", function(row, result) {
 					result.addRow(row);
@@ -278,7 +278,7 @@ var makeCaptain = function(req, res, pg, conString) {
 							} else {
 								client.query({
 									text : "INSERT INTO captain_for (customer_username, team_name) VALUES ($1, $2)",
-									values : [req.params.username, req.params.team]
+									values : [req.query.username, req.params.team]
 								}, function(err, result) {
 									if (err) {
 										res.status(500).send("Oh, no! Disaster!");
@@ -286,14 +286,14 @@ var makeCaptain = function(req, res, pg, conString) {
 									} else {
 										client.query("COMMIT");
 										client.end();
-										res.status(201).send("Yay " + req.params.username + " has beed made captain!");
+										res.status(201).send("Yay " + req.query.username + " has beed made captain!");
 									}
 								});
 							}
 						});
 					} else {
 						client.end();
-						res.status(401).send("Oh, no! It seems " + req.params.username +" is not a member of " + req.params.team);
+						res.status(401).send("Oh, no! It seems " + req.query.username +" is not a member of " + req.params.team);
 					}
 				});
 			} else {
