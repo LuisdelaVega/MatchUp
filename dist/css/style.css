@@ -22,6 +22,17 @@ a:hover {
 	height: 150px;
 }
 
+.report-status {
+	position: absolute;
+	top: 25px;
+}
+
+.no-pic-report-status {
+	position: absolute;
+	left: 50px;
+	top: 25px;
+}
+
 .signupButton {
 	position: relative;
 	left: 150px;
