@@ -33,7 +33,8 @@ var getUserProfile = function(req, res, pg, conString) {
 		});
 		profileQuery.on("end", function(result) {
 			if (result.rows.length) {
-
+				res.status(200).json(result.rows[0]);
+				client.end();
 			} else {
 				res.status(404).send('Oh, no! This user does not exist');
 				client.end();

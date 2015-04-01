@@ -133,7 +133,7 @@ var getEvent = function(req, res, pg, conString) {
 			});
 			queryEvent.on("end", function(result) {
 				if (result.rows.length > 0) {
-					event.info = result.rows[0];
+					event = result.rows[0];
 					var queryEvent = client.query({
 						text : "SELECT distinct customer.customer_username FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location LEFT OUTER JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active;",
 						values : [req.params.event, req.query.date, req.query.location, req.user.username]
@@ -142,7 +142,7 @@ var getEvent = function(req, res, pg, conString) {
 						result.addRow(row);
 					});
 					queryEvent.on("end", function(result) {
-						event.info.is_organizer = (result.rows.length > 0);
+						event.is_organizer = (result.rows.length > 0);
 						client.end();
 						res.status(200).json(event);
 					});
@@ -224,7 +224,7 @@ var getStationsForEvent = function(req, res, pg, conString) {
 
 		var event = new Object();
 		var queryEvent = client.query({
-			text : "SELECT station_number, station_in_use, bool_and(station_number IN (SELECT station_number from stream WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3)) AS has_stream FROM station WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 GROUP BY station_number, station_in_use ORDER BY station_number",
+			text : "SELECT station.station_number, station.station_in_use, stream.stream_link FROM station LEFT OUTER JOIN stream ON station.event_name = stream.event_name AND station.event_start_date = stream.event_start_date AND station.event_location = stream.event_location AND station.station_number = stream.station_number WHERE station.event_name = $1 AND station.event_start_date = $2 AND station.event_location = $3",
 			values : [req.params.event, req.query.date, req.query.location]
 		});
 		queryEvent.on("row", function(row, result) {
