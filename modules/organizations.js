@@ -14,7 +14,7 @@ var getOrganizations = function(req, res, pg, conString) {
 			result.addRow(row);
 		});
 		queryOrganizations.on("end", function(result) {
-			res.json(result.rows);
+			res.status(200).json(result.rows);
 			client.end();
 		});
 	});
@@ -27,41 +27,16 @@ var getOrganization = function(req, res, pg, conString) {
 		}
 
 		var queryOrganization = client.query({
-			text : "SELECT organization_name, organization_logo, organization_bio, organization_cover_photo, bool_and(customer_username = $1) AS my_organization FROM organization NATURAL JOIN belongs_to NATURAL JOIN customer WHERE organization_active AND customer_active AND organization_name = $2 GROUP BY organization_name",
+			text : "SELECT organization_name, organization_logo, organization_bio, organization_cover_photo, bool_and(customer_username = $1) AS is_member FROM organization NATURAL JOIN belongs_to NATURAL JOIN customer WHERE organization_active AND customer_active AND organization_name = $2 GROUP BY organization_name",
 			values : [req.user.username, req.params.organization]
 		});
 		queryOrganization.on("row", function(row, result) {
 			result.addRow(row);
 		});
 		queryOrganization.on("end", function(result) {
-			if (result.rows.length > 0) {
-				var organization = new Object();
-				// organization.info = new Object();
-				organization.info = result.rows[0];
-				var queryMembers = client.query({
-					text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, bool_and(customer_username IN (SELECT customer_username FROM owns WHERE organization_name = $1)) as is_owner FROM customer NATURAL JOIN belongs_to WHERE customer_active AND organization_name = $1 GROUP BY customer_username",
-					values : [req.params.organization]
-				});
-				queryMembers.on("row", function(row, result) {
-					result.addRow(row);
-				});
-				queryMembers.on("end", function(result) {
-					// organization.members = new Object();
-					organization.members = result.rows;
-					var queryEvents = client.query({
-						text : "SELECT event_name, event_location, event_venue, event_start_date, event_logo FROM event NATURAL JOIN hosts WHERE event_active AND organization_name = $1",
-						values : [req.params.organization]
-					});
-					queryEvents.on("row", function(row, result) {
-						result.addRow(row);
-					});
-					queryEvents.on("end", function(result) {
-						// organization.events = new Object();
-						organization.events = result.rows;
-						res.json(organization);
-						client.end();
-					});
-				});
+			if (result.rows.length) {
+				client.end();
+				res.status(200).json(result.rows[0]);
 			} else {
 				client.end();
 				res.status(404).send('Oh, no! This organization does not exist');
@@ -124,6 +99,46 @@ var deleteOrganization = function(req, res, pg, conString) {
 			} else {
 				res.status(204).send('');
 			}
+		});
+	});
+};
+
+var getOrganizationMembers = function(req, res, pg, conString) {//TODO export
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+		
+		var query = client.query({
+			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, bool_and(customer_username IN (SELECT customer_username FROM owns WHERE organization_name = $1)) AS is_owner FROM belongs_to NATURAL JOIN customer WHERE organization_name = $1 GROUP BY customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic",
+			values : [req.params.organization]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on("end", function(result) {
+			res.status(200).json(result.rows);
+			client.end();
+		});
+	});
+};
+
+var getOrganizationEvents = function(req, res, pg, conString) {//TODO export
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+		
+		var query = client.query({
+			text : "SELECT event_name, event_location, event_venue, event_start_date, event_end_date, event_logo FROM event NATURAL JOIN hosts WHERE event_active AND organization_name = $1 ORDER BY event_start_date DESC",
+			values : [req.params.organization]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on("end", function(result) {
+			res.status(200).json(result.rows);
+			client.end();
 		});
 	});
 };
@@ -347,5 +362,7 @@ module.exports.getOrganizations = getOrganizations;
 module.exports.getOrganization = getOrganization;
 module.exports.editOrganization = editOrganization;
 module.exports.deleteOrganization = deleteOrganization;
+module.exports.getOrganizationMembers = getOrganizationMembers;
+module.exports.getOrganizationEvents = getOrganizationEvents;
 module.exports.addOrganizationMember = addOrganizationMember;
 module.exports.removeOrganizationMember = removeOrganizationMember;
