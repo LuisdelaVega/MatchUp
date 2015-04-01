@@ -1,10 +1,5 @@
 //TODO Add Sponsor
 //TODO Remove Sponsor
-//TODO Get a Tournament from an Event
-//TODO Get all News for an Event
-
-//TODO Regular events can't have: News, Reviews, Meetups
-//TODO Check for visibility of event when posting (News, Reviews, Meetups)
 
 var getEventsParams = {
 	type : ["regular", "hosted"],
@@ -111,14 +106,13 @@ var getEvents = function(req, res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on("end", function(result) {
-			res.json(result.rows);
+			res.status(200).json(result.rows);
 			client.end();
 		});
 	});
 };
 
 var getEvent = function(req, res, pg, conString) {
-	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -161,6 +155,66 @@ var getEvent = function(req, res, pg, conString) {
 	});
 };
 
+var getParticipants = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+		var queryText = "SELECT distinct customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic FROM event ";
+		var queryJoinCustomer = "JOIN customer ON ";
+		
+		if (req.query.competitors) {
+			queryText+= "JOIN is_a ON is_a.event_name = event.event_name AND is_a.event_start_date = event.event_start_date AND is_a.event_location = event.event_location ";
+			queryJoinCustomer+= "customer.customer_username = is_a.customer_username ";
+			if (req.query.spectators) {
+				queryJoinCustomer+= "OR ";
+			}
+		}
+		if (req.query.spectators) {
+			queryText+= "JOIN pays ON pays.event_name = event.event_name AND pays.event_start_date = event.event_start_date AND pays.event_location = event.event_location ";
+			queryJoinCustomer+= "customer.customer_username = pays.customer_username ";
+		}
+		if (!req.query.competitors && !req.query.spectators) {
+			queryText+= "JOIN is_a ON is_a.event_name = event.event_name AND is_a.event_start_date = event.event_start_date AND is_a.event_location = event.event_location JOIN pays ON pays.event_name = event.event_name AND pays.event_start_date = event.event_start_date AND pays.event_location = event.event_location ";
+			queryJoinCustomer+= "customer.customer_username = is_a.customer_username OR customer.customer_username = pays.customer_username ";
+		}
+		
+		queryText+= (queryJoinCustomer + "WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3");
+		console.log(queryText);
+		var query = client.query({
+			text : queryText,
+			values : [req.params.event, req.query.date, req.query.location]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on("end", function(result) {
+			res.status(200).json(result.rows);
+			client.end();
+		});
+	});
+};
+
+var getCompetitors = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+		console.log(req.params.event, req.query.date, req.query.location, req.params.tournament);
+		var query = client.query({
+			text : "SELECT distinct customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic FROM tournament JOIN is_a ON is_a.event_name = tournament.event_name AND is_a.event_start_date = tournament.event_start_date AND is_a.event_location = tournament.event_location AND is_a.tournament_name = tournament.tournament_name JOIN customer ON customer.customer_username = is_a.customer_username WHERE tournament.event_name = $1 AND tournament.event_start_date = $2 AND tournament.event_location = $3 AND tournament.tournament_name = $4",
+			values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on("end", function(result) {
+			res.status(200).json(result.rows);
+			client.end();
+		});
+	});
+};
+
 var getStationsForEvent = function(req, res, pg, conString) {
 	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
@@ -170,7 +224,7 @@ var getStationsForEvent = function(req, res, pg, conString) {
 
 		var event = new Object();
 		var queryEvent = client.query({
-			text : "SELECT station_number, station_in_use, bool_and(station_number IN (SELECT station_number from stream WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3)) AS has_stream FROM station WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND event_active",
+			text : "SELECT station_number, station_in_use, bool_and(station_number IN (SELECT station_number from stream WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3)) AS has_stream FROM station WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 GROUP BY station_number, station_in_use ORDER BY station_number",
 			values : [req.params.event, req.query.date, req.query.location]
 		});
 		queryEvent.on("row", function(row, result) {
@@ -183,70 +237,66 @@ var getStationsForEvent = function(req, res, pg, conString) {
 	});
 };
 
-var addStation = function(req, res, pg, conString) {//TODO export
+var addStation = function(req, res, pg, conString) {
 	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var queryOrganizers = client.query({//TODO Ask if regular events can have stations
-			text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
-			values : [req.params.event, req.query.date, req.query.location, req.user.username]
-		});
-		queryOrganizers.on("row", function(row, result) {
-			result.addRow(row);
-		});
-		queryOrganizers.on("end", function(result) {
-			if (result.rows.length) {
-				var queryNews = client.query({
-					text : "SELECT max(station_number)+1 AS next_station FROM station WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
-					values : [req.params.event, req.query.date, req.query.location]
-				});
-				queryNews.on("row", function(row, result) {
-					result.addRow(row);
-				});
-				queryNews.on("end", function(result) {
-					var next_station = result.rows[0].next_station;
-					client.query({
-						text : "INSERT INTO station (event_name, event_start_date, event_location, station_number) VALUES($1, $2, $3, $4)",
-						values : [req.params.event, req.query.date, req.query.location, next_station]
-					}, function(err, result) {
-						if (err) {
-							res.status(500).send("Oh, no! Disaster!");
-							client.end();
-						} else {
-							client.query({
-								text : "INSERT INTO stream (event_name, event_start_date, event_location, station_number, stream_link) VALUES($1, $2, $3, $4, '')",
-								values : [req.params.event, req.query.date, req.query.location, next_station]
-							}, function(err, result) {
-								if (err) {
-									res.status(500).send("Oh, no! Disaster!");
-									client.end();
-								} else {
-									client.end();
-									res.status(201).send("Created new station");
-								}
-							});
-						}
+		var date = new Date(req.query.date);
+		if (!(date.getTime())) {
+			client.end();
+			res.status(400).send('Invalid date');
+		} else {
+			var queryOrganizers = client.query({//
+				text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
+				values : [req.params.event, date.toUTCString(), req.query.location, req.user.username]
+			});
+			queryOrganizers.on("row", function(row, result) {
+				result.addRow(row);
+			});
+			queryOrganizers.on("end", function(result) {
+				if (result.rows.length) {
+					var queryNews = client.query({
+						text : "SELECT max(station_number)+1 AS next_station FROM station WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
+						values : [req.params.event, req.query.date, req.query.location]
 					});
-				});
-			} else {
-				client.end();
-				res.status(403).send("You can't add stations to this event");
-			}
-		});
+					queryNews.on("row", function(row, result) {
+						result.addRow(row);
+					});
+					queryNews.on("end", function(result) {
+						var next_station = result.rows[0].next_station;
+						client.query({
+							text : "INSERT INTO station (event_name, event_start_date, event_location, station_number) VALUES($1, $2, $3, $4)",
+							values : [req.params.event, req.query.date, req.query.location, next_station]
+						}, function(err, result) {
+							if (err) {
+								res.status(500).send("Oh, no! Disaster!");
+								client.end();
+							} else {
+								client.end();
+								res.status(201).send("Created new station");
+							}
+						});
+					});
+				} else {
+					client.end();
+					res.status(403).send("You can't add stations to this event");
+				}
+			});
+		}
 	});
 };
 
-var removeStation = function(req, res, pg, conString) {//TODO export
+var removeStation = function(req, res, pg, conString) {
 	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var queryOrganizers = client.query({//TODO Ask if regular events can have stations
+		var queryOrganizers = client.query({//
 			text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
 			values : [req.params.event, req.query.date, req.query.location, req.user.username]
 		});
@@ -275,25 +325,38 @@ var removeStation = function(req, res, pg, conString) {//TODO export
 	});
 };
 
-var getStation = function(req, res, pg, conString) {//TODO export
+var getStation = function(req, res, pg, conString) {
 	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var event = new Object();
-		var queryEvent = client.query({
-			text : "SELECT station_number, station_in_use, stream_link FROM station NATURAL JOIN stream WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND station_number = $4 AND event_active",
+		var station = new Object();
+		var queryStation = client.query({
+			text : "SELECT station.station_number, station.station_in_use, stream.stream_link FROM station LEFT OUTER JOIN stream ON station.event_name = stream.event_name AND station.event_start_date = stream.event_start_date AND station.event_location = stream.event_location AND station.station_number = stream.station_number WHERE station.event_name = $1 AND station.event_start_date = $2 AND station.event_location = $3 AND station.station_number = $4",
 			values : [req.params.event, req.query.date, req.query.location, req.params.station]
 		});
-		queryEvent.on("row", function(row, result) {
+		queryStation.on("row", function(row, result) {
 			result.addRow(row);
 		});
-		queryEvent.on("end", function(result) {
+		queryStation.on("end", function(result) {
 			if (result.rows.length) {
-				client.end();
-				res.status(200).json(result.rows[0]);
+				station.info = result.rows[0];
+				station.tournaments = new Array();
+				var queryStation = client.query({
+					text : "SELECT tournament_name FROM capacity_for WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND station_number = $4",
+					values : [req.params.event, req.query.date, req.query.location, req.params.station]
+				});
+				queryStation.on("row", function(row, result) {
+					// result.addRow(row);
+					station.tournaments.push(row.tournament_name);
+				});
+				queryStation.on("end", function(result) {
+					// station.tournaments = result.rows;
+					client.end();
+					res.status(200).json(station);
+				});
 			} else {
 				client.end();
 				res.status(404).send("Station not found");
@@ -302,14 +365,61 @@ var getStation = function(req, res, pg, conString) {//TODO export
 	});
 };
 
-var editStation = function(req, res, pg, conString) {//TODO export
+var addStream = function(req, res, pg, conString) {
 	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var queryOrganizers = client.query({//TODO Ask if regular events can have stations
+		var queryOrganizers = client.query({
+			text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
+			values : [req.params.event, req.query.date, req.query.location, req.user.username]
+		});
+		queryOrganizers.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		queryOrganizers.on("end", function(result) {
+			if (result.rows.length) {
+				var queryStation = client.query({
+					text : "SELECT station_number FROM station WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND station_number = $4",
+					values : [req.params.event, req.query.date, req.query.location, req.params.station]
+				});
+				queryStation.on("row", function(row, result) {
+					result.addRow(row);
+				});
+				queryStation.on("end", function(result) {
+					if (result.rows.length) {
+						client.query({
+							text : "INSERT INTO stream (event_name, event_start_date, event_location, station_number, stream_link) VALUES($1, $2, $3, $4, $5)",
+							values : [req.params.event, req.query.date, req.query.location, req.params.station, req.body.stream]
+						}, function(err, result) {
+							if (err) {
+								res.status(500).send("Oh, no! Disaster!");
+								client.end();
+							} else {
+								client.end();
+								res.status(201).send("Stream link: " + req.body.stream + " added to Station #" + req.params.station);
+							}
+						});
+					}
+				});
+			} else {
+				client.end();
+				res.status(403).send("You can't edit stations in this event");
+			}
+		});
+	});
+};
+
+var editStation = function(req, res, pg, conString) {
+	// Query the DB to find the local Events
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var queryOrganizers = client.query({
 			text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
 			values : [req.params.event, req.query.date, req.query.location, req.user.username]
 		});
@@ -327,7 +437,7 @@ var editStation = function(req, res, pg, conString) {//TODO export
 						client.end();
 					} else {
 						client.end();
-						res.status(201).send("Created new station");
+						res.status(201).send("Changed the stream link to " + req.body.stream + " on Station #" + req.params.station);
 					}
 				});
 			} else {
@@ -338,7 +448,45 @@ var editStation = function(req, res, pg, conString) {//TODO export
 	});
 };
 
-var getTournaments = function(req, res, pg, conString) {//TODO export
+//TODO Verify event_start_date
+var removeStream = function(req, res, pg, conString) {
+	// Query the DB to find the local Events
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var queryOrganizers = client.query({
+			text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
+			values : [req.params.event, req.query.date, req.query.location, req.user.username]
+		});
+		queryOrganizers.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		queryOrganizers.on("end", function(result) {
+			if (result.rows.length) {
+				client.query({
+					text : "DELETE FROM stream WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND station_number = $4",
+					values : [req.params.event, req.query.date, req.query.location, req.params.station]
+				}, function(err, result) {
+					if (err) {
+						res.status(500).send("Oh, no! Disaster!");
+						client.end();
+					} else {
+						client.end();
+						res.status(204).send('');
+					}
+				});
+			} else {
+				client.end();
+				res.status(403).send("You can't edit stations in this event");
+			}
+		});
+	});
+};
+
+//TODO Verify event_start_date
+var getTournaments = function(req, res, pg, conString) {
 	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -364,7 +512,7 @@ var getTournaments = function(req, res, pg, conString) {//TODO export
 	});
 };
 
-var getTournament = function(req, res, pg, conString) {//TODO export
+var getTournament = function(req, res, pg, conString) {
 	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -381,7 +529,7 @@ var getTournament = function(req, res, pg, conString) {//TODO export
 		queryOrganizers.on("end", function(result) {
 			if (result.rows.length) {
 				client.end();
-				res.status(200).json(result.rows);
+				res.status(200).json(result.rows[0]);
 			} else {
 				client.end();
 				res.status(404).send("Tournament not found");
@@ -390,7 +538,7 @@ var getTournament = function(req, res, pg, conString) {//TODO export
 	});
 };
 
-var attachStation = function(req, res, pg, conString) {//TODO export
+var attachStation = function(req, res, pg, conString) {
 	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -424,7 +572,7 @@ var attachStation = function(req, res, pg, conString) {//TODO export
 								client.end();
 							} else {
 								client.end();
-								res.status(201).send("Attached station#" + req.query.station + " to " + req.params.tournament);
+								res.status(201).send("Attached Station #" + req.query.station + " to " + req.params.tournament);
 							}
 						});
 					} else {
@@ -440,16 +588,14 @@ var attachStation = function(req, res, pg, conString) {//TODO export
 	});
 };
 
-var getStationsforTournament = function(req, res, pg, conString) {//TODO export
+var getStationsforTournament = function(req, res, pg, conString) {
 	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
-
-		var event = new Object();
 		var queryEvent = client.query({
-			text : "SELECT station_number, station_in_use, bool_and(station_number IN (SELECT station_number from stream WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3)) AS has_stream FROM capacity_for WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active",
+			text : "SELECT station.station_number, station.station_in_use, stream.stream_link FROM station LEFT OUTER JOIN stream ON station.event_name = stream.event_name AND station.event_start_date = stream.event_start_date AND station.event_location = stream.event_location AND station.station_number = stream.station_number JOIN capacity_for ON station.event_name = capacity_for.event_name AND station.event_start_date = capacity_for.event_start_date AND station.event_location = capacity_for.event_location AND station.station_number = capacity_for.station_number WHERE station.event_name = $1 AND station.event_start_date = $2 AND station.event_location = $3 AND capacity_for.tournament_name = $4",
 			values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
 		});
 		queryEvent.on("row", function(row, result) {
@@ -462,8 +608,7 @@ var getStationsforTournament = function(req, res, pg, conString) {//TODO export
 	});
 };
 
-
-var detachStation = function(req, res, pg, conString) {//TODO export
+var detachStation = function(req, res, pg, conString) {
 	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -499,95 +644,31 @@ var detachStation = function(req, res, pg, conString) {//TODO export
 	});
 };
 
-/*
- var queryMeetup = client.query({
- text : "SELECT meetup_name, meetup_start_date, meetup_end_date, meetup_location, meetup_description, customer_username FROM meetup WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
- values : [event.info.event_name, event.info.event_start_date, event.info.event_location]
- });
- queryMeetup.on("row", function(row, result) {
- result.addRow(row);
- });
- queryMeetup.on("end", function(result) {
- event.meetups = result.rows;
- var queryTournament = client.query({
- text : "SELECT tournament_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group, game.* FROM tournament NATURAL JOIN game WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
- values : [event.info.event_name, event.info.event_start_date, event.info.event_location]
- });
- queryTournament.on("row", function(row, result) {
- result.addRow(row);
- });
- queryTournament.on("end", function(result) {
- event.tournaments = result.rows;
- var queryNews = client.query({
- text : "SELECT news_number, news_title, news_content, news_date_posted FROM news WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
- values : [event.info.event_name, event.info.event_start_date, event.info.event_location]
- });
- queryNews.on("row", function(row, result) {
- result.addRow(row);
- });
- queryNews.on("end", function(result) {
- event.news = result.rows;
- var querySponsor = client.query({
- text : "SELECT sponsor_name, sponsor_logo, sponsor_link FROM sponsors NATURAL JOIN shows WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
- values : [event.info.event_name, event.info.event_start_date, event.info.event_location]
- });
- querySponsor.on("row", function(row, result) {
- result.addRow(row);
- });
- querySponsor.on("end", function(result) {
- event.sponsors = result.rows;
- var querySpectatorFee = client.query({
- text : "SELECT spec_fee_name, spec_fee_amount, spec_fee_description FROM spectator_fee WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
- values : [event.info.event_name, event.info.event_start_date, event.info.event_location]
- });
- querySpectatorFee.on("row", function(row, result) {
- result.addRow(row);
- });
- querySpectatorFee.on("end", function(result) {
- event.spectator_fees = result.rows;
- var queryReview = client.query({
- text : "SELECT review_title, review_content, star_rating, review_date_created, customer_username FROM review WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
- values : [event.info.event_name, event.info.event_start_date, event.info.event_location]
- });
- queryReview.on("row", function(row, result) {
- result.addRow(row);
- });
- queryReview.on("end", function(result) {
- event.reviews = result.rows;
- if (event.info.is_hosted) {
- var queryHost = client.query({
- text : "SELECT organization_name, organization_logo, organization_active FROM organization NATURAL JOIN hosts WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
- values : [event.info.event_name, event.info.event_start_date, event.info.event_location]
- });
- queryHost.on("row", function(row, result) {
- result.addRow(row);
- });
- queryHost.on("end", function(result) {
- event.host = result.rows[0];
- res.json(event);
- client.end();
- });
- } else {
- var queryCreator = client.query({
- text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_active FROM customer NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
- values : [event.info.event_name, event.info.event_start_date, event.info.event_location]
- });
- queryCreator.on("row", function(row, result) {
- result.addRow(row);
- });
- queryCreator.on("end", function(result) {
- event.creator = result.rows[0];
- res.json(event);
- client.end();
- });
- }
- });
- });
- });
- });
- });
- });
- */
+var getAllNews = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var date = new Date(req.query.date);
+		if (!(date.getTime())) {
+			client.end();
+			res.status(400).send('Invalid date');
+		} else {
+			var queryNews = client.query({
+				text : "SELECT news_number, news_title, news_content, news_date_posted FROM news NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND event_active ORDER BY news_number",
+				values : [req.params.event, req.query.date, req.query.location]
+			});
+			queryNews.on("row", function(row, result) {
+				result.addRow(row);
+			});
+			queryNews.on("end", function(result) {
+				client.end();
+				res.status(200).json(result.rows);
+			});
+		}
+	});
+};
 
 var getNews = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
@@ -751,6 +832,32 @@ var updateNews = function(req, res, pg, conString) {
 					client.end();
 					res.status(403).send("You can't create a Meetup for this event");
 				}
+			});
+		}
+	});
+};
+
+var getReviews = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var date = new Date(req.query.date);
+		if (!(date.getTime())) {
+			client.end();
+			res.status(400).send('Invalid date');
+		} else {
+			var queryReview = client.query({
+				text : "SELECT review_title, review_content, star_rating, review_date_created, customer_username, bool_and(customer_username IN (SELECT customer_username FROM review WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $4)) as is_writer FROM review WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 GROUP BY review_title, review_content, star_rating, review_date_created, customer_username ORDER BY review_date_created",
+				values : [req.params.event, req.query.date, req.query.location, req.user.username]
+			});
+			queryReview.on("row", function(row, result) {
+				result.addRow(row);
+			});
+			queryReview.on("end", function(result) {
+				client.end();
+				res.status(200).json(result.rows);
 			});
 		}
 	});
@@ -920,13 +1027,38 @@ var updateReview = function(req, res, pg, conString) {
 	});
 };
 
+var getMeetups = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var eventStartDate = new Date(req.query.date);
+		if (!(eventStartDate.getTime())) {
+			client.end();
+			res.status(400).send('Invalid date');
+		} else {
+			var queryReview = client.query({
+				text : "SELECT meetup_name, meetup_start_date, meetup_end_date, meetup_location, meetup_description, customer_username, bool_and(customer_username IN (SELECT customer_username FROM meetup WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $4)) as is_organizer FROM meetup WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 GROUP BY meetup_name, meetup_start_date, meetup_end_date, meetup_location, meetup_description, customer_username ORDER BY meetup_start_date DESC",
+				values : [req.params.event, req.query.date, req.query.location, req.user.username]
+			});
+			queryReview.on("row", function(row, result) {
+				result.addRow(row);
+			});
+			queryReview.on("end", function(result) {
+				client.end();
+				res.status(200).json(result.rows);
+			});
+		}
+	});
+};
+
 var getMeetup = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		//TODO Validate Meetup date
 		var eventStartDate = new Date(req.query.date);
 		var meetupStartDate = new Date(req.body.start_date);
 		if (!(eventStartDate.getTime()) || !(meetupStartDate.getTime())) {
@@ -959,7 +1091,6 @@ var deleteMeetup = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		//TODO Validate Meetup date
 		var eventStartDate = new Date(req.query.date);
 		var meetupStartDate = new Date(req.query.meetup_date);
 		if (!(eventStartDate.getTime()) || !(meetupStartDate.getTime())) {
@@ -1417,15 +1548,20 @@ var getHome = function(res, pg, conString) {
 
 module.exports.getEvents = getEvents;
 module.exports.getEvent = getEvent;
+module.exports.getParticipants = getParticipants;
+module.exports.getCompetitors = getCompetitors;
 module.exports.getHome = getHome;
+module.exports.getAllNews = getAllNews;
 module.exports.getNews = getNews;
 module.exports.deleteNews = deleteNews;
 module.exports.createNews = createNews;
 module.exports.updateNews = updateNews;
+module.exports.getReviews = getReviews;
 module.exports.getReview = getReview;
 module.exports.deleteReview = deleteReview;
 module.exports.createReview = createReview;
 module.exports.updateReview = updateReview;
+module.exports.getMeetups = getMeetups;
 module.exports.getMeetup = getMeetup;
 module.exports.deleteMeetup = deleteMeetup;
 module.exports.createMeetup = createMeetup;
@@ -1440,6 +1576,8 @@ module.exports.getStationsForEvent = getStationsForEvent;
 module.exports.addStation = addStation;
 module.exports.removeStation = removeStation;
 module.exports.getStation = getStation;
+module.exports.addStream = addStream;
+module.exports.removeStream = removeStream;
 module.exports.editStation = editStation;
 module.exports.getTournaments = getTournaments;
 module.exports.getTournament = getTournament;

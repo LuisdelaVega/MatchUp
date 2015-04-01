@@ -1,5 +1,3 @@
-//TODO Subscribe to user
-//TODO Unsubscribe to user
 //TODO Register for Event
 //TODO Register for Tournament
 //TODO Get all Events organized by a specific Customer
@@ -17,7 +15,6 @@ var getMyProfile = function(req, res, pg, conString) {
 	getUserProfile(username, res, pg, conString);
 };
 
-//TODO Needs update. Only send customer information
 var getUserProfile = function(req, res, pg, conString) {
 	// Query the DB to find the account
 	pg.connect(conString, function(err, client, done) {
@@ -25,7 +22,6 @@ var getUserProfile = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		client.query("START TRANSACTION");
 		var profile = new Object();
 		// Query the database to find the user's account
 		var profileQuery = client.query({
@@ -36,57 +32,143 @@ var getUserProfile = function(req, res, pg, conString) {
 			result.addRow(row);
 		});
 		profileQuery.on("end", function(result) {
-			if (result.rows.length > 0) {
-				profile.info = result.rows[0];
+			if (result.rows.length) {
 
-				// Query the database to find the user's Teams
-				var teamsQuery = client.query({
-					text : "SELECT team_name, team_logo, team_bio, team_cover_photo FROM team NATURAL JOIN plays_for WHERE customer_username = $1 AND team_active",
-					values : [req.params.username]
-				});
-				teamsQuery.on("row", function(row, result) {
-					result.addRow(row);
-				});
-				teamsQuery.on("end", function(result) {
-					profile.teams = result.rows;
-
-					// Query the database to find the user's Organizations
-					var organizationsQuery = client.query({
-						text : "SELECT organization_name, organization_logo FROM organization NATURAL JOIN belongs_to WHERE customer_username = $1 AND organization_active",
-						values : [req.params.username]
-					});
-					organizationsQuery.on("row", function(row, result) {
-						result.addRow(row);
-					});
-					organizationsQuery.on("end", function(result) {
-						profile.organizations = result.rows;
-
-						// Query the database to find the user's created Events
-						var eventsQuery = client.query({
-							text : "SELECT event_name, event_start_date, event_location, event_venue, event_logo FROM event WHERE customer_username = $1 AND event_active",
-							values : [req.params.username]
-						});
-						eventsQuery.on("row", function(row, result) {
-							result.addRow(row);
-						});
-						eventsQuery.on("end", function(result) {
-							profile.events = result.rows;
-
-							res.json({
-								info : profile.info,
-								teams : profile.teams,
-								organizations : profile.organizations,
-								events : profile.events
-							});
-							client.query("COMMIT");
-							client.end();
-						});
-					});
-				});
 			} else {
 				res.status(404).send('Oh, no! This user does not exist');
 				client.end();
 			};
+		});
+	});
+};
+
+var getSubscriptions = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var profileQuery = client.query({
+			text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic FROM customer JOIN subscribed_to ON customer.customer_username = subscribed_to.interest WHERE subscribed_to.subscriber = $1 AND customer.customer_active",
+			values : [req.params.username]
+		});
+		profileQuery.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		profileQuery.on("end", function(result) {
+			res.status(200).send(result.rows);
+			client.end();
+		});
+	});
+};
+
+var getTeams = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var profileQuery = client.query({
+			text : "SELECT team_name, team_logo FROM team NATURAL JOIN plays_for WHERE customer_username = $1 AND team_active",
+			values : [req.params.username]
+		});
+		profileQuery.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		profileQuery.on("end", function(result) {
+			res.status(200).send(result.rows);
+			client.end();
+		});
+	});
+};
+
+var getOrganizations = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var profileQuery = client.query({
+			text : "SELECT organization_name, organization_logo FROM organization NATURAL JOIN belongs_to WHERE customer_username = $1 AND organization_active",
+			values : [req.params.username]
+		});
+		profileQuery.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		profileQuery.on("end", function(result) {
+			res.status(200).send(result.rows);
+			client.end();
+		});
+	});
+};
+
+var getEvents = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var profileQuery = client.query({
+			text : "SELECT event_name, event_start_date, event_end_date, event_location, event_logo FROM event WHERE customer_username = $1 AND event_active",
+			values : [req.params.username]
+		});
+		profileQuery.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		profileQuery.on("end", function(result) {
+			res.status(200).send(result.rows);
+			client.end();
+		});
+	});
+};
+
+var subscribe = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		if (req.user.username === req.params.username) {
+			client.end();
+			res.status(403).send("You can't subscribe to yourself");
+		} else {
+			client.query("START TRANSACTION");
+			client.query({
+				text : "INSERT INTO subscribed_to (subscriber, interest) VALUES ($1, $2)",
+				values : [req.user.username, req.params.username]
+			}, function(err, result) {
+				if (err) {
+					res.status(500).send("Oh, no! Disaster!");
+					client.end();
+				} else {
+					client.query("COMMIT");
+					client.end();
+					res.status(201).send("Subscribed to: " + req.params.username);
+				}
+			});
+		}
+	});
+};
+
+var unsubscribe = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		client.query("START TRANSACTION");
+		client.query({
+			text : "DELETE FROM subscribed_to WHERE subscriber = $1 AND interest = $2",
+			values : [req.user.username, req.params.username]
+		}, function(err, result) {
+			if (err) {
+				res.status(500).send("Oh, no! Disaster!");
+				client.end();
+			} else {
+				client.query("COMMIT");
+				client.end();
+				res.status(204).send("Unsubscribed from: " + req.params.username);
+			}
 		});
 	});
 };
@@ -507,3 +589,9 @@ module.exports.deleteAccount = deleteAccount;
 module.exports.createTeam = createTeam;
 module.exports.requestOrganization = requestOrganization;
 module.exports.createEvent = createEvent;
+module.exports.subscribe = subscribe;
+module.exports.unsubscribe = unsubscribe;
+module.exports.getSubscriptions = getSubscriptions;
+module.exports.getTeams = getTeams;
+module.exports.getOrganizations = getOrganizations;
+module.exports.getEvents = getEvents;
