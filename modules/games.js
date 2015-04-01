@@ -1,4 +1,5 @@
 //TODO Implement offsets like in Spruce
+//TODO Implement all games and popular games in separate routes/queries. Same for genres
 var getPopularGames = function(res, pg, conString) {
 	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
@@ -8,7 +9,7 @@ var getPopularGames = function(res, pg, conString) {
 
 		// Look for most Popular Games
 		var queryPopularGames = client.query({
-			text : "SELECT game.*, count(game_name IN (SELECT game_name FROM event NATURAL JOIN tournament WHERE event_active)) as popularity FROM game GROUP BY game.game_name ORDER BY popularity DESC"
+			text : "SELECT game.*, count(tournament.game_name) AS popularity FROM tournament RIGHT OUTER JOIN game ON tournament.game_name = game.game_name GROUP BY game.game_name ORDER BY popularity DESC"
 		});
 		queryPopularGames.on("row", function(row, result) {
 			result.addRow(row);
@@ -29,7 +30,7 @@ var getPopularGenres = function(res, pg, conString) {
 
 		// Look for most Popular Genres
 		var queryPopularGenre = client.query({
-			text : "SELECT genre.*, count(genre.genre_name IN (SELECT genre_name FROM event NATURAL JOIN tournament NATURAL JOIN game NATURAL JOIN is_of WHERE event.event_active)) as popularity FROM genre GROUP BY genre.genre_name ORDER BY popularity DESC"
+			text : "SELECT genre.*, count(tournament.game_name) AS popularity FROM tournament RIGHT OUTER JOIN is_of ON tournament.game_name = is_of.game_name JOIN genre ON genre.genre_name = is_of.genre_name GROUP BY genre.genre_name ORDER BY popularity DESC"
 		});
 		queryPopularGenre.on("row", function(row, result) {
 			result.addRow(row);
@@ -41,6 +42,7 @@ var getPopularGenres = function(res, pg, conString) {
 	});
 };
 
+// *Depreciated*
 var getPopularStuff = function(res, pg, conString) {
 	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
@@ -51,7 +53,7 @@ var getPopularStuff = function(res, pg, conString) {
 		// Look for most Popular Games
 		var gamesList = new Object();
 		var queryPopularGames = client.query({
-			text : "SELECT game.*, count(game.game_name) as popularity FROM event NATURAL JOIN tournament NATURAL JOIN game WHERE event.event_active GROUP BY game.game_name ORDER BY popularity DESC"
+			text : "select game.*, count(tournament.game_name) AS popularity from tournament RIGHT OUTER JOIN game ON tournament.game_name = game.game_name GROUP BY game.game_name ORDER BY popularity DESC"
 		});
 		queryPopularGames.on("row", function(row, result) {
 			result.addRow(row);
@@ -62,7 +64,7 @@ var getPopularStuff = function(res, pg, conString) {
 			// Look for most Popular Games
 			var genreList = new Object();
 			var queryPopularGenre = client.query({
-				text : "SELECT genre.*, count(genre.genre_name) as popularity FROM event NATURAL JOIN tournament NATURAL JOIN game NATURAL JOIN is_of NATURAL JOIN genre WHERE event.event_active GROUP BY genre.genre_name ORDER BY popularity DESC"
+				text : "select genre.*, count(tournament.game_name) AS popularity from tournament RIGHT OUTER JOIN is_of ON tournament.game_name = is_of.game_name JOIN genre ON genre.genre_name = is_of.genre_name GROUP BY genre.genre_name ORDER BY popularity DESC"
 			});
 			queryPopularGenre.on("row", function(row, result) {
 				result.addRow(row);
