@@ -2,7 +2,8 @@ $(function () {
 	$('#dtpCreateEventStartDate').datetimepicker();
 	$('#dtpCreateEventEndDate ').datetimepicker();
 	$('#dtpCreateEventRegistrationDeadline').datetimepicker();
-	console.log("I'm Alive");
+	
+	// Initiate bootstrap tooltip module
 	$('[data-toggle="tooltip"]').tooltip({
 		placement: 'top'
 	});

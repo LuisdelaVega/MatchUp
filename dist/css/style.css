@@ -22,17 +22,6 @@ a:hover {
 	height: 150px;
 }
 
-.report-status {
-	position: absolute;
-	top: 25px;
-}
-
-.no-pic-report-status {
-	position: absolute;
-	left: 50px;
-	top: 25px;
-}
-
 .signupButton {
 	position: relative;
 	left: 150px;
@@ -115,6 +104,15 @@ a:hover {
 	margin-right: auto
 }
 
+
+.checkin-avatar{
+	width: 50px;
+	height: 50px;
+	border-radius: 100px;
+    -webkit-border-radius: 100px;
+    -moz-border-radius: 100px;
+}
+
 /*Matchup*/
 
 .img-circular {
@@ -160,6 +158,17 @@ a:hover {
 .set-margin{
 	margin-right: 5px;
 	margin-left: 5px;
+}
+
+.report-status {
+	position: absolute;
+	top: 25px;
+}
+
+.no-pic-report-status {
+	position: absolute;
+	left: 50px;
+	top: 25px;
 }
 
 /*Snippets*/
