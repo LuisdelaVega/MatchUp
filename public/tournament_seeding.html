@@ -20,6 +20,8 @@
 	<!-- Custom CSS -->
 	<link href="../dist/css/sb-admin-2.css" rel="stylesheet">
 
+	<link rel="stylesheet" href="../bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" />
+
 	<!-- Custom Fonts -->
 	<link href="../bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
@@ -48,7 +50,7 @@
 		</div>
 		<!-- /.navbar-header -->
 
-		<ul class="nav navbar-top-links navbar-right">			
+		<ul class="nav navbar-top-links navbar-right">
 			<li class="dropdown">
 				<a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-envelope fa-fw"></i> <i class="fa fa-caret-down"></i> </a>
 				<ul class="dropdown-menu dropdown-messages">
@@ -304,104 +306,163 @@
 
 	<!-- Page Content -->
 	<div id="page-wrapper">
-		<div class="container-fluid custom-padding">
-			<div class="blur-cover"></div>
+		<div class="container-fluid">
 			<!-- Nav tabs -->
 			<ul class="nav nav-tabs nav-justified tab-padding-top">
 				<li class="active">
-					<a href="#main" data-toggle="tab">Main</a>
+					<a href="#spectators" data-toggle="tab">Spectators</a>
 				</li>
 				<li>
-					<a href="#seeding" data-toggle="tab">Seeding</a>
+					<a href="#tournament1" data-toggle="tab">Tournament 1</a>
+				</li>
+				<li>
+					<a href="#tournament2" data-toggle="tab">Tournament 2</a>
 				</li>
 			</ul>
 
 			<!-- Tab panes -->
 			<div class="tab-content">
-				<div class="tab-pane fade in active" id="main">
+				<div class="tab-pane fade in active" id="spectators">
 					<div class="panel-padding">
-						<div class="box box-margin">
-							<p class="info-title">Tournament Name
-								<br><small>Event Name</small>
-							</p>
-							<div class="row">
-								<div class="col-xs-12 col-md-6 col-lg-6">
-									<h4>Rules</h4>
-									<p class="info-paragraph">Raw denim Truffaut proident wolf, asymmetrical mollit exercitation. Tousled est art party wayfarers. Cupidatat ullamco gluten-free Schlitz listicle. Fixie literally normcore, DIY eu jean shorts Truffaut Helvetica actually mlkshk put a bird on it cold-pressed tilde. Tempor biodiesel Shoreditch ennui assumenda skateboard. Literally fixie fanny pack commodo organic, plaid raw denim viral delectus cornhole church-key tofu master cleanse pariatur. Food truck viral anim tilde aute PBR consequat leggings, aliqua single-origin coffee salvia quinoa enim qui wayfarers.</p>
-								</div>
-								<div class="col-xs-12  col-md-6 col-lg-6">
-									<h4>General Info</h4>
-									<dl class="info-paragraph">
-										<dt>Tournament Start Date</dt>
-										<dd>Jan 9, 2015 8:00PM</dd>
-										<dt>Event Start Date (Check-in)</dt>
-										<dd>Jan 5, 2015 12:00AM</dd>
-										<dt>Check in Deadline</dt>
-										<dd>Jan 19, 2015 11:00PM</dd>
-										<dt>Location</dt>
-										<dd>259 Blvd. Alfonso Valdez Cabian, Mayagüez</dd>
-										<dt>Venue</dt>
-										<dd>Coliseo Mangual</dd>
-									</dl>
-								</div>
-							</div>
-							<p class="info-title">Tournament Details</p>
-							<div class="row">
-								<div class="col-lg-4 col-md-4 col-xs-12">
-									<a class="thumbnail">
-										<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg">
-										<h4 align="center">League of Legends</h4>
-									</a>
-								</div>
-								<div class="col-lg-4 col-md-6 col-xs-12">
-									<dl class="info-paragraph">
-										<dt>Tournament Type</dt>
-										<dd>Two Stage</dd>
-										<dt>Format</dt>
-										<dd>Single Elimination</dd>
-										<dt># of competitors per group</dt>
-										<dd>4</dd>
-										<dt># of competitors advancing</dt>
-										<dd>2</dd>
-									</dl>
-								</div>
-								<div class="col-lg-4 col-md-6 col-xs-12">
-									<dl class="info-paragraph">
-										<dt>Score Type</dt>
-										<dd>By points</dd>
-										<dt>Team Based</dt>
-										<dd>Yes (Size 5)</dd>
-										<dt>Prize Pool</dt>
-										<dd>$50.00</dd>
-										<dt>Competitor Fee</dt>
-										<dd>$10.00</dd>
-									</dl>
-								</div>
-							</div>
-							<p class="info-title">Hosted By</p>
-							<div class="row">
-								<div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 center-block" style="float:none">
-									<a class="thumbnail">
-										<img src="http://neptunolabs.com/images/badillo.jpg">
-										<h3 align="center">Organizer</h3>
-									</a>
-								</div>
+						<div class="row box-margin">
+							<div class="col-md-10 col-md-offset-1">
+								<form role="form">
+									<div class="form-group">
+										<input class="form-control" id="searchinput" type="search" placeholder="Search Spectators..." />
+									</div>
+									<ul class="list-group">
+										<li class="list-group-item">
+											<div class="row">
+												<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+													<img class="checkin-avatar" src="http://neptunolabs.com/images/badillo.jpg">
+													<h4 style="display:inline">Spectator <small style="margin-left:10px">VIP Pass</small></h4>
+												</div>
+												<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+													<button class="btn btn-success pull-right">Check In</button>
+												</div>
+											</div>
+										</li>
+										<li class="list-group-item">
+											<div class="row">
+												<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+													<img class="checkin-avatar" src="http://neptunolabs.com/images/badillo.jpg">
+													<h4 style="display:inline">Spectator<small style="margin-left:10px">One Day Pass</small></h4>
+												</div>
+												<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+													<button class="btn btn-default pull-right">Check In</button>
+												</div>
+											</div>
+										</li>
+									</ul>
+								</form>
+
 							</div>
 						</div>
 					</div>
 				</div>
-				<div class="tab-pane fade" id="seeding">
+				<div class="tab-pane fade" id="tournament1">
 					<div class="panel-padding">
-												
+						<div class="row box-margin">
+							<div class="col-md-10 col-md-offset-1">
+								<form role="form">
+									<div class="form-group">
+										<input class="form-control" id="searchinput" type="search" placeholder="Search Competitors..." />
+									</div>
+									<ul class="list-group">
+										<li class="list-group-item">
+											<div class="row">
+												<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+													<img class="checkin-avatar" src="http://neptunolabs.com/images/badillo.jpg">
+													<h4 style="display:inline">Competitor</h4>
+												</div>
+												<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+													<button class="btn btn-default pull-right">Check In</button>
+												</div>
+											</div>
+										</li>
+										<li class="list-group-item">
+											<div class="row">
+												<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+													<img class="checkin-avatar" src="http://neptunolabs.com/images/badillo.jpg">
+													<h4 style="display:inline">Competitor</h4>
+												</div>
+												<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+													<button class="btn btn-success pull-right">Check In</button>
+												</div>
+											</div>
+										</li>
+										<li class="list-group-item">
+											<div class="row">
+												<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+													<img class="checkin-avatar" src="http://neptunolabs.com/images/badillo.jpg">
+													<h4 style="display:inline">Competitor</h4>
+												</div>
+												<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+													<button class="btn btn-default pull-right">Check In</button>
+												</div>
+											</div>
+										</li>
+									</ul>
+								</form>
+							</div>
+						</div>
 					</div>
 				</div>
-				<!--	registered users -->
+				<div class="tab-pane fade" id="tournament2">
+					<div class="panel-padding">
+						<div class="row box-margin">
+							<div class="col-md-10 col-md-offset-1">
+								<form role="form">
+									<div class="form-group">
+										<input class="form-control" id="searchinput" type="search" placeholder="Search Competitors..." />
+									</div>
+									<ul class="list-group">
+										<li class="list-group-item">
+											<div class="row">
+												<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+													<img class="checkin-avatar" src="http://neptunolabs.com/images/badillo.jpg">
+													<h4 style="display:inline">Competitor</h4>
+												</div>
+												<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+													<button class="btn btn-success pull-right">Check In</button>
+												</div>
+											</div>
+										</li>
+										<li class="list-group-item">
+											<div class="row">
+												<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+													<img class="checkin-avatar" src="http://neptunolabs.com/images/badillo.jpg">
+													<h4 style="display:inline">Competitor</h4>
+												</div>
+												<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+													<button class="btn btn-default pull-right">Check In</button>
+												</div>
+											</div>
+										</li>
+										<li class="list-group-item">
+											<div class="row">
+												<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+													<img class="checkin-avatar" src="http://neptunolabs.com/images/badillo.jpg">
+													<h4 style="display:inline">Competitor</h4>
+												</div>
+												<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+													<button class="btn btn-success pull-right">Check In</button>
+												</div>
+											</div>
+										</li>
+									</ul>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 			<!--	tab content -->
 		</div>
 		<!--	container -->
 	</div>
 	<!--	page wrap -->
+
 	<!-- jQuery -->
 	<script src="../bower_components/jquery/dist/jquery.min.js"></script>
 
@@ -413,7 +474,6 @@
 
 	<!-- Custom Theme JavaScript -->
 	<script src="../dist/js/sb-admin-2.js"></script>
-
 </body>
 
 </html>

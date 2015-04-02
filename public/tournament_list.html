@@ -11,10 +11,16 @@
 
 	<title>MatchUP by Neptuno Labs</title>
 
-	<!-- Bootstrap Core CSS -->
-	<link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+	<!-- jQuery -->
+	<script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
 
-	<!-- MetisMenu CSS -->
+
+	<!-- Bootstrap Core-->
+	<link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+	<!-- MetisMenu CSS/JS -->
+	<script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
 	<link href="../bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
 
 	<!-- Custom CSS -->
@@ -23,6 +29,19 @@
 
 	<!-- Custom Fonts -->
 	<link href="../bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+	<!-- Custom Theme JavaScript -->
+	<script src="../dist/js/sb-admin-2.js"></script>
+	<script type="text/javascript" src="../dist/js/app.js"></script>
+
+	<!-- Moment JS needed for DatePicker -->
+	<script type="text/javascript" src="../bower_components/moment/min/moment.min.js"></script>
+
+	<!-- DateTime Picker CSS/JS -->
+	<script type="text/javascript" src="../bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+	<link rel="stylesheet" href="../bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" />
+
 
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -34,7 +53,6 @@
 </head>
 
 <body>
-
 	<!-- Navigation -->
 	<nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
 		<div class="navbar-header">
@@ -246,7 +264,7 @@
 						<div class="input-group custom-search-form">
 							<input type="text" class="form-control" placeholder="Search...">
 							<span class="input-group-btn">
-										<button class="btn btn-default" type="button" onclick="window.location.href='search_page.html'">
+										<button class="btn btn-default" type="button">
 											<i class="fa fa-search"></i>
 										</button> </span>
 						</div>
@@ -256,7 +274,7 @@
 						<a href="index.html"><i class="fa fa-home fa-fw"></i> Home</a>
 					</li>
 					<li>
-						<a href="my_profile.html"><i class="fa fa-user fa-fw"></i> User Profile</a>
+						<a href="my_profile"><i class="fa fa-user fa-fw"></i> User Profile</a>
 					</li>
 					<li>
 						<a href="tables.html"><i class="fa fa-calendar fa-fw"></i> Events<span class="fa arrow"></span></a>
@@ -272,7 +290,7 @@
 							</li>
 							<li>
 								<a href="create_event.html">
-									</i> Create Event</a>
+                                        Create Event</a>
 							</li>
 						</ul>
 						<!-- /.nav-second-level -->
@@ -284,7 +302,7 @@
 						<a href="popular_games.html"><i class="fa fa-gamepad fa-fw"></i> Popular Games</a>
 					</li>
 					<li>
-						<a href="my_matchups.html"><i class="fa fa-calendar-o fa-fw"></i> My MatchUps</span></a>
+						<a href="my_matchups.html"><i class="fa fa-calendar-o fa-fw"></i> My MatchUps</a>
 					</li>
 					<li>
 						<a href="my_teams.html"><i class="fa fa-group fa-fw"></i> My Teams</a>
@@ -302,51 +320,206 @@
 		<!-- /.navbar-static-side -->
 	</nav>
 
-	<!-- Page Content -->
+
 	<div id="page-wrapper">
 		<div class="container-fluid custom-padding">
-			<div class="row">
-				<div class="col-xs-12 col-md-10">
-					<div class="list-group">
-						<a href="edit_event.html" class="list-group-item">
-							<h4 class="list-group-item-heading">Edit Event</h4>
-							<p class="list-group-item-text">Edit general information of the event like rules, about, start date, etc.</p>
-						</a>
-						<a href="tournament_list.html" class="list-group-item">
-							<h4 class="list-group-item-heading">Tournaments</h4>
-							<p class="list-group-item-text">View, add, delete, and edit tournaments in the event.</p>
-						</a>
-						<a href="check_in.html" class="list-group-item">
-							<h4 class="list-group-item-heading">Registrations</h4>
-							<p class="list-group-item-text">Check in spectators and competitors.</p>
-						</a>
-						<a href="station_assignment.html" class="list-group-item ">
-							<h4 class="list-group-item-heading">Station</h4>
-							<p class="list-group-item-text">Manage station across the event.</p>
-						</a>
-						<a href="tournament_seeding.html" class="list-group-item ">
-							<h4 class="list-group-item-heading">Seeding and Rounds</h4>
-							<p class="list-group-item-text">Arrange seeds for each tournament and create the bracket. Assign dates to the round of the tournament.</p>
-						</a>					
+			<div class="tab-content">
+				<div class="tab-pane fade in active" id="fees-tournaments-tab">
+					<div class="box">
+						<form>
+							<legend>Tournaments</legend>
+							<div class="list-group">
+								<div href="create_event.html#" class="list-group-item clearfix">
+									<span class="pull-right"><a class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteModal"><span class="fa fa-times"></span>
+									</a>
+									</span>
+									<span class="pull-right"><a href="create_event.html#" class="btn btn-sm btn-primary"><span class="fa fa-gear"></span>
+									</a>
+									</span>
+									<p class="lead event-footer-title">Tournament 1</p>
+									Game: Smash
+									<br>Type: Two Stage
+									<br>Format: Single Elimination
+									<br>Price $15.00
+									<br>Capacity 15
+								</div>
+								<div href="#" class="list-group-item clearfix">
+									<span class="pull-right"><a class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteModal"><span class="fa fa-times"></span>
+									</a>
+									</span>
+									<span class="pull-right"><a href="create_event.html#" class="btn btn-sm btn-primary"><span class="fa fa-gear"></span>
+									</a>
+									</span>
+									<p class="lead event-footer-title">Tournament 2</p>
+									Game: Smash
+									<br>Type: Two Stage
+									<br>Format: Single Elimination
+									<br>Price $15.00
+									<br>Capacity 15
+								</div>
+							</div>
+							<a href="#tournament-tab" class="btn btn-success" data-toggle="tab">Add Tournament</a>
+						</form>
+					</div>
+				</div>
+				<div class="tab-pane fade" id="tournament-tab">
+					<div class="box">
+						<h2>Tournament</h2>
+						<form>
+							<legend>General Info</legend>
+							<div class="row">
+								<div class="col-xs-12 col-md-6 col-lg-6">
+									<div class="form-group">
+										<label>Tournament Name: </label>
+										<input class="form-control" placeholder="Enter Name" id="createTournamentName">
+									</div>
+								</div>
+								<div class="col-xs-12 col-md-6 col-lg-6">
+									<div class="form-group has-feedback">
+										<label class="control-label">Game</label>
+										<input type="text" class="form-control" placeholder="Search for Games" />
+										<i class="form-control-feedback glyphicon glyphicon-search"></i>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-12 col-md-6 col-lg-6">
+									<div class="form-group">
+										<label>Start Date: </label>
+										<div class='input-group date' id='createTournamentStart'>
+											<input type='text' id="startDate" class="form-control" />
+											<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+											</span>
+										</div>
+									</div>
+								</div>
+								<div class="col-xs-12 col-md-6 col-lg-6">
+									<div class="form-group">
+										<label>Checkin Start: </label>
+										<div class='input-group date' id='dtpCreateEventRegistrationDeadline'>
+											<input type='text' class="form-control" id="registrationDeadline" />
+											<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span> </span>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label>Rules:</label>
+								<textarea class="form-control" rows="4" id="createTournamentRules"></textarea>
+							</div>
+							<div class="row">
+								<div class="col-xs-12 col-md-6 col-lg-6">
+									<label>Competitor Fee: </label>
+									<div class="form-group input-group">
+										<span class="input-group-addon">$</span>
+										<input type="text" class="form-control" id="spec_fee">
+									</div>
+								</div>
+								<div class="col-xs-12 col-md-6 col-lg-6">
+									<label>Seed Money: </label>
+									<div class="form-group input-group">
+										<span class="input-group-addon">$</span>
+										<input type="text" class="form-control" id="spec_fee">
+									</div>
+								</div>
+								<div class="col-xs-12 col-md-6 col-lg-6">
+									<label>Competitor Deduction Fee: <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" data-original-title="Percentage deducted from each competitor fee to the prize pool."></i>
+									</label>
+									<div class="form-group input-group">
+										<span class="input-group-addon">%</span>
+										<input type="text" class="form-control" id="spec_fee">
+									</div>
+								</div>
+								<div class="col-xs-12 col-md-6 col-lg-6">
+									<div class="form-group">
+										<label>Capacity: </label>
+										<input class="form-control" type="number" id="tournamentCapacity">
+									</div>
+								</div>
+							</div>
+							<legend>Format</legend>
+							<label>Team based</label>
+							<div class="form-inline">
+								<div class="form-group">
+									<div class="radio">
+										<label>
+											<input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked> Yes
+										</label>
+									</div>
+									<div class="radio">
+										<label>
+											<input type="radio" name="optionsRadios" id="optionsRadios2" value="option2"> No
+										</label>
+									</div>
+								</div>
+								<div class="form-group">
+									<label>Team Size: </label>
+									<input class="form-control" type="number" id="teamSize">
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-12 col-md-6 col-lg-6">
+									<div class="form-group">
+										<label>Tournament Type: </label>
+										<select class="form-control">
+											<option>Single Stage</option>
+											<option>Two Stage</option>
+										</select>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-12 col-md-6 col-lg-6">
+									<div class="form-group">
+										<label># of Participant per Group: </label>
+										<input class="form-control" type="number" id="participantPerGroup">
+									</div>
+								</div>
+								<div class="col-xs-12 col-md-6 col-lg-6">
+									<div class="form-group">
+										<label># of Participant advancing: </label>
+										<input class="form-control" type="number" id="partcipantAdvancingPerGroup">
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-12 col-md-6 col-lg-6">
+									<label>Tournament Format: </label>
+									<select class="form-control">
+										<option>Single Elimination</option>
+										<option>Double Elimination</option>
+										<option>Round Robin</option>
+									</select>
+								</div>
+							</div>
+							<div class="row custom-padding">
+								<div class="col-xs-12 col-md-6 col-lg-6">
+									<div class="form-group">
+										<div class="checkbox">
+											<label>
+												<input type="checkbox"> Allow set points
+											</label>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="btn-group btn-group-justified" role="group">
+								<div class="btn-group" role="group">
+									<a href="#fees-tournaments-tab" class="btn btn-default" data-toggle="tab">Cancel</a>
+								</div>
+								<div class="btn-group" role="group">
+									<a href="#fees-tournaments-tab" class="btn btn-primary" data-toggle="tab">Create</a>
+								</div>
+							</div>
+						</form>
 					</div>
 				</div>
 			</div>
 		</div>
-		<!-- /.container-fluid -->
+		<!-- container -->
 	</div>
-	<!-- /#page-wrapper -->
+	<!-- wrapper -->
 
-	<!-- jQuery -->
-	<script src="../bower_components/jquery/dist/jquery.min.js"></script>
-
-	<!-- Bootstrap Core JavaScript -->
-	<script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-
-	<!-- Metis Menu Plugin JavaScript -->
-	<script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
-
-	<!-- Custom Theme JavaScript -->
-	<script src="../dist/js/sb-admin-2.js"></script>
 
 </body>
 
