@@ -9,7 +9,7 @@ var getEventsParams = {
 
 //TODO Implement limit and offsets like in Spruce
 var getEvents = function(req, res, pg, conString) {
-	// Query the DB to find the local Events
+
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -134,6 +134,7 @@ var getEvent = function(req, res, pg, conString) {
 			queryEvent.on("end", function(result) {
 				if (result.rows.length > 0) {
 					event = result.rows[0];
+					// Check if user is organizer
 					var queryEvent = client.query({
 						text : "SELECT distinct customer.customer_username FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location LEFT OUTER JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active;",
 						values : [req.params.event, req.query.date, req.query.location, req.user.username]
@@ -162,24 +163,45 @@ var getParticipants = function(req, res, pg, conString) {
 		}
 		var queryText = "SELECT distinct customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic FROM event ";
 		var queryJoinCustomer = "JOIN customer ON ";
-		
+
 		if (req.query.competitors) {
-			queryText+= "JOIN is_a ON is_a.event_name = event.event_name AND is_a.event_start_date = event.event_start_date AND is_a.event_location = event.event_location ";
-			queryJoinCustomer+= "customer.customer_username = is_a.customer_username ";
+			queryText += "JOIN is_a ON is_a.event_name = event.event_name AND is_a.event_start_date = event.event_start_date AND is_a.event_location = event.event_location ";
+			queryJoinCustomer += "customer.customer_username = is_a.customer_username ";
 			if (req.query.spectators) {
-				queryJoinCustomer+= "OR ";
+				queryJoinCustomer += "OR ";
 			}
 		}
 		if (req.query.spectators) {
-			queryText+= "JOIN pays ON pays.event_name = event.event_name AND pays.event_start_date = event.event_start_date AND pays.event_location = event.event_location ";
-			queryJoinCustomer+= "customer.customer_username = pays.customer_username ";
+			queryText += "JOIN pays ON pays.event_name = event.event_name AND pays.event_start_date = event.event_start_date AND pays.event_location = event.event_location ";
+			queryJoinCustomer += "customer.customer_username = pays.customer_username ";
 		}
 		if (!req.query.competitors && !req.query.spectators) {
-			queryText+= "JOIN is_a ON is_a.event_name = event.event_name AND is_a.event_start_date = event.event_start_date AND is_a.event_location = event.event_location JOIN pays ON pays.event_name = event.event_name AND pays.event_start_date = event.event_start_date AND pays.event_location = event.event_location ";
-			queryJoinCustomer+= "customer.customer_username = is_a.customer_username OR customer.customer_username = pays.customer_username ";
+			queryText += "JOIN is_a ON is_a.event_name = event.event_name AND is_a.event_start_date = event.event_start_date AND is_a.event_location = event.event_location JOIN pays ON pays.event_name = event.event_name AND pays.event_start_date = event.event_start_date AND pays.event_location = event.event_location ";
+			queryJoinCustomer += "customer.customer_username = is_a.customer_username OR customer.customer_username = pays.customer_username ";
 		}
-		
-		queryText+= (queryJoinCustomer + "WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3");
+
+		queryText += (queryJoinCustomer + "WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3");
+		console.log(queryText);
+		var query = client.query({
+			text : queryText,
+			values : [req.params.event, req.query.date, req.query.location]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on("end", function(result) {
+			res.status(200).json(result.rows);
+			client.end();
+		});
+	});
+};
+
+var getParticipants = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
 		console.log(queryText);
 		var query = client.query({
 			text : queryText,
@@ -215,8 +237,48 @@ var getCompetitors = function(req, res, pg, conString) {
 	});
 };
 
+var getEventSpectators = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+		console.log(req.params.event, req.query.date, req.query.location, req.params.tournament);
+		var query = client.query({
+			text : "SELECT distinct customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic, pays.spec_fee_name FROM event JOIN pays ON pays.event_name = event.event_name AND pays.event_start_date = event.event_start_date AND pays.event_location = event.event_location JOIN customer ON customer.customer_username = pays.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3",
+			values : [req.params.event, req.query.date, req.query.location]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on("end", function(result) {
+			res.status(200).json(result.rows);
+			client.end();
+		});
+	});
+};
+
+var getEventCompetitors = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+		console.log(req.params.event, req.query.date, req.query.location, req.params.tournament);
+		var query = client.query({
+			text : "SELECT distinct customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic, tournament.competitor_fee FROM event JOIN is_a ON is_a.event_name = event.event_name AND is_a.event_start_date = event.event_start_date AND is_a.event_location = event.event_location JOIN tournament ON tournament.event_name = event.event_name AND tournament.event_start_date = event.event_start_date AND tournament.event_location = event.event_location AND is_a.tournament_name = tournament.tournament_name JOIN customer ON customer.customer_username = is_a.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3",
+			values : [req.params.event, req.query.date, req.query.location]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on("end", function(result) {
+			res.status(200).json(result.rows);
+			client.end();
+		});
+	});
+};
+
 var getStationsForEvent = function(req, res, pg, conString) {
-	// Query the DB to find the local Events
+
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -237,8 +299,60 @@ var getStationsForEvent = function(req, res, pg, conString) {
 	});
 };
 
+var checkInCompetitor = function(req, res, pg, conString) {
+
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var date = new Date(req.query.date);
+		if (!(date.getTime())) {
+			client.end();
+			res.status(400).send('Invalid date');
+		} else {
+			var queryOrganizers = client.query({//
+				text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
+				values : [req.params.event, date.toUTCString(), req.query.location, req.user.username]
+			});
+			queryOrganizers.on("row", function(row, result) {
+				result.addRow(row);
+			});
+			queryOrganizers.on("end", function(result) {
+				if (result.rows.length) {
+					var queryNews = client.query({
+						text : "SELECT max(station_number)+1 AS next_station FROM station WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
+						values : [req.params.event, req.query.date, req.query.location]
+					});
+					queryNews.on("row", function(row, result) {
+						result.addRow(row);
+					});
+					queryNews.on("end", function(result) {
+						var next_station = result.rows[0].next_station;
+						client.query({
+							text : "INSERT INTO station (event_name, event_start_date, event_location, station_number) VALUES($1, $2, $3, $4)",
+							values : [req.params.event, req.query.date, req.query.location, next_station]
+						}, function(err, result) {
+							if (err) {
+								res.status(500).send("Oh, no! Disaster!");
+								client.end();
+							} else {
+								client.end();
+								res.status(201).send("Created new station");
+							}
+						});
+					});
+				} else {
+					client.end();
+					res.status(403).send("You can't add stations to this event");
+				}
+			});
+		}
+	});
+};
+
 var addStation = function(req, res, pg, conString) {
-	// Query the DB to find the local Events
+
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -290,7 +404,7 @@ var addStation = function(req, res, pg, conString) {
 };
 
 var removeStation = function(req, res, pg, conString) {
-	// Query the DB to find the local Events
+
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -326,7 +440,6 @@ var removeStation = function(req, res, pg, conString) {
 };
 
 var getStation = function(req, res, pg, conString) {
-	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -366,7 +479,6 @@ var getStation = function(req, res, pg, conString) {
 };
 
 var addStream = function(req, res, pg, conString) {
-	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -413,7 +525,6 @@ var addStream = function(req, res, pg, conString) {
 };
 
 var editStation = function(req, res, pg, conString) {
-	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -450,7 +561,6 @@ var editStation = function(req, res, pg, conString) {
 
 //TODO Verify event_start_date
 var removeStream = function(req, res, pg, conString) {
-	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -487,7 +597,6 @@ var removeStream = function(req, res, pg, conString) {
 
 //TODO Verify event_start_date
 var getTournaments = function(req, res, pg, conString) {
-	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -513,7 +622,6 @@ var getTournaments = function(req, res, pg, conString) {
 };
 
 var getTournament = function(req, res, pg, conString) {
-	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -538,14 +646,136 @@ var getTournament = function(req, res, pg, conString) {
 	});
 };
 
-var attachStation = function(req, res, pg, conString) {
-	// Query the DB to find the local Events
+var getSponsors = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+		//select * from sponsors natural join shows where event_name = 'Event 01'
+		var queryOrganizers = client.query({
+			text : "SELECT sponsor_name, sponsor_logo, sponsor_link FROM sponsors NATURAL JOIN shows WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
+			values : [req.params.event, req.query.date, req.query.location]
+		});
+		queryOrganizers.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		queryOrganizers.on("end", function(result) {
+			client.end();
+			res.status(200).json(result.rows);
+		});
+	});
+};
+
+var addSponsorToEvent = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var queryOrganizers = client.query({//TODO Ask if regular events can have stations
+		client.query("START TRANSACTION");
+		var queryOrganizers = client.query({
+			text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
+			values : [req.params.event, req.query.date, req.query.location, req.user.username]
+		});
+		queryOrganizers.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		queryOrganizers.on("end", function(result) {
+			if (result.rows.length) {
+				var queryOrganizers = client.query({
+					text : "SELECT sponsor_name FROM is_confirmed JOIN hosts ON is_confirmed.organization_name = hosts.organization_name JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND sponsor_name = $4",
+					values : [req.params.event, req.query.date, req.query.location, req.query.sponsor]
+				});
+				queryOrganizers.on("row", function(row, result) {
+					result.addRow(row);
+				});
+				queryOrganizers.on("end", function(result) {
+					if (result.rows.length) {
+						client.query({
+							text : "INSERT INTO shows (event_name, event_start_date, event_location, sponsor_name) VALUES ($1, $2, $3, $4)",
+							values : [req.params.event, req.query.date, req.query.location, req.query.sponsor]
+						}, function(err, result) {
+							if (err) {
+								res.status(500).send("Oh, no! Disaster!");
+								client.end();
+							} else {
+								client.query("COMMIT");
+								client.end();
+								res.status(201).send("Sponsor: " + req.query.sponsor + " added");
+							}
+						});
+					} else {
+						client.end();
+						res.status(403).send(req.query.sponsor + " does not sponsor your Organization");
+					}
+				});
+			} else {
+				client.end();
+				res.status(403).send("You can't add sponsors to this Event");
+			}
+		});
+	});
+};
+
+var removeSponsor = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		client.query("START TRANSACTION");
+		var queryOrganizers = client.query({
+			text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
+			values : [req.params.event, req.query.date, req.query.location, req.user.username]
+		});
+		queryOrganizers.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		queryOrganizers.on("end", function(result) {
+			if (result.rows.length) {
+				var queryOrganizers = client.query({
+					text : "SELECT sponsor_name FROM shows WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND sponsor_name = $4",
+					values : [req.params.event, req.query.date, req.query.location, req.query.sponsor]
+				});
+				queryOrganizers.on("row", function(row, result) {
+					result.addRow(row);
+				});
+				queryOrganizers.on("end", function(result) {
+					if (result.rows.length) {
+						client.query({
+							text : "DELETE FROM shows WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND sponsor_name = $4",
+							values : [req.params.event, req.query.date, req.query.location, req.query.sponsor]
+						}, function(err, result) {
+							if (err) {
+								res.status(500).send("Oh, no! Disaster!");
+								client.end();
+							} else {
+								client.query("COMMIT");
+								client.end();
+								res.status(204).send('');
+							}
+						});
+					} else {
+						client.end();
+						res.status(403).send(req.query.sponsor + " does not sponsor your Event");
+					}
+				});
+			} else {
+				client.end();
+				res.status(403).send("You can't add sponsors to this Event");
+			}
+		});
+	});
+};
+
+var attachStation = function(req, res, pg, conString) {
+
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var queryOrganizers = client.query({
 			text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
 			values : [req.params.event, req.query.date, req.query.location, req.user.username]
 		});
@@ -589,7 +819,7 @@ var attachStation = function(req, res, pg, conString) {
 };
 
 var getStationsforTournament = function(req, res, pg, conString) {
-	// Query the DB to find the local Events
+
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -609,13 +839,13 @@ var getStationsforTournament = function(req, res, pg, conString) {
 };
 
 var detachStation = function(req, res, pg, conString) {
-	// Query the DB to find the local Events
+
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var queryOrganizers = client.query({//TODO Ask if regular events can have stations
+		var queryOrganizers = client.query({
 			text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
 			values : [req.params.event, req.query.date, req.query.location, req.user.username]
 		});
@@ -1571,7 +1801,6 @@ module.exports.removeTournament = removeTournament;
 module.exports.deleteEvent = deleteEvent;
 module.exports.editEvent = editEvent;
 module.exports.editTournament = editTournament;
-
 module.exports.getStationsForEvent = getStationsForEvent;
 module.exports.addStation = addStation;
 module.exports.removeStation = removeStation;
@@ -1584,3 +1813,8 @@ module.exports.getTournament = getTournament;
 module.exports.attachStation = attachStation;
 module.exports.getStationsforTournament = getStationsforTournament;
 module.exports.detachStation = detachStation;
+module.exports.getSponsors = getSponsors;
+module.exports.addSponsorToEvent = addSponsorToEvent;
+module.exports.removeSponsor = removeSponsor;
+module.exports.getEventSpectators = getEventSpectators;
+module.exports.getEventCompetitors = getEventCompetitors;

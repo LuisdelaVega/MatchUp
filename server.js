@@ -189,6 +189,32 @@ app.route('/matchup/events/:event')
 		events.deleteEvent(req, res, pg, conString);
 	});
 
+/* /matchup/events/:event/check/competitor/:user
+ * 
+ * [PUT] Check a Competitor into a Tournament TODO Organizers only, Spectators and competitors.
+ * [DELETE] Un-check a Competitor from a Tournament TODO
+ */
+app.route('/matchup/events/:event/check/competitor/:username')
+	.put(function(req, res) {
+		events.checkInCompetitor(req, res, pg, conString);
+	})
+	.delete(function(req, res) {
+		events.uncheckInCompetitor(req, res, pg, conString);
+	});
+
+/* /matchup/events/:event/check/spectator/:user
+ * 
+ * [PUT] Check a Competitor into a Tournament TODO Organizers only, Spectators and competitors.
+ * [DELETE] Un-check a Competitor from a Tournament TODO
+ */
+app.route('/matchup/events/:event/check/spectator/:username')
+	.put(function(req, res) {
+		events.checkInSpectator(req, res, pg, conString);
+	})
+	.delete(function(req, res) {
+		events.uncheckInSpectator(req, res, pg, conString);
+	});
+
 /* /matchup/events/:event/participants?date=date&location=string&spectators=true&competitors=true
  * 
  * params:
@@ -202,12 +228,32 @@ app.route('/matchup/events/:event/participants')
 		events.getParticipants(req, res, pg, conString);
 	});
 
+/* /matchup/events/:event/spectators?date=date&location=string
+ * 
+ * 
+ * [GET] Get all Spectators that are registered for an event
+ */
+app.route('/matchup/events/:event/spectators')
+	.get(function(req, res) {
+		events.getEventSpectators(req, res, pg, conString);
+	});
+
+/* /matchup/events/:event/competitors?date=date&location=string
+ * 
+ * 
+ * [GET] Get all Competitors that are registered for an event
+ */
+app.route('/matchup/events/:event/competitors')
+	.get(function(req, res) {
+		events.getEventCompetitors(req, res, pg, conString);
+	});
+
 /* /matchup/events/:event/stations?date=date&location=string
  * /matchup/events/:event/stations?date=date&location=string&station=int
  * 
  * [GET] Get all Stations in an Event
  * [POST] Add a new Station to your Event
- * [DELETE] Remove a station from your Event TODO Update DB to ON UPDATE CASCADE. Problem deleting when they appear on capacity_for
+ * [DELETE] Remove a station from your Event
  */
 app.route('/matchup/events/:event/stations')
 	.get(function(req, res) {
@@ -389,11 +435,25 @@ app.route('/matchup/events/:event/meetups/:username')
 		events.deleteMeetup(req, res, pg, conString);
 	});
 
-/* /matchup/events/:event/sponsors?date=date&location=string
+/* /matchup/events/:event/sponsors?date=date&location=string&sponsor=string
  * 
- * [GET] Get all sponsors of an Event TODO
- * [DELETE] Remove a sponsor from an Event TODO
+ * params:
+ * 	sponsor = The name of the sponsor
+ * 
+ * [GET] Get all sponsors of an Event
+ * [POST] Add sponsor to your Event
+ * [DELETE] Remove a sponsor from an Event
  */
+app.route('/matchup/events/:event/sponsors')
+	.get(function(req, res) {
+		events.getSponsors(req, res, pg, conString);
+	})
+	.post(function(req, res) {
+		events.addSponsorToEvent(req, res, pg, conString);
+	})
+	.delete(function(req, res){
+		events.removeSponsor(req, res, pg, conString);
+	});
 
 //*\\\\\\\\\\* HOME *//////////*/
 
@@ -464,16 +524,22 @@ app.route('/matchup/organizations/:organization/events')
 		organizations.getOrganizationEvents(req, res, pg, conString);
 	});
 
-/* /matchup/organizations/:organization/sponsors 
+/* /matchup/organizations/:organization/sponsors?sponsor=string
  * 
- * [GET] All sponsors for a specific Organization TODO
- * [POST] Request to add a Sponsor to your organization TODO
+ * [GET] All sponsors for a specific Organization
+ * [POST] Request to add a Sponsor to your organization
+ * [DELETE] Remove a Sponsor from your Organization *NEEDS TEST**
  */
-
-/* /matchup/organizations/:organization/sponsors/:sponsor
- * 
- * [DELETE] Remove a Sponsor from your Organization TODO
- */
+app.route('/matchup/organizations/:organization/sponsors')
+	.get(function(req, res) {
+		organizations.getSponsors(req, res, pg, conString);
+	})
+	.post(function(req, res) {
+		organizations.requestSponsor(req, res, pg, conString);
+	})
+	.delete(function(req, res) {
+		organizations.removeSponsor(req, res, pg, conString);
+	});
 
 //*\\\\\\\\\\* POPULAR *//////////*/
 // *Depreciated*

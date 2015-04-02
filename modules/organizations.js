@@ -108,7 +108,7 @@ var getOrganizationMembers = function(req, res, pg, conString) {//TODO export
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
-		
+
 		var query = client.query({
 			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, bool_and(customer_username IN (SELECT customer_username FROM owns WHERE organization_name = $1)) AS is_owner FROM belongs_to NATURAL JOIN customer WHERE organization_name = $1 GROUP BY customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic",
 			values : [req.params.organization]
@@ -128,7 +128,7 @@ var getOrganizationEvents = function(req, res, pg, conString) {//TODO export
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
-		
+
 		var query = client.query({
 			text : "SELECT event_name, event_location, event_venue, event_start_date, event_end_date, event_logo FROM event NATURAL JOIN hosts WHERE event_active AND organization_name = $1 ORDER BY event_start_date DESC",
 			values : [req.params.organization]
@@ -230,6 +230,101 @@ var addOrganizationMember = function(req, res, pg, conString) {
 			} else {
 				client.end();
 				res.status(401).send('Oh, no! It seems you are do not have enough privileges to do this');
+			}
+		});
+	});
+};
+
+var getSponsors = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+		//select * from sponsors natural join shows where event_name = 'Event 01'
+		var queryOrganizers = client.query({
+			text : "SELECT sponsor_name, sponsor_logo, sponsor_link FROM sponsors NATURAL JOIN is_confirmed WHERE organization_name = $1",
+			values : [req.params.organization]
+		});
+		queryOrganizers.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		queryOrganizers.on("end", function(result) {
+			client.end();
+			res.status(200).json(result.rows);
+		});
+	});
+};
+
+var requestSponsor = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		client.query("START TRANSACTION");
+		var queryOrganizers = client.query({
+			text : "SELECT customer_username FROM belongs_to NATURAL JOIN organization WHERE organization_name = $1 AND customer_username = $2 AND organization_active",
+			values : [req.params.organization]
+		});
+		queryOrganizers.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		queryOrganizers.on("end", function(result) {
+			if (result.rows.length) {
+				client.query({
+					text : "INSERT INTO request_sponsor (request_sponsor_name, organization_name, request_sponsor_link, request_sponsor_description) VALUES ($1, $2, $3, $4)",
+					values : [req.body.name, req.params.organization, req.body.link, req.body.description]
+				}, function(err, result) {
+					if (err) {
+						res.status(500).send("Oh, no! Disaster!");
+						client.end();
+					} else {
+						client.query("COMMIT");
+						client.end();
+						res.status(202).send("Request sent");
+					}
+				});
+			} else {
+				client.end();
+				res.status(403).send("You are not part of this organization");
+			}
+		});
+	});
+};
+
+var removeSponsor = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		client.query("START TRANSACTION");
+		var queryOrganizers = client.query({
+			text : "SELECT customer_username FROM belongs_to NATURAL JOIN organization WHERE organization_name = $1 AND customer_username = $2 AND organization_active",
+			values : [req.params.organization, req.user.username]
+		});
+		queryOrganizers.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		queryOrganizers.on("end", function(result) {
+			if (result.rows.length) {
+				console.log("Gonna delete from is_confirmed now");
+				client.query({
+					text : "DELETE FROM is_confirmed WHERE organization_name = $1 AND sponsor_name = $2",
+					values : [req.params.organization, req.query.sponsor]
+				}, function(err, result) {
+					if (err) {
+						res.status(500).send("Oh, no! Disaster!");
+						client.end();
+					} else {
+						client.query("COMMIT");
+						client.end();
+						res.status(204).send('');
+					}
+				});
+			} else {
+				client.end();
+				res.status(403).send("You are not part of this organization");
 			}
 		});
 	});
@@ -366,3 +461,6 @@ module.exports.getOrganizationMembers = getOrganizationMembers;
 module.exports.getOrganizationEvents = getOrganizationEvents;
 module.exports.addOrganizationMember = addOrganizationMember;
 module.exports.removeOrganizationMember = removeOrganizationMember;
+module.exports.getSponsors = getSponsors;
+module.exports.requestSponsor = requestSponsor;
+module.exports.removeSponsor = removeSponsor;
