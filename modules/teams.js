@@ -1,3 +1,5 @@
+//TODO Register Team to Event
+
 var getTeams = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -17,7 +19,7 @@ var getTeams = function(req, res, pg, conString) {
 	});
 };
 
-//TODO Look for Tournaments the team has participated and calculate their standing
+//TODO Look for Tournaments the team has participated and calculate their matches won/lost
 var getTeam = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -210,7 +212,7 @@ var removeTeamMember = function(req, res, pg, conString) {
 				queryMember.on("end", function(result) {
 					if (result.rows.length > 0) {
 						var member = result.rows[0];
-						// A member can't remove the captain, so if you're the captain, u fuked nig. Make someone else captain, then try again
+						// A member can't remove the captain, so if you're the captain make someone else captain, then try again
 						if (!member.is_captain) {
 							client.query({
 								text : "DELETE FROM plays_for WHERE customer_username = $1 AND team_name = $2",

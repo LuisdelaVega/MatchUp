@@ -1,6 +1,3 @@
-//TODO Add Sponsor
-//TODO Remove Sponsor
-
 var getEventsParams = {
 	type : ["regular", "hosted"],
 	filter : ["game", "genre"],
@@ -224,7 +221,7 @@ var getCompetitors = function(req, res, pg, conString) {
 		}
 		console.log(req.params.event, req.query.date, req.query.location, req.params.tournament);
 		var query = client.query({
-			text : "SELECT distinct customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic FROM tournament JOIN is_a ON is_a.event_name = tournament.event_name AND is_a.event_start_date = tournament.event_start_date AND is_a.event_location = tournament.event_location AND is_a.tournament_name = tournament.tournament_name JOIN customer ON customer.customer_username = is_a.customer_username WHERE tournament.event_name = $1 AND tournament.event_start_date = $2 AND tournament.event_location = $3 AND tournament.tournament_name = $4",
+			text : "SELECT distinct customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic, tournament.competitor_fee, competitor.competitor_check_in, competitor.competitor_seed, competitor.competitor_number FROM tournament JOIN is_a ON is_a.event_name = tournament.event_name AND is_a.event_start_date = tournament.event_start_date AND is_a.event_location = tournament.event_location AND is_a.tournament_name = tournament.tournament_name JOIN competitor ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN customer ON customer.customer_username = is_a.customer_username WHERE tournament.event_name = $1 AND tournament.event_start_date = $2 AND tournament.event_location = $3 AND tournament.tournament_name = $4",
 			values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
 		});
 		query.on("row", function(row, result) {
@@ -244,7 +241,7 @@ var getEventSpectators = function(req, res, pg, conString) {
 		}
 		console.log(req.params.event, req.query.date, req.query.location, req.params.tournament);
 		var query = client.query({
-			text : "SELECT distinct customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic, pays.spec_fee_name FROM event JOIN pays ON pays.event_name = event.event_name AND pays.event_start_date = event.event_start_date AND pays.event_location = event.event_location JOIN customer ON customer.customer_username = pays.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3",
+			text : "SELECT distinct customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic, pays.spec_fee_name, pays.check_in FROM event JOIN pays ON pays.event_name = event.event_name AND pays.event_start_date = event.event_start_date AND pays.event_location = event.event_location JOIN customer ON customer.customer_username = pays.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3",
 			values : [req.params.event, req.query.date, req.query.location]
 		});
 		query.on("row", function(row, result) {
@@ -299,8 +296,7 @@ var getStationsForEvent = function(req, res, pg, conString) {
 	});
 };
 
-var checkInCompetitor = function(req, res, pg, conString) {
-
+var checkInSpectator = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -311,7 +307,7 @@ var checkInCompetitor = function(req, res, pg, conString) {
 			client.end();
 			res.status(400).send('Invalid date');
 		} else {
-			var queryOrganizers = client.query({//
+			var queryOrganizers = client.query({
 				text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
 				values : [req.params.event, date.toUTCString(), req.query.location, req.user.username]
 			});
@@ -320,31 +316,62 @@ var checkInCompetitor = function(req, res, pg, conString) {
 			});
 			queryOrganizers.on("end", function(result) {
 				if (result.rows.length) {
-					var queryNews = client.query({
-						text : "SELECT max(station_number)+1 AS next_station FROM station WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
-						values : [req.params.event, req.query.date, req.query.location]
-					});
-					queryNews.on("row", function(row, result) {
-						result.addRow(row);
-					});
-					queryNews.on("end", function(result) {
-						var next_station = result.rows[0].next_station;
-						client.query({
-							text : "INSERT INTO station (event_name, event_start_date, event_location, station_number) VALUES($1, $2, $3, $4)",
-							values : [req.params.event, req.query.date, req.query.location, next_station]
-						}, function(err, result) {
-							if (err) {
-								res.status(500).send("Oh, no! Disaster!");
-								client.end();
-							} else {
-								client.end();
-								res.status(201).send("Created new station");
-							}
-						});
+					client.query({
+						text : "UPDATE pays SET check_in = NOT check_in WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $4",
+						values : [req.params.event, req.query.date, req.query.location, req.params.username]
+					}, function(err, result) {
+						if (err) {
+							res.status(500).send("Oh, no! Disaster!");
+							client.end();
+						} else {
+							client.end();
+							res.status(201).send("Updated");
+						}
 					});
 				} else {
 					client.end();
-					res.status(403).send("You can't add stations to this event");
+					res.status(403).send("You can't check-in people for this event");
+				}
+			});
+		}
+	});
+};
+
+var checkInCompetitor = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var date = new Date(req.query.date);
+		if (!(date.getTime())) {
+			client.end();
+			res.status(400).send('Invalid date');
+		} else {
+			var queryOrganizers = client.query({
+				text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
+				values : [req.params.event, date.toUTCString(), req.query.location, req.user.username]
+			});
+			queryOrganizers.on("row", function(row, result) {
+				result.addRow(row);
+			});
+			queryOrganizers.on("end", function(result) {
+				if (result.rows.length) {
+					client.query({
+						text : "UPDATE competitor SET competitor_check_in = NOT competitor_check_in WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_number = $5",
+						values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.competitor]
+					}, function(err, result) {
+						if (err) {
+							res.status(500).send("Oh, no! Disaster!");
+							client.end();
+						} else {
+							client.end();
+							res.status(201).send("Updated");
+						}
+					});
+				} else {
+					client.end();
+					res.status(403).send("You can't check-in people for this event");
 				}
 			});
 		}
@@ -1780,7 +1807,6 @@ module.exports.getEvents = getEvents;
 module.exports.getEvent = getEvent;
 module.exports.getParticipants = getParticipants;
 module.exports.getCompetitors = getCompetitors;
-module.exports.getHome = getHome;
 module.exports.getAllNews = getAllNews;
 module.exports.getNews = getNews;
 module.exports.deleteNews = deleteNews;
@@ -1817,4 +1843,9 @@ module.exports.getSponsors = getSponsors;
 module.exports.addSponsorToEvent = addSponsorToEvent;
 module.exports.removeSponsor = removeSponsor;
 module.exports.getEventSpectators = getEventSpectators;
+module.exports.checkInSpectator = checkInSpectator;
+module.exports.checkInCompetitor = checkInCompetitor;
+
+//** DEPRECIATED **
+module.exports.getHome = getHome;
 module.exports.getEventCompetitors = getEventCompetitors;

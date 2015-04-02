@@ -148,11 +148,14 @@ app.post('/login', authenticate);
 /* /matchup/events?type=string&filter=string&value=string&state=string
  * /matchup/events?hosted=bool
  * 
+ * params:
+ * 	type = Events can be created/organized by a single customer or can be hosted by an organization. Possible values: [regular, hosted]
+ * 	filter = Filter Events by the games that are played or by a genre of games. Possible values: [game, genre]
+ * 	value = The value for the filter. The game/genre (i.e, filter=game&value=Street Fighter)
+ * 	state = Indicate if the list of Events will show only ongoing Events, upcoming Events, or past Events. Possible values: [live, upcoming, past]
+ * 	hosted = When creating a new Event, indicate if it will be hosted by an Organization you belong to
+ * 
  * [GET] Get a list of all Events
- * 		Events can be filtered by:
- * 			type (regular, hosted)
- * 			filter (game, genre) (Specify the game/genre in the value parameter)
- * 			state (live, past, upcoming)
  * [POST] Create an Event
  */
 app.route('/matchup/events')
@@ -189,33 +192,11 @@ app.route('/matchup/events/:event')
 		events.deleteEvent(req, res, pg, conString);
 	});
 
-/* /matchup/events/:event/check/competitor/:user
+/* DEPRECIATED
+ * 	The routes /matchup/events/:event/spectators and /matchup/events/:event/competitors return more information about each type of
+ * 	attendee for an Event.
  * 
- * [PUT] Check a Competitor into a Tournament TODO Organizers only, Spectators and competitors.
- * [DELETE] Un-check a Competitor from a Tournament TODO
- */
-app.route('/matchup/events/:event/check/competitor/:username')
-	.put(function(req, res) {
-		events.checkInCompetitor(req, res, pg, conString);
-	})
-	.delete(function(req, res) {
-		events.uncheckInCompetitor(req, res, pg, conString);
-	});
-
-/* /matchup/events/:event/check/spectator/:user
- * 
- * [PUT] Check a Competitor into a Tournament TODO Organizers only, Spectators and competitors.
- * [DELETE] Un-check a Competitor from a Tournament TODO
- */
-app.route('/matchup/events/:event/check/spectator/:username')
-	.put(function(req, res) {
-		events.checkInSpectator(req, res, pg, conString);
-	})
-	.delete(function(req, res) {
-		events.uncheckInSpectator(req, res, pg, conString);
-	});
-
-/* /matchup/events/:event/participants?date=date&location=string&spectators=true&competitors=true
+ * /matchup/events/:event/participants?date=date&location=string&spectators=true&competitors=true
  * 
  * params:
  * 	spectators = Filters the participants to those who payed a spectator fee
@@ -238,8 +219,22 @@ app.route('/matchup/events/:event/spectators')
 		events.getEventSpectators(req, res, pg, conString);
 	});
 
-/* /matchup/events/:event/competitors?date=date&location=string
+/* /matchup/events/:event/spectators/:username?date=date&location=string
  * 
+ * [PUT] Check/Uncheck a Spectator into a Tournament
+ */
+app.route('/matchup/events/:event/spectators/:username')
+	.put(function(req, res) {
+		events.checkInSpectator(req, res, pg, conString);
+	});
+
+/* DEPRECIATED
+ * 	This route's functionality will be moved to /matchup/events/:event/tournaments/:tournament/competitors where the competitor details sent will be 
+ * 	for a specific Tournament. This makes more sense since different Tournament may have different fees and will also synergize better with the check-in function
+ * 	because the same Customer may participate in more than one Tournament but these Tournaments may be played on separate dates, meaning that a Customer may 
+ * 	be present one day and absent on the other.
+ * 
+ * /matchup/events/:event/competitors?date=date&location=string
  * 
  * [GET] Get all Competitors that are registered for an event
  */
@@ -338,11 +333,23 @@ app.route('/matchup/events/:event/tournaments/:tournament/stations')
 
 /* /matchup/events/:event/tournaments/:tournament/competitors?date=date&location=string
  * 
- * [GET] Get all competitors for a specific Tournament
+ * [GET] Get the details for all Competitors for a specific Tournament
  */
 app.route('/matchup/events/:event/tournaments/:tournament/competitors')
 	.get(function(req, res) {
 		events.getCompetitors(req, res, pg, conString);
+	});
+
+/* /matchup/events/:event/tournaments/:tournament/competitors/:competitor?date=date&location=string
+ * 
+ * params:
+ * 	competitor = The competitor number id
+ * 
+ * [PUT] Check/Uncheck a Competitor into a Tournament
+ */
+app.route('/matchup/events/:event/tournaments/:tournament/competitors/:competitor')
+	.put(function(req, res) {
+		events.checkInCompetitor(req, res, pg, conString);
 	});
 
 /* /matchup/events/:event/news?date=date&location=string

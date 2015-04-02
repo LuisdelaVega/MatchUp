@@ -1,6 +1,3 @@
-//TODO Request to add Sponsor
-//TODO Remove Sponsor
-
 var getOrganizations = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -103,7 +100,7 @@ var deleteOrganization = function(req, res, pg, conString) {
 	});
 };
 
-var getOrganizationMembers = function(req, res, pg, conString) {//TODO export
+var getOrganizationMembers = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -123,7 +120,7 @@ var getOrganizationMembers = function(req, res, pg, conString) {//TODO export
 	});
 };
 
-var getOrganizationEvents = function(req, res, pg, conString) {//TODO export
+var getOrganizationEvents = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -330,7 +327,6 @@ var removeSponsor = function(req, res, pg, conString) {
 	});
 };
 
-//TODO I can remove myself here and thus leave the organization without owners. That's bad
 var removeOrganizationMember = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {

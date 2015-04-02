@@ -1,8 +1,5 @@
 //TODO Register for Event
 //TODO Register for Tournament
-//TODO Get all Events organized by a specific Customer
-//TODO Get all Teams where a specific Customer plays in
-//TODO Get all Organizations where a specific Customer is a member
 
 //TODO Calculate the matches won/lost for the profile pages
 var getMyProfile = function(req, res, pg, conString) {
@@ -262,7 +259,6 @@ var deleteAccount = function(req, res, pg, conString) {
 	});
 };
 
-// /create/account - Create a new user account
 var createAccount = function(req, res, pg, conString, jwt, secret, crypto) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
