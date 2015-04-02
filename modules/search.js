@@ -117,4 +117,55 @@ var getSearchResults = function(req, res, pg, conString) {
 	});
 };
 
-module.exports.getSearchResults = getSearchResults; 
+var searchSponsors = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var queryGenres = client.query({
+			text : "SELECT * FROM genre WHERE genre_name ILIKE '%" + req.params.parameter + "%'"
+		});
+		queryGenres.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		queryGenres.on("end", function(result) {
+			searchresults.genres = result.rows;
+
+			res.json({
+				users : searchresults.users,
+				events : searchresults.events,
+				teams : searchresults.teams,
+				organizations : searchresults.organizations,
+				games : searchresults.games,
+				genres : searchresults.genres
+			});
+			client.end();
+		});
+	});
+};
+
+/*
+ // Look for all relevant Genres
+ var queryGenres = client.query({
+ text : "SELECT * FROM genre WHERE genre_name ILIKE '%" + req.params.parameter + "%'"
+ });
+ queryGenres.on("row", function(row, result) {
+ result.addRow(row);
+ });
+ queryGenres.on("end", function(result) {
+ searchresults.genres = result.rows;
+
+ res.json({
+ users : searchresults.users,
+ events : searchresults.events,
+ teams : searchresults.teams,
+ organizations : searchresults.organizations,
+ games : searchresults.games,
+ genres : searchresults.genres
+ });
+ client.end();
+ });
+ */
+
+module.exports.getSearchResults = getSearchResults;

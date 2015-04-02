@@ -78,7 +78,6 @@ function authenticate(req, res) {
 		}
 
 		// Query the database to find the account
-		//TODO Query to find the salt and attach it to the password before comparing with the DB
 		var query = client.query({
 			text : "SELECT customer_username, customer_password, customer_salt FROM customer WHERE customer_username = $1 AND customer_active",
 			values : [user.name]
@@ -118,39 +117,207 @@ function authenticate(req, res) {
 app.get('/bracket/:format/:numofplayers', tournaments.createBraket);
 // *Depreciated* Used for testing of the group stage algorithm
 app.post('/groupstage', tournaments.createGroupStage);
-//TODO Read the details from the DB and only expect the array of players
+// Read the details from the DB and only expect the array of players
 app.post('/tournament', tournaments.createTournament);
 
-///////////////////////////////////////////////////////////////////////////////////////////// API
+//*\\\\\\\\\\* API *//////////*/
+/* /api
+ * 
+ * [GET] Redirects to the MatchUp API powered by Apiary
+ */
 app.get('/api', function(req, res) {
 	res.redirect('http://docs.neptunolabsmatchup.apiary.io');
 });
 
-///////////////////////////////////////////////////////////////////////////////////////////// ACCOUNTS
+//*\\\\\\\\\\* ACCOUNTS *//////////*/
+/* /create/account
+ * 
+ * [POST] Create a new account
+ */
 app.post('/create/account', function(req, res) {
 	customers.createAccount(req, res, pg, conString, jwt, secret, crypto);
 });
+
+/* /login
+ * 
+ * [POST] Login to receive a token for your account
+ */
 app.post('/login', authenticate);
 
-///////////////////////////////////////////////////////////////////////////////////////////// EVENTS
-app.get('/events', function(req, res) {
-	events.getEvents(req, res, pg, conString);
-});
-app.get('/events/:event', function(req, res) {
-	events.getEvent(req, res, pg, conString);
-});
-app.post('/matchup/events', function(req, res) {
-	customers.createEvent(req, res, pg, conString);
-});
-app.post('/matchup/events/:event/news', function(req, res) {
-	events.createNews(req, res, pg, conString);
-});
-app.post('/matchup/events/:event/reviews', function(req, res) {
-	events.createReview(req, res, pg, conString);
-});
-app.post('/matchup/events/:event/meetups', function(req, res) {
-	events.createMeetup(req, res, pg, conString);
-});
+//*\\\\\\\\\\* EVENTS *//////////*/
+/* /matchup/events?type=string&filter=string&value=string&state=string
+ * /matchup/events?hosted=bool
+ * 
+ * [GET] Get a list of all Events
+ * 		Events can be filtered by:
+ * 			type (regular, hosted)
+ * 			filter (game, genre) (Specify the game/genre in the value parameter)
+ * 			state (live, past, upcoming)
+ * [POST] Create an Event
+ */
+app.route('/matchup/events')
+	.get(function(req, res) {
+		events.getEvents(req, res, pg, conString);
+	})
+	.post(function(req, res) {
+		customers.createEvent(req, res, pg, conString);
+	});
+
+/* /matchup/events/:event?date=date&location=string
+ * 
+ * params:
+ * 	event = Name of the event
+ * 	date = Start date of the event
+ * 	location = Location of the event
+ * 
+ * [GET] Get the details for a specific Event
+ * [POST] Add a Tournament to a specific Event
+ * [PUT] Edit the details of a specific Event
+ * [DELETE] Remove a specific Event
+ */
+app.route('/matchup/events/:event')
+	.get(function(req, res) {
+		events.getEvent(req, res, pg, conString);
+	})
+	.post(function(req, res){
+		events.addTournament(req, res, pg, conString);
+	})
+	.put(function(req, res) {
+		events.editEvent(req, res, pg, conString);
+	})
+	.delete(function(req, res){
+		events.deleteEvent(req, res, pg, conString);
+	});
+
+/* /matchup/events/:event/participants?date=date&location=string&spectators=true&competitors=true
+ * 
+ * params:
+ * 	spectators = Filters the participants to those who payed a spectator fee
+ * 	competitors = Filters the participants to those who payed a competitor fee
+ * 
+ * [GET] Get all Customers that are registered for an event
+ */
+app.route('/matchup/events/:event/participants')
+	.get(function(req, res) {
+		events.getParticipants(req, res, pg, conString);
+	});
+
+/* /matchup/events/:event/stations?date=date&location=string
+ * /matchup/events/:event/stations?date=date&location=string&station=int
+ * 
+ * [GET] Get all Stations in an Event
+ * [POST] Add a new Station to your Event
+ * [DELETE] Remove a station from your Event TODO Update DB to ON UPDATE CASCADE. Problem deleting when they appear on capacity_for
+ */
+app.route('/matchup/events/:event/stations')
+	.get(function(req, res) {
+		events.getStationsForEvent(req, res, pg, conString);
+	})
+	.post(function(req, res){
+		events.addStation(req, res, pg, conString);
+	})
+	.delete(function(req, res){
+		events.removeStation(req, res, pg, conString);
+	});
+
+/* /matchup/events/:event/stations/:station?date=date&location=string
+ * 
+ * params:
+ * 	station = Station number
+ * 
+ * [GET] Get the details for a specific station
+ * [POST] Add a stream link to a specific station
+ * [PUT] Edit the stream link for a specific station
+ * [DELETE] Remove the stream link for a specific station
+ */
+app.route('/matchup/events/:event/stations/:station')
+	.get(function(req, res){
+		events.getStation(req, res, pg, conString);
+	})
+	.post(function(req, res){
+		events.addStream(req, res, pg, conString);
+	})
+	.put(function(req, res){
+		events.editStation(req, res, pg, conString);
+	})
+	.delete(function(req, res){
+		events.removeStream(req, res, pg, conString);
+	});
+
+/* /matchup/events/:event/tournaments?date=date&location=string
+ * 
+ * [GET] Get all Tournaments from a specific Event
+ */
+app.route('/matchup/events/:event/tournaments')
+	.get(function(req, res){
+		events.getTournaments(req, res, pg, conString);
+	});
+
+/* /matchup/events/:event/tournaments/:tournament?date=date&location=string&station=int
+ * 
+ * params:
+ * 	tournament = The name of the Tournament
+ * 
+ * [GET] Get a single Tournament from a specific Event
+ * [POST] Attach a station to a Tournament
+ * [PUT] Edit the details of a specific Tournament
+ * [DELETE] Remove a specific Tournament from an Event
+ */
+app.route('/matchup/events/:event/tournaments/:tournament')
+	.get(function(req, res){
+		events.getTournament(req, res, pg, conString);
+	})
+	.post(function(req, res){
+		events.attachStation(req, res, pg, conString);
+	})
+	.put(function(req, res){
+		events.editTournament(req, res, pg, conString);
+	})
+	.delete(function(req, res){
+		events.removeTournament(req, res, pg, conString);
+	});
+
+/* /matchup/events/:event/tournaments/:tournament/stations?date=date&location=string&station=int
+ * 
+ * [GET] Get all stations attached to a Tournament
+ * [DELETE] Detach a station from a Tournament
+ */
+app.route('/matchup/events/:event/tournaments/:tournament/stations')
+	.get(function(req, res){
+		events.getStationsforTournament(req, res, pg, conString);
+	})
+	.delete(function(req, res){
+		events.detachStation(req, res, pg, conString);
+	});
+
+/* /matchup/events/:event/tournaments/:tournament/competitors?date=date&location=string
+ * 
+ * [GET] Get all competitors for a specific Tournament
+ */
+app.route('/matchup/events/:event/tournaments/:tournament/competitors')
+	.get(function(req, res) {
+		events.getCompetitors(req, res, pg, conString);
+	});
+
+/* /matchup/events/:event/news?date=date&location=string
+ * 
+ * [GET] Get all News posted on a specific Event
+ * [POST] Create a new News article for a specific Event
+ */
+app.route('/matchup/events/:event/news')
+	.get(function(req, res) {
+		events.getAllNews(req, res, pg, conString);
+	})
+	.post(function(req, res) {
+		events.createNews(req, res, pg, conString);
+	});
+
+/* /matchup/events/:event/news/:news?date=date&location=string
+ * 
+ * [GET] Get the details for a specific News article
+ * [PUT] Edit the details of a specific News article
+ * [DELETE] Remove a specific News article
+ */
 app.route('/matchup/events/:event/news/:news')
 	.get(function(req, res) {
 		events.getNews(req, res, pg, conString);
@@ -161,6 +328,26 @@ app.route('/matchup/events/:event/news/:news')
 	.delete(function(req, res){
 		events.deleteNews(req, res, pg, conString);
 	});
+
+/* /matchup/events/:event/reviews?date=date&location=string
+ * 
+ * [GET] Get all Reviews posted on a specific Event
+ * [POST] Post a new Review for a specific Event
+ */
+app.route('/matchup/events/:event/reviews')
+	.get(function(req, res) {
+		events.getReviews(req, res, pg, conString);
+	})
+	.post(function(req, res) {
+		events.createReview(req, res, pg, conString);
+	});
+
+/* /matchup/events/:event/review/:username?date=date&location=string
+ * 
+ * [GET] Get the details for a specific Review
+ * [PUT] Edit the details of a Review written by you
+ * [DELETE] Remove a Review written by you
+ */
 app.route('/matchup/events/:event/reviews/:username')
 	.get(function(req, res) {
 		events.getReview(req, res, pg, conString);
@@ -171,6 +358,26 @@ app.route('/matchup/events/:event/reviews/:username')
 	.delete(function(req, res){
 		events.deleteReview(req, res, pg, conString);
 	});
+
+/* /matchup/events/:event/meetups?date=date&location=string
+ * 
+ * [GET] Get all Meetups posted on a specific Event
+ * [POST] Create a new Meetup for a specific Event
+ */
+app.route('/matchup/events/:event/meetups')
+	.get(function(req, res) {
+		events.getMeetups(req, res, pg, conString);
+	})
+	.post(function(req, res) {
+		events.createMeetup(req, res, pg, conString);
+	});
+
+/* /matchup/events/:event/meetups/:username?date=date&location=string&meetup_date=date&meetup_location=string
+ * 
+ * [GET] Get the details for a specific Meetup
+ * [PUT] Edit the details of a specific Meetup posted by you
+ * [DELETE] Remove a specific Meetup posted by you
+ */
 app.route('/matchup/events/:event/meetups/:username')
 	.get(function(req, res) {
 		events.getMeetup(req, res, pg, conString);
@@ -182,20 +389,42 @@ app.route('/matchup/events/:event/meetups/:username')
 		events.deleteMeetup(req, res, pg, conString);
 	});
 
+/* /matchup/events/:event/sponsors?date=date&location=string
+ * 
+ * [GET] Get all sponsors of an Event TODO
+ * [DELETE] Remove a sponsor from an Event TODO
+ */
 
-///////////////////////////////////////////////////////////////////////////////////////////// HOME
+//*\\\\\\\\\\* HOME *//////////*/
+
 // *Depreciated*
 app.get('/home', function(req, res) {
 	events.getHome(res, pg, conString);
 });
 
-///////////////////////////////////////////////////////////////////////////////////////////// ORGANIZATIONS
-app.get('/organizations', function(req, res) {
-	organizations.getOrganizations(req, res, pg, conString);
-});
-app.post('/matchup/organizations', function(req, res) {
-	customers.requestOrganization(req, res, pg, conString);
-});
+//*\\\\\\\\\\* ORGANIZATIONS *//////////*/ 
+/* /matchup/organizations
+ * 
+ * [GET] Get all registered Organizations
+ * [POST] Send a request to create an Organization 
+ */
+app.route('/matchup/organizations')
+	.get(function(req, res) {
+		organizations.getOrganizations(req, res, pg, conString);
+	})
+	.post(function(req, res) {
+		customers.requestOrganization(req, res, pg, conString);
+	});
+
+/* /matchup/organizations/:organization
+ * 
+ * params:
+ * 	organization = The name of the Organization
+ * 
+ * [GET] Get the details of a specific Organization
+ * [PUT] Edit the details of a specific Organization
+ * [DELETE] Remove an Organization from the system
+ */
 app.route('/matchup/organizations/:organization')
 	.get(function(req, res) {
 		organizations.getOrganization(req, res, pg, conString);
@@ -206,26 +435,74 @@ app.route('/matchup/organizations/:organization')
 	.delete(function(req, res) {
 		organizations.deleteOrganization(req, res, pg, conString);
 	});
-app.route('/matchup/organizations/:organization/user/:username')
-	.put(function(req, res) {
+
+/* /matchup/organizations/:organization/members
+ * /matchup/organizations/:organization/members?username=string&owner=bool
+ * /matchup/organizations/:organization/members?username=string
+ * 
+ * [GET] Get all members of a specific Organization
+ * [POST] Add a new member to your Organization
+ * [DELETE] Remove a member from your Organization
+ */
+app.route('/matchup/organizations/:organization/members')
+	.get(function(req, res) {
+		organizations.getOrganizationMembers(req, res, pg, conString);
+	})
+	.post(function(req, res) {
 		organizations.addOrganizationMember(req, res, pg, conString);
 	})
 	.delete(function(req, res) {
 		organizations.removeOrganizationMember(req, res, pg, conString);
 	});
 
-///////////////////////////////////////////////////////////////////////////////////////////// POPULAR
+/* /matchup/organizations/:organization/events
+ * 
+ * [GET] Get all Events hosted by a specific Organization
+ */
+app.route('/matchup/organizations/:organization/events')
+	.get(function(req, res) {
+		organizations.getOrganizationEvents(req, res, pg, conString);
+	});
+
+/* /matchup/organizations/:organization/sponsors 
+ * 
+ * [GET] All sponsors for a specific Organization TODO
+ * [POST] Request to add a Sponsor to your organization TODO
+ */
+
+/* /matchup/organizations/:organization/sponsors/:sponsor
+ * 
+ * [DELETE] Remove a Sponsor from your Organization TODO
+ */
+
+//*\\\\\\\\\\* POPULAR *//////////*/
+// *Depreciated*
 app.get('/popular', function(req, res) {
 	games.getPopularStuff(res, pg, conString);
 });
-app.get('/popular/games', function(req, res) {
+
+/* /matchup/popular/games
+ * 
+ * [GET] Get a list of all Games ordered by their popularity (Amount of Tournaments that feature them)
+ */
+app.get('/matchup/popular/games', function(req, res) {
 	games.getPopularGames(res, pg, conString);
 });
-app.get('/popular/genres', function(req, res) {
+
+/* /matchup/popular/genres
+ * 
+ * [GET] Get a list of all Genres ordered by their popularity (Amount of Tournaments that feature Games of their genre)
+ */
+app.get('/matchup/popular/genres', function(req, res) {
 	games.getPopularGenres(res, pg, conString);
 });
 
-///////////////////////////////////////////////////////////////////////////////////////////// PROFILE
+//*\\\\\\\\\\* PROFILE *//////////*/
+/* /matchup/profile
+ * 
+ * [GET] Get the details of your account
+ * [DELETE] Remove your account from the system
+ */
 app.route('/matchup/profile')
 	.get(function(req, res) {
 		customers.getMyProfile(req, res, pg, conString);
@@ -233,25 +510,96 @@ app.route('/matchup/profile')
 	.delete(function(req, res) {
 		customers.deleteAccount(req, res, pg, conString);
 	});
-app.get('/matchup/profile/:username', function(req, res) {
-	customers.getUserProfile(req, res, pg, conString);
-});
 
-///////////////////////////////////////////////////////////////////////////////////////////// SEARCH
-app.get('/search/:parameter', function(req, res) {
+/* /matchup/profile/:username
+ * 
+ * [GET] Get the details of a specific Customer
+ * [POST] Subscribe to a specific Customer
+ * [DELETE] Unsubscribe to a specific Customer
+ */
+app.route('/matchup/profile/:username')
+	.get(function(req, res) {
+		customers.getUserProfile(req, res, pg, conString);
+	})
+	.post(function(req, res) {
+		customers.subscribe(req, res, pg, conString);
+	})
+	.delete(function(req, res) {
+		customers.unsubscribe(req, res, pg, conString);
+	});
+
+/* /matchup/profile/:username/subscriptions
+ * 
+ * [GET] Get the subscriptions of a specific Customer
+ */
+app.route('/matchup/profile/:username/subscriptions')
+	.get(function(req, res) {
+		customers.getSubscriptions(req, res, pg, conString);
+	});
+
+/* /matchup/profile/:username/teams
+ * 
+ * [GET] Get the Teams for which a specific Customer competes
+ */
+app.route('/matchup/profile/:username/teams')
+	.get(function(req, res) {
+		customers.getTeams(req, res, pg, conString);
+	});
+
+/* /matchup/profile/:username/organizations
+ * 
+ * [GET] Get the Organizations for which a specific Customer is a member
+ */
+app.route('/matchup/profile/:username/organizations')
+	.get(function(req, res) {
+		customers.getOrganizations(req, res, pg, conString);
+	});
+
+/* /matchup/profile/:username/events
+ * 
+ * [GET] Get the events a specific Customer has created
+ */
+app.route('/matchup/profile/:username/events')
+	.get(function(req, res) {
+		customers.getEvents(req, res, pg, conString);
+	});
+
+//*\\\\\\\\\\* SEARCH *//////////*/
+/* /matchup/search/:parameter
+ * 
+ * [GET] Search the system
+ * 		The search will give results for:
+ * 			events (live, past, upcoming)
+ * 			Customers
+ * 			Teams
+ * 			Organizations
+ * 			Games
+ * 			Genres
+ */
+app.get('/matchup/search/:parameter', function(req, res) {
 	search.getSearchResults(req, res, pg, conString);
 });
 
-///////////////////////////////////////////////////////////////////////////////////////////// TEAMS
-app.get('/teams', function(req, res) {
-	teams.getTeams(req, res, pg, conString);
-});
-app.get('/teams/:team/members', function(req, res) {
-	teams.getTeamMembers(req, res, pg, conString);
-});
-app.post('/matchup/teams', function(req, res) {
-	customers.createTeam(req, res, pg, conString);
-});
+//*\\\\\\\\\\* TEAMS *//////////*/
+/* /matchup/teams
+ * 
+ * [GET] Get all registered Teams
+ * [POST] Create a new Team
+ */
+app.route('/matchup/teams')
+	.get(function(req, res) {
+		teams.getTeams(req, res, pg, conString);
+	})
+	.post(function(req, res) {
+		customers.createTeam(req, res, pg, conString);
+	});
+
+/* /matchup/teams/:team
+ * 
+ * [GET] Get the details of a specific Team
+ * [PUT] Edit the details of a specific Team
+ * [DELETE] Delete your Team
+ */
 app.route('/matchup/teams/:team')
 	.get(function(req, res) {
 		teams.getTeam(req, res, pg, conString);
@@ -262,7 +610,18 @@ app.route('/matchup/teams/:team')
 	.delete(function(req, res) {
 		teams.deleteTeam(req, res, pg, conString);
 	});
-app.route('/matchup/teams/:team/user/:username')
+
+/* /matchup/teams/:team/members?username=string
+ * 
+ * [GET] Get the members of a specific Team
+ * [POST] Add a new member to your Team
+ * [PUT] Pass the title of captain to a member of your Team
+ * [DELETE] Remove a member of your Team
+ */
+app.route('/matchup/teams/:team/members')
+	.get(function(req, res) {
+		teams.getTeamMembers(req, res, pg, conString);
+	})
 	.post(function(req, res) {
 		teams.addTeamMember(req, res, pg, conString);
 	})
