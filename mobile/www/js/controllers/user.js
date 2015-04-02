@@ -20,8 +20,6 @@ myApp.controller('ProfileController', function ($scope, $ionicPopover, $state, s
     }
 
     $scope.customerUsername = sharedDataService.get();
-
-
 });
 
 myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$stateParams', function ($scope, $http, $window, $stateParams) {
@@ -42,7 +40,7 @@ myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$st
     });
 }]);
 
-myApp.controller('profileEventsController', ['$scope', '$http', '$stateParams', '$window', function ($scope, $http, $stateParams, $window) {
+myApp.controller('profileEventsController', ['$scope', '$http', '$stateParams', '$window', 'sharedDataService', '$state', function ($scope, $http, $stateParams, $window, sharedDataService, $state) {
     
     console.log("entered profileEventsController");
 
@@ -61,6 +59,34 @@ myApp.controller('profileEventsController', ['$scope', '$http', '$stateParams', 
         console.log(err);
     });
 
+    $scope.goToEvent = function(eventName, date, location){
+
+        eventName = eventName.replace(" ", "%20");
+        var params = [eventName, date, location];
+
+        $http.get('http://136.145.116.232/events/'+eventName+'?date='+date+'&location='+location+'').
+        success(function(data, status, headers, config) {
+
+            var eventData = angular.fromJson(data);
+
+            var isHosted = eventData.info.is_hosted;
+
+            sharedDataService.set(params);
+
+            if(isHosted){
+                $state.go('app.eventpremium.summary', {"eventname": eventName, "date": date, "location": location});
+            }
+            else{
+                $state.go('app.regularevent', {"eventname": eventName, "date": date, "location": location});
+            }
+
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in goToEvent");
+        });
+
+    };
+    
 }]);
 
 

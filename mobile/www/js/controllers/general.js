@@ -1,7 +1,13 @@
 var myApp = angular.module('home',[]);
 
-myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedDataService', function ($scope, $http, $state, sharedDataService) {
-    $http.get('http://matchup.neptunolabs.com/events?type=hosted&state=upcoming').
+myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedDataService', '$window', function ($scope, $http, $state, sharedDataService, $window) {
+    var config = {
+        headers: {
+            'Authorization': "Bearer "+ $window.sessionStorage.token
+        }
+    };
+
+    $http.get('http://matchup.neptunolabs.com/matchup/events?type=hosted&state=upcoming', config).
     success(function(data, status, headers, config) {
 
         $scope.hostedEvents = angular.fromJson(data);
@@ -11,7 +17,7 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
         console.log("error in home controller. obtaining hosted upcoming events");
     });
 
-    $http.get('http://matchup.neptunolabs.com/events?type=regular&state=upcoming').
+    $http.get('http://matchup.neptunolabs.com/matchup/events?type=regular&state=upcoming', config).
     success(function(data, status, headers, config) {
 
         $scope.regularEvents = angular.fromJson(data);
@@ -21,7 +27,7 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
         console.log("error in home controller. obtaining hosted upcoming events");
     });
 
-    $http.get('http://matchup.neptunolabs.com/events?state=live').
+    $http.get('http://matchup.neptunolabs.com/matchup/events?state=live', config).
     success(function(data, status, headers, config) {
 
         $scope.liveEvents = angular.fromJson(data);
@@ -31,7 +37,7 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
         console.log("error in home controller. obtaining hosted upcoming events");
     });
 
-    $http.get('http://matchup.neptunolabs.com/popular/games').
+    $http.get('http://matchup.neptunolabs.com/matchup/popular/games', config).
     success(function(data, status, headers, config) {
 
         $scope.popularGames = angular.fromJson(data);
@@ -46,12 +52,18 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
         eventName = eventName.replace(" ", "%20");
         var params = [eventName, date, location];
 
-        $http.get('http://136.145.116.232/events/'+eventName+'?date='+date+'&location='+location+'').
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+        $http.get('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'', config).
         success(function(data, status, headers, config) {
 
             var eventData = angular.fromJson(data);
 
-            var isHosted = eventData.info.is_hosted;
+            var isHosted = eventData.is_hosted;
 
             sharedDataService.set(params);
 
@@ -77,50 +89,53 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
 
 }]);
 
-myApp.controller('popularGameViewController', ['$scope', '$http', function ($scope, $http) {
-
-    $scope.games = ['img/csgo.jpg', 'img/dota2.jpg', 'img/hearthstone.jpg', 'img/leagueofeppa.jpg'];
-    var moreImgs = ['img/csgo.jpg', 'img/dota2.jpg', 'img/hearthstone.jpg', 'img/leagueofeppa.jpg']
-
-    $scope.add = function add(name) {
-        if (moreImgs.length > 0) {
-            $scope.games.push(moreImgs.pop());
-            $scope.$broadcast('scroll.infiniteScrollComplete');
-        } else
-            $scope.$broadcast('scroll.infiniteScrollComplete');
-    }
-
-}]);
-
-myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$state', function ($scope, $http, sharedDataService, $state) {
+myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$state', '$window', function ($scope, $http, sharedDataService, $state, $window) {
 
     $scope.search = function (query) {
 
-        $http.get('http://136.145.116.232/search/'+query+'').
-        success(function(data, status, headers, config) {
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
 
-            var searchData = angular.fromJson(data);
+        if(query.length > 0){
+            $http.get('http://136.145.116.232/matchup/search/'+query+'', config).
+            success(function(data, status, headers, config) {
 
-            $scope.liveEvents = searchData.events.live;
-            $scope.pastEvents = searchData.events.past;
-            $scope.premiumEvents = searchData.events.hosted;
-            $scope.regularEvents = searchData.events.regular;
-            $scope.users = searchData.users;
-            $scope.teams = searchData.teams;
-            $scope.organizations = searchData.organizations;
-            $scope.games = searchData.games;
-            $scope.genres = searchData.genres;
+                console.log('http://136.145.116.232/matchup/search/'+query+'');
 
-            sharedDataService.set(searchData);
+                $scope.searchData = angular.fromJson(data);
 
-            console.log(searchData);
-            console.log(data);
-            console.log($scope.query);
+                $scope.liveEvents = $scope.searchData.events.live;
+                $scope.pastEvents = $scope.searchData.events.past;
+                $scope.premiumEvents = $scope.searchData.events.hosted;
+                $scope.regularEvents = $scope.searchData.events.regular;
+                $scope.users = $scope.searchData.users;
+                $scope.teams = $scope.searchData.teams;
+                $scope.organizations = $scope.searchData.organizations;
+                $scope.games = $scope.searchData.games;
+                $scope.genres = $scope.searchData.genres;
 
-        }).
-        error(function(data, status, headers, config) {
-            console.log("error in search controller");
-        });
+                sharedDataService.set($scope.searchData);
+            }).
+            error(function(data, status, headers, config) {
+                console.log("error in search controller");
+            });
+        }
+        else{
+
+            $scope.liveEvents.length = 0
+            $scope.pastEvents.length = 0
+            $scope.premiumEvents.length = 0
+            $scope.regularEvents.length = 0
+            $scope.users.length = 0
+            $scope.teams.length = 0
+            $scope.organizations.length = 0
+            $scope.games.length = 0
+            $scope.genres.length = 0
+
+        }
 
     }
 
@@ -129,12 +144,18 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$
         eventName = eventName.replace(" ", "%20");
         var params = [eventName, date, location];
 
-        $http.get('http://136.145.116.232/events/'+eventName+'?date='+date+'&location='+location+'').
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+        $http.get('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'', config).
         success(function(data, status, headers, config) {
 
             var eventData = angular.fromJson(data);
 
-            var isHosted = eventData.info.is_hosted;
+            var isHosted = eventData.is_hosted;
 
             sharedDataService.set(params);
 
@@ -162,9 +183,11 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$
 
 }]);
 
-myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDataService', '$state', function ($scope, $stateParams, sharedDataService, $state) {
+myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDataService', '$state', '$http', '$window', function ($scope, $stateParams, sharedDataService, $state, $http, $window) {
 
     $scope.resultType = $stateParams.type;
+
+    console.log($scope.resultType);
 
     var searchData = sharedDataService.get();
 
@@ -179,19 +202,19 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
     $scope.genres = false;
 
     if ($scope.resultType == 'Live'){
-        $scope.searchData = searchData.live;
+        $scope.searchData = searchData.events.live;
         $scope.live = true;
     }
     else if ($scope.resultType == 'Past'){
-        $scope.searchData = searchData.past;
+        $scope.searchData = searchData.events.past;
         $scope.past = true;
     }
     else if ($scope.resultType == 'Premium'){
-        $scope.searchData = searchData.hosted;
+        $scope.searchData = searchData.events.hosted;
         $scope.hosted = true;
     }
     else if ($scope.resultType == 'Regular'){
-        $scope.searchData = searchData.regular;
+        $scope.searchData = searchData.events.regular;
         $scope.regular = true;
     }
     else if ($scope.resultType == 'Users'){
@@ -221,14 +244,21 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
         eventName = eventName.replace(" ", "%20");
         var params = [eventName, date, location];
 
-        $http.get('http://136.145.116.232/events/'+eventName+'?date='+date+'&location='+location+'').
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+        $http.get('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'', config).
         success(function(data, status, headers, config) {
 
             var eventData = angular.fromJson(data);
 
-            var isHosted = eventData.info.is_hosted;
+            var isHosted = eventData.is_hosted;
 
             sharedDataService.set(params);
+
 
             if(isHosted){
                 $state.go('app.eventpremium.summary', {"eventname": eventName, "date": date, "location": location});
@@ -273,12 +303,18 @@ myApp.controller('cameraReportController', ['$scope', '$http', 'Camera', functio
     };
 }]);
 
-myApp.controller('popularGameViewController', ['$scope', '$http', '$state', 'sharedDataService', function ($scope, $http, $state, sharedDataService) {
+myApp.controller('popularGameViewController', ['$scope', '$http', '$state', 'sharedDataService', '$window', function ($scope, $http, $state, sharedDataService, $window) {
 
     var allGames = [ ];
     $scope.popularGames = [];
 
-    $http.get('http://matchup.neptunolabs.com/popular/games').
+    var config = {
+        headers: {
+            'Authorization': "Bearer "+ $window.sessionStorage.token
+        }
+    };
+
+    $http.get('http://matchup.neptunolabs.com/matchup/popular/games', config).
     success(function(data, status, headers, config) {
 
         allGames = angular.fromJson(data);
@@ -358,21 +394,26 @@ myApp.controller('sidebarController', ['$scope', '$http', '$state', 'sharedDataS
 
             sharedDataService.set(customer_username);
             $state.go('app.profile.summary', { "username":  customer_username});
-            
+
         };
 
         $http.get('http://136.145.116.232/matchup/profile', config).success(function (data) {
 
-            $scope.profileData = data;
             $scope.loggedInUserProfileData = angular.fromJson(data);
-            $scope.coverPhotoCSS = "linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.6)), url("+data.info.customer_cover_photo+")";
-            $scope.profilePictureCSS =  "url("+data.info.customer_profile_pic+")";
-
-            console.log($scope.loggedInUserProfileData);
+            $scope.coverPhotoCSS = "linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.6)), url("+data.customer_cover_photo+")";
+            $scope.profilePictureCSS =  "url("+data.customer_profile_pic+")";
 
         }).error(function (err) {
             console.log(err);
 
         });
+
+        $scope.goToMyEvents = function (customer_username) {
+
+            sharedDataService.set(customer_username);
+            $state.go('app.myevents.melist', { "username":  customer_username});
+
+        };
+
     });
 }]);

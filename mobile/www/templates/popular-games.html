@@ -1,17 +1,15 @@
 <ion-view view-title="Popular Games">
     <ion-content>
-        <div ng-controller="popularGameViewController">
-            <div class="pad-sides" masonry="{columnWidth: 60}">
-                <div class="masonry-brick" ng-repeat="game in popularGames">
-                    <a ng-click="goToGameProfile(game.game_name, game.game_image)">
-                        <img ng-src="{{ game.game_image }}" class="game-cover" style="width: 45vw; height: 45vh">
-                    </a>
-                </div>
+        <div class="pad-sides" masonry="{columnWidth: 60}">
+            <div class="masonry-brick" ng-repeat="game in popularGames">
+                <a ng-click="goToGameProfile(game.game_name, game.game_image)">
+                    <img ng-src="{{ game.game_image }}" class="game-cover" style="width: 45vw; height: 45vh">
+                </a>
             </div>
-            <ion-infinite-scroll ng-if="allGamesIsEmpty()"
-                                 on-infinite="add()"
-                                 distance="1%">
-            </ion-infinite-scroll>
         </div>
+        <ion-infinite-scroll ng-if="allGamesIsEmpty()"
+                             on-infinite="add()"
+                             distance="1%">
+        </ion-infinite-scroll>
     </ion-content>
 </ion-view>

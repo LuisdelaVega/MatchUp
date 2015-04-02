@@ -1,30 +1,24 @@
 var myApp = angular.module('events',[]);
 
-myApp.controller('EventController', function ($scope, $ionicPopover, $http, sharedDataService, $state) {
-    //    $ionicPopover.fromTemplateUrl('templates/events/events-popover.html', {
-    //        scope: $scope,
-    //    }).then(function (popover) {
-    //        $scope.popover = popover;
-    //    });
-    //    $scope.openPopover = function ($event) {
-    //        $scope.popover.show($event);
-    //    };
-    //    $scope.closePopover = function () {
-    //        $scope.popover.hide();
-    //    };
-
+myApp.controller('EventController', function ($scope, $ionicPopover, $http, sharedDataService, $state, $window) {
 
     $scope.goToEvent = function(eventName, date, location){
 
         eventName = eventName.replace(" ", "%20");
-        var params = [eventName, date, location]
+        var params = [eventName, date, location];
 
-        $http.get('http://136.145.116.232/events/'+eventName+'?date='+date+'&location='+location+'').
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+        $http.get('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'', config).
         success(function(data, status, headers, config) {
 
             var eventData = angular.fromJson(data);
 
-            var isHosted = eventData.info.is_hosted;
+            var isHosted = eventData.is_hosted;
 
             sharedDataService.set(params);
 
@@ -45,9 +39,15 @@ myApp.controller('EventController', function ($scope, $ionicPopover, $http, shar
 
 });
 
-myApp.controller('PremiumEventController', function ($scope, $http) {
+myApp.controller('PremiumEventController', function ($scope, $http, $window) {
 
-    $http.get('http://matchup.neptunolabs.com/events?type=hosted').
+    var config = {
+        headers: {
+            'Authorization': "Bearer "+ $window.sessionStorage.token
+        }
+    };
+
+    $http.get('http://matchup.neptunolabs.com/matchup/events?type=hosted', config).
     success(function(data, status, headers, config) {
 
         $scope.hostedEvents = angular.fromJson(data);
@@ -61,9 +61,15 @@ myApp.controller('PremiumEventController', function ($scope, $http) {
 
 });
 
-myApp.controller('RegularEventController', function ($scope, $http) {
+myApp.controller('RegularEventController', function ($scope, $http, $window) {
 
-    $http.get('http://matchup.neptunolabs.com/events?type=regular').
+    var config = {
+        headers: {
+            'Authorization': "Bearer "+ $window.sessionStorage.token
+        }
+    };
+
+    $http.get('http://matchup.neptunolabs.com/matchup/events?type=regular', config).
     success(function(data, status, headers, config) {
 
         $scope.regularEvents = angular.fromJson(data);

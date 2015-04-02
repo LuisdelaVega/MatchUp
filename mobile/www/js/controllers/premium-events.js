@@ -100,26 +100,39 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
 
 });
 
-myApp.controller('eventPremiumSummaryController', function ($scope, $state, $http, $stateParams, sharedDataService) {
+myApp.controller('eventPremiumSummaryController', function ($scope, $state, $http, $stateParams, sharedDataService, $window) {
 
     var now = new Date(); 
     var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
 
-    $http.get('http://136.145.116.232/events/'+$stateParams.eventname+'?date='+$stateParams.date+'&location='+$stateParams.location+'').
+
+    var config = {
+        headers: {
+            'Authorization': "Bearer "+ $window.sessionStorage.token
+        }
+    };
+
+    $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
     success(function(data, status, headers, config) {
 
         $scope.eventInfo = angular.fromJson(data);
-        var startDate = new Date($scope.eventInfo.info.event_start_date);
+        var startDate = new Date($scope.eventInfo.event_start_date);
 
         if(startDate > now_utc)
             $scope.isOngoing = false;
         else
             $scope.isOngoing = true;
 
+    }).
+    error(function(data, status, headers, config) {
+        console.log("error in eventPremiumSummaryController");
+    });
 
+    $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
+    success(function(data, status, headers, config) {
 
-        console.log('Event start date:'+ startDate);
-        console.log('Current date:'+ now_utc);
+        $scope.tournamentsInfo = angular.fromJson(data);
+
 
     }).
     error(function(data, status, headers, config) {
@@ -148,8 +161,9 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
         sharedDataService.set(selectedTournament);
         $state.go("app.writereview")
     }
-    
+
     $scope.goToTournament = function (eventName, eventDate, eventLocation, selectedTournament) {
+
 
         eventName = eventName.replace(" ", "%20");
         var params = [eventName, eventDate, eventLocation];
@@ -160,7 +174,7 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
             location: eventLocation
         })
     }
-    
+
 });
 
 myApp.controller('meetupController', function ($scope, $state, $http, $stateParams, sharedDataService) {

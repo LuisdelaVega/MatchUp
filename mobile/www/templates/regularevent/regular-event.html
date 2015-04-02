@@ -8,11 +8,11 @@
     </ion-nav-buttons>
     <ion-content>
         <div class="crop-banner">
-            <img class="crop-image" src="img/halo4.jpg">
+            <img class="crop-image" ng-src="{{ eventInfo.event_banner }}">
         </div>
         <div>
             <div class="center-text">
-                <img class="profile-pic" src="img/ron.jpg">
+                <img class="profile-pic" ng-src="{{ currentTournament.game_image }}">
             </div>
             <div class="card">
                 <div class="item item-text-wrap">
@@ -20,7 +20,7 @@
                         <h1 class="h1-username">{{ currentTournament.tournament_name }}</h1>
                     </div>
                     <div class="center-text">
-                        <h2 class="h1-username">{{ eventInfo.info.event_name }}</h2>
+                        <h2 class="h1-username">{{ eventInfo.event_name }}</h2>
                     </div>
                     <div class="row">
                         <div class="col">
@@ -31,11 +31,11 @@
                         </div>
                         <div class="col center-text">
                             <h2 class="h1-username">Location<br><br></h2>
-                            <span>{{ eventInfo.info.event_location }}</span>
+                            <span>{{ eventInfo.event_location }}</span>
                         </div>
                     </div>            
                     <p>
-                        <br>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                        <br>{{ currentTournament.tournament_rules }}
                     </p>
                 </div>
             </div>

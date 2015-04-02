@@ -5,27 +5,27 @@
     </ion-nav-buttons>
     <ion-content>
         <div class="crop-banner">
-            <img class="crop-image" ng-src="{{ eventInfo.info.event_banner }}">
+            <img class="crop-image" ng-src="{{ eventInfo.event_banner }}">
         </div>
         <div class="center-text">
-            <img class="profile-pic" ng-src="{{eventInfo.info.event_logo}}">
+            <img class="profile-pic" ng-src="{{eventInfo.event_logo}}">
         </div>
         <div class="card">
             <div class="item item-text-wrap">
                 <div class="center-text">
-                    <h1 class="h1-username">{{ eventInfo.info.event_name }}</h1>
-                    <h2>{{ eventInfo.info.event_start_date | date: 'medium'}}</h2>
-                    <p>{{ eventInfo.info.event_location }}</p>
+                    <h1 class="h1-username">{{ eventInfo.event_name }}</h1>
+                    <h2>{{ eventInfo.event_start_date | date: 'medium'}}</h2>
+                    <p>{{ eventInfo.event_location }}</p>
                 </div>
                 <p>
-                    <br>{{ eventInfo.info.event_description }}
+                    <br>{{ eventInfo.event_description }}
                 </p>
             </div>
             <div class="item tabs tabs-secondary tabs-icon-left">
-                <a class="tab-item" ng-click="goToSignUp(eventInfo.info.event_name, eventInfo.info.event_start_date, eventInfo.info.event_location)" ng-if="!isOngoing">
+                <a class="tab-item" ng-click="goToSignUp(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location)" ng-if="!isOngoing">
                     <i class="icon ion-log-in"></i> Sign Up
                 </a>
-                <a class="tab-item" ng-click="goToMeetup(eventInfo.info.event_name, eventInfo.info.event_start_date, eventInfo.info.event_location)">
+                <a class="tab-item" ng-click="goToMeetup(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location)">
                     <i class="icon ion-android-people"></i> Meetup
                 </a>
             </div>
@@ -51,15 +51,15 @@
             <div class="item item-divider">
                 Tournaments
             </div>
-            <a class="item item-thumbnail-left" ng-click="goToTournament(eventInfo.info.event_name, eventInfo.info.event_start_date, eventInfo.info.event_location, tournament)" ng-repeat="tournament in eventInfo.tournaments">
+            <a class="item item-thumbnail-left" ng-click="goToTournament(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location, tournament.tournament_name)" ng-repeat="tournament in tournamentsInfo">
                 <img ng-src="{{ tournament.game_image }}">
                 <h2>{{tournament.tournament_name}}</h2>
                 <p>{{tournament.tournament_start_date | date: 'medium'}}</p>
             </a>
         </div>
 
-        <div class="list list-inset" ng-if="isOngoing" ng-repeat="tournament in eventInfo.tournaments">
-            <a class="item item-thumbnail-left" ng-click="goToTournament(eventInfo.info.event_name, eventInfo.info.event_start_date, eventInfo.info.event_location)">
+        <div class="list list-inset" ng-if="isOngoing" ng-repeat="tournament in tournamentsInfo">
+            <a class="item item-thumbnail-left" ng-click="goToTournament(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location, tournament.tournament_name)">
                 <img ng-src="{{ tournament.game_image }}">
                 <h2>{{tournament.tournament_name}}</h2>
                 <p>{{tournament.tournament_start_date | date: 'medium'}}</p>
@@ -109,18 +109,6 @@
                     </div>
                 </div>
             </a>
-            <a class="item item-avatar" href="#/app/regulareventmatchups">
-                <img src="img/ron.jpg">
-                <div class="row">
-                    <div class="col col-75">
-                        <h2>Ron Paul</h2>
-                        <p>This is my info</p>
-                    </div>
-                    <div class="col center-text">
-                        <h1 class="h1-username" style="color: rgb(255, 102, 102);"> 1 - 2</h1>
-                    </div>
-                </div>
-            </a>
         </div>
 
         <div ng-controller="ratingsController" ng-if="isOngoing">
@@ -135,7 +123,7 @@
                 </div>
             </div>
             <div class="padding">
-                <button class="button button-block button-positive" ng-click="goToReview(eventInfo.info.event_name, eventInfo.info.event_start_date, eventInfo.info.event_location)">
+                <button class="button button-block button-positive" ng-click="goToReview(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location)">
                     Write a review
                 </button>
             </div>

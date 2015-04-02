@@ -6,7 +6,7 @@
     </ion-nav-buttons>
     <ion-content>
         <div class="list" ng-if="live || past || hosted || regular">
-            <a class="item item-avatar" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="data in searchData">
+            <a class="item item-avatar" ng-click="goToEvent(data.event_name, data.event_start_date, data.event_location)" ng-repeat="data in searchData">
                 <img ng-src="{{ data.event_logo }}">
                 <h2>{{ data.event_name }}</h2>
                 <p>{{ data.event_location }}</p>

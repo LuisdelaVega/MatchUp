@@ -4,7 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-events', 'user', 'team-organizations', 'genres', 'regular-events', 'events', 'game-profile'])
+angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-events', 'user', 'team-organizations', 'genres', 'regular-events', 'events', 'game-profile', 'my-events'])
 
     .run(function ($ionicPlatform) {
     $ionicPlatform.ready(function () {
@@ -155,13 +155,16 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
         .state('app.myevents', {
         url: "/myevents",
         abstract: true,
-        templateUrl: "templates/myevents/my-events.html"
+        templateUrl: "templates/myevents/my-events.html",
+        controller: "myEventsParentController"
+        
     })
         .state('app.myevents.melist', {
-        url: "/melist",
+        url: "/melist/:username",
         views: {
             'upcoming-tab': {
-                templateUrl: "templates/myevents/my-eventsupcoming.html"
+                templateUrl: "templates/myevents/my-eventsupcoming.html",
+                controller: "myEventsUpcomingController"
             },
             'history-tab': {
                 templateUrl: "templates/myevents/my-eventshistory.html"

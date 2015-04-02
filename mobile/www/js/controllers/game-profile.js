@@ -1,6 +1,6 @@
 var myApp = angular.module('game-profile',[]);
 
-myApp.controller('gameProfileParentController', ['$scope', '$http', '$state', 'sharedDataService', function ($scope, $http, $state, sharedDataService) {
+myApp.controller('gameProfileParentController', ['$scope', '$http', '$state', 'sharedDataService', '$window', function ($scope, $http, $state, sharedDataService, $window) {
 
     $scope.$on('$ionicView.beforeEnter', function(){
         var params = sharedDataService.get();
@@ -13,12 +13,18 @@ myApp.controller('gameProfileParentController', ['$scope', '$http', '$state', 's
         eventName = eventName.replace(" ", "%20");
         var params = [eventName, date, location];
 
-        $http.get('http://136.145.116.232/events/'+eventName+'?date='+date+'&location='+location+'').
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+        $http.get('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'', config).
         success(function(data, status, headers, config) {
 
             var eventData = angular.fromJson(data);
 
-            var isHosted = eventData.info.is_hosted;
+            var isHosted = eventData.is_hosted;
 
             sharedDataService.set(params);
 
@@ -38,9 +44,15 @@ myApp.controller('gameProfileParentController', ['$scope', '$http', '$state', 's
 
 }]);
 
-myApp.controller('gameProfileSummaryController', ['$scope', '$http', 'sharedDataService', '$state', '$stateParams', function ($scope, $http, sharedDataService, $state, $stateParams) {
+myApp.controller('gameProfileSummaryController', ['$scope', '$http', 'sharedDataService', '$state', '$stateParams', '$window', function ($scope, $http, sharedDataService, $state, $stateParams, $window) {
 
-    $http.get('http://matchup.neptunolabs.com/events?type=hosted&filter=game&value='+$stateParams.gamename+'').
+    var config = {
+        headers: {
+            'Authorization': "Bearer "+ $window.sessionStorage.token
+        }
+    };
+
+    $http.get('http://matchup.neptunolabs.com/matchup/events?type=hosted&filter=game&value='+$stateParams.gamename+'', config).
     success(function(data, status, headers, config) {
 
         $scope.promotedEvents = data;
@@ -52,9 +64,15 @@ myApp.controller('gameProfileSummaryController', ['$scope', '$http', 'sharedData
 
 }]);
 
-myApp.controller('gameProfileUpcomingController', ['$scope', '$http', 'sharedDataService', '$state', '$stateParams', function ($scope, $http, sharedDataService, $state, $stateParams) {
+myApp.controller('gameProfileUpcomingController', ['$scope', '$http', 'sharedDataService', '$state', '$stateParams', '$window', function ($scope, $http, sharedDataService, $state, $stateParams, $window) {
 
-    $http.get('http://matchup.neptunolabs.com/events?type=hosted&filter=game&value='+$stateParams.gamename+'&state=upcoming').
+    var config = {
+        headers: {
+            'Authorization': "Bearer "+ $window.sessionStorage.token
+        }
+    };
+
+    $http.get('http://matchup.neptunolabs.com/matchup/events?type=hosted&filter=game&value='+$stateParams.gamename+'&state=upcoming', config).
     success(function(data, status, headers, config) {
 
         $scope.upcomingEvents = data;
@@ -68,9 +86,16 @@ myApp.controller('gameProfileUpcomingController', ['$scope', '$http', 'sharedDat
 
 }]);
 
-myApp.controller('gameProfileLiveController', ['$scope', '$http', 'sharedDataService', '$state', '$stateParams', function ($scope, $http, sharedDataService, $state, $stateParams) {
+myApp.controller('gameProfileLiveController', ['$scope', '$http', 'sharedDataService', '$state', '$stateParams', '$window', function ($scope, $http, sharedDataService, $state, $stateParams, $window) {
 
-    $http.get('http://matchup.neptunolabs.com/events?type=hosted&filter=game&value='+$stateParams.gamename+'&state=live').
+    var config = {
+        headers: {
+            'Authorization': "Bearer "+ $window.sessionStorage.token
+        }
+    };
+
+
+    $http.get('http://matchup.neptunolabs.com/matchup/events?type=hosted&filter=game&value='+$stateParams.gamename+'&state=live', config).
     success(function(data, status, headers, config) {
 
         $scope.liveEvents = data;
@@ -82,9 +107,15 @@ myApp.controller('gameProfileLiveController', ['$scope', '$http', 'sharedDataSer
 
 }]);
 
-myApp.controller('gameProfileHistoryController', ['$scope', '$http', 'sharedDataService', '$state', '$stateParams', function ($scope, $http, sharedDataService, $state, $stateParams) {
+myApp.controller('gameProfileHistoryController', ['$scope', '$http', 'sharedDataService', '$state', '$stateParams', '$window', function ($scope, $http, sharedDataService, $state, $stateParams, $window) {
 
-    $http.get('http://matchup.neptunolabs.com/events?type=hosted&filter=game&value='+$stateParams.gamename+'&state=past').
+    var config = {
+        headers: {
+            'Authorization': "Bearer "+ $window.sessionStorage.token
+        }
+    };
+
+    $http.get('http://matchup.neptunolabs.com/matchup/events?type=hosted&filter=game&value='+$stateParams.gamename+'&state=past', config).
     success(function(data, status, headers, config) {
 
         $scope.pastEvents = data;
