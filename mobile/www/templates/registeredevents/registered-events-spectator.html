@@ -1,0 +1,23 @@
+<ion-view view-title="Registered Events">
+    <ion-nav-buttons side="left">
+        <button class="button button-icon button-clear ion-navicon" menu-toggle="left">
+        </button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="right">
+        <button class="button button-icon ion-android-alert">
+        </button>
+        <button class="button button-icon">
+            <i class="ion-android-more-vertical"></i>
+        </button>
+    </ion-nav-buttons>
+    <ion-content>
+        <div class="list list-inset">
+            <a class="item item-thumbnail-left" href="#" ng-repeat="event in eventsSpectating">
+                <img ng-src="{{event.event_logo}}">
+                <h2>{{ event.event_name }}</h2>
+                <p>{{ event.event_location }}</p>
+                <p>{{ event.event_start_date }}</p>
+            </a>
+        </div>
+    </ion-content>
+</ion-view>

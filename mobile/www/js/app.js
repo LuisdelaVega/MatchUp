@@ -4,7 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-events', 'user', 'team-organizations', 'genres', 'regular-events', 'events', 'game-profile', 'my-events'])
+angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-events', 'user', 'team-organizations', 'genres', 'regular-events', 'events', 'game-profile', 'my-events', 'registered-events'])
 
     .run(function ($ionicPlatform) {
     $ionicPlatform.ready(function () {
@@ -180,19 +180,19 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
         .state('app.registeredevents', {
         url: "/registeredevents",
         abstract: true,
-        templateUrl: "templates/registeredevents/registered-events.html"
+        templateUrl: "templates/registeredevents/registered-events.html",
+        controller: "registeredEventsParentController"
     })
         .state('app.registeredevents.relist', {
         url: "/relist",
         views: {
-            're-upcoming-tab': {
-                templateUrl: "templates/registeredevents/registered-eventsupcoming.html"
+            're-competitor-tab': {
+                templateUrl: "templates/registeredevents/registered-events-competitor.html",
+                controller: "registeredEventsCompetitorController"
             },
-            're-history-tab': {
-                templateUrl: "templates/registeredevents/registered-eventshistory.html"
-            },
-            're-live-tab': {
-                templateUrl: "templates/registeredevents/registered-eventslive.html"
+            're-spectator-tab': {
+                templateUrl: "templates/registeredevents/registered-events-spectator.html",
+                controller: "registeredEventsSpectatorController"
             }
         }
     })
@@ -369,12 +369,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
             'event-summary-tab': {
                 templateUrl: "templates/premiumEvent/summary.html",
                 controller: "eventPremiumSummaryController"
-            }
-        }
-    })
-        .state('app.eventpremium.news', {
-        url: "/news/:eventname/:date/:location",
-        views: {
+            },
             'event-news-tab': {
                 templateUrl: "templates/premiumEvent/news.html",
                 controller: "newsController"
@@ -390,7 +385,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     })
     // Edit and post news
         .state('app.postnews', {
-        url: "/postnews/:type",
+        url: "/postnews/:type/:eventname/:date/:location",
         templateUrl: "templates/premiumEvent/post-news.html",
         controller: "postNewsController"
 

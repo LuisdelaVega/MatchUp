@@ -85,7 +85,7 @@ myApp.controller('profileEventsController', ['$scope', '$http', '$stateParams', 
 
             var eventData = angular.fromJson(data);
 
-            var isHosted = eventData.is_hosted;
+            var isHosted = eventData.hosted;
 
             sharedDataService.set(params);
 
@@ -147,9 +147,9 @@ myApp.controller('profileOrganizationsController', ['$scope', '$http', '$statePa
         }
     };
 
-    $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'', config).success(function (data) {
+    $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/organizations', config).success(function (data) {
 
-        $scope.organizationsData = data.organizations;
+        $scope.organizationsData = angular.fromJson(data);
 
     }).error(function (err) {
         console.log(err);

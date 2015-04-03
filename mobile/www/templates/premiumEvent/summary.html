@@ -34,15 +34,13 @@
             <div class="item item-divider">
                 Sponsors
             </div>
-            <div ng-repeat="sponsor in eventInfo.sponsors">
-                <div ng-if="$index%2 == 0"> 
-                    <div class="row">
-                        <div class="col" ng-if="eventInfo.sponsors[$index + 0]">
-                            <img class="game-cover" ng-src="{{ sponsor.sponsor_logo }}">
-                        </div>
-                        <div class="col" ng-if="eventInfo.sponsors[$index + 1]">
-                            <img class="game-cover" ng-src="{{ sponsor.sponsor_logo }}">
-                        </div>
+            <div ng-repeat="sponsor in sponsors" ng-if="$index%2 == 0">
+                <div class="row">
+                    <div class="col">
+                        <img class="game-cover" ng-src="{{ sponsors[$index].sponsor_logo }}">
+                    </div>
+                    <div class="col">
+                        <img class="game-cover" ng-src="{{ sponsors[$index +1].sponsor_logo }}">
                     </div>
                 </div>
             </div>

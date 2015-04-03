@@ -8,7 +8,7 @@ myApp.controller('ratingsController', ['$scope', '$http', '$stateParams', '$wind
             'Authorization': "Bearer "+ $window.sessionStorage.token
         }
     };
-    
+
     $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/reviews?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
     success(function(data, status, headers, config) {
 
@@ -53,46 +53,58 @@ myApp.controller('postNewsController', function ($scope, $stateParams, $state, s
     $scope.goToEvent = function(eventName){
 
         eventName = eventName.replace(" ", "%20");
-        $state.go('app.eventpremium.news', {"eventname": eventName});
-        sharedDataService.set(eventName);
+        $state.go("app.eventpremium.summary", {
+            eventname: $stateParams.eventname,
+            date: $stateParams.date,
+            location: $stateParams.location
+        });
     };  
 });
 
-myApp.controller('newsController', function ($scope, sharedDataService, $stateParams, $state) {
+myApp.controller('newsController', function ($scope, sharedDataService, $stateParams, $state, $http, $window) {
 
-    $scope.result = {
-        "news": [
-            {
-                "title": "Venue Changed Again",
-                "date": "November 01,2015",
-                "content": "Street art pork belly stumptown farm-to-table. Disrupt chillwave tote bag occupy art party, master cleanse vegan 3 wolf moon polaroid Schlitz Austin sustainable plaid. Try-hard tattooed meditation Tumblr vinyl meh. Fanny pack freegan Schlitz Tumblr kogi. Pickled Marfa retro gastropub Blue Bottle. Drinking vinegar cray Banksy migas craft beer. Intelligentsia brunch art party flexitarian, disrupt chia normcore post-ironic leggings raw denim tote bag hella polaroid 8-bit."
-            },
-            {   
-                "title": "Venue Changed",
-                "date": "November 01,2015",
-                "content": "This is a test"
-            }
-        ]
+    var config = {
+        headers: {
+            'Authorization': "Bearer "+ $window.sessionStorage.token
+        }
     };
+
+
+    $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/news?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
+    success(function(data, status, headers, config) {
+
+        console.log('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/news?date='+$stateParams.date+'&location='+$stateParams.location+'');
+
+        $scope.news = angular.fromJson(data);
+
+    }).
+    error(function(data, status, headers, config) {
+        console.log("error in eventPremiumSummaryController");
+    });
 
     // Send data to post news controller
     $scope.clickEdit = function (id) {
-        var values = [$scope.result.news[id], $stateParams.eventname]; 
+        var values = [$scope.news[id], $stateParams.eventname, $stateParams.date, $stateParams.location]; 
         sharedDataService.set(values);
         console.log("in click");
         $state.go("app.postnews", {
-            type: "Edit"
+            type: "Edit",
+            eventname: $stateParams.eventname,
+            date: $stateParams.date,
+            location: $stateParams.location
         })
     }
 });
 
 
 myApp.controller('eventPremiumParentController', function ($scope, $state, $http, $stateParams, sharedDataService) {
-    var params = sharedDataService.get();   
-    $scope.eventName = params[0];
-    $scope.date =  params[1];
-    $scope.location =  params[2];
 
+    $scope.$on('$ionicView.enter', function () {
+        var params = sharedDataService.get();   
+        $scope.eventName = params[0];
+        $scope.date =  params[1];
+        $scope.location =  params[2];
+    });
     console.log('Entered abstract controller of eventPremium');
 });
 
@@ -150,6 +162,18 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
     error(function(data, status, headers, config) {
         console.log("error in eventPremiumSummaryController");
     });
+
+    $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/sponsors?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
+    success(function(data, status, headers, config) {
+
+        $scope.sponsors = angular.fromJson(data);
+
+
+    }).
+    error(function(data, status, headers, config) {
+        console.log("error in eventPremiumSummaryController");
+    });
+
 
     $scope.goToSignUp = function (eventName, eventDate, eventLocation) {
 

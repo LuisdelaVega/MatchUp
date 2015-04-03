@@ -63,11 +63,11 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
 
             var eventData = angular.fromJson(data);
 
-            var isHosted = eventData.is_hosted;
+            var isHosted = eventData.hosted;
 
             sharedDataService.set(params);
 
-            if(isHosted){
+            if(isHosted != 'null'){
                 $state.go('app.eventpremium.summary', {"eventname": eventName, "date": date, "location": location});
             }
             else{
@@ -155,11 +155,11 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$
 
             var eventData = angular.fromJson(data);
 
-            var isHosted = eventData.is_hosted;
+            var isHosted = eventData.hosted;
 
             sharedDataService.set(params);
 
-            if(isHosted){
+            if(isHosted != 'null'){
                 $state.go('app.eventpremium.summary', {"eventname": eventName, "date": date, "location": location});
             }
             else{
@@ -255,12 +255,12 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
 
             var eventData = angular.fromJson(data);
 
-            var isHosted = eventData.is_hosted;
+            var isHosted = eventData.hosted;
 
             sharedDataService.set(params);
 
 
-            if(isHosted){
+            if(isHosted != 'null'){
                 $state.go('app.eventpremium.summary', {"eventname": eventName, "date": date, "location": location});
             }
             else{
@@ -412,6 +412,13 @@ myApp.controller('sidebarController', ['$scope', '$http', '$state', 'sharedDataS
 
             sharedDataService.set(customer_username);
             $state.go('app.myevents.melist', { "username":  customer_username});
+
+        };
+        
+        $scope.goToRegisteredEvents = function (customer_username) {
+
+            sharedDataService.set(customer_username);
+            $state.go('app.registeredevents.relist');
 
         };
 

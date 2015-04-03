@@ -1,10 +1,10 @@
 <ion-view>
-    <ion-tabs class="tabs-positive">
-        <ion-tab title="Summary" href="#/app/eventpremium/summary/{{eventName}}/{{date}}/{{location}}">
-            <ion-nav-view name="event-summary-tab"></ion-nav-view>
-        </ion-tab>
-        <ion-tab title="News" href="#/app/eventpremium/news/{{eventName}}/{{date}}/{{location}}">
+    <ion-tabs class="tabs-positive">   
+        <ion-tab title="News" ng-href="#/app/eventpremium/news/{{eventName}}/{{date}}/{{location}}">
             <ion-nav-view name="event-news-tab"></ion-nav-view>
+        </ion-tab>
+        <ion-tab title="Summary" ng-href="#/app/eventpremium/summary/{{eventName}}/{{date}}/{{location}}">
+            <ion-nav-view name="event-summary-tab"></ion-nav-view>
         </ion-tab>
     </ion-tabs>
 </ion-view>

@@ -22,7 +22,7 @@ myApp.controller('EventController', function ($scope, $ionicPopover, $http, shar
 
             sharedDataService.set(params);
 
-            if(isHosted){
+            if(isHosted != 'null'){
                 $state.go('app.eventpremium.summary', {"eventname": eventName, "date": date, "location": location});
 
             }

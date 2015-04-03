@@ -2,10 +2,11 @@ var myApp = angular.module('game-profile',[]);
 
 myApp.controller('gameProfileParentController', ['$scope', '$http', '$state', 'sharedDataService', '$window', function ($scope, $http, $state, sharedDataService, $window) {
 
-
-    var params = sharedDataService.get();
-    $scope.gameName = params[1];
-    $scope.gameImage = params[0];
+    $scope.$on('$ionicView.enter', function () {
+        var params = sharedDataService.get();
+        $scope.gameName = params[1];
+        $scope.gameImage = params[0];
+    });
 
     $scope.goToEvent = function(eventName, date, location){
 
@@ -27,7 +28,7 @@ myApp.controller('gameProfileParentController', ['$scope', '$http', '$state', 's
 
             sharedDataService.set(params);
 
-            if(isHosted){
+            if(isHosted != 'null'){
                 $state.go('app.eventpremium.summary', {"eventname": eventName, "date": date, "location": location});
             }
             else{

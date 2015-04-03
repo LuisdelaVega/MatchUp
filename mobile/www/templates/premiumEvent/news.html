@@ -6,13 +6,13 @@
         </button>
     </ion-nav-buttons>
     <ion-content>
-        <div class="list card" ng-repeat="new in result.news">
+        <div class="list card" ng-repeat="new in news">
             <div class="item item-body">
-                <h1 class="h1-username">{{new.title}}</h1>
-                <p>{{new.date}}</p>
+                <h1 class="h1-username">{{new.news_title}}</h1>
+                <p>{{new.news_date_posted | date: 'medium'}}</p>
             </div>
             <div class="item item-body">
-                <p>{{new.content | limitTo: 300 }}{{new.content.length > 300 ? '...' : ''}}</p>
+                <p>{{new.news_content | limitTo: 300 }}{{new.content.length > 300 ? '...' : ''}}</p>
             </div>
             <div class="item tabs tabs-secondary tabs-icon-left">
                 <a class="tab-item" ng-click="clickEdit('{{$index}}')">
