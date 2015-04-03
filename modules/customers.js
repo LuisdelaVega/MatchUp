@@ -131,7 +131,7 @@ var getRegisteredEvents = function(req, res, pg, conString) {
 			client.end();
 		} else if (req.query.type === "spectator") {
 			var profileQuery = client.query({
-				text : "SELECT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_logo FROM pays JOIN event ON pays.event_name = event.event_name AND pays.event_start_date = event.event_start_date AND pays.event_location = event.event_location WHERE pays.customer_username = $1 AND event.event_active",
+				text : "SELECT DISTINCT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_logo FROM pays JOIN event ON pays.event_name = event.event_name AND pays.event_start_date = event.event_start_date AND pays.event_location = event.event_location WHERE pays.customer_username = $1 AND event.event_active",
 				values : [req.params.username]
 			});
 			profileQuery.on("row", function(row, result) {
@@ -143,7 +143,7 @@ var getRegisteredEvents = function(req, res, pg, conString) {
 			});
 		} else if (req.query.type === "competitor") {
 			var profileQuery = client.query({
-				text : "SELECT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_logo FROM is_a JOIN event ON is_a.event_name = event.event_name AND is_a.event_start_date = event.event_start_date AND is_a.event_location = event.event_location WHERE is_a.customer_username = $1 AND event.event_active",
+				text : "SELECT DISTINCT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_logo FROM is_a JOIN event ON is_a.event_name = event.event_name AND is_a.event_start_date = event.event_start_date AND is_a.event_location = event.event_location WHERE is_a.customer_username = $1 AND event.event_active",
 				values : [req.params.username]
 			});
 			profileQuery.on("row", function(row, result) {
