@@ -17,7 +17,7 @@ a:hover {
 	left: 10px;
 }
 
-.event-organzier-logo{
+.event-organzier-logo {
 	width: 150px;
 	height: 150px;
 }
@@ -66,7 +66,7 @@ a:hover {
 	padding: 10px;
 }
 
-.second-button-ticket{
+.second-button-ticket {
 	margin-right: 8px;
 }
 
@@ -104,58 +104,55 @@ a:hover {
 	margin-right: auto
 }
 
-
-.checkin-avatar{
+.checkin-avatar {
 	width: 50px;
 	height: 50px;
 	border-radius: 100px;
-    -webkit-border-radius: 100px;
-    -moz-border-radius: 100px;
+	-webkit-border-radius: 100px;
+	-moz-border-radius: 100px;
 }
-
 /*Matchup*/
 
 .img-circular {
-    background-image: url('http://neptunolabs.com/images/badillo.jpg');
-    background-size: cover;
-    border-style: solid;
-    border-width: 3px;
-    border-radius: 100px;
-    -webkit-border-radius: 100px;
-    -moz-border-radius: 100px;
+	background-image: url('http://neptunolabs.com/images/badillo.jpg');
+	background-size: cover;
+	border-style: solid;
+	border-width: 3px;
+	border-radius: 100px;
+	-webkit-border-radius: 100px;
+	-moz-border-radius: 100px;
 }
 
 .player-1 {
-    border-color: #387ef5;
-    background-color: #387ef5;
+	border-color: #387ef5;
+	background-color: #387ef5;
 }
 
 .player-2 {
-    border-color: #ef473a;
-    background-color: #ef473a;
+	border-color: #ef473a;
+	background-color: #ef473a;
 }
 
 .large {
-    height: 10vh;
-    width: 10vh;
+	height: 10vh;
+	width: 10vh;
 }
 
 .mini {
-    height: 7vh;
-    width: 7vh;
+	height: 7vh;
+	width: 7vh;
 }
-
 
 .set-circular {
-    height: 4vh;
-    width: 4vh;
-    display: inline-block;
-    border-radius: 100px;
-    -webkit-border-radius: 100px;
-    -moz-border-radius: 100px;
+	height: 4vh;
+	width: 4vh;
+	display: inline-block;
+	border-radius: 100px;
+	-webkit-border-radius: 100px;
+	-moz-border-radius: 100px;
 }
 
-.set-margin{
+.set-margin {
 	margin-right: 5px;
 	margin-left: 5px;
 }
@@ -171,6 +168,32 @@ a:hover {
 	top: 25px;
 }
 
+
+/*Upload buttons*/
+.btn-file {
+	position: relative;
+	overflow: hidden;
+}
+
+.btn-file input[type=file] {
+	position: absolute;
+	top: 0;
+	right: 0;
+	min-width: 100%;
+	min-height: 100%;
+	font-size: 100px;
+	text-align: right;
+	filter: alpha(opacity=0);
+	opacity: 0;
+	background: red;
+	cursor: inherit;
+	display: block;
+}
+
+input[readonly] {
+	background-color: white !important;
+	cursor: text !important;
+}
 /*Snippets*/
 
 @import url(//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css);

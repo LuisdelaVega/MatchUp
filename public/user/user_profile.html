@@ -1,0 +1,356 @@
+<div class="blur-cover"></div>
+<div class="box box-margin">
+	<div class="row">
+		<div class="col-xs-12 col-md-6 col-lg-6">
+			<p class="info-title">
+				User Name
+			</p>
+			<div class="row" align="center">
+				<div class="profile-picture"></div>
+				<p class="info-title">
+					User tag
+				</p>
+				<p class="info-paragraph">
+					Country Name
+				</p>
+				<div class="countryflag"></div>
+				<br />
+			</div>
+		</div>
+		<div class="col-xs-12 col-md-6 col-lg-6">
+			<div class="row" align="center">
+				<h3>About</h3>
+				<div class="center">
+					<p class="info-paragraph">
+						Raw denim Truffaut proident wolf, asymmetrical mollit exercitation. Tousled est art party wayfarers. Cupidatat ullamco gluten-free Schlitz listicle. Fixie literally normcore, DIY eu jean shorts Truffaut Helvetica actually mlkshk put a bird on it cold-pressed tilde. Tempor biodiesel Shoreditch ennui assumenda skateboard. Literally fixie fanny pack commodo organic, plaid raw denim viral delectus cornhole church-key tofu master cleanse pariatur. Food truck viral anim tilde aute PBR consequat leggings, aliqua single-origin coffee salvia quinoa enim qui wayfarers.
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="btn-group btn-group-justified" role="group">
+		<div class="btn-group" role="group">
+			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#messageModal">
+				<i class="fa fa-envelope"></i> Message
+			</button>
+			<div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="messageModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<h4 class="modal-title" id="messageModalLabel">New message</h4>
+						</div>
+						<div class="modal-body">
+							<form>
+								<div class="form-group">
+									<label for="recipient-name" class="control-label">Recipient:</label>
+									<input type="text" class="form-control" id="recipient-name">
+								</div>
+								<div class="form-group">
+									<label for="message-text" class="control-label">Message:</label>
+									<textarea class="form-control" id="message-text"></textarea>
+								</div>
+							</form>
+						</div>
+						<div class="modal-footer">
+							<div class="col-xs-12 col-md-6 col-lg-6">
+								<button type="button" class="btn btn-primary" data-dismiss="modal">
+									Send message
+								</button>
+							</div>
+							<div class="col-xs-12 col-md-6 col-lg-6">
+								<button type="button" class="btn btn-default" data-dismiss="modal">
+									Cancel
+								</button>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="btn-group" role="group">
+			<button type="button" class="btn btn-default">
+				<i class="fa fa-star-o"></i>Subscribe
+			</button>
+		</div>
+	</div>
+</div>
+
+<!-- Standings widget -->
+<div class="widget-box box-margin">
+	<div class="widget-header bordered-bottom bordered-themesecondary">
+		<h3 class="widget-title themesecondary">Standings</h3>
+		<a class="widget-more" onclick="window.location.href='user_standings.html'">
+						See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
+					</a>
+	</div>
+	<!--Widget Header-->
+	<div class="widget-body">
+		<div class="widget-main no-padding">
+			<div class="tickets-container">
+				<table class="table table-striped table-hover">
+					<thead>
+						<tr>
+							<th>Placing</th>
+							<th>Event</th>
+							<th>Tournament</th>
+							<th>Date</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="cursor" onclick="window.location.href='tournament_page.html'">
+							<td>5th</td>
+							<td>Apex 2015</td>
+							<td>Halo 4</td>
+							<td>March 1, 2015</td>
+						</tr>
+						<tr class="cursor" onclick="window.location.href='tournament_page.html'">
+							<td>5th</td>
+							<td>Apex 2015</td>
+							<td>Halo 4</td>
+							<td>March 1, 2015</td>
+						</tr>
+						<tr class="cursor" onclick="window.location.href='tournament_page.html'">
+							<td>5th</td>
+							<td>Apex 2015</td>
+							<td>Halo 4</td>
+							<td>March 1, 2015</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Standings widget -->
+
+<!-- Teams widget -->
+<div class="widget-box">
+	<div class="widget-header bordered-bottom bordered-themesecondary">
+		<h3 class="widget-title themesecondary">Teams</h3>
+		<a class="widget-more" onclick="window.location.href='user_teams.html'">
+						See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
+					</a>
+	</div>
+	<!--Widget Header-->
+	<div class="widget-body">
+		<div class="widget-main no-padding">
+			<div class="tickets-container">
+				<div class="row" style="padding-left: 15px">
+					<div class="col-md-3 col-sm-4 col-xs-6">
+						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='team_page.html'">
+							<hr class="hr-custom-padding">
+							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+											overflow: hidden;">
+								<p class="thumbnail-title" onclick="window.location.href='team_page.html'">
+									Team Name
+								</p>
+								<p class="thumbnail-paragraph">
+									Captain: Name
+								</p>
+							</div>
+						</a>
+					</div>
+					<div class="col-md-3 col-sm-4 col-xs-6">
+						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='team_page.html'">
+							<hr class="hr-custom-padding">
+							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+											overflow: hidden;">
+								<p class="thumbnail-title" onclick="window.location.href='team_page.html'">
+									Team Name
+								</p>
+								<p class="thumbnail-paragraph">
+									Captain: Name
+								</p>
+							</div>
+						</a>
+					</div>
+					<div class="col-md-3 col-sm-4 col-xs-6">
+						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='team_page.html'">
+							<hr class="hr-custom-padding">
+							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+											overflow: hidden;">
+								<p class="thumbnail-title" onclick="window.location.href='team_page.html'">
+									Team Name
+								</p>
+								<p class="thumbnail-paragraph">
+									Captain: Name
+								</p>
+							</div>
+						</a>
+					</div>
+					<div class="col-md-3 col-sm-4 col-xs-6">
+						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='team_page.html'">
+							<hr class="hr-custom-padding">
+							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+											overflow: hidden;">
+								<p class="thumbnail-title" onclick="window.location.href='team_page.html'">
+									Team Name
+								</p>
+								<p class="thumbnail-paragraph">
+									Captain: Name
+								</p>
+							</div>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Teams widget -->
+
+<!-- User Events widget -->
+<div class="widget-box">
+	<div class="widget-header bordered-bottom bordered-themesecondary">
+		<h3 class="widget-title themesecondary">User Events</h3>
+		<a class="widget-more" onclick="window.location.href='user_events.html'">
+						See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
+					</a>
+	</div>
+	<!--Widget Header-->
+	<div class="widget-body">
+		<div class="widget-main no-padding">
+			<div class="tickets-container">
+				<div class="row" style="padding-left: 15px">
+					<div class="col-md-3 col-sm-4 col-xs-6">
+						<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
+							<hr class="hr-custom-padding">
+							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+											overflow: hidden;">
+								<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
+									Event Name
+								</p>
+								<p class="thumbnail-paragraph">
+									Staple Centersdafdfgdfgsdfgsdfgsdfgdfgsdfgasdfasdf
+								</p>
+								<p class="thumbnail-paragraph">
+									January 2, 8:00PM
+								</p>
+							</div>
+						</a>
+					</div>
+					<div class="col-md-3 col-sm-4 col-xs-6">
+						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
+							<hr class="hr-custom-padding">
+							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+											overflow: hidden;">
+								<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
+									Event Name
+								</p>
+								<p class="thumbnail-paragraph">
+									Staple Centersdafdfgdfgsdfgsdfgsdfgdfgsdfgasdfasdf
+								</p>
+								<p class="thumbnail-paragraph">
+									January 2, 8:00PM
+								</p>
+							</div>
+						</a>
+					</div>
+					<div class="col-md-3 col-sm-4 col-xs-6">
+						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
+							<hr class="hr-custom-padding">
+							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+											overflow: hidden;">
+								<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
+									Event Name
+								</p>
+								<p class="thumbnail-paragraph">
+									Staple Centersdafdfgdfgsdfgsdfgsdfgdfgsdfgasdfasdf
+								</p>
+								<p class="thumbnail-paragraph">
+									January 2, 8:00PM
+								</p>
+							</div>
+						</a>
+					</div>
+					<div class="col-md-3 col-sm-4 col-xs-6">
+						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
+							<hr class="hr-custom-padding">
+							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+											overflow: hidden;">
+								<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
+									Event Name
+								</p>
+								<p class="thumbnail-paragraph">
+									Staple Centersdafdfgdfgsdfgsdfgsdfgdfgsdfgasdfasdf
+								</p>
+								<p class="thumbnail-paragraph">
+									January 2, 8:00PM
+								</p>
+							</div>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- User Events widget-->
+
+<!-- Organizations widget-->
+<div class="widget-box">
+	<div class="widget-header bordered-bottom bordered-themesecondary">
+		<h3 class="widget-title themesecondary">Organizations</h3>
+		<a class="widget-more" onclick="window.location.href='user_organizations.html'">
+						See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
+					</a>
+	</div>
+	<!--Widget Header-->
+	<div class="widget-body">
+		<div class="widget-main no-padding">
+			<div class="tickets-container">
+				<div class="row" style="padding-left: 15px">
+					<div class="col-md-3 col-sm-4 col-xs-6">
+						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='organization_profile1.0.html'">
+							<hr class="hr-custom-padding">
+							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+											overflow: hidden;">
+								<p class="thumbnail-title" align="center" onclick="window.location.href='organization_profile1.0.html'">
+									Organization Name
+								</p>
+							</div>
+						</a>
+					</div>
+					<div class="col-md-3 col-sm-4 col-xs-6">
+						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='organization_profile1.0.html'">
+							<hr class="hr-custom-padding">
+							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+											overflow: hidden;">
+								<p class="thumbnail-title" align="center" onclick="window.location.href='organization_profile1.0.html'">
+									Organization Name
+								</p>
+							</div>
+						</a>
+					</div>
+					<div class="col-md-3 col-sm-4 col-xs-6">
+						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='organization_profile1.0.html'">
+							<hr class="hr-custom-padding">
+							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+											overflow: hidden;">
+								<p class="thumbnail-title" align="center" onclick="window.location.href='organization_profile1.0.html'">
+									Organization Name
+								</p>
+							</div>
+						</a>
+					</div>
+					<div class="col-md-3 col-sm-4 col-xs-6">
+						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='organization_profile1.0.html'">
+							<hr class="hr-custom-padding">
+							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+											overflow: hidden;">
+								<p class="thumbnail-title" align="center" onclick="window.location.href='organization_profile1.0.html'">
+									Organization Name
+								</p>
+							</div>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Organizations widget -->

@@ -1,0 +1,31 @@
+<!-- Nav tabs -->
+<ul class="nav nav-tabs nav-justified tab-padding-top">
+	<li ng-class="{active: $index==0}" ng-repeat="tab in test.tabs">
+		<a data-target="#{{tab.firstName}}" data-toggle="tab">firstName 1</a>
+	</li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+	<div class="tab-pane fade in active" id="tournament1">
+		<div class="panel-padding">
+			<div class="row box-margin">
+				<div class="col-md-10 col-md-offset-1">
+					<ul ui-sortable ng-model="items">
+						<li ng-repeat="item in items">{{ item }}</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade" id="tournament2">
+		<div class="panel-padding">
+			<div class="row box-margin">
+				<div class="col-md-10 col-md-offset-1">
+					<p>hi2</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--	tab content -->
