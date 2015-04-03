@@ -1,88 +1,240 @@
-$(function () {
-	$('#dtpCreateEventStartDate').datetimepicker();
-	$('#dtpCreateEventEndDate ').datetimepicker();
-	$('#dtpCreateEventRegistrationDeadline').datetimepicker();
-	
-	// Initiate bootstrap tooltip module
-	$('[data-toggle="tooltip"]').tooltip({
-		placement: 'top'
+var myApp = angular.module('MatchUp', ['ui.router']);
+
+myApp.config(function ($stateProvider, $urlRouterProvider) {
+	//
+	// For any unmatched url, redirect to /home
+	$urlRouterProvider.otherwise("/login");
+	//
+	// Now set up the states
+	$stateProvider
+		.state('login', {
+			url: "/login",
+			templateUrl: "login.html"
+		})
+		.state('app', {
+			url: "/app",
+			abstract: true,
+			templateUrl: "app.html"
+		})
+		.state('app.home', {
+			url: "/home",
+			templateUrl: "home.html"
+		})
+		/**
+		 *	Events
+		 *
+		 */
+		.state('app.premiumEvent', {
+			url: "/premiumEvent",
+			templateUrl: "event/premium_event.html"
+		})
+		.state('app.generalEvents', {
+			url: "/generalEvents",
+			templateUrl: "event/general_events.html"
+		})
+		.state('app.myEvents', {
+			url: "/myEvents",
+			templateUrl: "event/my_events.html"
+		})
+		.state('app.createEvent', {
+			url: "/createEvent",
+			templateUrl: "event/create_event.html"
+		})
+		.state('app.registeredEvents', {
+			url: "/registeredEvents",
+			templateUrl: "event/registered_events.html"
+		})
+		.state('app.meetupList', {
+			url: "/meetupList",
+			templateUrl: "event/meetupList.html"
+		})
+		.state('app.meetup', {
+			url: "/meetup",
+			templateUrl: "event/meetup.html"
+		})
+		.state('app.create_meetup', {
+			url: "/createMeetup",
+			templateUrl: "event/create_meetup.html"
+		})
+		.state('app.competitorSignup', {
+			url: "/competitorSignup",
+			templateUrl: "event/competitor_signup.html"
+		})
+		/**
+		 *	Event organizer views
+		 *
+		 */
+		.state('app.eventSettings', {
+			url: "/eventSettings",
+			templateUrl: "organizer/event_settings.html"
+		})
+		.state('app.editEvent', {
+			url: "/editEvent",
+			templateUrl: "organizer/edit_event.html"
+		})
+		.state('app.tournamentList', {
+			url: "/tournamentList",
+			templateUrl: "organizer/tournament_list.html"
+		})
+		.state('app.registrations', {
+			url: "/registrations",
+			templateUrl: "organizer/registrations.html"
+		})
+		.state('app.stationAssignment', {
+			url: "/stationAssignment",
+			templateUrl: "organizer/station_assignment.html"
+		})
+		.state('app.seeding', {
+			url: "/seeding",
+			templateUrl: "organizer/seeding.html",
+			controller: "Seeding"
+		})
+		.state('app.reportList', {
+			url: "/reportList",
+			templateUrl: "organizer/report_list.html",
+		})
+		/**
+		 *	Tournaments
+		 *
+		 */
+		.state('app.tournament', {
+			url: "/tournament",
+			templateUrl: "tournament/tournament.html"
+		})
+		.state('app.tournamentLive', {
+			url: "/tournamentLive",
+			templateUrl: "tournament/tournamentLive.html"
+		})
+		/**
+		 *	User Profiles
+		 *
+		 */
+		.state('app.userProfile', {
+			url: "/userProfile",
+			// using my profile for now to fix edit page
+			// TODO change to user_profile and use ng-if
+			templateUrl: "user/my_profile.html"
+		})
+		.state('app.userStandings', {
+			url: "/userStandings",
+			templateUrl: "user/user_standings.html"
+		})
+		.state('app.userTeams', {
+			url: "/userTeams",
+			templateUrl: "user/user_teams.html"
+		})
+		.state('app.userEvents', {
+			url: "/userEvents",
+			templateUrl: "user/user_events.html"
+		})
+		.state('app.userOrganizations', {
+			url: "/userOrganizations",
+			templateUrl: "user/user_organizations.html"
+		})
+		.state('app.editProfile', {
+			url: "/editProfile",
+			templateUrl: "user/edit_profile.html"
+		})
+		.state('app.myMatchups', {
+			url: "/myMatchups",
+			templateUrl: "user/my_matchups.html"
+		})
+		.state('app.subscribed', {
+			url: "/subscribed",
+			templateUrl: "user/subscribed.html"
+		})
+		/**
+		 *	Game Profiles
+		 *
+		 */
+		.state('app.gameProfile', {
+			url: "/gameProfile",
+			templateUrl: "game/game_profile.html"
+		})
+		.state('app.popularGames', {
+			url: "/popularGames",
+			templateUrl: "game/popular_games.html"
+		})
+		/**
+		 *	Genre Profiles
+		 *
+		 */
+		.state('app.genreProfile', {
+			url: "/genreProfile",
+			templateUrl: "genre/genre_profile.html"
+		})
+		.state('app.genres', {
+			url: "/genres",
+			templateUrl: "genre/genres.html"
+		})
+		/**
+		 *	Team Stuff
+		 *
+		 */
+		.state('app.teamProfile', {
+			url: "/teamProfile",
+			templateUrl: "team/team_profile.html"
+		})
+		.state('app.teamStandings', {
+			url: "/teamStandings",
+			templateUrl: "team/team_standings.html"
+		})
+		.state('app.editTeam', {
+			url: "/editTeam",
+			templateUrl: "team/edit_team.html"
+		})
+		.state('app.myTeams', {
+			url: "/myTeams",
+			templateUrl: "team/my_teams.html"
+		})
+		.state('app.createTeam', {
+			url: "/createTeam",
+			templateUrl: "team/create_team.html"
+		})
+		/**
+		 *	Organization Stuff
+		 *
+		 */
+		.state('app.organizationProfile', {
+			url: "/organizationProfile",
+			templateUrl: "organization/organization_profile.html"
+		})
+		.state('app.editOrganization', {
+			url: "/editOrganization",
+			templateUrl: "organization/edit_organization.html"
+		})
+		.state('app.organizationEvents', {
+			url: "/organizationEvents",
+			templateUrl: "organization/organization_events.html"
+		})
+		.state('app.myOrganizations', {
+			url: "/myOrganizations",
+			templateUrl: "organization/my_organizations.html"
+		})
+		.state('app.requestOrganization', {
+			url: "/requestOrganization",
+			templateUrl: "organization/request_organization.html"
+		})
+
+
+	.state('app.search', {
+		url: "/search",
+		templateUrl: "search.html"
 	});
 });
 
-var images = [];
-// Imgur api!
-function upload(file, imglabel) {
-	if (!file || !file.type.match(/image.*/))
-		return;
-
-	$("#" + imglabel + "Label").val(file.name);
-
-
-	console.log("Image Name: " + file.name + "\nFile type: " + file.type);
-	console.log();
-
-	document.body.className = "uploading";
-
-	var fd = new FormData();
-	fd.append("image", file);
-	fd.append("key", "6528448c258cff474ca9701c5bab6927");
-	var xhr = new XMLHttpRequest();
-	xhr.open("POST", "http://api.imgur.com/2/upload.json");
-	xhr.onload = function () {
-		link = JSON.parse(xhr.responseText).upload.links.imgur_page;
-		link = link + ".png";
-		images.push({
-			"id": imglabel,
-			"image": link
-		});
-
-
-
-		console.log(images);
-
-	};
-	xhr.send(fd);
-}
-
-function getValuesTest() {
-	console.log("Submit Initiated");
-	console.log($('#name').val());
-	var name = $('#createEventName').val();
-	var hostedBy = $('#createEventHostedBy').val();
-	var about = $('#createEventAbout').val();
-	var rules = $('#createEventRules').val();
-	var banner = document.all["createEventBanner"].value;
-	console.log(link);
-	//    var logo = $('#lrd-sellitemAmount').val();
-	//    var startDate = $('#lrd-sellitemPrice').val();
-	//    var endDate = $('#lrd-sellitemModel').val();
-	//    var location = $('#lrd-sellitemBrand').val();
-	//    var registrationDeadline = $('#lrd-dimensions').val();
-	//    var sponsors = $('#lrd-sellitemAmount').val();
-	//    var spec_fee = $('#lrd-sellitemPrice').val();
-
-	//Tournaments Array
-}
-
-//Changes to file input for asthetics
-$(document).on('change', '.btn-file :file', function () {
-	var input = $(this),
-		numFiles = input.get(0).files ? input.get(0).files.length : 1,
-		label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
-	input.trigger('fileselect', [numFiles, label]);
-});
-
-$(document).ready(function () {
-	$('.btn-file :file').on('fileselect', function (event, numFiles, label) {
-
-		var input = $(this).parents('.input-group').find(':text'),
-			log = numFiles > 1 ? numFiles + ' files selected' : label;
-
-		if (input.length) {
-			input.val(log);
-		} else {
-			if (log) alert(log);
-		}
-
-	});
+myApp.controller("Seeding", function ($scope) {
+	$scope.test = {
+		"tabs": [
+			{
+				"firstName": "tournament1",
+				"lastName": "Doe"
+			},
+			{
+				"firstName": "tournament1",
+				"lastName": "Smith"
+			}
+]
+	}
+	$scope.items = ["One", "Two", "Three"];
 });
