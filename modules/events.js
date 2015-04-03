@@ -146,7 +146,7 @@ var getEvent = function(req, res, pg, conString) {
 					});
 				} else {
 					client.end();
-					res.status(404).send('Oh, no! This event does not exist');
+					res.status(404).send("Couldn't find the event: " + req.params.event+" starting on: " +req.query.date+" located at: "+ req.query.location);
 				}
 			});
 		}
@@ -234,6 +234,7 @@ var getCompetitors = function(req, res, pg, conString) {
 	});
 };
 
+//TODO Validate date 400
 var getEventSpectators = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -275,7 +276,6 @@ var getEventCompetitors = function(req, res, pg, conString) {
 };
 
 var getStationsForEvent = function(req, res, pg, conString) {
-
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -379,7 +379,6 @@ var checkInCompetitor = function(req, res, pg, conString) {
 };
 
 var addStation = function(req, res, pg, conString) {
-
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -431,7 +430,6 @@ var addStation = function(req, res, pg, conString) {
 };
 
 var removeStation = function(req, res, pg, conString) {
-
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -460,7 +458,7 @@ var removeStation = function(req, res, pg, conString) {
 				});
 			} else {
 				client.end();
-				res.status(403).send("You can't add stations to this event");
+				res.status(403).send("You can't remove stations from this event");
 			}
 		});
 	});
@@ -545,7 +543,7 @@ var addStream = function(req, res, pg, conString) {
 				});
 			} else {
 				client.end();
-				res.status(403).send("You can't edit stations in this event");
+				res.status(403).send("You can't add streams in this event");
 			}
 		});
 	});
@@ -575,7 +573,7 @@ var editStation = function(req, res, pg, conString) {
 						client.end();
 					} else {
 						client.end();
-						res.status(201).send("Changed the stream link to " + req.body.stream + " on Station #" + req.params.station);
+						res.status(200).send("Changed the stream link to " + req.body.stream + " on Station #" + req.params.station);
 					}
 				});
 			} else {
@@ -616,7 +614,7 @@ var removeStream = function(req, res, pg, conString) {
 				});
 			} else {
 				client.end();
-				res.status(403).send("You can't edit stations in this event");
+				res.status(403).send("You can't remove streams in this event");
 			}
 		});
 	});
@@ -1676,7 +1674,7 @@ var editEvent = function(req, res, pg, conString) {
 								result.event.location = req.body.location;
 								client.query("COMMIT");
 								client.end();
-								res.status(201).json(result);
+								res.status(200).json(result);
 							}
 						});
 					}

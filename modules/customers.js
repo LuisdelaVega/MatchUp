@@ -292,7 +292,7 @@ var createAccount = function(req, res, pg, conString, jwt, secret, crypto) {
 						]
 					}, function(err, result) {
 						if (err) {
-							res.status(400).send("Oh, no! Disaster!");
+							res.status(500).send("Oh, no! Disaster!");
 							client.end();
 						} else {
 							var response = {
@@ -566,7 +566,7 @@ var createEvent = function(req, res, pg, conString) {
 											});
 										} else {
 											client.end();
-											res.status(403).send("You are not a member of " + req.body.host);
+											res.status(403).send("You are not a member of: " + req.body.host);
 										}
 									});
 								}

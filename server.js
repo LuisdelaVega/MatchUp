@@ -285,6 +285,7 @@ app.route('/matchup/events/:event/stations/:station')
 		events.removeStream(req, res, pg, conString);
 	});
 
+//TODO Document Below
 /* /matchup/events/:event/tournaments?date=date&location=string
  * 
  * [GET] Get all Tournaments from a specific Event
