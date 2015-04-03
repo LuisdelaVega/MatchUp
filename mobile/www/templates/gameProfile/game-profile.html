@@ -1,16 +1,16 @@
 <ion-view view-title="Tournaments">
-    <ion-tabs class="tabs-positive">
-        <ion-tab title="Main" href="#/app/game/summary/{{ gameName }}">
-            <ion-nav-view name="game-summary-tab"></ion-nav-view>
-        </ion-tab>
-        <ion-tab title="Upcoming" href="#/app/game/upcoming/{{ gameName }}">
+    <ion-tabs class="tabs-positive">   
+        <ion-tab title="Upcoming" ng-href="#/app/game/summary/{{gameName}}">
             <ion-nav-view name="game-upcoming-tab"></ion-nav-view>
         </ion-tab>
-        <ion-tab title="Live" href="#/app/game/live/{{ gameName }}">
+        <ion-tab title="Live" ng-href="#/app/game/summary{{gameName}}">
             <ion-nav-view name="game-live-tab"></ion-nav-view>
         </ion-tab>
-        <ion-tab title="History" href="#/app/game/history/{{ gameName }}">
+        <ion-tab title="History" ng-href="#/app/game/summary{{gameName}}">
             <ion-nav-view name="game-history-tab"></ion-nav-view>
+        </ion-tab>
+        <ion-tab title="Main" ng-href="#/app/game/summary{{gameName}}">
+            <ion-nav-view name="game-summary-tab"></ion-nav-view>
         </ion-tab>
     </ion-tabs>
 </ion-view>

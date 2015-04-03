@@ -16,7 +16,7 @@
     <ion-side-menu side="left">
         <ion-content>
             <div class="list list-cover">
-                <a class="full-width" ng-click="goToProfile(loggedInUserProfileData.info.customer_username)" nav-clear menu-close>
+                <a class="full-width" ng-click="goToProfile(loggedInUserProfileData.customer_username)" nav-clear menu-close>
                     <div class="blur-cover" ng-style="{'background': coverPhotoCSS}">
                         <header class="padding">
                             <div class="img-circular no-border mini" ng-style="{'background-image': profilePictureCSS}"></div>
@@ -47,15 +47,6 @@
                 </ion-item>
                 <ion-item nav-clear menu-close href="#/app/mymatchups">
                     My Matchups
-                </ion-item>
-                <ion-item nav-clear menu-close ng-click="goToMyEvents(loggedInUserProfileData.info.customer_username)">
-                    My Events
-                </ion-item>
-                <ion-item nav-clear menu-close href="#/app/myteams">
-                    My Teams
-                </ion-item>
-                <ion-item nav-clear menu-close href="#/app/myorganizations">
-                    My Organizations
                 </ion-item>
                 <ion-item nav-clear menu-close href="#/app/mysubscriptions">
                     Subscribed

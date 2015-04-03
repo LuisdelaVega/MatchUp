@@ -31,13 +31,30 @@ myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$st
     };
 
     $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'', config).success(function (data) {
-
-        $scope.profileData = data;
-        $scope.myProfile = data.info.my_profile;
+        
+        $scope.profileData = angular.fromJson(data);
+        $scope.myProfile = $scope.profileData.my_profile;
         
     }).error(function (err) {
         console.log(err);
     });
+    
+    $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/teams', config).success(function (data) {
+        
+        $scope.teams = angular.fromJson(data);
+        
+    }).error(function (err) {
+        console.log(err);
+    });
+    
+    $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/organizations', config).success(function (data) {
+        
+        $scope.organizations = angular.fromJson(data);
+        
+    }).error(function (err) {
+        console.log(err);
+    });
+    
 }]);
 
 myApp.controller('profileEventsController', ['$scope', '$http', '$stateParams', '$window', 'sharedDataService', '$state', function ($scope, $http, $stateParams, $window, sharedDataService, $state) {
@@ -50,10 +67,9 @@ myApp.controller('profileEventsController', ['$scope', '$http', '$stateParams', 
         }
     };
 
-    $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'', config).success(function (data) {
+    $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/events', config).success(function (data) {
 
-        $scope.eventsData = data.events;
-        console.log($scope.eventsData);
+        $scope.eventsData = angular.fromJson(data);
 
     }).error(function (err) {
         console.log(err);
@@ -64,12 +80,12 @@ myApp.controller('profileEventsController', ['$scope', '$http', '$stateParams', 
         eventName = eventName.replace(" ", "%20");
         var params = [eventName, date, location];
 
-        $http.get('http://136.145.116.232/events/'+eventName+'?date='+date+'&location='+location+'').
+        $http.get('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'', config).
         success(function(data, status, headers, config) {
 
             var eventData = angular.fromJson(data);
 
-            var isHosted = eventData.info.is_hosted;
+            var isHosted = eventData.is_hosted;
 
             sharedDataService.set(params);
 
@@ -107,10 +123,10 @@ myApp.controller('profileTeamsController', ['$scope', '$http', '$stateParams', '
         }
     };
 
-    $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'', config).success(function (data) {
-
-        $scope.teamsData = data.teams;
-
+    $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/teams', config).success(function (data) {
+        
+        $scope.teams = angular.fromJson(data);
+        
     }).error(function (err) {
         console.log(err);
     });

@@ -12,7 +12,7 @@
     <ion-content>
         <div class="list">
             <a class="item item-divider " href="#/app/searchgeneral/Live">
-                Live          
+                Live
             </a>
             <a class="item item-avatar" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="event in liveEvents | limitTo: 3">
                 <img ng-src="{{ event.event_logo }}">
@@ -31,7 +31,7 @@
                 <p>{{event.event_start_date | date: 'medium'}}</p>
             </a>
 
-            <a class="item item-divider " href="#/app/searchgeneral/Premium">
+            <a class="item item-divider" href="#/app/searchgeneral/Premium">
                 Premium            
             </a>
             <a class="item item-avatar" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="event in premiumEvents | limitTo: 3">

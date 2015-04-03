@@ -8,18 +8,18 @@
     </ion-nav-buttons>
     <ion-content>
         <div class="crop-banner">
-            <img class="crop-image" ng-src="{{ profileData.info.customer_cover_photo }}">
+            <img class="crop-image" ng-src="{{ profileData.customer_cover_photo }}">
         </div>
         <div>
             <div class="center-text">
-                <img class="profile-pic" ng-src="{{ profileData.info.customer_profile_pic }}">
+                <img class="profile-pic" ng-src="{{ profileData.customer_profile_pic }}">
             </div>
             <div class="card">
                 <div class="item item-text-wrap">
                     <div class="center-text">
-                        <h1 class="h1-username">{{ profileData.info.customer_tag }}</h1>
-                        <h2>{{ profileData.info.customer_first_name }} {{ profileData.info.customer_last_name }}</h2>
-                        <p>{{ profileData.info.customer_country }}</p>
+                        <h1 class="h1-username">{{ profileData.customer_tag }}</h1>
+                        <h2>{{ profileData.customer_first_name }} {{ profileData.customer_last_name }}</h2>
+                        <p>{{ profileData.customer_country }}</p>
                     </div>
                     <div class="row">
                         <div class="col">
@@ -34,7 +34,7 @@
                         </div>
                     </div>
                     <p>
-                        <br>{{ profileData.info.customer_bio }}
+                        <br>{{ profileData.customer_bio }}
                     </p>
                 </div>
                 <div class="item tabs tabs-secondary tabs-icon-left" ng-if="!myProfile">
@@ -53,13 +53,13 @@
             </div>
             <div class="list">
 
-                <a class="item item-thumbnail-left" href="#" ng-repeat="team in profileData.teams | limitTo: 3">
+                <a class="item item-thumbnail-left" href="#" ng-repeat="team in teams | limitTo: 3">
                     <img ng-src="{{ team.team_logo }}">
                     <h2>{{ team.team_name }}</h2>
                     <p>{{ team.team_bio }}</p>
                 </a>
             </div>
-            <a class="item item-icon-left dark" ng-href="#/app/teams/{{ profileData.info.customer_username }}">
+            <a class="item item-icon-left dark" ng-href="#/app/teams/{{ profileData.customer_username }}">
                 <i class="icon ion-android-arrow-forward"></i> See More
             </a>
         </div>
@@ -69,12 +69,12 @@
             </div>
             <div class="list">
 
-                <a class="item item-thumbnail-left" ng-repeat="organization in profileData.organizations | limitTo: 3">
+                <a class="item item-thumbnail-left" ng-repeat="organization in organizations | limitTo: 3">
                     <img ng-src="{{ organization.organization_logo }}">
                     <h2>{{ organization.organization_name }}</h2>
                 </a>
             </div>
-            <a class="item item-icon-left dark" ng-href="#/app/organizations/{{ profileData.info.customer_username }}">
+            <a class="item item-icon-left dark" ng-href="#/app/organizations/{{ profileData.customer_username }}">
                 <i class="icon ion-android-arrow-forward"></i> See More
             </a>
         </div>

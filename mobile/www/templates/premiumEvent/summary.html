@@ -35,7 +35,7 @@
                 Sponsors
             </div>
             <div ng-repeat="sponsor in eventInfo.sponsors">
-                <span ng-if="$index%2 == 0"> 
+                <div ng-if="$index%2 == 0"> 
                     <div class="row">
                         <div class="col" ng-if="eventInfo.sponsors[$index + 0]">
                             <img class="game-cover" ng-src="{{ sponsor.sponsor_logo }}">
@@ -44,7 +44,7 @@
                             <img class="game-cover" ng-src="{{ sponsor.sponsor_logo }}">
                         </div>
                     </div>
-                </span>
+                </div>
             </div>
         </div>
         <div class="list-inset" ng-if="!isOngoing">
@@ -112,14 +112,14 @@
         </div>
 
         <div ng-controller="ratingsController" ng-if="isOngoing">
-            <div class="card">
+            <div class="card" ng-repeat="review in reviews | limitTo: 3">
                 <div class="item">
-                    <h2 style="text-align: center;">This is the review title</h2>
-                    <rating ng-model="rate" max="max" style="text-align: center;" readonly="true"></rating>
-                    <p style="text-align: center;"> by anonymous </p>
+                    <h2 style="text-align: center;">{{review.review_title}}</h2>
+                    <rating ng-model="review.star_rating" max="5" style="text-align: center;" readonly="true"></rating>
+                    <p style="text-align: center;"> by {{review.customer_username}} </p>
                 </div>
                 <div class="item item-text-wrap">
-                    This is a review of the event.
+                    {{review.review_content}}
                 </div>
             </div>
             <div class="padding">

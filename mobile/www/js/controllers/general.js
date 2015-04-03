@@ -275,7 +275,7 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
     };
 
     $scope.goToGameProfile = function (gameName, gameImage) {
-        var params = [gameName, gameImage];
+        var params = [gameImage, gameName];
         sharedDataService.set(params);
         $state.go('app.game.summary', {"gamename": gameName});
     };
@@ -342,7 +342,7 @@ myApp.controller('popularGameViewController', ['$scope', '$http', '$state', 'sha
     };
 
     $scope.goToGameProfile = function (gameName, gameImage) {
-        var params = [gameName, gameImage];
+        var params = [gameImage, gameName];
         sharedDataService.set(params);
         $state.go('app.game.summary', {"gamename": gameName});
     };

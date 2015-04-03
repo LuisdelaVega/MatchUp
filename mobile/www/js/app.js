@@ -157,7 +157,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
         abstract: true,
         templateUrl: "templates/myevents/my-events.html",
         controller: "myEventsParentController"
-        
+
     })
         .state('app.myevents.melist', {
         url: "/melist/:username",
@@ -220,36 +220,22 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
         .state('app.game.summary', {
         url: "/summary/:gamename",
         views: {
-            'game-summary-tab': {
-                templateUrl: "templates/gameProfile/game-summary.html",
-                controller: "gameProfileSummaryController"
-            }
-        }
-    })
-        .state('app.game.upcoming', {
-        url: "/upcoming/:gamename",
-        views: {
             'game-upcoming-tab': {
                 templateUrl: "templates/gameProfile/game-upcoming.html",
                 controller: "gameProfileUpcomingController"
-            }
-        }
-    })
-        .state('app.game.live', {
-        url: "/live/:gamename",
-        views: {
+            },
             'game-live-tab': {
                 templateUrl: "templates/gameProfile/game-live.html",
                 controller: "gameProfileLiveController"
-            }
-        }
-    })
-        .state('app.game.history', {
-        url: "/history/:gamename",
-        views: {
+            },
             'game-history-tab': {
                 templateUrl: "templates/gameProfile/game-history.html",
                 controller: "gameProfileHistoryController"
+
+            },
+            'game-summary-tab': {
+                templateUrl: "templates/gameProfile/game-summary.html",
+                controller: "gameProfileSummaryController"
             }
         }
     })
@@ -414,13 +400,13 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     // Meetups
     //================================================================================
         .state('app.meetups', {
-        url: "/meetups",
+        url: "/meetups/:eventname/:date/:location",
         templateUrl: "templates/meetup/meetups.html",
         controller: "meetupController"
 
     })
         .state('app.createmeetup', {
-        url: "/createmeetup",
+        url: "/createmeetup/:eventname/:date/:location",
         templateUrl: "templates/meetup/create-meetup.html",
 
     })
