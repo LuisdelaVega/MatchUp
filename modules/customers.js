@@ -120,6 +120,46 @@ var getEvents = function(req, res, pg, conString) {
 	});
 };
 
+var getRegisteredEvents = function(req, res, pg, conString) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		if (!req.query.type) {
+			res.status(400).send("No type specified");
+			client.end();
+		} else if (req.query.type === "spectator") {
+			var profileQuery = client.query({
+				text : "SELECT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_logo FROM pays JOIN event ON pays.event_name = event.event_name AND pays.event_start_date = event.event_start_date AND pays.event_location = event.event_location WHERE pays.customer_username = $1 AND event.event_active",
+				values : [req.params.username]
+			});
+			profileQuery.on("row", function(row, result) {
+				result.addRow(row);
+			});
+			profileQuery.on("end", function(result) {
+				res.status(200).send(result.rows);
+				client.end();
+			});
+		} else if (req.query.type === "competitor") {
+			var profileQuery = client.query({
+				text : "SELECT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_logo FROM is_a JOIN event ON is_a.event_name = event.event_name AND is_a.event_start_date = event.event_start_date AND is_a.event_location = event.event_location WHERE is_a.customer_username = $1 AND event.event_active",
+				values : [req.params.username]
+			});
+			profileQuery.on("row", function(row, result) {
+				result.addRow(row);
+			});
+			profileQuery.on("end", function(result) {
+				res.status(200).send(result.rows);
+				client.end();
+			});
+		} else {
+			res.status(400).send("No valid type specified. Posible values [spectator, competitor]");
+			client.end();
+		}
+	});
+};
+
 var subscribe = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -592,3 +632,4 @@ module.exports.getSubscriptions = getSubscriptions;
 module.exports.getTeams = getTeams;
 module.exports.getOrganizations = getOrganizations;
 module.exports.getEvents = getEvents;
+module.exports.getRegisteredEvents = getRegisteredEvents;

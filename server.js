@@ -285,7 +285,6 @@ app.route('/matchup/events/:event/stations/:station')
 		events.removeStream(req, res, pg, conString);
 	});
 
-//TODO Document Below
 /* /matchup/events/:event/tournaments?date=date&location=string
  * 
  * [GET] Get all Tournaments from a specific Event
@@ -636,6 +635,18 @@ app.route('/matchup/profile/:username/organizations')
 app.route('/matchup/profile/:username/events')
 	.get(function(req, res) {
 		customers.getEvents(req, res, pg, conString);
+	});
+
+/* /matchup/profile/:username/events/registered?type=string
+ * 
+ * params:
+ * 	type = The type of attendee you were/are at en event. Possible values: [spectator, competitor]
+ * 
+ * [GET] Get the events where a specific Customer has registered has spectator or competitor
+ */
+app.route('/matchup/profile/:username/events/registered')
+	.get(function(req, res) {
+		customers.getRegisteredEvents(req, res, pg, conString);
 	});
 
 //*\\\\\\\\\\* SEARCH *//////////*/

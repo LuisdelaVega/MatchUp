@@ -1,3 +1,5 @@
+//TODO Take all dates and storee them in the DB using toUTCString
+
 var getEventsParams = {
 	type : ["regular", "hosted"],
 	filter : ["game", "genre"],
@@ -122,7 +124,7 @@ var getEvent = function(req, res, pg, conString) {
 		} else {
 			var event = new Object();
 			var queryEvent = client.query({
-				text : "SELECT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_venue, event.event_banner, event.event_logo, event.event_end_date, event.event_registration_deadline, event.event_rules, event.event_description, event.event_deduction_fee, event.event_is_online, event.event_type, event.customer_username AS creator, hosts.organization_name AS host FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND event.event_active;",
+				text : "SELECT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_venue, event.event_banner, event.event_logo, event.event_registration_deadline, event.event_rules, event.event_description, event.event_deduction_fee, event.event_is_online, event.event_type, event.customer_username AS creator, hosts.organization_name AS host FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND event.event_active;",
 				values : [req.params.event, req.query.date, req.query.location]
 			});
 			queryEvent.on("row", function(row, result) {
@@ -573,7 +575,7 @@ var editStation = function(req, res, pg, conString) {
 						client.end();
 					} else {
 						client.end();
-						res.status(200).send("Changed the stream link to " + req.body.stream + " on Station #" + req.params.station);
+						res.status(200).send("Changed the stream link to: " + req.body.stream + " on Station #" + req.params.station);
 					}
 				});
 			} else {
