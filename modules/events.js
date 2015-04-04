@@ -128,6 +128,7 @@ var getEvent = function(req, res, pg, conString) {
 				values : [req.params.event, req.query.date, req.query.location]
 			});
 			queryEvent.on("row", function(row, result) {
+				console.log(row.event_start_date);
 				result.addRow(row);
 			});
 			queryEvent.on("end", function(result) {
@@ -148,7 +149,7 @@ var getEvent = function(req, res, pg, conString) {
 					});
 				} else {
 					client.end();
-					res.status(404).send("Couldn't find the event: " + req.params.event+" starting on: " +req.query.date+" located at: "+ req.query.location);
+					res.status(404).send("Couldn't find the event: " + req.params.event + " starting on: " + req.query.date + " located at: " + req.query.location);
 				}
 			});
 		}
@@ -216,6 +217,7 @@ var getParticipants = function(req, res, pg, conString) {
 	});
 };
 
+//TODO Validate Date
 var getCompetitors = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -327,7 +329,7 @@ var checkInSpectator = function(req, res, pg, conString) {
 							client.end();
 						} else {
 							client.end();
-							res.status(201).send("Updated");
+							res.status(200).send("Updated");
 						}
 					});
 				} else {
@@ -368,7 +370,7 @@ var checkInCompetitor = function(req, res, pg, conString) {
 							client.end();
 						} else {
 							client.end();
-							res.status(201).send("Updated");
+							res.status(200).send("Updated");
 						}
 					});
 				} else {
@@ -482,7 +484,7 @@ var getStation = function(req, res, pg, conString) {
 		});
 		queryStation.on("end", function(result) {
 			if (result.rows.length) {
-				station.info = result.rows[0];
+				station = result.rows[0];
 				station.tournaments = new Array();
 				var queryStation = client.query({
 					text : "SELECT tournament_name FROM capacity_for WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND station_number = $4",
@@ -795,6 +797,7 @@ var removeSponsor = function(req, res, pg, conString) {
 	});
 };
 
+//TODO Verify dates
 var attachStation = function(req, res, pg, conString) {
 
 	pg.connect(conString, function(err, client, done) {
@@ -833,7 +836,7 @@ var attachStation = function(req, res, pg, conString) {
 							}
 						});
 					} else {
-						res.status(403).send("Invalid station");
+						res.status(404).send("Station not found");
 						client.end();
 					}
 				});
@@ -845,28 +848,34 @@ var attachStation = function(req, res, pg, conString) {
 	});
 };
 
+//TODO Validate date
 var getStationsforTournament = function(req, res, pg, conString) {
-
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
-		var queryEvent = client.query({
-			text : "SELECT station.station_number, station.station_in_use, stream.stream_link FROM station LEFT OUTER JOIN stream ON station.event_name = stream.event_name AND station.event_start_date = stream.event_start_date AND station.event_location = stream.event_location AND station.station_number = stream.station_number JOIN capacity_for ON station.event_name = capacity_for.event_name AND station.event_start_date = capacity_for.event_start_date AND station.event_location = capacity_for.event_location AND station.station_number = capacity_for.station_number WHERE station.event_name = $1 AND station.event_start_date = $2 AND station.event_location = $3 AND capacity_for.tournament_name = $4",
-			values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
-		});
-		queryEvent.on("row", function(row, result) {
-			result.addRow(row);
-		});
-		queryEvent.on("end", function(result) {
+		var date = new Date(req.query.date);
+		if (!(date.getTime())) {
 			client.end();
-			res.status(200).json(result.rows);
-		});
+			res.status(400).send('Invalid date');
+		} else {
+			var queryEvent = client.query({
+				text : "SELECT station.station_number, station.station_in_use, stream.stream_link FROM station LEFT OUTER JOIN stream ON station.event_name = stream.event_name AND station.event_start_date = stream.event_start_date AND station.event_location = stream.event_location AND station.station_number = stream.station_number JOIN capacity_for ON station.event_name = capacity_for.event_name AND station.event_start_date = capacity_for.event_start_date AND station.event_location = capacity_for.event_location AND station.station_number = capacity_for.station_number WHERE station.event_name = $1 AND station.event_start_date = $2 AND station.event_location = $3 AND capacity_for.tournament_name = $4",
+				values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
+			});
+			queryEvent.on("row", function(row, result) {
+				result.addRow(row);
+			});
+			queryEvent.on("end", function(result) {
+				client.end();
+				res.status(200).json(result.rows);
+			});
+		}
 	});
 };
 
+//TODO Validate date
 var detachStation = function(req, res, pg, conString) {
-
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -913,7 +922,7 @@ var getAllNews = function(req, res, pg, conString) {
 			res.status(400).send('Invalid date');
 		} else {
 			var queryNews = client.query({
-				text : "SELECT news_number, news_title, news_content, news_date_posted FROM news NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND event_active ORDER BY news_number",
+				text : "SELECT news_number, news_title, news_content, news_date_posted FROM news NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND event_active ORDER BY news_number DESC",
 				values : [req.params.event, req.query.date, req.query.location]
 			});
 			queryNews.on("row", function(row, result) {
@@ -977,7 +986,7 @@ var deleteNews = function(req, res, pg, conString) {
 				result.addRow(row);
 			});
 			queryNews.on("end", function(result) {
-				if (result.rows.length > 0) {
+				if (result.rows.length) {
 					client.query({
 						text : "DELETE FROM news WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND news_number = $4",
 						values : [req.params.event, req.query.date, req.query.location, req.params.news]
@@ -992,7 +1001,7 @@ var deleteNews = function(req, res, pg, conString) {
 					});
 				} else {
 					client.end();
-					res.status(404).send("News not found");
+					res.status(403).send("You can't delete news in this event");
 				}
 			});
 		}
@@ -1018,7 +1027,7 @@ var createNews = function(req, res, pg, conString) {
 				result.addRow(row);
 			});
 			queryNews.on("end", function(result) {
-				if (result.rows.length > 0) {
+				if (result.rows.length) {
 					var queryNews = client.query({
 						text : "SELECT max(news_number)+1 AS next_news FROM news WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
 						values : [req.params.event, req.query.date, req.query.location]
@@ -1027,6 +1036,7 @@ var createNews = function(req, res, pg, conString) {
 						result.addRow(row);
 					});
 					queryNews.on("end", function(result) {
+						var nextNews = result.rows[0].next_news;
 						client.query({
 							text : "INSERT INTO news (event_name, event_start_date, event_location, news_number, news_title, news_content, news_date_posted) VALUES($1, $2, $3, $7, $4, $5, $6)",
 							values : [req.params.event, req.query.date, req.query.location, req.body.title, req.body.content, (new Date()).toUTCString(), result.rows[0].next_news]
@@ -1036,7 +1046,13 @@ var createNews = function(req, res, pg, conString) {
 								client.end();
 							} else {
 								client.end();
-								res.status(204).send('');
+								var news = new Object();
+								news.event = new Object();
+								news.event.name = req.params.event;
+								news.event.date = req.query.date;
+								news.event.location = req.query.location;
+								news.number = nextNews;
+								res.status(201).json(news);
 							}
 						});
 					});
@@ -1082,12 +1098,18 @@ var updateNews = function(req, res, pg, conString) {
 						} else {
 							client.query("COMMIT");
 							client.end();
-							res.status(201).send("News updated");
+							var news = new Object();
+							news.event = new Object();
+							news.event.name = req.params.event;
+							news.event.date = req.query.date;
+							news.event.location = req.query.location;
+							news.number = req.params.news;
+							res.status(200).json(news);
 						}
 					});
 				} else {
 					client.end();
-					res.status(403).send("You can't create a Meetup for this event");
+					res.status(403).send("You can't update news for this event");
 				}
 			});
 		}
@@ -1106,7 +1128,7 @@ var getReviews = function(req, res, pg, conString) {
 			res.status(400).send('Invalid date');
 		} else {
 			var queryReview = client.query({
-				text : "SELECT review_title, review_content, star_rating, review_date_created, customer_username, bool_and(customer_username IN (SELECT customer_username FROM review WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $4)) as is_writer FROM review WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 GROUP BY review_title, review_content, star_rating, review_date_created, customer_username ORDER BY review_date_created",
+				text : "SELECT review_title, review_content, star_rating, review_date_created, customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, bool_and(customer_username IN (SELECT customer_username FROM review WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $4)) as is_writer FROM review NATURAL JOIN customer WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 GROUP BY review_title, review_content, star_rating, review_date_created, customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic ORDER BY review_date_created",
 				values : [req.params.event, req.query.date, req.query.location, req.user.username]
 			});
 			queryReview.on("row", function(row, result) {
@@ -1132,16 +1154,16 @@ var getReview = function(req, res, pg, conString) {
 			res.status(400).send('Invalid date');
 		} else {
 			var queryReview = client.query({
-				text : "SELECT review_title, review_content, star_rating, review_date_created, customer_username, bool_and(customer_username IN (SELECT customer_username FROM review WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $5)) as is_writer FROM review WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $4 GROUP BY review_title, review_content, star_rating, review_date_created, customer_username",
+				text : "SELECT review_title, review_content, star_rating, review_date_created, customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, bool_and(customer_username IN (SELECT customer_username FROM review WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $5)) as is_writer FROM review NATURAL JOIN customer WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $4 GROUP BY review_title, review_content, star_rating, review_date_created, customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic",
 				values : [req.params.event, req.query.date, req.query.location, req.params.username, req.user.username]
 			});
 			queryReview.on("row", function(row, result) {
 				result.addRow(row);
 			});
 			queryReview.on("end", function(result) {
-				if (result.rows.length > 0) {
+				if (result.rows.length) {
 					client.end();
-					res.json(result.rows[0]);
+					res.status(200).json(result.rows[0]);
 				} else {
 					client.end();
 					res.status(404).send("Review not found");
@@ -1185,7 +1207,7 @@ var deleteReview = function(req, res, pg, conString) {
 					});
 				} else {
 					client.end();
-					res.status(404).send("Review not found");
+					res.status(403).send("You can't delete this review");
 				}
 			});
 		}
@@ -1226,7 +1248,13 @@ var createReview = function(req, res, pg, conString) {
 								client.end();
 							} else {
 								client.end();
-								res.status(204).send('');
+								var review = new Object();
+								review.event = new Object();
+								review.event.name = req.params.event;
+								review.event.date = req.query.date;
+								review.event.location = req.query.location;
+								review.username = req.user.username;
+								res.status(201).json(review);
 							}
 						});
 					}
@@ -1264,15 +1292,20 @@ var updateReview = function(req, res, pg, conString) {
 					console.log(req.body);
 					client.query({
 						text : "UPDATE review SET (review_title, review_content, star_rating) = ($5, $6, $7) WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $4",
-						values : [req.params.event, req.query.date, req.query.location, req.params.username, req.body.title, req.body.content, req.body.rating]
+						values : [req.params.event, req.query.date, req.query.location, req.user.username, req.body.title, req.body.content, req.body.rating]
 					}, function(err, result) {
 						if (err) {
 							res.status(500).send("Oh, no! Disaster!");
 							client.end();
 						} else {
 							client.query("COMMIT");
-							client.end();
-							res.status(201).send("Review updated");
+							var review = new Object();
+							review.event = new Object();
+							review.event.name = req.params.event;
+							review.event.date = req.query.date;
+							review.event.location = req.query.location;
+							review.username = req.user.username;
+							res.status(201).json(review);
 						}
 					});
 				} else {
@@ -1296,7 +1329,7 @@ var getMeetups = function(req, res, pg, conString) {
 			res.status(400).send('Invalid date');
 		} else {
 			var queryReview = client.query({
-				text : "SELECT meetup_name, meetup_start_date, meetup_end_date, meetup_location, meetup_description, customer_username, bool_and(customer_username IN (SELECT customer_username FROM meetup WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $4)) as is_organizer FROM meetup WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 GROUP BY meetup_name, meetup_start_date, meetup_end_date, meetup_location, meetup_description, customer_username ORDER BY meetup_start_date DESC",
+				text : "SELECT meetup_name, meetup_start_date, meetup_end_date, meetup_location, meetup_description, customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, bool_and(customer_username IN (SELECT customer_username FROM meetup WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $4)) as is_organizer FROM meetup NATURAL JOIN customer WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 GROUP BY meetup_name, meetup_start_date, meetup_end_date, meetup_location, meetup_description, customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic ORDER BY meetup_start_date DESC",
 				values : [req.params.event, req.query.date, req.query.location, req.user.username]
 			});
 			queryReview.on("row", function(row, result) {
@@ -1317,20 +1350,22 @@ var getMeetup = function(req, res, pg, conString) {
 		}
 
 		var eventStartDate = new Date(req.query.date);
-		var meetupStartDate = new Date(req.body.start_date);
+		var meetupStartDate = new Date(req.query.meetup_date);
+		console.log(meetupStartDate.toUTCString());
+		console.log(meetupStartDate.toLocaleString());
 		if (!(eventStartDate.getTime()) || !(meetupStartDate.getTime())) {
 			client.end();
 			res.status(400).send('Invalid date');
 		} else {
 			var queryReview = client.query({
-				text : "SELECT meetup_name, meetup_start_date, meetup_end_date, meetup_location, meetup_description, customer_username, bool_and(customer_username IN (SELECT customer_username FROM meetup WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $5)) as is_organizer FROM meetup WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND meetup_start_date = $6 AND meetup_location = $7 AND customer_username = $4 GROUP BY meetup_name, meetup_start_date, meetup_end_date, meetup_location, meetup_description, customer_username",
+				text : "SELECT meetup_name, meetup_start_date, meetup_end_date, meetup_location, meetup_description, customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, bool_and(customer_username IN (SELECT customer_username FROM meetup WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $5)) as is_organizer FROM meetup NATURAL JOIN customer WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND meetup_start_date = $6 AND meetup_location = $7 AND customer_username = $4 GROUP BY meetup_name, meetup_start_date, meetup_end_date, meetup_location, meetup_description, customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic",
 				values : [req.params.event, req.query.date, req.query.location, req.params.username, req.user.username, req.query.meetup_date, req.query.meetup_location]
 			});
 			queryReview.on("row", function(row, result) {
 				result.addRow(row);
 			});
 			queryReview.on("end", function(result) {
-				if (result.rows.length > 0) {
+				if (result.rows.length) {
 					client.end();
 					res.json(result.rows[0]);
 				} else {
@@ -1423,7 +1458,18 @@ var createMeetup = function(req, res, pg, conString) {
 							} else {
 								client.query("COMMIT");
 								client.end();
-								res.status(201).send("Meetup Created");
+								var meetup = new Object();
+								meetup.event = new Object();
+								meetup.event.name = req.params.event;
+								meetup.event.date = req.query.date;
+								meetup.event.location = req.query.location;
+								meetup.meetup = new Object();
+								meetup.meetup.name = req.body.name;
+								meetup.meetup.location = req.body.location;
+								meetup.meetup.start_date = req.body.start_date;
+								meetup.meetup.end_date = req.body.end_date;
+								meetup.meetup.creator = req.user.username;
+								res.status(201).json(meetup);
 							}
 						});
 					}
@@ -1528,7 +1574,7 @@ var addTournament = function(req, res, pg, conString) {
 							result.event.name = req.params.event;
 							result.event.start_date = req.query.date;
 							result.event.location = req.query.location;
-							result.event.tournament = req.body.name;
+							result.tournament = req.body.name;
 							res.status(201).json(result);
 						}
 					});
@@ -1728,8 +1774,8 @@ var editTournament = function(req, res, pg, conString) {
 							result.event.name = req.params.event;
 							result.event.start_date = req.query.date;
 							result.event.location = req.query.location;
-							result.event.tournament = req.body.name;
-							res.status(201).json(result);
+							result.tournament = req.body.name;
+							res.status(200).json(result);
 						}
 					});
 				} else {
