@@ -1,9 +1,4 @@
-// Ionic Starter App
-
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
-// 'starter.controllers' is found in controllers.js
+//Declare parent module. Module defines states and has within its parameters all the other js files containing the controllers.
 angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-events', 'user', 'team-organizations', 'genres', 'regular-events', 'events', 'game-profile', 'my-events', 'registered-events'])
 
     .run(function ($ionicPlatform) {
@@ -21,14 +16,13 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
 })
 
     .config(function ($stateProvider, $urlRouterProvider, $httpProvider) {
-    $stateProvider
+    $stateProvider //All states can be found here. States are defined so that the ui-router. This is used due to the enormous amount of states (if there was a small amount of states than they would be easy to keep track of and state transitions) and allows us to use templates which ensures less duplicate code. This is can be seen in the implementation of the sidebar who's html is accesed through all views except the login and the tab views which have various views with a singular parent view.
     //================================================================================
     // Parent Home View
     //================================================================================
         .state('app', {
         url: "/app",
-        /*An abstract state can have child states but can not get activated itself. An 'abstract' state is simply a state 
-                                that can't be transitioned to. It is activated implicitly when one of its descendants are activated*/
+        /*An abstract state can have child states but can not get activated itself. An 'abstract' state is simply a state that can't be transitioned to. It is activated implicitly when one of its descendants are activated*/
         abstract: true,
         templateUrl: "templates/home/sidebar.html",
         controller: "sidebarController"
@@ -242,38 +236,10 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     //================================================================================
     // Genre Profile
     //================================================================================
-        .state('app.genre', {
-        url: "/genre",
-        abstract: true,
-        templateUrl: "templates/genreProfile/genre-profile.html",
+        .state('app.genreevents', {
+        url: "/genreprofile",
+        templateUrl: "templates/genreProfile/genre-history.html",
         controller: "genreProfileController"
-    })
-        .state('app.genre.upcoming', {
-        url: "/upcoming",
-        views: {
-            'genre-upcoming-tab': {
-                templateUrl: "templates/genreProfile/genre-upcoming.html",
-                controller: "genreUpcomingProfileController"
-            }
-        }
-    })
-        .state('app.genre.live', {
-        url: "/live",
-        views: {
-            'genre-live-tab': {
-                templateUrl: "templates/genreProfile/genre-live.html",
-                controller: "genreLiveProfileController"
-            }
-        }
-    })
-        .state('app.genre.history', {
-        url: "/history",
-        views: {
-            'genre-history-tab': {
-                templateUrl: "templates/genreProfile/genre-history.html",
-                controller: "genreHistoryProfileController"
-            }
-        }
     })
 
     //================================================================================
@@ -358,23 +324,15 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     // Premium Events
     //================================================================================
         .state('app.eventpremium', {
-        url: "/eventpremium",
-        abstract: true,
-        templateUrl: "templates/premiumEvent/event.html",
-        controller: "eventPremiumParentController"
-    })
-        .state('app.eventpremium.summary', {
         url: "/summary/:eventname/:date/:location",
-        views: {
-            'event-summary-tab': {
-                templateUrl: "templates/premiumEvent/summary.html",
-                controller: "eventPremiumSummaryController"
-            },
-            'event-news-tab': {
-                templateUrl: "templates/premiumEvent/news.html",
-                controller: "newsController"
-            }
-        }
+        templateUrl: "templates/premiumEvent/summary.html",
+        controller: "eventPremiumSummaryController"
+    })
+
+        .state('app.news', {
+        url: "/news/:eventname/:date/:location",
+        templateUrl: "templates/premiumEvent/news.html",
+        controller: "newsController"
     })
     // Sigun Up Event Premium
         .state('app.premiumsignup', {
@@ -474,6 +432,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     delete $httpProvider.defaults.headers.common["X-Requested-With"];
 
 })
+//Allows controllers to pass data between each other. Should be used only when values set will immediately used by another controller in a get.
     .factory('sharedDataService', function () {
     var savedData = {}
 
@@ -491,7 +450,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     }
 
 })
-
+//Factory that interacts with the camera API of the targeted platform and allows us to use the camera.
     .factory('Camera', ['$q', function ($q) {
 
         return {

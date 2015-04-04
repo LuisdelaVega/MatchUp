@@ -90,7 +90,7 @@ myApp.controller('profileEventsController', ['$scope', '$http', '$stateParams', 
             sharedDataService.set(params);
 
             if(isHosted){
-                $state.go('app.eventpremium.summary', {"eventname": eventName, "date": date, "location": location});
+                $state.go('app.eventpremium', {"eventname": eventName, "date": date, "location": location});
             }
             else{
                 $state.go('app.regularevent', {"eventname": eventName, "date": date, "location": location});

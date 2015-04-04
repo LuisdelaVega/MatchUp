@@ -1,4 +1,9 @@
-<ion-view view-title="Capcom Pro Tour">
+<ion-view view-title="News">
+    <ion-nav-buttons side="left">
+        <button class="button button-icon" ng-click="goToEventFromNews()">
+            <i class="icon ion-ios-arrow-back"></i>
+        </button>
+    </ion-nav-buttons>
     <ion-nav-buttons side="right">
         <button class="button button-icon ion-ios-compose" ui-sref="app.postnews({ type: 'Create'})">
         </button>

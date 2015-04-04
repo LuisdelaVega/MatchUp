@@ -1,11 +1,13 @@
+//*********NO LONGER IN USE***********
 var myApp = angular.module('my-events',[]);
 
 myApp.controller('myEventsParentController', function ($scope, $ionicPopover, $state, sharedDataService, $window, $http) {
 
+    //obtain my events through sharedDataService
     $scope.customerUsername = sharedDataService.get();
 
     var now = new Date(); 
-    var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
+    var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds()); //obtain current time in UTC
 
     var config = {
         headers: {
@@ -18,11 +20,11 @@ myApp.controller('myEventsParentController', function ($scope, $ionicPopover, $s
         var eventData = data.events;
         $scope.pastEvents = [ ];
 
-        for(event in eventData){
+        for(event in eventData){ //iterate over all events in eventdata
             var currentDateObj = new Date(event.event_start_date);
             if(currentDateObj > now_utc){
                 $scope.pastEvents.push(event);
-                $scope.liveEvents.push(event);
+                $scope.liveEvents.push(event); //push into respective scopes depending on time of objects
             }
             else{
                 $scope.upcomingEvents.push(event);

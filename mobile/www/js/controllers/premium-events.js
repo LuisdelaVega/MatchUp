@@ -8,7 +8,7 @@ myApp.controller('ratingsController', ['$scope', '$http', '$stateParams', '$wind
             'Authorization': "Bearer "+ $window.sessionStorage.token
         }
     };
-
+    //get the reviews from all values found in the server
     $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/reviews?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
     success(function(data, status, headers, config) {
 
@@ -24,7 +24,7 @@ myApp.controller('ratingsController', ['$scope', '$http', '$stateParams', '$wind
 
 myApp.controller('writeReviewRatingsController', ['$scope', '$http', function ($scope, $http) {
 
-    // set the rate and max variables
+    // Default rate and max variables. Editable by user.
     $scope.rate = 3;
     $scope.max = 5;
 
@@ -49,11 +49,8 @@ myApp.controller('postNewsController', function ($scope, $stateParams, $state, s
 
     $scope.eventName = values[1];
 
-    //Might require change remember to look into
-    $scope.goToEvent = function(eventName){
-
-        eventName = eventName.replace(" ", "%20");
-        $state.go("app.eventpremium.summary", {
+    $scope.goToEvent = function(){
+        $state.go("app.eventpremium", {
             eventname: $stateParams.eventname,
             date: $stateParams.date,
             location: $stateParams.location
@@ -69,11 +66,9 @@ myApp.controller('newsController', function ($scope, sharedDataService, $statePa
         }
     };
 
-
+    //Obtain news of currently selected event
     $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/news?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
     success(function(data, status, headers, config) {
-
-        console.log('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/news?date='+$stateParams.date+'&location='+$stateParams.location+'');
 
         $scope.news = angular.fromJson(data);
 
@@ -94,18 +89,27 @@ myApp.controller('newsController', function ($scope, sharedDataService, $statePa
             location: $stateParams.location
         })
     }
+    $scope.goToEventFromNews = function () {
+
+        $state.go("app.eventpremium", {
+            eventname: $stateParams.eventname,
+            date: $stateParams.date,
+            location: $stateParams.location
+        }) 
+
+    }
 });
 
 
 myApp.controller('eventPremiumParentController', function ($scope, $state, $http, $stateParams, sharedDataService) {
 
+    //Every time a premium event is navigated to, obtain params from sharedDataService.
     $scope.$on('$ionicView.enter', function () {
         var params = sharedDataService.get();   
         $scope.eventName = params[0];
         $scope.date =  params[1];
         $scope.location =  params[2];
     });
-    console.log('Entered abstract controller of eventPremium');
 });
 
 myApp.controller('premiumSignUpController', function ($scope, $state, $http, $stateParams, sharedDataService) {
@@ -114,7 +118,7 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
 
     $scope.returnToPremiumEvent = function () {
 
-        $state.go("app.eventpremium.summary", {
+        $state.go("app.eventpremium", {
             eventname: params[0],
             date: params[1],
             location: params[2]
@@ -125,6 +129,14 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
 });
 
 myApp.controller('eventPremiumSummaryController', function ($scope, $state, $http, $stateParams, sharedDataService, $window) {
+
+    //Every time a premium event is navigated to, obtain params from sharedDataService.
+    $scope.$on('$ionicView.enter', function () {
+        var params = sharedDataService.get();   
+        $scope.eventName = params[0];
+        $scope.date =  params[1];
+        $scope.location =  params[2];
+    });
 
     var now = new Date(); 
     var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
@@ -138,7 +150,6 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 
     $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
     success(function(data, status, headers, config) {
-
         $scope.eventInfo = angular.fromJson(data);
         var startDate = new Date($scope.eventInfo.event_start_date);
 
@@ -214,6 +225,19 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
         })
     }
 
+    $scope.goToNews = function (eventName, eventDate, eventLocation, selectedTournament) {
+
+
+        eventName = eventName.replace(" ", "%20");
+        var params = [eventName, eventDate, eventLocation];
+        sharedDataService.set(selectedTournament);
+        $state.go("app.news", {
+            eventname: eventName,
+            date: eventDate,
+            location: eventLocation
+        })
+    }
+
 });
 
 myApp.controller('meetupController', function ($scope, $state, $http, $stateParams, sharedDataService, $window) {
@@ -246,7 +270,7 @@ myApp.controller('meetupController', function ($scope, $state, $http, $statePara
 
     $scope.goToSummaryFromMeetup = function (eventName) {
 
-        $state.go("app.eventpremium.summary", {
+        $state.go("app.eventpremium", {
             eventname: $stateParams.eventname,
             date: $stateParams.date,
             location: $stateParams.location
@@ -261,7 +285,7 @@ myApp.controller('writeReviewController', function ($scope, $state, $http, $stat
 
     $scope.goToSummaryFromReview = function (eventName) {
 
-        $state.go("app.eventpremium.summary", {
+        $state.go("app.eventpremium", {
             eventname: params[0],
             date: params[1],
             location: params[2]

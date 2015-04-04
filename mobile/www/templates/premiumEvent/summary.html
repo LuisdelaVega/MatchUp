@@ -1,4 +1,4 @@
-<ion-view view-title="Capcom Pro Tour">
+<ion-view view-title="{{ eventInfo.event_name  }}">
     <ion-nav-buttons side="right">
         <button class="button button-icon ion-android-alert">
         </button>
@@ -27,6 +27,9 @@
                 </a>
                 <a class="tab-item" ng-click="goToMeetup(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location)">
                     <i class="icon ion-android-people"></i> Meetup
+                </a>
+                <a class="tab-item" ng-click="goToNews(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location)">
+                    <i class="icon ion-ios-paper"></i> News
                 </a>
             </div>
         </div>

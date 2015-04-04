@@ -1,29 +1,9 @@
 <ion-view view-title="Genre">
     <ion-content>
-        <div class="list  list-inset">
+        <div class="list list-inset">
 
-            <a class="item" ng-click="goToGenreProfile('Fighting')">
-                Fighting
-            </a>
-            
-            <a class="item" ng-click="goToGenreProfile('FPS')">
-                FPS
-            </a>
-            
-            <a class="item" ng-click="goToGenreProfile('RTS')">
-                RTS
-            </a>
-            
-            <a class="item" ng-click="goToGenreProfile('Sports')">
-                Sports
-            </a>
-            
-           <a class="item" ng-click="goToGenreProfile('MOBA')">
-                MOBA
-            </a>
-            
-            <a class="item" ng-click="goToGenreProfile('Card')">
-                Card
+            <a class="item" ng-click="goToGenreProfile(genre.genre_name)" ng-repeat="genre in genres">
+                {{ genre.genre_name }}
             </a>
 
         </div>
