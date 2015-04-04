@@ -202,6 +202,7 @@ var getParticipants = function(req, res, pg, conString) {
 };
 
 //TODO Validate Date
+//TODO Validate Undefined
 var getCompetitors = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -224,12 +225,12 @@ var getCompetitors = function(req, res, pg, conString) {
 };
 
 //TODO Validate date 400
+//TODO Validate Undefined
 var getEventSpectators = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
-		console.log(req.params.event, req.query.date, req.query.location, req.params.tournament);
 		var query = client.query({
 			text : "SELECT distinct customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic, pays.spec_fee_name, pays.check_in FROM event JOIN pays ON pays.event_name = event.event_name AND pays.event_start_date = event.event_start_date AND pays.event_location = event.event_location JOIN customer ON customer.customer_username = pays.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3",
 			values : [req.params.event, req.query.date, req.query.location]
