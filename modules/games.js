@@ -15,16 +15,16 @@ var getPopularGames = function(res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on('error', function(error) {
-			done();
+			client.end();
 			console.log(error);
 			res.status(500).send(error);
 		});
 		query.on("end", function(result) {
-			done();
+			client.end();
 			res.json(result.rows);
 		});
 	});
-	pg.end();
+	//pg.end();
 };
 
 var getPopularGenres = function(res, pg, conString) {
@@ -42,16 +42,16 @@ var getPopularGenres = function(res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on('error', function(error) {
-			done();
+			client.end();
 			console.log(error);
 			res.status(500).send(error);
 		});
 		query.on("end", function(result) {
-			done();
+			client.end();
 			res.json(result.rows);
 		});
 	});
-	pg.end();
+	//pg.end();
 };
 
 // *Depreciated*
@@ -81,13 +81,13 @@ var getPopularStuff = function(res, pg, conString) {
 				result.addRow(row);
 			});
 			query.on('error', function(error) {
-				done();
+				client.end();
 				console.log(error);
 				res.status(500).send(error);
 			});
 			query.on("end", function(result) {
 				genreList.genres = result.rows;
-				done();
+				client.end();
 				res.status(202).json({
 					popular_games : gamesList.popular_games,
 					genres : genreList.genres
@@ -95,7 +95,7 @@ var getPopularStuff = function(res, pg, conString) {
 			});
 		});
 	});
-	pg.end();
+	//pg.end();
 };
 
 module.exports.getPopularGames = getPopularGames;

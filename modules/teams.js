@@ -13,12 +13,12 @@ var getTeams = function(req, res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on('error', function(error) {
-			done();
+			client.end();
 			console.log(error);
 			res.status(500).send(error);
 		});
 		query.on("end", function(result) {
-			done();
+			client.end();
 			res.json(result.rows);
 		});
 	});
@@ -39,7 +39,7 @@ var getTeam = function(req, res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on('error', function(error) {
-			done();
+			client.end();
 			console.log(error);
 			res.status(500).send(error);
 		});
@@ -55,17 +55,17 @@ var getTeam = function(req, res, pg, conString) {
 					result.addRow(row);
 				});
 				query.on('error', function(error) {
-					done();
+					client.end();
 					console.log(error);
 					res.status(500).send(error);
 				});
 				playersQuery.on("end", function(result) {
 					team.players = result.rows;
-					done();
+					client.end();
 					res.json(team);
 				});
 			} else {
-				done();
+				client.end();
 				res.status(404).send('Oh, no! This team does not exist');
 			};
 		});
@@ -90,7 +90,7 @@ var editTeam = function(req, res, pg, conString) {
 		}
 
 		if (!req.body.logo && !req.body.bio && !req.body.cover) {
-			done();
+			client.end();
 			res.status(401).send("Oh no! Disaster");
 		}
 
@@ -100,10 +100,10 @@ var editTeam = function(req, res, pg, conString) {
 			text : queryText
 		}, function(err, result) {
 			if (err) {
-				done();
+				client.end();
 				res.status(400).send("Oh, no! Disaster!");
 			} else {
-				done();
+				client.end();
 				res.status(204).send('');
 			}
 		});
@@ -121,10 +121,10 @@ var deleteTeam = function(req, res, pg, conString) {
 			values : [req.params.team, req.user.username]
 		}, function(err, result) {
 			if (err) {
-				done();
+				client.end();
 				res.status(400).send("Oh, no! Disaster!");
 			} else {
-				done();
+				client.end();
 				res.status(204).send('');
 			}
 		});
@@ -145,12 +145,12 @@ var getTeamMembers = function(req, res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on('error', function(error) {
-			done();
+			client.end();
 			console.log(error);
 			res.status(500).send(error);
 		});
 		query.on("end", function(result) {
-			done();
+			client.end();
 			res.status(200).send(result.rows);
 		});
 	});
@@ -172,7 +172,7 @@ var addTeamMember = function(req, res, pg, conString) {
 		});
 		query.on('error', function(error) {
 			client.query("ROLLBACK");
-			done();
+			client.end();
 			console.log(error);
 			res.status(500).send(error);
 		});
@@ -187,7 +187,7 @@ var addTeamMember = function(req, res, pg, conString) {
 				});
 				query.on('error', function(error) {
 					client.query("ROLLBACK");
-					done();
+					client.end();
 					console.log(error);
 					res.status(500).send(error);
 				});
@@ -199,23 +199,23 @@ var addTeamMember = function(req, res, pg, conString) {
 						}, function(err, result) {
 							if (err) {
 								client.query("ROLLBACK");
-								done();
+								client.end();
 								res.status(400).send("Oh, no! This user already plays for this team dummy");
 							} else {
 								client.query("COMMIT");
-								done();
+								client.end();
 								res.status(201).send('This user has been added! Yay!');
 							}
 						});
 					} else {
 						client.query("ROLLBACK");
-						done();
+						client.end();
 						res.status(400).send("Oh, no! This user does not exist");
 					}
 				});
 			} else {
 				client.query("ROLLBACK");
-				done();
+				client.end();
 				res.status(401).send('Oh, no! It seems you are not part of this team');
 			}
 		});
@@ -239,7 +239,7 @@ var removeTeamMember = function(req, res, pg, conString) {
 		});
 		query.on('error', function(error) {
 			client.query("ROLLBACK");
-			done();
+			client.end();
 			console.log(error);
 			res.status(500).send(error);
 		});
@@ -256,7 +256,7 @@ var removeTeamMember = function(req, res, pg, conString) {
 				});
 				query.on('error', function(error) {
 					client.query("ROLLBACK");
-					done();
+					client.end();
 					console.log(error);
 					res.status(500).send(error);
 				});
@@ -271,28 +271,28 @@ var removeTeamMember = function(req, res, pg, conString) {
 							}, function(err, result) {
 								if (err) {
 									client.query("ROLLBACK");
-									done();
+									client.end();
 									res.status(400).send("Oh, no! Disaster!");
 								} else {
 									client.query("COMMIT");
-									done();
+									client.end();
 									res.status(204).send('');
 								}
 							});
 						} else {
 							client.query("ROLLBACK");
-							done();
+							client.end();
 							res.status(401).send('Oh, no! It seems you are do not have enough privileges to do this');
 						}
 					} else {
 						client.query("ROLLBACK");
-						done();
+						client.end();
 						res.status(401).send('Oh, no! It seems this user is not a member of this team');
 					}
 				});
 			} else {
 				client.query("ROLLBACK");
-				done();
+				client.end();
 				res.status(401).send('Oh, no! It seems you are not a member of this team');
 			}
 		});
@@ -315,7 +315,7 @@ var makeCaptain = function(req, res, pg, conString) {
 		});
 		query.on('error', function(error) {
 			client.query("ROLLBACK");
-			done();
+			client.end();
 			console.log(error);
 			res.status(500).send(error);
 		});
@@ -331,7 +331,7 @@ var makeCaptain = function(req, res, pg, conString) {
 				});
 				query.on('error', function(error) {
 					client.query("ROLLBACK");
-					done();
+					client.end();
 					console.log(error);
 					res.status(500).send(error);
 				});
@@ -344,7 +344,7 @@ var makeCaptain = function(req, res, pg, conString) {
 						}, function(err, result) {
 							if (err) {
 								client.query("ROLLBACK");
-								done();
+								client.end();
 								res.status(500).send(err);
 							} else {
 								client.query({
@@ -353,11 +353,11 @@ var makeCaptain = function(req, res, pg, conString) {
 								}, function(err, result) {
 									if (err) {
 										client.query("ROLLBACK");
-										done();
+										client.end();
 										res.status(500).send(err);
 									} else {
 										client.query("COMMIT");
-										done();
+										client.end();
 										res.status(201).send("Yay " + req.query.username + " has beed made captain!");
 									}
 								});
@@ -365,13 +365,13 @@ var makeCaptain = function(req, res, pg, conString) {
 						});
 					} else {
 						client.query("ROLLBACK");
-						done();
+						client.end();
 						res.status(401).send("Oh, no! It seems " + req.query.username + " is not a member of " + req.params.team);
 					}
 				});
 			} else {
 				client.query("ROLLBACK");
-				done();
+				client.end();
 				res.status(401).send("Oh no! It seems you (" + req.user.username + ") are not the captain of " + req.params.team);
 			}
 		});
