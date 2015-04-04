@@ -1,18 +1,18 @@
-<div class="blur-cover">
+<div class="blur-cover" ng-style="{'background': userCover}">
 </div>
 <div class="box box-margin">
 	<div class="row">
 		<div class="col-xs-12 col-md-6 col-lg-6">
-			<p class="info-title">
-				User Name
+			<p class="info-title" ng-if="myProfile">
+                {{profileData.customer_username}}
 			</p>
 			<div class="row" align="center">
-				<div class="profile-picture"></div>
+				<div class="profile-picture" ng-style="{'background-image': profilePicture}"></div>
 				<p class="info-title">
-					User tag
+                {{profileData.customer_tag}}
 				</p>
 				<p class="info-paragraph">
-					Country Name
+                {{profileData.customer_country}}
 				</p>
 				<div class="countryflag"></div>
 				<br />
@@ -23,7 +23,7 @@
 				<h3>About</h3>
 				<div class="center">
 					<p class="info-paragraph">
-						Raw denim Truffaut proident wolf, asymmetrical mollit exercitation. Tousled est art party wayfarers. Cupidatat ullamco gluten-free Schlitz listicle. Fixie literally normcore, DIY eu jean shorts Truffaut Helvetica actually mlkshk put a bird on it cold-pressed tilde. Tempor biodiesel Shoreditch ennui assumenda skateboard. Literally fixie fanny pack commodo organic, plaid raw denim viral delectus cornhole church-key tofu master cleanse pariatur. Food truck viral anim tilde aute PBR consequat leggings, aliqua single-origin coffee salvia quinoa enim qui wayfarers.
+                {{profileData.customer_bio}}
 					</p>
 				</div>
 			</div>
@@ -31,12 +31,12 @@
 	</div>
 	<div class="row">
 		<div class="col-md-3 col-md-offset-9">
-			<a class="btn btn-primary btn-block" ui-sref="app.editProfile">Edit</a>
+			<a class="btn btn-primary btn-block" ui-sref="app.editProfile" ng-if="myProfile">Edit</a>
 		</div>
 	</div>
 </div>
 
-<!-- Standings widget -->
+<!-- Standings widget  JAJAJAJAJAJAJ-->
 <div class="widget-box box-margin">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Standings</h3>
@@ -97,16 +97,16 @@
 		<div class="widget-main no-padding">
 			<div class="tickets-container">
 				<div class="row" style="padding-left: 15px">
-					<div class="col-md-3 col-sm-4 col-xs-6">
-						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." ui-sref="app.teamProfile">
+					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat = "team in teams">
+						<a class="thumbnail"> <img ng-src="{{team.team_logo}}" alt="..." ui-sref="app.teamProfile">
 							<hr class="hr-custom-padding">
 							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 											overflow: hidden;">
 								<p class="thumbnail-title" ui-sref="app.teamProfile">
-									Team Name
+                                    {{team.team_name}}
 								</p>
 								<p class="thumbnail-paragraph">
-									Captain: Name
+									Captain: {{team.team_captain}}
 								</p>
 							</div>
 						</a>
@@ -168,13 +168,13 @@
 		<div class="widget-main no-padding">
 			<div class="tickets-container">
 				<div class="row" style="padding-left: 15px">
-					<div class="col-md-3 col-sm-4 col-xs-6">
-						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." ui-sref="app.organizationProfile">
+					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat = "organization in organizations">
+						<a class="thumbnail"> <img ng-src="{{organization.organization_logo}}" alt="..." ui-sref="app.organizationProfile">
 							<hr class="hr-custom-padding">
 							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 											overflow: hidden;">
 								<p class="thumbnail-title" align="center" ui-sref="app.organizationProfile">
-									Organization Name
+                                    {{organization.organization_name}}
 								</p>
 							</div>
 						</a>
