@@ -115,6 +115,7 @@ var getEvents = function(req, res, pg, conString) {
 
 		});
 	});
+	pg.end();
 };
 
 var getEvent = function(req, res, pg, conString) {
@@ -173,6 +174,7 @@ var getEvent = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 var getParticipants = function(req, res, pg, conString) {
@@ -219,6 +221,7 @@ var getParticipants = function(req, res, pg, conString) {
 
 		});
 	});
+	pg.end();
 };
 
 //TODO Validate Date
@@ -247,6 +250,7 @@ var getCompetitors = function(req, res, pg, conString) {
 
 		});
 	});
+	pg.end();
 };
 
 //TODO Validate date 400
@@ -275,6 +279,7 @@ var getEventSpectators = function(req, res, pg, conString) {
 
 		});
 	});
+	pg.end();
 };
 
 var getEventCompetitors = function(req, res, pg, conString) {
@@ -301,6 +306,7 @@ var getEventCompetitors = function(req, res, pg, conString) {
 
 		});
 	});
+	pg.end();
 };
 
 var getStationsForEvent = function(req, res, pg, conString) {
@@ -328,6 +334,7 @@ var getStationsForEvent = function(req, res, pg, conString) {
 			res.status(200).json(result.rows);
 		});
 	});
+	pg.end();
 };
 
 var checkInSpectator = function(req, res, pg, conString) {
@@ -380,6 +387,7 @@ var checkInSpectator = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 //TODO Transaction
@@ -431,6 +439,7 @@ var checkInCompetitor = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 //TODO Log all errors
@@ -498,6 +507,7 @@ var addStation = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 var removeStation = function(req, res, pg, conString) {
@@ -541,6 +551,7 @@ var removeStation = function(req, res, pg, conString) {
 			}
 		});
 	});
+	pg.end();
 };
 
 var getStation = function(req, res, pg, conString) {
@@ -592,6 +603,7 @@ var getStation = function(req, res, pg, conString) {
 			}
 		});
 	});
+	pg.end();
 };
 
 var addStream = function(req, res, pg, conString) {
@@ -651,6 +663,7 @@ var addStream = function(req, res, pg, conString) {
 			}
 		});
 	});
+	pg.end();
 };
 
 var editStation = function(req, res, pg, conString) {
@@ -694,6 +707,7 @@ var editStation = function(req, res, pg, conString) {
 			}
 		});
 	});
+	pg.end();
 };
 
 //TODO Verify event_start_date
@@ -738,6 +752,7 @@ var removeStream = function(req, res, pg, conString) {
 			}
 		});
 	});
+	pg.end();
 };
 
 //TODO Verify event_start_date
@@ -764,6 +779,7 @@ var getTournaments = function(req, res, pg, conString) {
 
 		});
 	});
+	pg.end();
 };
 
 var getTournament = function(req, res, pg, conString) {
@@ -794,6 +810,7 @@ var getTournament = function(req, res, pg, conString) {
 			}
 		});
 	});
+	pg.end();
 };
 
 var getSponsors = function(req, res, pg, conString) {
@@ -819,6 +836,7 @@ var getSponsors = function(req, res, pg, conString) {
 			res.status(200).json(result.rows);
 		});
 	});
+	pg.end();
 };
 
 var addSponsorToEvent = function(req, res, pg, conString) {
@@ -886,6 +904,7 @@ var addSponsorToEvent = function(req, res, pg, conString) {
 			}
 		});
 	});
+	pg.end();
 };
 
 var removeSponsor = function(req, res, pg, conString) {
@@ -951,6 +970,7 @@ var removeSponsor = function(req, res, pg, conString) {
 			}
 		});
 	});
+	pg.end();
 };
 
 //TODO Verify dates
@@ -1014,6 +1034,7 @@ var attachStation = function(req, res, pg, conString) {
 			}
 		});
 	});
+	pg.end();
 };
 
 //TODO Validate date
@@ -1047,6 +1068,7 @@ var getStationsforTournament = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 //TODO Validate date
@@ -1088,6 +1110,7 @@ var detachStation = function(req, res, pg, conString) {
 			}
 		});
 	});
+	pg.end();
 };
 
 var getAllNews = function(req, res, pg, conString) {
@@ -1121,6 +1144,7 @@ var getAllNews = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 var getNews = function(req, res, pg, conString) {
@@ -1160,6 +1184,7 @@ var getNews = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 var deleteNews = function(req, res, pg, conString) {
@@ -1210,6 +1235,7 @@ var deleteNews = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 var createNews = function(req, res, pg, conString) {
@@ -1279,6 +1305,7 @@ var createNews = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 var updateNews = function(req, res, pg, conString) {
@@ -1336,6 +1363,7 @@ var updateNews = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 var getReviews = function(req, res, pg, conString) {
@@ -1369,6 +1397,7 @@ var getReviews = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 var getReview = function(req, res, pg, conString) {
@@ -1406,6 +1435,7 @@ var getReview = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 var deleteReview = function(req, res, pg, conString) {
@@ -1452,6 +1482,7 @@ var deleteReview = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 var createReview = function(req, res, pg, conString) {
@@ -1511,6 +1542,7 @@ var createReview = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 var updateReview = function(req, res, pg, conString) {
@@ -1566,6 +1598,7 @@ var updateReview = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 var getMeetups = function(req, res, pg, conString) {
@@ -1598,6 +1631,7 @@ var getMeetups = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 var getMeetup = function(req, res, pg, conString) {
@@ -1637,6 +1671,7 @@ var getMeetup = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 var deleteMeetup = function(req, res, pg, conString) {
@@ -1685,6 +1720,7 @@ var deleteMeetup = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 var createMeetup = function(req, res, pg, conString) {
@@ -1754,6 +1790,7 @@ var createMeetup = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 var updateMeetup = function(req, res, pg, conString) {
@@ -1812,6 +1849,7 @@ var updateMeetup = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 var addTournament = function(req, res, pg, conString) {
@@ -1869,6 +1907,7 @@ var addTournament = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 //TODO Don't leave an Event without a Tournament
@@ -1921,6 +1960,7 @@ var removeTournament = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 var deleteEvent = function(req, res, pg, conString) {
@@ -1970,6 +2010,7 @@ var deleteEvent = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 var editEvent = function(req, res, pg, conString) {
@@ -2034,6 +2075,7 @@ var editEvent = function(req, res, pg, conString) {
 			});
 		}
 	});
+	pg.end();
 };
 
 var editTournament = function(req, res, pg, conString) {
@@ -2085,6 +2127,7 @@ var editTournament = function(req, res, pg, conString) {
 			}
 		});
 	});
+	pg.end();
 };
 
 //TODO Limit the result to a maximum of 3 or something
@@ -2148,6 +2191,7 @@ var getHome = function(res, pg, conString) {
 			});
 		});
 	});
+	pg.end();
 };
 
 module.exports.getEvents = getEvents;
