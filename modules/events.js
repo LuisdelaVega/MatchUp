@@ -20,17 +20,17 @@ var getEvents = function(req, res, pg, conString) {
 		switch (req.query.type) {
 		case getEventsParams.type[0]:
 			queryText += "event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event WHERE concat(event_name, event_location, event_start_date) NOT IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)";
-			console.log(queryText);
+			//console.log(queryText);
 			where = true;
 			break;
 		case getEventsParams.type[1]:
 			queryText += "event_name, event_start_date, event_end_date, event_location, event_venue, event_logo, organization_name, organization_logo FROM event NATURAL JOIN hosts NATURAL JOIN organization";
 			queryGroupBy += ", organization_name, organization_logo";
-			console.log(queryText);
+			//console.log(queryText);
 			break;
 		default:
 			queryText += "event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event";
-			console.log(queryText);
+		// console.log(queryText);
 		}
 		switch (req.query.filter) {
 		case getEventsParams.filter[0]:
@@ -41,7 +41,7 @@ var getEvents = function(req, res, pg, conString) {
 				where = true;
 			}
 			queryText += "concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM event NATURAL JOIN tournament NATURAL JOIN game WHERE game_name ILIKE '%" + ((!req.query.value) ? 0 : req.query.value) + "%')";
-			console.log(queryText);
+			// console.log(queryText);
 			break;
 		case getEventsParams.filter[1]:
 			if (where) {
@@ -51,7 +51,7 @@ var getEvents = function(req, res, pg, conString) {
 				where = true;
 			}
 			queryText += "concat(event_name, event_location, event_start_date) IN (SELECT concat(event_name, event_location, event_start_date) FROM event NATURAL JOIN tournament NATURAL JOIN game NATURAL JOIN is_of NATURAL JOIN genre WHERE genre_name ILIKE '%" + ((!req.query.value) ? 0 : req.query.value) + "%')";
-			console.log(queryText);
+			// console.log(queryText);
 			break;
 		}
 		switch (req.query.state) {
@@ -63,7 +63,7 @@ var getEvents = function(req, res, pg, conString) {
 				where = true;
 			}
 			queryText += "event_start_date < now() at time zone 'utc' AND event_end_date > now() at time zone 'utc'";
-			console.log(queryText);
+			// console.log(queryText);
 			break;
 		case getEventsParams.state[1]:
 			if (where) {
@@ -73,7 +73,7 @@ var getEvents = function(req, res, pg, conString) {
 				where = true;
 			}
 			queryText += "event_end_date < now() at time zone 'utc'";
-			console.log(queryText);
+			// console.log(queryText);
 			break;
 		case getEventsParams.state[2]:
 			if (where) {
@@ -83,7 +83,7 @@ var getEvents = function(req, res, pg, conString) {
 				where = true;
 			}
 			queryText += "event_start_date > now() at time zone 'utc'";
-			console.log(queryText);
+			// console.log(queryText);
 			break;
 		}
 
@@ -96,7 +96,7 @@ var getEvents = function(req, res, pg, conString) {
 
 		queryText += queryGroupBy;
 		queryText += " ORDER BY event_start_date";
-		console.log(queryText);
+		// console.log(queryText);
 		// Query the database to find the account
 		var query = client.query({
 			text : queryText
@@ -104,10 +104,15 @@ var getEvents = function(req, res, pg, conString) {
 		query.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		query.on("end", function(result) {
 			done();
 			res.status(200).json(result.rows);
-			client.end();
+
 		});
 	});
 };
@@ -121,7 +126,7 @@ var getEvent = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-			client.end();
+
 			res.status(400).send('Invalid date');
 		} else {
 			var event = new Object();
@@ -132,6 +137,11 @@ var getEvent = function(req, res, pg, conString) {
 			queryEvent.on("row", function(row, result) {
 				console.log(row.event_start_date);
 				result.addRow(row);
+			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
 			});
 			queryEvent.on("end", function(result) {
 				if (result.rows.length > 0) {
@@ -144,15 +154,20 @@ var getEvent = function(req, res, pg, conString) {
 					queryEvent.on("row", function(row, result) {
 						result.addRow(row);
 					});
+					query.on('error', function(error) {
+						done();
+						console.log(error);
+						res.status(500).send(error);
+					});
 					queryEvent.on("end", function(result) {
 						event.is_organizer = (result.rows.length > 0);
 						done();
-						client.end();
+
 						res.status(200).json(event);
 					});
 				} else {
 					done();
-					client.end();
+
 					res.status(404).send("Couldn't find the event: " + req.params.event + " starting on: " + req.query.date + " located at: " + req.query.location);
 				}
 			});
@@ -193,10 +208,15 @@ var getParticipants = function(req, res, pg, conString) {
 		query.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		query.on("end", function(result) {
 			res.status(200).json(result.rows);
 			done();
-			client.end();
+
 		});
 	});
 };
@@ -216,10 +236,15 @@ var getCompetitors = function(req, res, pg, conString) {
 		query.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		query.on("end", function(result) {
 			res.status(200).json(result.rows);
 			done();
-			client.end();
+
 		});
 	});
 };
@@ -238,11 +263,16 @@ var getEventSpectators = function(req, res, pg, conString) {
 		query.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		query.on("end", function(result) {
 			res.status(200).json(result.rows);
 			console.log("HEEEELLOOOOOOOOOO!!!!!");
 			done();
-			client.end();
+
 		});
 	});
 };
@@ -260,10 +290,15 @@ var getEventCompetitors = function(req, res, pg, conString) {
 		query.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		query.on("end", function(result) {
 			res.status(200).json(result.rows);
 			done();
-			client.end();
+
 		});
 	});
 };
@@ -282,9 +317,14 @@ var getStationsForEvent = function(req, res, pg, conString) {
 		queryEvent.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		queryEvent.on("end", function(result) {
 			done();
-			client.end();
+
 			res.status(200).json(result.rows);
 		});
 	});
@@ -299,15 +339,22 @@ var checkInSpectator = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-			client.end();
+
 			res.status(400).send('Invalid date');
 		} else {
+			client.query("START TRANSACTION");
 			var queryOrganizers = client.query({
 				text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
 				values : [req.params.event, date.toUTCString(), req.query.location, req.user.username]
 			});
 			queryOrganizers.on("row", function(row, result) {
 				result.addRow(row);
+			});
+			query.on('error', function(error) {
+				client.query("ROLLBACK");
+				done();
+				console.log(error);
+				res.status(500).send(error);
 			});
 			queryOrganizers.on("end", function(result) {
 				if (result.rows.length) {
@@ -316,18 +363,18 @@ var checkInSpectator = function(req, res, pg, conString) {
 						values : [req.params.event, req.query.date, req.query.location, req.params.username]
 					}, function(err, result) {
 						if (err) {
-							res.status(500).send("Oh, no! Disaster!");
+							client.query("ROLLBACK");
 							done();
-							client.end();
+							res.status(500).send(err);
 						} else {
+							client.query("COMMIT");
 							done();
-							client.end();
 							res.status(200).send("Updated");
 						}
 					});
 				} else {
+					client.query("ROLLBACK");
 					done();
-					client.end();
 					res.status(403).send("You can't check-in people for this event");
 				}
 			});
@@ -335,6 +382,7 @@ var checkInSpectator = function(req, res, pg, conString) {
 	});
 };
 
+//TODO Transaction
 var checkInCompetitor = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -344,7 +392,7 @@ var checkInCompetitor = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-			client.end();
+
 			res.status(400).send('Invalid date');
 		} else {
 			var queryOrganizers = client.query({
@@ -353,6 +401,11 @@ var checkInCompetitor = function(req, res, pg, conString) {
 			});
 			queryOrganizers.on("row", function(row, result) {
 				result.addRow(row);
+			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
 			});
 			queryOrganizers.on("end", function(result) {
 				if (result.rows.length) {
@@ -363,16 +416,16 @@ var checkInCompetitor = function(req, res, pg, conString) {
 						if (err) {
 							res.status(500).send("Oh, no! Disaster!");
 							done();
-							client.end();
+
 						} else {
 							done();
-							client.end();
+
 							res.status(200).send("Updated");
 						}
 					});
 				} else {
 					done();
-					client.end();
+
 					res.status(403).send("You can't check-in people for this event");
 				}
 			});
@@ -380,6 +433,8 @@ var checkInCompetitor = function(req, res, pg, conString) {
 	});
 };
 
+//TODO Log all errors
+//TODO Transaction
 var addStation = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -389,7 +444,7 @@ var addStation = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-			client.end();
+
 			res.status(400).send('Invalid date');
 		} else {
 			var queryOrganizers = client.query({//
@@ -398,6 +453,11 @@ var addStation = function(req, res, pg, conString) {
 			});
 			queryOrganizers.on("row", function(row, result) {
 				result.addRow(row);
+			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
 			});
 			queryOrganizers.on("end", function(result) {
 				if (result.rows.length) {
@@ -408,6 +468,11 @@ var addStation = function(req, res, pg, conString) {
 					queryNews.on("row", function(row, result) {
 						result.addRow(row);
 					});
+					query.on('error', function(error) {
+						done();
+						console.log(error);
+						res.status(500).send(error);
+					});
 					queryNews.on("end", function(result) {
 						var next_station = result.rows[0].next_station;
 						client.query({
@@ -415,19 +480,19 @@ var addStation = function(req, res, pg, conString) {
 							values : [req.params.event, req.query.date, req.query.location, next_station]
 						}, function(err, result) {
 							if (err) {
-								res.status(500).send("Oh, no! Disaster!");
+								res.status(500).send(err);
 								done();
-								client.end();
+
 							} else {
 								done();
-								client.end();
+
 								res.status(201).send("Created new station");
 							}
 						});
 					});
 				} else {
 					done();
-					client.end();
+
 					res.status(403).send("You can't add stations to this event");
 				}
 			});
@@ -448,6 +513,11 @@ var removeStation = function(req, res, pg, conString) {
 		queryOrganizers.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		queryOrganizers.on("end", function(result) {
 			if (result.rows.length) {
 				client.query({
@@ -457,16 +527,16 @@ var removeStation = function(req, res, pg, conString) {
 					if (err) {
 						res.status(500).send("Oh, no! Disaster!");
 						done();
-						client.end();
+
 					} else {
 						done();
-						client.end();
+
 						res.status(204).send('');
 					}
 				});
 			} else {
 				done();
-				client.end();
+
 				res.status(403).send("You can't remove stations from this event");
 			}
 		});
@@ -487,6 +557,11 @@ var getStation = function(req, res, pg, conString) {
 		queryStation.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		queryStation.on("end", function(result) {
 			if (result.rows.length) {
 				station = result.rows[0];
@@ -499,15 +574,20 @@ var getStation = function(req, res, pg, conString) {
 					// result.addRow(row);
 					station.tournaments.push(row.tournament_name);
 				});
+				query.on('error', function(error) {
+					done();
+					console.log(error);
+					res.status(500).send(error);
+				});
 				queryStation.on("end", function(result) {
 					// station.tournaments = result.rows;
 					done();
-					client.end();
+
 					res.status(200).json(station);
 				});
 			} else {
 				done();
-				client.end();
+
 				res.status(404).send("Station not found");
 			}
 		});
@@ -527,6 +607,11 @@ var addStream = function(req, res, pg, conString) {
 		queryOrganizers.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		queryOrganizers.on("end", function(result) {
 			if (result.rows.length) {
 				var queryStation = client.query({
@@ -535,6 +620,11 @@ var addStream = function(req, res, pg, conString) {
 				});
 				queryStation.on("row", function(row, result) {
 					result.addRow(row);
+				});
+				query.on('error', function(error) {
+					done();
+					console.log(error);
+					res.status(500).send(error);
 				});
 				queryStation.on("end", function(result) {
 					if (result.rows.length) {
@@ -545,10 +635,10 @@ var addStream = function(req, res, pg, conString) {
 							if (err) {
 								res.status(500).send("Oh, no! Disaster!");
 								done();
-								client.end();
+
 							} else {
 								done();
-								client.end();
+
 								res.status(201).send("Stream link: " + req.body.stream + " added to Station #" + req.params.station);
 							}
 						});
@@ -556,7 +646,7 @@ var addStream = function(req, res, pg, conString) {
 				});
 			} else {
 				done();
-				client.end();
+
 				res.status(403).send("You can't add streams in this event");
 			}
 		});
@@ -576,6 +666,11 @@ var editStation = function(req, res, pg, conString) {
 		queryOrganizers.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		queryOrganizers.on("end", function(result) {
 			if (result.rows.length) {
 				client.query({
@@ -585,16 +680,16 @@ var editStation = function(req, res, pg, conString) {
 					if (err) {
 						res.status(500).send("Oh, no! Disaster!");
 						done();
-						client.end();
+
 					} else {
 						done();
-						client.end();
+
 						res.status(200).send("Changed the stream link to: " + req.body.stream + " on Station #" + req.params.station);
 					}
 				});
 			} else {
 				done();
-				client.end();
+
 				res.status(403).send("You can't edit stations in this event");
 			}
 		});
@@ -615,6 +710,11 @@ var removeStream = function(req, res, pg, conString) {
 		queryOrganizers.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		queryOrganizers.on("end", function(result) {
 			if (result.rows.length) {
 				client.query({
@@ -624,16 +724,16 @@ var removeStream = function(req, res, pg, conString) {
 					if (err) {
 						res.status(500).send("Oh, no! Disaster!");
 						done();
-						client.end();
+
 					} else {
 						done();
-						client.end();
+
 						res.status(204).send('');
 					}
 				});
 			} else {
 				done();
-				client.end();
+
 				res.status(403).send("You can't remove streams in this event");
 			}
 		});
@@ -654,16 +754,14 @@ var getTournaments = function(req, res, pg, conString) {
 		queryOrganizers.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		queryOrganizers.on("end", function(result) {
-			if (result.rows.length) {
-				done();
-				client.end();
-				res.status(200).json(result.rows);
-			} else {
-				done();
-				client.end();
-				res.status(500).send("Oh no! Disaster!");
-			}
+			res.status(200).json(result.rows);
+
 		});
 	});
 };
@@ -681,14 +779,17 @@ var getTournament = function(req, res, pg, conString) {
 		queryOrganizers.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		queryOrganizers.on("end", function(result) {
 			if (result.rows.length) {
 				done();
-				client.end();
 				res.status(200).json(result.rows[0]);
 			} else {
 				done();
-				client.end();
 				res.status(404).send("Tournament not found");
 			}
 		});
@@ -708,9 +809,13 @@ var getSponsors = function(req, res, pg, conString) {
 		queryOrganizers.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		queryOrganizers.on("end", function(result) {
 			done();
-			client.end();
 			res.status(200).json(result.rows);
 		});
 	});
@@ -730,6 +835,12 @@ var addSponsorToEvent = function(req, res, pg, conString) {
 		queryOrganizers.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			client.query("ROLLBACK");
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		queryOrganizers.on("end", function(result) {
 			if (result.rows.length) {
 				var queryOrganizers = client.query({
@@ -739,6 +850,12 @@ var addSponsorToEvent = function(req, res, pg, conString) {
 				queryOrganizers.on("row", function(row, result) {
 					result.addRow(row);
 				});
+				query.on('error', function(error) {
+					client.query("ROLLBACK");
+					done();
+					console.log(error);
+					res.status(500).send(error);
+				});
 				queryOrganizers.on("end", function(result) {
 					if (result.rows.length) {
 						client.query({
@@ -746,25 +863,25 @@ var addSponsorToEvent = function(req, res, pg, conString) {
 							values : [req.params.event, req.query.date, req.query.location, req.query.sponsor]
 						}, function(err, result) {
 							if (err) {
-								res.status(500).send("Oh, no! Disaster!");
+								client.query("ROLLBACK");
+								res.status(500).send(err);
 								done();
-								client.end();
+
 							} else {
 								client.query("COMMIT");
 								done();
-								client.end();
 								res.status(201).send("Sponsor: " + req.query.sponsor + " added");
 							}
 						});
 					} else {
+						client.query("ROLLBACK");
 						done();
-						client.end();
 						res.status(403).send(req.query.sponsor + " does not sponsor your Organization");
 					}
 				});
 			} else {
+				client.query("ROLLBACK");
 				done();
-				client.end();
 				res.status(403).send("You can't add sponsors to this Event");
 			}
 		});
@@ -785,6 +902,11 @@ var removeSponsor = function(req, res, pg, conString) {
 		queryOrganizers.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		queryOrganizers.on("end", function(result) {
 			if (result.rows.length) {
 				var queryOrganizers = client.query({
@@ -793,6 +915,11 @@ var removeSponsor = function(req, res, pg, conString) {
 				});
 				queryOrganizers.on("row", function(row, result) {
 					result.addRow(row);
+				});
+				query.on('error', function(error) {
+					done();
+					console.log(error);
+					res.status(500).send(error);
 				});
 				queryOrganizers.on("end", function(result) {
 					if (result.rows.length) {
@@ -803,23 +930,23 @@ var removeSponsor = function(req, res, pg, conString) {
 							if (err) {
 								res.status(500).send("Oh, no! Disaster!");
 								done();
-								client.end();
+
 							} else {
 								client.query("COMMIT");
 								done();
-								client.end();
+
 								res.status(204).send('');
 							}
 						});
 					} else {
 						done();
-						client.end();
+
 						res.status(403).send(req.query.sponsor + " does not sponsor your Event");
 					}
 				});
 			} else {
 				done();
-				client.end();
+
 				res.status(403).send("You can't add sponsors to this Event");
 			}
 		});
@@ -827,8 +954,8 @@ var removeSponsor = function(req, res, pg, conString) {
 };
 
 //TODO Verify dates
+//TODO Transaction
 var attachStation = function(req, res, pg, conString) {
-
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -841,6 +968,11 @@ var attachStation = function(req, res, pg, conString) {
 		queryOrganizers.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		queryOrganizers.on("end", function(result) {
 			if (result.rows.length) {
 				var queryNews = client.query({
@@ -849,6 +981,11 @@ var attachStation = function(req, res, pg, conString) {
 				});
 				queryNews.on("row", function(row, result) {
 					result.addRow(row);
+				});
+				query.on('error', function(error) {
+					done();
+					console.log(error);
+					res.status(500).send(error);
 				});
 				queryNews.on("end", function(result) {
 					if (result.rows.length) {
@@ -859,22 +996,20 @@ var attachStation = function(req, res, pg, conString) {
 							if (err) {
 								res.status(500).send("Oh, no! Disaster!");
 								done();
-								client.end();
+
 							} else {
 								done();
-								client.end();
 								res.status(201).send("Attached Station #" + req.query.station + " to " + req.params.tournament);
 							}
 						});
 					} else {
 						res.status(404).send("Station not found");
 						done();
-						client.end();
+
 					}
 				});
 			} else {
 				done();
-				client.end();
 				res.status(403).send("You can't attach stations to this tournament");
 			}
 		});
@@ -890,7 +1025,7 @@ var getStationsforTournament = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-			client.end();
+
 			res.status(400).send('Invalid date');
 		} else {
 			var queryEvent = client.query({
@@ -900,9 +1035,14 @@ var getStationsforTournament = function(req, res, pg, conString) {
 			queryEvent.on("row", function(row, result) {
 				result.addRow(row);
 			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
+			});
 			queryEvent.on("end", function(result) {
 				done();
-				client.end();
+
 				res.status(200).json(result.rows);
 			});
 		}
@@ -923,6 +1063,11 @@ var detachStation = function(req, res, pg, conString) {
 		queryOrganizers.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		queryOrganizers.on("end", function(result) {
 			if (result.rows.length) {
 				client.query({
@@ -932,16 +1077,13 @@ var detachStation = function(req, res, pg, conString) {
 					if (err) {
 						res.status(500).send("Oh, no! Disaster!");
 						done();
-						client.end();
 					} else {
 						done();
-						client.end();
 						res.status(204).send('');
 					}
 				});
 			} else {
 				done();
-				client.end();
 				res.status(403).send("You can't remove stations from this tournament");
 			}
 		});
@@ -957,7 +1099,7 @@ var getAllNews = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-			client.end();
+
 			res.status(400).send('Invalid date');
 		} else {
 			var queryNews = client.query({
@@ -967,9 +1109,14 @@ var getAllNews = function(req, res, pg, conString) {
 			queryNews.on("row", function(row, result) {
 				result.addRow(row);
 			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
+			});
 			queryNews.on("end", function(result) {
 				done();
-				client.end();
+
 				res.status(200).json(result.rows);
 			});
 		}
@@ -985,7 +1132,7 @@ var getNews = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-			client.end();
+
 			res.status(400).send('Invalid date');
 		} else {
 			var queryNews = client.query({
@@ -995,14 +1142,19 @@ var getNews = function(req, res, pg, conString) {
 			queryNews.on("row", function(row, result) {
 				result.addRow(row);
 			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
+			});
 			queryNews.on("end", function(result) {
 				if (result.rows.length > 0) {
 					done();
-					client.end();
+
 					res.json(result.rows[0]);
 				} else {
 					done();
-					client.end();
+
 					res.status(404).send("News not found");
 				}
 			});
@@ -1019,7 +1171,7 @@ var deleteNews = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-			client.end();
+
 			res.status(400).send('Invalid date');
 		} else {
 			var queryNews = client.query({
@@ -1028,6 +1180,11 @@ var deleteNews = function(req, res, pg, conString) {
 			});
 			queryNews.on("row", function(row, result) {
 				result.addRow(row);
+			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
 			});
 			queryNews.on("end", function(result) {
 				if (result.rows.length) {
@@ -1038,16 +1195,16 @@ var deleteNews = function(req, res, pg, conString) {
 						if (err) {
 							res.status(500).send("Oh, no! Disaster!");
 							done();
-							client.end();
+
 						} else {
 							done();
-							client.end();
+
 							res.status(204).send('');
 						}
 					});
 				} else {
 					done();
-					client.end();
+
 					res.status(403).send("You can't delete news in this event");
 				}
 			});
@@ -1064,7 +1221,7 @@ var createNews = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-			client.end();
+
 			res.status(400).send('Invalid date');
 		} else {
 			var queryNews = client.query({
@@ -1073,6 +1230,11 @@ var createNews = function(req, res, pg, conString) {
 			});
 			queryNews.on("row", function(row, result) {
 				result.addRow(row);
+			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
 			});
 			queryNews.on("end", function(result) {
 				if (result.rows.length) {
@@ -1083,6 +1245,11 @@ var createNews = function(req, res, pg, conString) {
 					queryNews.on("row", function(row, result) {
 						result.addRow(row);
 					});
+					query.on('error', function(error) {
+						done();
+						console.log(error);
+						res.status(500).send(error);
+					});
 					queryNews.on("end", function(result) {
 						var nextNews = result.rows[0].next_news;
 						client.query({
@@ -1092,10 +1259,9 @@ var createNews = function(req, res, pg, conString) {
 							if (err) {
 								res.status(500).send("Oh, no! Disaster!");
 								done();
-								client.end();
+
 							} else {
 								done();
-								client.end();
 								var news = new Object();
 								news.event = new Object();
 								news.event.name = req.params.event;
@@ -1108,7 +1274,6 @@ var createNews = function(req, res, pg, conString) {
 					});
 				} else {
 					done();
-					client.end();
 					res.status(403).send("You can't post News to this event");
 				}
 			});
@@ -1125,7 +1290,7 @@ var updateNews = function(req, res, pg, conString) {
 		var eventStartDate = new Date(req.query.date);
 		if (!(eventStartDate.getTime())) {
 			done();
-			client.end();
+
 			res.status(400).send('Invalid date');
 		} else {
 			client.query("START TRANSACTION");
@@ -1137,8 +1302,13 @@ var updateNews = function(req, res, pg, conString) {
 			queryCustomer.on("row", function(row, result) {
 				result.addRow(row);
 			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
+			});
 			queryCustomer.on("end", function(result) {
-				if (result.rows.length > 0) {
+				if (result.rows.length) {
 					console.log(req.body);
 					client.query({
 						text : "UPDATE news SET (news_title, news_content) = ($5, $6) WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND news_number = $4",
@@ -1147,11 +1317,9 @@ var updateNews = function(req, res, pg, conString) {
 						if (err) {
 							res.status(500).send("Oh, no! Disaster!");
 							done();
-							client.end();
 						} else {
 							client.query("COMMIT");
 							done();
-							client.end();
 							var news = new Object();
 							news.event = new Object();
 							news.event.name = req.params.event;
@@ -1163,7 +1331,6 @@ var updateNews = function(req, res, pg, conString) {
 					});
 				} else {
 					done();
-					client.end();
 					res.status(403).send("You can't update news for this event");
 				}
 			});
@@ -1180,7 +1347,7 @@ var getReviews = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-			client.end();
+
 			res.status(400).send('Invalid date');
 		} else {
 			var queryReview = client.query({
@@ -1190,9 +1357,14 @@ var getReviews = function(req, res, pg, conString) {
 			queryReview.on("row", function(row, result) {
 				result.addRow(row);
 			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
+			});
 			queryReview.on("end", function(result) {
 				done();
-				client.end();
+
 				res.status(200).json(result.rows);
 			});
 		}
@@ -1208,7 +1380,7 @@ var getReview = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-			client.end();
+
 			res.status(400).send('Invalid date');
 		} else {
 			var queryReview = client.query({
@@ -1218,14 +1390,17 @@ var getReview = function(req, res, pg, conString) {
 			queryReview.on("row", function(row, result) {
 				result.addRow(row);
 			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
+			});
 			queryReview.on("end", function(result) {
 				if (result.rows.length) {
 					done();
-					client.end();
 					res.status(200).json(result.rows[0]);
 				} else {
 					done();
-					client.end();
 					res.status(404).send("Review not found");
 				}
 			});
@@ -1242,7 +1417,6 @@ var deleteReview = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-			client.end();
 			res.status(400).send('Invalid date');
 		} else {
 			var queryReview = client.query({
@@ -1251,6 +1425,11 @@ var deleteReview = function(req, res, pg, conString) {
 			});
 			queryReview.on("row", function(row, result) {
 				result.addRow(row);
+			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
 			});
 			queryReview.on("end", function(result) {
 				if (result.rows.length > 0) {
@@ -1261,16 +1440,13 @@ var deleteReview = function(req, res, pg, conString) {
 						if (err) {
 							res.status(500).send("Oh, no! Disaster!");
 							done();
-							client.end();
 						} else {
 							done();
-							client.end();
 							res.status(204).send('');
 						}
 					});
 				} else {
 					done();
-					client.end();
 					res.status(403).send("You can't delete this review");
 				}
 			});
@@ -1287,7 +1463,6 @@ var createReview = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-			client.end();
 			res.status(400).send('Invalid date');
 		} else {
 			var queryCustomer = client.query({
@@ -1297,12 +1472,16 @@ var createReview = function(req, res, pg, conString) {
 			queryCustomer.on("row", function(row, result) {
 				result.addRow(row);
 			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
+			});
 			queryCustomer.on("end", function(result) {
 				if (result.rows.length > 0) {
 					var today = new Date();
 					if (today.getTime() < date.getTime()) {
 						done();
-						client.end();
 						res.status(403).send('Event not yet started');
 					} else {
 						client.query({
@@ -1312,10 +1491,9 @@ var createReview = function(req, res, pg, conString) {
 							if (err) {
 								res.status(500).send("Oh, no! Disaster!");
 								done();
-								client.end();
+
 							} else {
 								done();
-								client.end();
 								var review = new Object();
 								review.event = new Object();
 								review.event.name = req.params.event;
@@ -1328,7 +1506,6 @@ var createReview = function(req, res, pg, conString) {
 					}
 				} else {
 					done();
-					client.end();
 					res.status(403).send("You can't post a review for this event");
 				}
 			});
@@ -1345,7 +1522,6 @@ var updateReview = function(req, res, pg, conString) {
 		var eventStartDate = new Date(req.query.date);
 		if (!(eventStartDate.getTime())) {
 			done();
-			client.end();
 			res.status(400).send('Invalid date');
 		} else {
 			client.query("START TRANSACTION");
@@ -1357,6 +1533,11 @@ var updateReview = function(req, res, pg, conString) {
 			queryCustomer.on("row", function(row, result) {
 				result.addRow(row);
 			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
+			});
 			queryCustomer.on("end", function(result) {
 				if (result.rows.length > 0) {
 					console.log(req.body);
@@ -1367,7 +1548,6 @@ var updateReview = function(req, res, pg, conString) {
 						if (err) {
 							res.status(500).send("Oh, no! Disaster!");
 							done();
-							client.end();
 						} else {
 							client.query("COMMIT");
 							var review = new Object();
@@ -1381,7 +1561,6 @@ var updateReview = function(req, res, pg, conString) {
 					});
 				} else {
 					done();
-					client.end();
 					res.status(403).send("You can't update this review");
 				}
 			});
@@ -1398,7 +1577,7 @@ var getMeetups = function(req, res, pg, conString) {
 		var eventStartDate = new Date(req.query.date);
 		if (!(eventStartDate.getTime())) {
 			done();
-			client.end();
+
 			res.status(400).send('Invalid date');
 		} else {
 			var queryReview = client.query({
@@ -1408,9 +1587,13 @@ var getMeetups = function(req, res, pg, conString) {
 			queryReview.on("row", function(row, result) {
 				result.addRow(row);
 			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
+			});
 			queryReview.on("end", function(result) {
 				done();
-				client.end();
 				res.status(200).json(result.rows);
 			});
 		}
@@ -1429,7 +1612,6 @@ var getMeetup = function(req, res, pg, conString) {
 		console.log(meetupStartDate.toLocaleString());
 		if (!(eventStartDate.getTime()) || !(meetupStartDate.getTime())) {
 			done();
-			client.end();
 			res.status(400).send('Invalid date');
 		} else {
 			var queryReview = client.query({
@@ -1439,14 +1621,17 @@ var getMeetup = function(req, res, pg, conString) {
 			queryReview.on("row", function(row, result) {
 				result.addRow(row);
 			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
+			});
 			queryReview.on("end", function(result) {
 				if (result.rows.length) {
 					done();
-					client.end();
 					res.json(result.rows[0]);
 				} else {
 					done();
-					client.end();
 					res.status(404).send("Meetup not found");
 				}
 			});
@@ -1464,7 +1649,7 @@ var deleteMeetup = function(req, res, pg, conString) {
 		var meetupStartDate = new Date(req.query.meetup_date);
 		if (!(eventStartDate.getTime()) || !(meetupStartDate.getTime())) {
 			done();
-			client.end();
+
 			res.status(400).send('Invalid date');
 		} else {
 			var queryNews = client.query({
@@ -1473,6 +1658,11 @@ var deleteMeetup = function(req, res, pg, conString) {
 			});
 			queryNews.on("row", function(row, result) {
 				result.addRow(row);
+			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
 			});
 			queryNews.on("end", function(result) {
 				if (result.rows.length > 0) {
@@ -1483,16 +1673,13 @@ var deleteMeetup = function(req, res, pg, conString) {
 						if (err) {
 							res.status(500).send("Oh, no! Disaster!");
 							done();
-							client.end();
 						} else {
 							done();
-							client.end();
 							res.status(204).send('');
 						}
 					});
 				} else {
 					done();
-					client.end();
 					res.status(403).send("You can't delete this Meetup");
 				}
 			});
@@ -1511,7 +1698,7 @@ var createMeetup = function(req, res, pg, conString) {
 		var meetupEndDate = new Date(req.body.end_date);
 		if (!(eventStartDate.getTime()) || !(meetupStartDate.getTime()) || !(meetupEndDate.getTime()) || meetupStartDate.getTime() > meetupEndDate.getTime()) {
 			done();
-			client.end();
+
 			res.status(400).send('Invalid date');
 		} else {
 			client.query("START TRANSACTION");
@@ -1523,12 +1710,16 @@ var createMeetup = function(req, res, pg, conString) {
 			queryCustomer.on("row", function(row, result) {
 				result.addRow(row);
 			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
+			});
 			queryCustomer.on("end", function(result) {
 				if (result.rows.length > 0) {
 					var eventEndDate = new Date(result.rows[0].event_end_date);
 					if (meetupEndDate.getTime() > eventEndDate.getTime()) {
 						done();
-						client.end();
 						res.status(400).send('Invalid date');
 					} else {
 						client.query({
@@ -1538,11 +1729,9 @@ var createMeetup = function(req, res, pg, conString) {
 							if (err) {
 								res.status(500).send("Oh, no! Disaster!");
 								done();
-								client.end();
 							} else {
 								client.query("COMMIT");
 								done();
-								client.end();
 								var meetup = new Object();
 								meetup.event = new Object();
 								meetup.event.name = req.params.event;
@@ -1560,7 +1749,6 @@ var createMeetup = function(req, res, pg, conString) {
 					}
 				} else {
 					done();
-					client.end();
 					res.status(403).send("You can't create a Meetup for this event");
 				}
 			});
@@ -1579,7 +1767,6 @@ var updateMeetup = function(req, res, pg, conString) {
 		var meetupEndDate = new Date(req.body.end_date);
 		if (!(eventStartDate.getTime()) || !(meetupStartDate.getTime()) || !(meetupEndDate.getTime()) || meetupStartDate.getTime() > meetupEndDate.getTime()) {
 			done();
-			client.end();
 			res.status(400).send('Invalid date');
 		} else {
 			client.query("START TRANSACTION");
@@ -1591,12 +1778,16 @@ var updateMeetup = function(req, res, pg, conString) {
 			queryCustomer.on("row", function(row, result) {
 				result.addRow(row);
 			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
+			});
 			queryCustomer.on("end", function(result) {
 				if (result.rows.length > 0) {
 					var eventEndDate = new Date(result.rows[0].event_end_date);
 					if (meetupEndDate.getTime() > eventEndDate.getTime()) {
 						done();
-						client.end();
 						res.status(400).send('Invalid date');
 					} else {
 						console.log(req.body);
@@ -1607,18 +1798,15 @@ var updateMeetup = function(req, res, pg, conString) {
 							if (err) {
 								res.status(500).send("Oh, no! Disaster!");
 								done();
-								client.end();
 							} else {
 								client.query("COMMIT");
 								done();
-								client.end();
 								res.status(201).send("Meetup updated");
 							}
 						});
 					}
 				} else {
 					done();
-					client.end();
 					res.status(403).send("You can't update this review");
 				}
 			});
@@ -1637,7 +1825,6 @@ var addTournament = function(req, res, pg, conString) {
 		var checkInDeadline = new Date(req.body.deadline);
 		if (!(eventStartDate.getTime()) || !(startDate.getTime()) || !(checkInDeadline.getTime()) || checkInDeadline.getTime() > startDate.getTime() || eventStartDate.getTime() > startDate.getTime()) {
 			done();
-			client.end();
 			res.status(400).send('Invalid date');
 		} else {
 			client.query("START TRANSACTION");
@@ -1649,6 +1836,11 @@ var addTournament = function(req, res, pg, conString) {
 			queryCustomer.on("row", function(row, result) {
 				result.addRow(row);
 			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
+			});
 			queryCustomer.on("end", function(result) {
 				if (result.rows.length > 0) {
 					client.query({
@@ -1658,11 +1850,9 @@ var addTournament = function(req, res, pg, conString) {
 						if (err) {
 							res.status(500).send("Oh, no! Disaster!");
 							done();
-							client.end();
 						} else {
 							client.query("COMMIT");
 							done();
-							client.end();
 							var result = new Object();
 							result.event = new Object();
 							result.event.name = req.params.event;
@@ -1674,7 +1864,6 @@ var addTournament = function(req, res, pg, conString) {
 					});
 				} else {
 					done();
-					client.end();
 					res.status(403).send("You can't add this tournament");
 				}
 			});
@@ -1694,7 +1883,6 @@ var removeTournament = function(req, res, pg, conString) {
 		var checkInDeadline = new Date(req.body.deadline);
 		if (!(eventStartDate.getTime()) || !(startDate.getTime()) || !(checkInDeadline.getTime()) || checkInDeadline.getTime() > startDate.getTime() || eventStartDate.getTime() > startDate.getTime()) {
 			done();
-			client.end();
 			res.status(400).send('Invalid date');
 		} else {
 			client.query("START TRANSACTION");
@@ -1706,6 +1894,11 @@ var removeTournament = function(req, res, pg, conString) {
 			queryCustomer.on("row", function(row, result) {
 				result.addRow(row);
 			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
+			});
 			queryCustomer.on("end", function(result) {
 				if (result.rows.length > 0) {
 					client.query({
@@ -1715,17 +1908,14 @@ var removeTournament = function(req, res, pg, conString) {
 						if (err) {
 							res.status(500).send("Oh, no! Disaster!");
 							done();
-							client.end();
 						} else {
 							client.query("COMMIT");
 							done();
-							client.end();
 							res.status(204).send('');
 						}
 					});
 				} else {
 					done();
-					client.end();
 					res.status(403).send("You can't delete this tournament");
 				}
 			});
@@ -1742,7 +1932,6 @@ var deleteEvent = function(req, res, pg, conString) {
 		var eventStartDate = new Date(req.query.date);
 		if (!(eventStartDate.getTime())) {
 			done();
-			client.end();
 			res.status(400).send('Invalid date');
 		} else {
 			client.query("START TRANSACTION");
@@ -1754,6 +1943,11 @@ var deleteEvent = function(req, res, pg, conString) {
 			queryCustomer.on("row", function(row, result) {
 				result.addRow(row);
 			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
+			});
 			queryCustomer.on("end", function(result) {
 				if (result.rows.length > 0) {
 					client.query({
@@ -1763,17 +1957,14 @@ var deleteEvent = function(req, res, pg, conString) {
 						if (err) {
 							res.status(500).send("Oh, no! Disaster!");
 							done();
-							client.end();
 						} else {
 							client.query("COMMIT");
 							done();
-							client.end();
 							res.status(204).send('');
 						}
 					});
 				} else {
 					done();
-					client.end();
 					res.status(403).send("You can't delete this tournament");
 				}
 			});
@@ -1790,7 +1981,6 @@ var editEvent = function(req, res, pg, conString) {
 		var eventStartDate = new Date(req.query.date);
 		if (!(eventStartDate.getTime())) {
 			done();
-			client.end();
 			res.status(400).send('Invalid date');
 		} else {
 			client.query("START TRANSACTION");
@@ -1802,6 +1992,11 @@ var editEvent = function(req, res, pg, conString) {
 			queryCustomer.on("row", function(row, result) {
 				result.addRow(row);
 			});
+			query.on('error', function(error) {
+				done();
+				console.log(error);
+				res.status(500).send(error);
+			});
 			queryCustomer.on("end", function(result) {
 				if (result.rows.length > 0) {
 					var eventStartDate = new Date(req.body.event.start_date);
@@ -1809,7 +2004,6 @@ var editEvent = function(req, res, pg, conString) {
 					var eventRegistrationDeadline = new Date(req.body.event.registration_deadline);
 					if (!(eventStartDate.getTime()) || !(eventEndDate.getTime()) || !(eventRegistrationDeadline.getTime()) || eventRegistrationDeadline.getTime() > eventStartDate.getTime() || eventStartDate.getTime() > eventEndDate.getTime()) {
 						done();
-						client.end();
 						res.status(400).send('Invalid date');
 					} else {
 						client.query({
@@ -1817,25 +2011,24 @@ var editEvent = function(req, res, pg, conString) {
 							values : [req.params.event, req.query.date, req.query.location, req.body.name, req.body.start_date, req.body.location, req.body.venue, req.body.banner, req.body.logo, req.body.end_date, req.body.registration_deadline, req.body.rules, req.body.description, req.body.deduction_fee, req.body.is_online, req.body.type]
 						}, function(err, result) {
 							if (err) {
-								res.status(500).send("Oh, no! Disaster!");
+								client.query("ROLLBACK");
 								done();
-								client.end();
+								res.status(500).send("Oh, no! Disaster!");
 							} else {
+								client.query("COMMIT");
+								done();
 								var result = new Object();
 								result.event = new Object();
 								result.event.name = req.body.name;
 								result.event.start_date = req.body.start_date;
 								result.event.location = req.body.location;
-								client.query("COMMIT");
-								done();
-								client.end();
 								res.status(200).json(result);
 							}
 						});
 					}
 				} else {
+					client.query("ROLLBACK");
 					done();
-					client.end();
 					res.status(403).send("You can't edit this event");
 				}
 			});
@@ -1849,53 +2042,48 @@ var editTournament = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var eventStartDate = new Date(req.query.date);
-		var startDate = new Date(req.body.start_date);
-		var checkInDeadline = new Date(req.body.deadline);
-		if (!(eventStartDate.getTime()) || !(startDate.getTime()) || !(checkInDeadline.getTime()) || checkInDeadline.getTime() > startDate.getTime() || eventStartDate.getTime() > startDate.getTime()) {
+		client.query("START TRANSACTION");
+		// Check if the user is registered for this event
+		var queryCustomer = client.query({
+			text : "SELECT distinct customer.customer_username FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location LEFT OUTER JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active;",
+			values : [req.params.event, req.query.date, req.query.location, req.user.username]
+		});
+		queryCustomer.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			client.query("ROLLBACK");
 			done();
-			client.end();
-			res.status(400).send('Invalid date');
-		} else {
-			client.query("START TRANSACTION");
-			// Check if the user is registered for this event
-			var queryCustomer = client.query({
-				text : "SELECT distinct customer.customer_username FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location LEFT OUTER JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active;",
-				values : [req.params.event, req.query.date, req.query.location, req.user.username]
-			});
-			queryCustomer.on("row", function(row, result) {
-				result.addRow(row);
-			});
-			queryCustomer.on("end", function(result) {
-				if (result.rows.length > 0) {
-					client.query({
-						text : "UPDATE tournament SET (tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) = ($5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4",
-						values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.body.name, req.body.game, req.body.rules, req.body.teams, req.body.start_date, req.body.deadline, Math.floor(req.body.fee * 100) / 100, req.body.capacity, Math.floor(req.body.seed_money * 100) / 100, req.body.type, req.body.format, req.body.scoring, ((req.body.type === "Two-Stage") ? req.body.group_players : 0), ((req.body.type === "Two-Stage") ? req.body.group_winners : 0)]
-					}, function(err, result) {
-						if (err) {
-							res.status(500).send("Oh, no! Disaster!");
-							done();
-							client.end();
-						} else {
-							client.query("COMMIT");
-							done();
-							client.end();
-							var result = new Object();
-							result.event = new Object();
-							result.event.name = req.params.event;
-							result.event.start_date = req.query.date;
-							result.event.location = req.query.location;
-							result.tournament = req.body.name;
-							res.status(200).json(result);
-						}
-					});
-				} else {
-					done();
-					client.end();
-					res.status(403).send("You can't edit this tournament");
-				}
-			});
-		}
+			res.status(500).send(error);
+		});
+		queryCustomer.on("end", function(result) {
+			if (result.rows.length) {
+				client.query({
+					text : "UPDATE tournament SET (tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) = ($5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4",
+					values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.body.name, req.body.game, req.body.rules, req.body.teams, req.body.start_date, req.body.deadline, Math.floor(req.body.fee * 100) / 100, req.body.capacity, Math.floor(req.body.seed_money * 100) / 100, req.body.type, req.body.format, req.body.scoring, ((req.body.type === "Two-Stage") ? req.body.group_players : 0), ((req.body.type === "Two-Stage") ? req.body.group_winners : 0)]
+				}, function(err, result) {
+					if (err) {
+						client.query("ROLLBACK");
+						done();
+						res.status(500).send("Oh, no! Disaster!");
+					} else {
+						client.query("COMMIT");
+						done();
+						var result = new Object();
+						result.event = new Object();
+						result.event.name = req.params.event;
+						result.event.start_date = req.query.date;
+						result.event.location = req.query.location;
+						result.tournament = req.body.name;
+						res.status(200).json(result);
+					}
+				});
+			} else {
+				client.query("ROLLBACK");
+				done();
+				res.status(403).send("You can't edit this tournament");
+			}
+		});
 	});
 };
 
@@ -1954,7 +2142,7 @@ var getHome = function(res, pg, conString) {
 							popular_games : gamesList.popular_games
 						});
 						done();
-						client.end();
+
 					});
 				});
 			});

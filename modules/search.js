@@ -105,7 +105,7 @@ var getSearchResults = function(req, res, pg, conString) {
 												genres : searchresults.genres
 											});
 											done();
-											client.end();
+											
 										});
 									});
 								});
@@ -142,7 +142,7 @@ var searchSponsors = function(req, res, pg, conString) {
 				genres : searchresults.genres
 			});
 			done();
-			client.end();
+			
 		});
 	});
 };
@@ -167,7 +167,7 @@ var searchSponsors = function(req, res, pg, conString) {
  genres : searchresults.genres
  });
  done();
- client.end();
+ 
  });
  */
 
