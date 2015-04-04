@@ -11,15 +11,15 @@ var bodyParser = require('body-parser');
 var basicAuth = require('basic-auth');
 var pg = require('pg');
 var crypto = require('crypto');
-var bunyan = require('bunyan');
+// var bunyan = require('bunyan');
 
-var log = bunyan.createLogger({
-	name : 'myserver',
-	serializers : {
-		req : bunyan.stdSerializers.req,
-		res : bunyan.stdSerializers.res
-	}
-});
+// var log = bunyan.createLogger({
+	// name : 'myserver',
+	// serializers : {
+		// req : bunyan.stdSerializers.req,
+		// res : bunyan.stdSerializers.res
+	// }
+// });
 
 // My modules
 var tournaments = require('./modules/tournaments');
@@ -135,9 +135,9 @@ app.post('/tournament', tournaments.createTournament);
  * [GET] Redirects to the MatchUp API powered by Apiary
  */
 app.get('/api', function(req, res) {
-	log.info({ req: req }, 'start request');
+	//log.info({ req: req }, 'start request');
 	res.redirect('http://docs.neptunolabsmatchup.apiary.io');
-	log.info({ res: res }, 'done response');
+	//log.info({ res: res }, 'done response');
 });
 
 //*\\\\\\\\\\* ACCOUNTS *//////////*/
@@ -146,9 +146,9 @@ app.get('/api', function(req, res) {
  * [POST] Create a new account
  */
 app.post('/create/account', function(req, res) {
-	log.info({ req: req }, 'start request');
+	//log.info({ req: req }, 'start request');
 	customers.createAccount(req, res, pg, conString, jwt, secret, crypto);
-	log.info({ res: res }, 'done response');
+	//log.info({ res: res }, 'done response');
 });
 
 /* /login
@@ -173,14 +173,14 @@ app.post('/login', authenticate);
  */
 app.route('/matchup/events')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.getEvents(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.post(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		customers.createEvent(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/events/:event?date=date&location=string
@@ -197,24 +197,24 @@ app.route('/matchup/events')
  */
 app.route('/matchup/events/:event')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.getEvent(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.post(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.addTournament(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.put(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.editEvent(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.delete(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.deleteEvent(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* DEPRECIATED
@@ -231,9 +231,9 @@ app.route('/matchup/events/:event')
  */
 app.route('/matchup/events/:event/participants')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.getParticipants(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/events/:event/spectators?date=date&location=string
@@ -243,9 +243,8 @@ app.route('/matchup/events/:event/participants')
  */
 app.route('/matchup/events/:event/spectators')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.getEventSpectators(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/events/:event/spectators/:username?date=date&location=string
@@ -254,9 +253,9 @@ app.route('/matchup/events/:event/spectators')
  */
 app.route('/matchup/events/:event/spectators/:username')
 	.put(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.checkInSpectator(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* DEPRECIATED
@@ -271,9 +270,9 @@ app.route('/matchup/events/:event/spectators/:username')
  */
 app.route('/matchup/events/:event/competitors')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.getEventCompetitors(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/events/:event/stations?date=date&location=string
@@ -285,19 +284,19 @@ app.route('/matchup/events/:event/competitors')
  */
 app.route('/matchup/events/:event/stations')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.getStationsForEvent(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.post(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.addStation(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.delete(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.removeStation(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/events/:event/stations/:station?date=date&location=string
@@ -312,24 +311,24 @@ app.route('/matchup/events/:event/stations')
  */
 app.route('/matchup/events/:event/stations/:station')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.getStation(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.post(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.addStream(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.put(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.editStation(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.delete(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.removeStream(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/events/:event/tournaments?date=date&location=string
@@ -338,9 +337,9 @@ app.route('/matchup/events/:event/stations/:station')
  */
 app.route('/matchup/events/:event/tournaments')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.getTournaments(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/events/:event/tournaments/:tournament?date=date&location=string&station=int
@@ -355,24 +354,24 @@ app.route('/matchup/events/:event/tournaments')
  */
 app.route('/matchup/events/:event/tournaments/:tournament')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.getTournament(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.post(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.attachStation(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.put(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.editTournament(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.delete(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.removeTournament(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/events/:event/tournaments/:tournament/stations?date=date&location=string&station=int
@@ -382,14 +381,14 @@ app.route('/matchup/events/:event/tournaments/:tournament')
  */
 app.route('/matchup/events/:event/tournaments/:tournament/stations')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.getStationsforTournament(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.delete(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.detachStation(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/events/:event/tournaments/:tournament/competitors?date=date&location=string
@@ -398,9 +397,9 @@ app.route('/matchup/events/:event/tournaments/:tournament/stations')
  */
 app.route('/matchup/events/:event/tournaments/:tournament/competitors')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.getCompetitors(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/events/:event/tournaments/:tournament/competitors/:competitor?date=date&location=string
@@ -412,9 +411,9 @@ app.route('/matchup/events/:event/tournaments/:tournament/competitors')
  */
 app.route('/matchup/events/:event/tournaments/:tournament/competitors/:competitor')
 	.put(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.checkInCompetitor(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/events/:event/news?date=date&location=string
@@ -424,14 +423,14 @@ app.route('/matchup/events/:event/tournaments/:tournament/competitors/:competito
  */
 app.route('/matchup/events/:event/news')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.getAllNews(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.post(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.createNews(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/events/:event/news/:news?date=date&location=string
@@ -442,19 +441,19 @@ app.route('/matchup/events/:event/news')
  */
 app.route('/matchup/events/:event/news/:news')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.getNews(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.put(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.updateNews(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.delete(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.deleteNews(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/events/:event/reviews?date=date&location=string
@@ -464,14 +463,14 @@ app.route('/matchup/events/:event/news/:news')
  */
 app.route('/matchup/events/:event/reviews')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.getReviews(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.post(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.createReview(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/events/:event/review/:username?date=date&location=string
@@ -482,19 +481,19 @@ app.route('/matchup/events/:event/reviews')
  */
 app.route('/matchup/events/:event/reviews/:username')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.getReview(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.put(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.updateReview(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.delete(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.deleteReview(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/events/:event/meetups?date=date&location=string
@@ -504,14 +503,14 @@ app.route('/matchup/events/:event/reviews/:username')
  */
 app.route('/matchup/events/:event/meetups')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.getMeetups(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.post(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.createMeetup(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/events/:event/meetups/:username?date=date&location=string&meetup_date=date&meetup_location=string
@@ -522,19 +521,19 @@ app.route('/matchup/events/:event/meetups')
  */
 app.route('/matchup/events/:event/meetups/:username')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.getMeetup(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.put(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.updateMeetup(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.delete(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.deleteMeetup(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/events/:event/sponsors?date=date&location=string&sponsor=string
@@ -548,28 +547,28 @@ app.route('/matchup/events/:event/meetups/:username')
  */
 app.route('/matchup/events/:event/sponsors')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.getSponsors(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.post(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.addSponsorToEvent(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.delete(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		events.removeSponsor(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 //*\\\\\\\\\\* HOME *//////////*/
 
 // *Depreciated*
 app.get('/home', function(req, res) {
-	log.info({ req: req }, 'start request');
+	//log.info({ req: req }, 'start request');
 	events.getHome(res, pg, conString);
-	log.info({ res: res }, 'done response');
+	//log.info({ res: res }, 'done response');
 });
 
 //*\\\\\\\\\\* ORGANIZATIONS *//////////*/
@@ -580,14 +579,14 @@ app.get('/home', function(req, res) {
  */
 app.route('/matchup/organizations')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		organizations.getOrganizations(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.post(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		customers.requestOrganization(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/organizations/:organization
@@ -601,19 +600,19 @@ app.route('/matchup/organizations')
  */
 app.route('/matchup/organizations/:organization')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		organizations.getOrganization(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.put(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		organizations.editOrganization(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.delete(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		organizations.deleteOrganization(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/organizations/:organization/members
@@ -626,19 +625,19 @@ app.route('/matchup/organizations/:organization')
  */
 app.route('/matchup/organizations/:organization/members')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		organizations.getOrganizationMembers(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.post(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		organizations.addOrganizationMember(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.delete(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		organizations.removeOrganizationMember(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/organizations/:organization/events
@@ -647,9 +646,9 @@ app.route('/matchup/organizations/:organization/members')
  */
 app.route('/matchup/organizations/:organization/events')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		organizations.getOrganizationEvents(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/organizations/:organization/sponsors?sponsor=string
@@ -660,27 +659,27 @@ app.route('/matchup/organizations/:organization/events')
  */
 app.route('/matchup/organizations/:organization/sponsors')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		organizations.getSponsors(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.post(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		organizations.requestSponsor(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.delete(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		organizations.removeSponsor(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 //*\\\\\\\\\\* POPULAR *//////////*/
 // *Depreciated*
 app.get('/popular', function(req, res) {
-	log.info({ req: req }, 'start request');
+	//log.info({ req: req }, 'start request');
 	games.getPopularStuff(res, pg, conString);
-	log.info({ res: res }, 'done response');
+	//log.info({ res: res }, 'done response');
 });
 
 /* /matchup/popular/games
@@ -688,9 +687,9 @@ app.get('/popular', function(req, res) {
  * [GET] Get a list of all Games ordered by their popularity (Amount of Tournaments that feature them)
  */
 app.get('/matchup/popular/games', function(req, res) {
-	log.info({ req: req }, 'start request');
+	//log.info({ req: req }, 'start request');
 	games.getPopularGames(res, pg, conString);
-	log.info({ res: res }, 'done response');
+	//log.info({ res: res }, 'done response');
 });
 
 /* /matchup/popular/genres
@@ -698,9 +697,9 @@ app.get('/matchup/popular/games', function(req, res) {
  * [GET] Get a list of all Genres ordered by their popularity (Amount of Tournaments that feature Games of their genre)
  */
 app.get('/matchup/popular/genres', function(req, res) {
-	log.info({ req: req }, 'start request');
+	//log.info({ req: req }, 'start request');
 	games.getPopularGenres(res, pg, conString);
-	log.info({ res: res }, 'done response');
+	//log.info({ res: res }, 'done response');
 });
 
 //*\\\\\\\\\\* PROFILE *//////////*/
@@ -711,14 +710,14 @@ app.get('/matchup/popular/genres', function(req, res) {
  */
 app.route('/matchup/profile')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		customers.getMyProfile(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.delete(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		customers.deleteAccount(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/profile/:username
@@ -729,19 +728,19 @@ app.route('/matchup/profile')
  */
 app.route('/matchup/profile/:username')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		customers.getUserProfile(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.post(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		customers.subscribe(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.delete(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		customers.unsubscribe(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/profile/:username/subscriptions
@@ -750,9 +749,9 @@ app.route('/matchup/profile/:username')
  */
 app.route('/matchup/profile/:username/subscriptions')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		customers.getSubscriptions(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/profile/:username/teams
@@ -761,9 +760,9 @@ app.route('/matchup/profile/:username/subscriptions')
  */
 app.route('/matchup/profile/:username/teams')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		customers.getTeams(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/profile/:username/organizations
@@ -772,9 +771,9 @@ app.route('/matchup/profile/:username/teams')
  */
 app.route('/matchup/profile/:username/organizations')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		customers.getOrganizations(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/profile/:username/events
@@ -783,9 +782,9 @@ app.route('/matchup/profile/:username/organizations')
  */
 app.route('/matchup/profile/:username/events')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		customers.getEvents(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/profile/:username/events/registered?type=string
@@ -797,9 +796,9 @@ app.route('/matchup/profile/:username/events')
  */
 app.route('/matchup/profile/:username/events/registered')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		customers.getRegisteredEvents(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 //*\\\\\\\\\\* SEARCH *//////////*/
@@ -815,9 +814,9 @@ app.route('/matchup/profile/:username/events/registered')
  * 			Genres
  */
 app.get('/matchup/search/:parameter', function(req, res) {
-	log.info({ req: req }, 'start request');
+	//log.info({ req: req }, 'start request');
 	search.getSearchResults(req, res, pg, conString);
-	log.info({ res: res }, 'done response');
+	//log.info({ res: res }, 'done response');
 });
 
 //*\\\\\\\\\\* TEAMS *//////////*/
@@ -828,14 +827,14 @@ app.get('/matchup/search/:parameter', function(req, res) {
  */
 app.route('/matchup/teams')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		teams.getTeams(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.post(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		customers.createTeam(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/teams/:team
@@ -846,18 +845,18 @@ app.route('/matchup/teams')
  */
 app.route('/matchup/teams/:team')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		teams.getTeam(req, res, pg, conString);
 	})
 	.put(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		teams.editTeam(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.delete(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		teams.deleteTeam(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 /* /matchup/teams/:team/members?username=string
@@ -869,24 +868,24 @@ app.route('/matchup/teams/:team')
  */
 app.route('/matchup/teams/:team/members')
 	.get(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		teams.getTeamMembers(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.post(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		teams.addTeamMember(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.put(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		teams.makeCaptain(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	})
 	.delete(function(req, res) {
-		log.info({ req: req }, 'start request');
+		//log.info({ req: req }, 'start request');
 		teams.removeTeamMember(req, res, pg, conString);
-		log.info({ res: res }, 'done response');
+		//log.info({ res: res }, 'done response');
 	});
 
 ///////////////////////////////////////////////// SERVER LISTEN
