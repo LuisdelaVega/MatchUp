@@ -13,7 +13,7 @@ var getSearchResults = function(req, res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on('error', function(error) {
-			client.end();
+			done();
 			console.log(error);
 			res.status(500).send(error);
 		});
@@ -28,7 +28,7 @@ var getSearchResults = function(req, res, pg, conString) {
 				result.addRow(row);
 			});
 			query.on('error', function(error) {
-				client.end();
+				done();
 				console.log(error);
 				res.status(500).send(error);
 			});
@@ -44,7 +44,7 @@ var getSearchResults = function(req, res, pg, conString) {
 					result.addRow(row);
 				});
 				query.on('error', function(error) {
-					client.end();
+					done();
 					console.log(error);
 					res.status(500).send(error);
 				});
@@ -59,7 +59,7 @@ var getSearchResults = function(req, res, pg, conString) {
 						result.addRow(row);
 					});
 					query.on('error', function(error) {
-						client.end();
+						done();
 						console.log(error);
 						res.status(500).send(error);
 					});
@@ -74,7 +74,7 @@ var getSearchResults = function(req, res, pg, conString) {
 							result.addRow(row);
 						});
 						query.on('error', function(error) {
-							client.end();
+							done();
 							console.log(error);
 							res.status(500).send(error);
 						});
@@ -89,7 +89,7 @@ var getSearchResults = function(req, res, pg, conString) {
 								result.addRow(row);
 							});
 							query.on('error', function(error) {
-								client.end();
+								done();
 								console.log(error);
 								res.status(500).send(error);
 							});
@@ -104,7 +104,7 @@ var getSearchResults = function(req, res, pg, conString) {
 									result.addRow(row);
 								});
 								query.on('error', function(error) {
-									client.end();
+									done();
 									console.log(error);
 									res.status(500).send(error);
 								});
@@ -119,7 +119,7 @@ var getSearchResults = function(req, res, pg, conString) {
 										result.addRow(row);
 									});
 									query.on('error', function(error) {
-										client.end();
+										done();
 										console.log(error);
 										res.status(500).send(error);
 									});
@@ -134,13 +134,13 @@ var getSearchResults = function(req, res, pg, conString) {
 											result.addRow(row);
 										});
 										query.on('error', function(error) {
-											client.end();
+											done();
 											console.log(error);
 											res.status(500).send(error);
 										});
 										query.on("end", function(result) {
 											searchresults.genres = result.rows;
-											client.end();
+											done();
 											res.status(200).json({
 												users : searchresults.users,
 												events : searchresults.events,
@@ -185,7 +185,7 @@ var getSearchResults = function(req, res, pg, conString) {
  games : searchresults.games,
  genres : searchresults.genres
  });
- client.end();
+ done();
 
  });
  });
@@ -210,7 +210,7 @@ var getSearchResults = function(req, res, pg, conString) {
  games : searchresults.games,
  genres : searchresults.genres
  });
- client.end();
+ done();
 
  });
  */
