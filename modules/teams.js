@@ -14,6 +14,7 @@ var getTeams = function(req, res, pg, conString) {
 		});
 		teamsQuery.on("end", function(result) {
 			res.json(result.rows);
+			done();
 			client.end();
 		});
 	});
@@ -47,9 +48,11 @@ var getTeam = function(req, res, pg, conString) {
 				playersQuery.on("end", function(result) {
 					team.players = result.rows;
 					res.json(team);
+					done();
 					client.end();
 				});
 			} else {
+				done();
 				client.end();
 				res.status(404).send('Oh, no! This team does not exist');
 			};
@@ -75,6 +78,7 @@ var editTeam = function(req, res, pg, conString) {
 		}
 
 		if (!req.body.logo && !req.body.bio && !req.body.cover) {
+			done();
 			client.end();
 			res.status(401).send("Oh no! Disaster");
 		}
@@ -86,6 +90,7 @@ var editTeam = function(req, res, pg, conString) {
 		}, function(err, result) {
 			if (err) {
 				res.status(400).send("Oh, no! Disaster!");
+				done();
 				client.end();
 			} else {
 				res.status(204).send('');
@@ -106,6 +111,7 @@ var deleteTeam = function(req, res, pg, conString) {
 		}, function(err, result) {
 			if (err) {
 				res.status(400).send("Oh, no! Disaster!");
+				done();
 				client.end();
 			} else {
 				res.status(204).send('');
@@ -164,6 +170,7 @@ var addTeamMember = function(req, res, pg, conString) {
 						}, function(err, result) {
 							if (err) {
 								res.status(400).send("Oh, no! This user already plays for this team dummy");
+								done();
 								client.end();
 							} else {
 								client.query("COMMIT");
@@ -172,10 +179,12 @@ var addTeamMember = function(req, res, pg, conString) {
 						});
 					} else {
 						res.status(400).send("Oh, no! This user does not exist");
+						done();
 						client.end();
 					}
 				});
 			} else {
+				done();
 				client.end();
 				res.status(401).send('Oh, no! It seems you are not part of this team');
 			}
@@ -220,6 +229,7 @@ var removeTeamMember = function(req, res, pg, conString) {
 							}, function(err, result) {
 								if (err) {
 									res.status(400).send("Oh, no! Disaster!");
+									done();
 									client.end();
 								} else {
 									client.query("COMMIT");
@@ -227,15 +237,18 @@ var removeTeamMember = function(req, res, pg, conString) {
 								}
 							});
 						} else {
+							done();
 							client.end();
 							res.status(401).send('Oh, no! It seems you are do not have enough privileges to do this');
 						}
 					} else {
+						done();
 						client.end();
 						res.status(401).send('Oh, no! It seems this user is not a member of this team');
 					}
 				});
 			} else {
+				done();
 				client.end();
 				res.status(401).send('Oh, no! It seems you are not a member of this team');
 			}
@@ -276,6 +289,7 @@ var makeCaptain = function(req, res, pg, conString) {
 						}, function(err, result) {
 							if (err) {
 								res.status(500).send("Oh, no! Disaster!");
+								done();
 								client.end();
 							} else {
 								client.query({
@@ -284,9 +298,11 @@ var makeCaptain = function(req, res, pg, conString) {
 								}, function(err, result) {
 									if (err) {
 										res.status(500).send("Oh, no! Disaster!");
+										done();
 										client.end();
 									} else {
 										client.query("COMMIT");
+										done();
 										client.end();
 										res.status(201).send("Yay " + req.query.username + " has beed made captain!");
 									}
@@ -294,13 +310,15 @@ var makeCaptain = function(req, res, pg, conString) {
 							}
 						});
 					} else {
+						done();
 						client.end();
-						res.status(401).send("Oh, no! It seems " + req.query.username +" is not a member of " + req.params.team);
+						res.status(401).send("Oh, no! It seems " + req.query.username + " is not a member of " + req.params.team);
 					}
 				});
 			} else {
+				done();
 				client.end();
-				res.status(401).send("Oh no! It seems you ("+ req.user.username +") are not the captain of " + req.params.team);
+				res.status(401).send("Oh no! It seems you (" + req.user.username + ") are not the captain of " + req.params.team);
 			}
 		});
 	});

@@ -104,6 +104,7 @@ var getSearchResults = function(req, res, pg, conString) {
 												games : searchresults.games,
 												genres : searchresults.genres
 											});
+											done();
 											client.end();
 										});
 									});
@@ -116,7 +117,7 @@ var getSearchResults = function(req, res, pg, conString) {
 		});
 	});
 };
-
+/*
 var searchSponsors = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -140,11 +141,12 @@ var searchSponsors = function(req, res, pg, conString) {
 				games : searchresults.games,
 				genres : searchresults.genres
 			});
+			done();
 			client.end();
 		});
 	});
 };
-
+*/
 /*
  // Look for all relevant Genres
  var queryGenres = client.query({
@@ -164,6 +166,7 @@ var searchSponsors = function(req, res, pg, conString) {
  games : searchresults.games,
  genres : searchresults.genres
  });
+ done();
  client.end();
  });
  */

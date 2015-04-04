@@ -16,6 +16,7 @@ var getPopularGames = function(res, pg, conString) {
 		});
 		queryPopularGames.on("end", function(result) {
 			res.json(result.rows);
+			done();
 			client.end();
 		});
 	});
@@ -37,6 +38,7 @@ var getPopularGenres = function(res, pg, conString) {
 		});
 		queryPopularGenre.on("end", function(result) {
 			res.json(result.rows);
+			done();
 			client.end();
 		});
 	});
@@ -76,6 +78,7 @@ var getPopularStuff = function(res, pg, conString) {
 					popular_games : gamesList.popular_games,
 					genres : genreList.genres
 				});
+				done();
 				client.end();
 			});
 		});
@@ -84,4 +87,4 @@ var getPopularStuff = function(res, pg, conString) {
 
 module.exports.getPopularGames = getPopularGames;
 module.exports.getPopularGenres = getPopularGenres;
-module.exports.getPopularStuff = getPopularStuff; 
+module.exports.getPopularStuff = getPopularStuff;
