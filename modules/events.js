@@ -241,7 +241,6 @@ var getEventSpectators = function(req, res, pg, conString) {
 		query.on("end", function(result) {
 			res.status(200).json(result.rows);
 			console.log("HEEEELLOOOOOOOOOO!!!!!");
-			log.info({ res: res }, 'done response');
 			done();
 			client.end();
 		});
