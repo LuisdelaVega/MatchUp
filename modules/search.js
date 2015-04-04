@@ -96,7 +96,7 @@ var getSearchResults = function(req, res, pg, conString) {
 										queryGenres.on("end", function(result) {
 											searchresults.genres = result.rows;
 
-											res.json({
+											res.status(200).json({
 												users : searchresults.users,
 												events : searchresults.events,
 												teams : searchresults.teams,

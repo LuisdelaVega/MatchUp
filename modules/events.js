@@ -181,28 +181,7 @@ var getParticipants = function(req, res, pg, conString) {
 		}
 
 		queryText += (queryJoinCustomer + "WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3");
-		console.log(queryText);
-		var query = client.query({
-			text : queryText,
-			values : [req.params.event, req.query.date, req.query.location]
-		});
-		query.on("row", function(row, result) {
-			result.addRow(row);
-		});
-		query.on("end", function(result) {
-			res.status(200).json(result.rows);
-			client.end();
-		});
-	});
-};
-
-var getParticipants = function(req, res, pg, conString) {
-	pg.connect(conString, function(err, client, done) {
-		if (err) {
-			return console.error('error fetching client from pool', err);
-		}
-
-		console.log(queryText);
+		// console.log(queryText);
 		var query = client.query({
 			text : queryText,
 			values : [req.params.event, req.query.date, req.query.location]
@@ -232,7 +211,7 @@ var getCompetitors = function(req, res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on("end", function(result) {
-			res.status(200).json(result.rows);
+		res.status(200).json(result.rows);
 			client.end();
 		});
 	});
