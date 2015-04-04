@@ -112,7 +112,6 @@ var getEvents = function(req, res, pg, conString) {
 		query.on("end", function(result) {
 			done();
 			res.status(200).json(result.rows);
-
 		});
 	});
 	//pg.end();
@@ -130,6 +129,7 @@ var getEvent = function(req, res, pg, conString) {
 			res.status(400).send('Invalid date');
 		} else {
 			var event = new Object();
+			client.query("BEGIN");
 			var query = client.query({
 				text : "SELECT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_venue, event.event_banner, event.event_logo, event.event_registration_deadline, event.event_rules, event.event_description, event.event_deduction_fee, event.event_is_online, event.event_type, event.customer_username AS creator, hosts.organization_name AS host FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND event.event_active;",
 				values : [req.params.event, req.query.date, req.query.location]
@@ -139,6 +139,7 @@ var getEvent = function(req, res, pg, conString) {
 				result.addRow(row);
 			});
 			query.on('error', function(error) {
+				client.query("ROLLBACK");
 				done();
 				console.log(error);
 				res.status(500).send(error);
@@ -155,16 +156,19 @@ var getEvent = function(req, res, pg, conString) {
 						result.addRow(row);
 					});
 					query.on('error', function(error) {
+						client.query("ROLLBACK");
 						done();
 						console.log(error);
 						res.status(500).send(error);
 					});
 					query.on("end", function(result) {
+						client.query("COMMIT");
 						done();
 						event.is_organizer = (result.rows.length > 0);
 						res.status(200).json(event);
 					});
 				} else {
+					client.query("ROLLBACK");
 					done();
 					res.status(404).send("Couldn't find the event: " + req.params.event + " starting on: " + req.query.date + " located at: " + req.query.location);
 				}
@@ -213,9 +217,8 @@ var getParticipants = function(req, res, pg, conString) {
 			res.status(500).send(error);
 		});
 		query.on("end", function(result) {
-			res.status(200).json(result.rows);
 			done();
-
+			res.status(200).json(result.rows);
 		});
 	});
 	//pg.end();
@@ -242,9 +245,8 @@ var getCompetitors = function(req, res, pg, conString) {
 			res.status(500).send(error);
 		});
 		query.on("end", function(result) {
-			res.status(200).json(result.rows);
 			done();
-
+			res.status(200).json(result.rows);
 		});
 	});
 	//pg.end();
@@ -270,9 +272,9 @@ var getEventSpectators = function(req, res, pg, conString) {
 			res.status(500).send(error);
 		});
 		query.on("end", function(result) {
+			done();
 			res.status(200).json(result.rows);
 			console.log("HEEEELLOOOOOOOOOO!!!!!");
-			done();
 
 		});
 	});
@@ -298,9 +300,8 @@ var getEventCompetitors = function(req, res, pg, conString) {
 			res.status(500).send(error);
 		});
 		query.on("end", function(result) {
-			res.status(200).json(result.rows);
 			done();
-
+			res.status(200).json(result.rows);
 		});
 	});
 	//pg.end();
@@ -395,9 +396,9 @@ var checkInCompetitor = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-
 			res.status(400).send('Invalid date');
 		} else {
+			client.query("BEGIN");
 			var query = client.query({
 				text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
 				values : [req.params.event, date.toUTCString(), req.query.location, req.user.username]
@@ -406,6 +407,7 @@ var checkInCompetitor = function(req, res, pg, conString) {
 				result.addRow(row);
 			});
 			query.on('error', function(error) {
+				client.query("ROLLBACK");
 				done();
 				console.log(error);
 				res.status(500).send(error);
@@ -417,18 +419,18 @@ var checkInCompetitor = function(req, res, pg, conString) {
 						values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.competitor]
 					}, function(err, result) {
 						if (err) {
+							client.query("ROLLBACK");
+							done();
 							res.status(500).send("Oh, no! Disaster!");
-							done();
-
 						} else {
+							client.query("COMMIT");
 							done();
-
 							res.status(200).send("Updated");
 						}
 					});
 				} else {
+					client.query("ROLLBACK");
 					done();
-
 					res.status(403).send("You can't check-in people for this event");
 				}
 			});
@@ -448,9 +450,9 @@ var addStation = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-
 			res.status(400).send('Invalid date');
 		} else {
+			client.query("BEGIN");
 			var query = client.query({//
 				text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
 				values : [req.params.event, date.toUTCString(), req.query.location, req.user.username]
@@ -459,6 +461,7 @@ var addStation = function(req, res, pg, conString) {
 				result.addRow(row);
 			});
 			query.on('error', function(error) {
+				client.query("ROLLBACK");
 				done();
 				console.log(error);
 				res.status(500).send(error);
@@ -473,6 +476,7 @@ var addStation = function(req, res, pg, conString) {
 						result.addRow(row);
 					});
 					query.on('error', function(error) {
+						client.query("ROLLBACK");
 						done();
 						console.log(error);
 						res.status(500).send(error);
@@ -484,19 +488,19 @@ var addStation = function(req, res, pg, conString) {
 							values : [req.params.event, req.query.date, req.query.location, next_station]
 						}, function(err, result) {
 							if (err) {
+								client.query("ROLLBACK");
+								done();
 								res.status(500).send(err);
-								done();
-
 							} else {
+								client.query("COMMIT");
 								done();
-
 								res.status(201).send("Created new station");
 							}
 						});
 					});
 				} else {
+					client.query("ROLLBACK");
 					done();
-
 					res.status(403).send("You can't add stations to this event");
 				}
 			});
@@ -511,7 +515,8 @@ var removeStation = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var query = client.query({//
+		client.query("BEGIN");
+		var query = client.query({
 			text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
 			values : [req.params.event, req.query.date, req.query.location, req.user.username]
 		});
@@ -519,6 +524,7 @@ var removeStation = function(req, res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on('error', function(error) {
+			client.query("ROLLBACK");
 			done();
 			console.log(error);
 			res.status(500).send(error);
@@ -530,18 +536,18 @@ var removeStation = function(req, res, pg, conString) {
 					values : [req.params.event, req.query.date, req.query.location, req.query.station]
 				}, function(err, result) {
 					if (err) {
-						res.status(500).send("Oh, no! Disaster!");
+						client.query("ROLLBACK");
 						done();
-
+						res.status(500).send(err);
 					} else {
+						client.query("COMMIT");
 						done();
-
 						res.status(204).send('');
 					}
 				});
 			} else {
+				client.query("ROLLBACK");
 				done();
-
 				res.status(403).send("You can't remove stations from this event");
 			}
 		});
@@ -555,6 +561,7 @@ var getStation = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
+		client.query("BEGIN");
 		var station = new Object();
 		var query = client.query({
 			text : "SELECT station.station_number, station.station_in_use, stream.stream_link FROM station LEFT OUTER JOIN stream ON station.event_name = stream.event_name AND station.event_start_date = stream.event_start_date AND station.event_location = stream.event_location AND station.station_number = stream.station_number WHERE station.event_name = $1 AND station.event_start_date = $2 AND station.event_location = $3 AND station.station_number = $4",
@@ -564,6 +571,7 @@ var getStation = function(req, res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on('error', function(error) {
+			client.query("ROLLBACK");
 			done();
 			console.log(error);
 			res.status(500).send(error);
@@ -581,19 +589,20 @@ var getStation = function(req, res, pg, conString) {
 					station.tournaments.push(row.tournament_name);
 				});
 				query.on('error', function(error) {
+					client.query("ROLLBACK");
 					done();
 					console.log(error);
 					res.status(500).send(error);
 				});
 				query.on("end", function(result) {
 					// station.tournaments = result.rows;
+					client.query("COMMIT");
 					done();
-
 					res.status(200).json(station);
 				});
 			} else {
+				client.query("ROLLBACK");
 				done();
-
 				res.status(404).send("Station not found");
 			}
 		});
@@ -607,6 +616,7 @@ var addStream = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
+		client.query("BEGIN");
 		var query = client.query({
 			text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
 			values : [req.params.event, req.query.date, req.query.location, req.user.username]
@@ -615,6 +625,7 @@ var addStream = function(req, res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on('error', function(error) {
+			client.query("ROLLBACK");
 			done();
 			console.log(error);
 			res.status(500).send(error);
@@ -629,6 +640,7 @@ var addStream = function(req, res, pg, conString) {
 					result.addRow(row);
 				});
 				query.on('error', function(error) {
+					client.query("ROLLBACK");
 					done();
 					console.log(error);
 					res.status(500).send(error);
@@ -640,20 +652,24 @@ var addStream = function(req, res, pg, conString) {
 							values : [req.params.event, req.query.date, req.query.location, req.params.station, req.body.stream]
 						}, function(err, result) {
 							if (err) {
+								client.query("ROLLBACK");
+								done();
 								res.status(500).send("Oh, no! Disaster!");
-								done();
-
 							} else {
+								client.query("COMMIT");
 								done();
-
 								res.status(201).send("Stream link: " + req.body.stream + " added to Station #" + req.params.station);
 							}
 						});
+					} else {
+						client.query("ROLLBACK");
+						done();
+						res.status(404).send("Station not found");
 					}
 				});
 			} else {
+				client.query("ROLLBACK");
 				done();
-
 				res.status(403).send("You can't add streams in this event");
 			}
 		});
@@ -667,6 +683,7 @@ var editStation = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
+		client.query("BEGIN");
 		var query = client.query({
 			text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
 			values : [req.params.event, req.query.date, req.query.location, req.user.username]
@@ -675,6 +692,7 @@ var editStation = function(req, res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on('error', function(error) {
+			client.query("ROLLBACK");
 			done();
 			console.log(error);
 			res.status(500).send(error);
@@ -685,19 +703,20 @@ var editStation = function(req, res, pg, conString) {
 					text : "UPDATE stream SET stream_link = $5 WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND station_number = $4",
 					values : [req.params.event, req.query.date, req.query.location, req.params.station, req.body.stream]
 				}, function(err, result) {
+					done();
 					if (err) {
+						client.query("ROLLBACK");
+						done();
 						res.status(500).send("Oh, no! Disaster!");
-						done();
-
 					} else {
+						client.query("COMMIT");
 						done();
-
 						res.status(200).send("Changed the stream link to: " + req.body.stream + " on Station #" + req.params.station);
 					}
 				});
 			} else {
+				client.query("ROLLBACK");
 				done();
-
 				res.status(403).send("You can't edit stations in this event");
 			}
 		});
@@ -712,6 +731,7 @@ var removeStream = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
+		client.query("BEGIN");
 		var query = client.query({
 			text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
 			values : [req.params.event, req.query.date, req.query.location, req.user.username]
@@ -720,6 +740,7 @@ var removeStream = function(req, res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on('error', function(error) {
+			client.query("ROLLBACK");
 			done();
 			console.log(error);
 			res.status(500).send(error);
@@ -731,18 +752,18 @@ var removeStream = function(req, res, pg, conString) {
 					values : [req.params.event, req.query.date, req.query.location, req.params.station]
 				}, function(err, result) {
 					if (err) {
+						client.query("ROLLBACK");
+						done();
 						res.status(500).send("Oh, no! Disaster!");
-						done();
-
 					} else {
+						client.query("COMMIT");
 						done();
-
 						res.status(204).send('');
 					}
 				});
 			} else {
+				client.query("ROLLBACK");
 				done();
-
 				res.status(403).send("You can't remove streams in this event");
 			}
 		});
@@ -770,6 +791,7 @@ var getTournaments = function(req, res, pg, conString) {
 			res.status(500).send(error);
 		});
 		query.on("end", function(result) {
+			done();
 			res.status(200).json(result.rows);
 
 		});
@@ -796,11 +818,10 @@ var getTournament = function(req, res, pg, conString) {
 			res.status(500).send(error);
 		});
 		query.on("end", function(result) {
+			done();
 			if (result.rows.length) {
-				done();
 				res.status(200).json(result.rows[0]);
 			} else {
-				done();
 				res.status(404).send("Tournament not found");
 			}
 		});
@@ -840,7 +861,7 @@ var addSponsorToEvent = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		client.query("START TRANSACTION");
+		client.query("BEGIN");
 		var query = client.query({
 			text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
 			values : [req.params.event, req.query.date, req.query.location, req.user.username]
@@ -877,9 +898,8 @@ var addSponsorToEvent = function(req, res, pg, conString) {
 						}, function(err, result) {
 							if (err) {
 								client.query("ROLLBACK");
-								res.status(500).send(err);
 								done();
-
+								res.status(500).send(err);
 							} else {
 								client.query("COMMIT");
 								done();
@@ -908,7 +928,7 @@ var removeSponsor = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		client.query("START TRANSACTION");
+		client.query("BEGIN");
 		var query = client.query({
 			text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
 			values : [req.params.event, req.query.date, req.query.location, req.user.username]
@@ -917,6 +937,7 @@ var removeSponsor = function(req, res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on('error', function(error) {
+			client.query("ROLLBACK");
 			done();
 			console.log(error);
 			res.status(500).send(error);
@@ -931,6 +952,7 @@ var removeSponsor = function(req, res, pg, conString) {
 					result.addRow(row);
 				});
 				query.on('error', function(error) {
+					client.query("ROLLBACK");
 					done();
 					console.log(error);
 					res.status(500).send(error);
@@ -942,25 +964,24 @@ var removeSponsor = function(req, res, pg, conString) {
 							values : [req.params.event, req.query.date, req.query.location, req.query.sponsor]
 						}, function(err, result) {
 							if (err) {
-								res.status(500).send("Oh, no! Disaster!");
+								client.query("ROLLBACK");
 								done();
-
+								res.status(500).send("Oh, no! Disaster!");
 							} else {
 								client.query("COMMIT");
 								done();
-
 								res.status(204).send('');
 							}
 						});
 					} else {
+						client.query("ROLLBACK");
 						done();
-
 						res.status(403).send(req.query.sponsor + " does not sponsor your Event");
 					}
 				});
 			} else {
+				client.query("ROLLBACK");
 				done();
-
 				res.status(403).send("You can't add sponsors to this Event");
 			}
 		});
@@ -976,6 +997,7 @@ var attachStation = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
+		client.query("BEGIN");
 		var query = client.query({
 			text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
 			values : [req.params.event, req.query.date, req.query.location, req.user.username]
@@ -984,6 +1006,7 @@ var attachStation = function(req, res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on('error', function(error) {
+			client.query("ROLLBACK");
 			done();
 			console.log(error);
 			res.status(500).send(error);
@@ -1009,21 +1032,23 @@ var attachStation = function(req, res, pg, conString) {
 							values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.query.station]
 						}, function(err, result) {
 							if (err) {
-								res.status(500).send("Oh, no! Disaster!");
+								client.query("ROLLBACK");
 								done();
-
+								res.status(500).send("Oh, no! Disaster!");
 							} else {
+								client.query("COMMIT");
 								done();
 								res.status(201).send("Attached Station #" + req.query.station + " to " + req.params.tournament);
 							}
 						});
 					} else {
-						res.status(404).send("Station not found");
+						client.query("ROLLBACK");
 						done();
-
+						res.status(404).send("Station not found");
 					}
 				});
 			} else {
+				client.query("ROLLBACK");
 				done();
 				res.status(403).send("You can't attach stations to this tournament");
 			}
@@ -1041,7 +1066,6 @@ var getStationsforTournament = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-
 			res.status(400).send('Invalid date');
 		} else {
 			var query = client.query({
@@ -1058,7 +1082,6 @@ var getStationsforTournament = function(req, res, pg, conString) {
 			});
 			query.on("end", function(result) {
 				done();
-
 				res.status(200).json(result.rows);
 			});
 		}
@@ -1073,6 +1096,7 @@ var detachStation = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
+		client.query("BEGIN");
 		var query = client.query({
 			text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
 			values : [req.params.event, req.query.date, req.query.location, req.user.username]
@@ -1081,6 +1105,7 @@ var detachStation = function(req, res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on('error', function(error) {
+			client.query("ROLLBACK");
 			done();
 			console.log(error);
 			res.status(500).send(error);
@@ -1092,14 +1117,17 @@ var detachStation = function(req, res, pg, conString) {
 					values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.query.station]
 				}, function(err, result) {
 					if (err) {
-						res.status(500).send("Oh, no! Disaster!");
+						client.query("ROLLBACK");
 						done();
+						res.status(500).send(err);
 					} else {
+						client.query("COMMIT");
 						done();
 						res.status(204).send('');
 					}
 				});
 			} else {
+				client.query("ROLLBACK");
 				done();
 				res.status(403).send("You can't remove stations from this tournament");
 			}
@@ -1117,7 +1145,6 @@ var getAllNews = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-
 			res.status(400).send('Invalid date');
 		} else {
 			var query = client.query({
@@ -1134,7 +1161,6 @@ var getAllNews = function(req, res, pg, conString) {
 			});
 			query.on("end", function(result) {
 				done();
-
 				res.status(200).json(result.rows);
 			});
 		}
@@ -1151,7 +1177,6 @@ var getNews = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-
 			res.status(400).send('Invalid date');
 		} else {
 			var query = client.query({
@@ -1167,13 +1192,10 @@ var getNews = function(req, res, pg, conString) {
 				res.status(500).send(error);
 			});
 			query.on("end", function(result) {
-				if (result.rows.length > 0) {
-					done();
-
+				done();
+				if (result.rows.length) {
 					res.json(result.rows[0]);
 				} else {
-					done();
-
 					res.status(404).send("News not found");
 				}
 			});
@@ -1191,9 +1213,9 @@ var deleteNews = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-
 			res.status(400).send('Invalid date');
 		} else {
+			client.query("BEGIN");
 			var query = client.query({
 				text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
 				values : [req.params.event, req.query.date, req.query.location, req.user.username]
@@ -1202,6 +1224,7 @@ var deleteNews = function(req, res, pg, conString) {
 				result.addRow(row);
 			});
 			query.on('error', function(error) {
+				client.query("ROLLBACK");
 				done();
 				console.log(error);
 				res.status(500).send(error);
@@ -1213,18 +1236,19 @@ var deleteNews = function(req, res, pg, conString) {
 						values : [req.params.event, req.query.date, req.query.location, req.params.news]
 					}, function(err, result) {
 						if (err) {
-							res.status(500).send("Oh, no! Disaster!");
+							client.query("ROLLBACK");
 							done();
-
+							console.log(err);
+							res.status(500).send(err);
 						} else {
+							client.query("COMMIT");
 							done();
-
 							res.status(204).send('');
 						}
 					});
 				} else {
+					client.query("ROLLBACK");
 					done();
-
 					res.status(403).send("You can't delete news in this event");
 				}
 			});
@@ -1242,9 +1266,9 @@ var createNews = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-
 			res.status(400).send('Invalid date');
 		} else {
+			client.query("BEGIN");
 			var query = client.query({
 				text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
 				values : [req.params.event, req.query.date, req.query.location, req.user.username]
@@ -1253,6 +1277,7 @@ var createNews = function(req, res, pg, conString) {
 				result.addRow(row);
 			});
 			query.on('error', function(error) {
+				client.query("ROLLBACK");
 				done();
 				console.log(error);
 				res.status(500).send(error);
@@ -1267,6 +1292,7 @@ var createNews = function(req, res, pg, conString) {
 						result.addRow(row);
 					});
 					query.on('error', function(error) {
+						client.query("ROLLBACK");
 						done();
 						console.log(error);
 						res.status(500).send(error);
@@ -1278,10 +1304,11 @@ var createNews = function(req, res, pg, conString) {
 							values : [req.params.event, req.query.date, req.query.location, req.body.title, req.body.content, (new Date()).toUTCString(), result.rows[0].next_news]
 						}, function(err, result) {
 							if (err) {
-								res.status(500).send("Oh, no! Disaster!");
+								client.query("ROLLBACK");
 								done();
-
+								res.status(500).send("Oh, no! Disaster!");
 							} else {
+								client.query("COMMIT");
 								done();
 								var news = new Object();
 								news.event = new Object();
@@ -1294,6 +1321,7 @@ var createNews = function(req, res, pg, conString) {
 						});
 					});
 				} else {
+					client.query("ROLLBACK");
 					done();
 					res.status(403).send("You can't post News to this event");
 				}
@@ -1312,10 +1340,9 @@ var updateNews = function(req, res, pg, conString) {
 		var eventStartDate = new Date(req.query.date);
 		if (!(eventStartDate.getTime())) {
 			done();
-
 			res.status(400).send('Invalid date');
 		} else {
-			client.query("START TRANSACTION");
+			client.query("BEGIN");
 			// Check if the user is registered for this event
 			var query = client.query({
 				text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
@@ -1325,6 +1352,7 @@ var updateNews = function(req, res, pg, conString) {
 				result.addRow(row);
 			});
 			query.on('error', function(error) {
+				client.query("ROLLBACK");
 				done();
 				console.log(error);
 				res.status(500).send(error);
@@ -1337,8 +1365,10 @@ var updateNews = function(req, res, pg, conString) {
 						values : [req.params.event, req.query.date, req.query.location, req.params.news, req.body.title, req.body.content]
 					}, function(err, result) {
 						if (err) {
-							res.status(500).send("Oh, no! Disaster!");
+							client.query("ROLLBACK");
 							done();
+							console.log(err);
+							res.status(500).send(err);
 						} else {
 							client.query("COMMIT");
 							done();
@@ -1352,6 +1382,7 @@ var updateNews = function(req, res, pg, conString) {
 						}
 					});
 				} else {
+					client.query("ROLLBACK");
 					done();
 					res.status(403).send("You can't update news for this event");
 				}
@@ -1370,7 +1401,6 @@ var getReviews = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-
 			res.status(400).send('Invalid date');
 		} else {
 			var query = client.query({
@@ -1387,7 +1417,6 @@ var getReviews = function(req, res, pg, conString) {
 			});
 			query.on("end", function(result) {
 				done();
-
 				res.status(200).json(result.rows);
 			});
 		}
@@ -1404,7 +1433,6 @@ var getReview = function(req, res, pg, conString) {
 		var date = new Date(req.query.date);
 		if (!(date.getTime())) {
 			done();
-
 			res.status(400).send('Invalid date');
 		} else {
 			var query = client.query({
@@ -1420,11 +1448,10 @@ var getReview = function(req, res, pg, conString) {
 				res.status(500).send(error);
 			});
 			query.on("end", function(result) {
+				done();
 				if (result.rows.length) {
-					done();
 					res.status(200).json(result.rows[0]);
 				} else {
-					done();
 					res.status(404).send("Review not found");
 				}
 			});
@@ -1444,6 +1471,7 @@ var deleteReview = function(req, res, pg, conString) {
 			done();
 			res.status(400).send('Invalid date');
 		} else {
+			client.query("BEGIN");
 			var query = client.query({
 				text : "SELECT distinct customer.customer_username FROM review JOIN event ON review.event_name = event.event_name AND review.event_start_date = event.event_start_date AND review.event_location = event.event_location JOIN customer ON customer.customer_username = review.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND review.customer_username = $5 AND event.event_active",
 				values : [req.params.event, req.query.date, req.query.location, req.user.username, req.params.username]
@@ -1452,25 +1480,29 @@ var deleteReview = function(req, res, pg, conString) {
 				result.addRow(row);
 			});
 			query.on('error', function(error) {
+				client.query("ROLLBACK");
 				done();
 				console.log(error);
 				res.status(500).send(error);
 			});
 			query.on("end", function(result) {
-				if (result.rows.length > 0) {
+				if (result.rows.length) {
 					client.query({
 						text : "DELETE FROM review WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $4",
 						values : [req.params.event, req.query.date, req.query.location, req.params.username]
 					}, function(err, result) {
 						if (err) {
-							res.status(500).send("Oh, no! Disaster!");
+							client.query("ROLLBACK");
 							done();
+							res.status(500).send("Oh, no! Disaster!");
 						} else {
+							client.query("COMMIT");
 							done();
 							res.status(204).send('');
 						}
 					});
 				} else {
+					client.query("ROLLBACK");
 					done();
 					res.status(403).send("You can't delete this review");
 				}
@@ -1491,6 +1523,7 @@ var createReview = function(req, res, pg, conString) {
 			done();
 			res.status(400).send('Invalid date');
 		} else {
+			client.query("BEGIN");
 			var query = client.query({
 				text : "SELECT distinct customer.customer_username, event.event_end_date FROM is_a JOIN event ON is_a.event_name = event.event_name AND is_a.event_start_date = event.event_start_date AND is_a.event_location = event.event_location JOIN pays ON pays.event_name = event.event_name AND pays.event_start_date = event.event_start_date AND pays.event_location = event.event_location JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN customer ON customer.customer_username = pays.customer_username OR customer.customer_username = is_a.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
 				values : [req.params.event, req.query.date, req.query.location, req.user.username]
@@ -1499,12 +1532,13 @@ var createReview = function(req, res, pg, conString) {
 				result.addRow(row);
 			});
 			query.on('error', function(error) {
+				client.query("ROLLBACK");
 				done();
 				console.log(error);
 				res.status(500).send(error);
 			});
 			query.on("end", function(result) {
-				if (result.rows.length > 0) {
+				if (result.rows.length) {
 					var today = new Date();
 					if (today.getTime() < date.getTime()) {
 						done();
@@ -1515,10 +1549,12 @@ var createReview = function(req, res, pg, conString) {
 							values : [req.params.event, req.query.date, req.query.location, req.user.username, req.body.title, req.body.content, req.body.rating, (new Date()).toUTCString()]
 						}, function(err, result) {
 							if (err) {
-								res.status(500).send("Oh, no! Disaster!");
+								client.query("ROLLBACK");
 								done();
-
+								console.log(err);
+								res.status(500).send(err);
 							} else {
+								client.query("COMMIT");
 								done();
 								var review = new Object();
 								review.event = new Object();
@@ -1531,6 +1567,7 @@ var createReview = function(req, res, pg, conString) {
 						});
 					}
 				} else {
+					client.query("ROLLBACK");
 					done();
 					res.status(403).send("You can't post a review for this event");
 				}
@@ -1551,7 +1588,7 @@ var updateReview = function(req, res, pg, conString) {
 			done();
 			res.status(400).send('Invalid date');
 		} else {
-			client.query("START TRANSACTION");
+			client.query("BEGIN");
 			// Check if the user is registered for this event
 			var query = client.query({
 				text : "SELECT distinct customer.customer_username FROM review JOIN event ON review.event_name = event.event_name AND review.event_start_date = event.event_start_date AND review.event_location = event.event_location JOIN customer ON customer.customer_username = review.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND review.customer_username = $5 AND event.event_active",
@@ -1561,22 +1598,25 @@ var updateReview = function(req, res, pg, conString) {
 				result.addRow(row);
 			});
 			query.on('error', function(error) {
+				client.query("ROLLBACK");
 				done();
 				console.log(error);
 				res.status(500).send(error);
 			});
 			query.on("end", function(result) {
-				if (result.rows.length > 0) {
+				if (result.rows.length) {
 					console.log(req.body);
 					client.query({
 						text : "UPDATE review SET (review_title, review_content, star_rating) = ($5, $6, $7) WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $4",
 						values : [req.params.event, req.query.date, req.query.location, req.user.username, req.body.title, req.body.content, req.body.rating]
 					}, function(err, result) {
 						if (err) {
-							res.status(500).send("Oh, no! Disaster!");
+							client.query("ROLLBACK");
 							done();
+							res.status(500).send(err);
 						} else {
 							client.query("COMMIT");
+							done();
 							var review = new Object();
 							review.event = new Object();
 							review.event.name = req.params.event;
@@ -1587,6 +1627,7 @@ var updateReview = function(req, res, pg, conString) {
 						}
 					});
 				} else {
+					client.query("ROLLBACK");
 					done();
 					res.status(403).send("You can't update this review");
 				}
@@ -1605,7 +1646,6 @@ var getMeetups = function(req, res, pg, conString) {
 		var eventStartDate = new Date(req.query.date);
 		if (!(eventStartDate.getTime())) {
 			done();
-
 			res.status(400).send('Invalid date');
 		} else {
 			var query = client.query({
@@ -1656,11 +1696,10 @@ var getMeetup = function(req, res, pg, conString) {
 				res.status(500).send(error);
 			});
 			query.on("end", function(result) {
+				done();
 				if (result.rows.length) {
-					done();
 					res.json(result.rows[0]);
 				} else {
-					done();
 					res.status(404).send("Meetup not found");
 				}
 			});
@@ -1679,9 +1718,9 @@ var deleteMeetup = function(req, res, pg, conString) {
 		var meetupStartDate = new Date(req.query.meetup_date);
 		if (!(eventStartDate.getTime()) || !(meetupStartDate.getTime())) {
 			done();
-
 			res.status(400).send('Invalid date');
 		} else {
+			client.query("BEGIN");
 			var query = client.query({
 				text : "SELECT distinct customer.customer_username FROM meetup JOIN event ON meetup.event_name = event.event_name AND meetup.event_start_date = event.event_start_date AND meetup.event_location = event.event_location join hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username OR customer.customer_username = meetup.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND meetup.customer_username = $5 AND meetup.meetup_start_date = $6 AND meetup.meetup_location = $7 AND event.event_active",
 				values : [req.params.event, req.query.date, req.query.location, req.user.username, req.params.username, req.query.meetup_date, req.query.meetup_location]
@@ -1690,25 +1729,29 @@ var deleteMeetup = function(req, res, pg, conString) {
 				result.addRow(row);
 			});
 			query.on('error', function(error) {
+				client.query("ROLLBACK");
 				done();
 				console.log(error);
 				res.status(500).send(error);
 			});
 			query.on("end", function(result) {
-				if (result.rows.length > 0) {
+				if (result.rows.length) {
 					client.query({
 						text : "DELETE FROM meetup WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND meetup_start_date = $5 AND meetup_location = $6 AND customer_username = $4",
 						values : [req.params.event, req.query.date, req.query.location, req.params.username, req.query.meetup_date, req.query.meetup_location]
 					}, function(err, result) {
 						if (err) {
-							res.status(500).send("Oh, no! Disaster!");
+							client.query("ROLLBACK");
 							done();
+							res.status(500).send(err);
 						} else {
+							client.query("COMMIT");
 							done();
 							res.status(204).send('');
 						}
 					});
 				} else {
+					client.query("ROLLBACK");
 					done();
 					res.status(403).send("You can't delete this Meetup");
 				}
@@ -1729,10 +1772,9 @@ var createMeetup = function(req, res, pg, conString) {
 		var meetupEndDate = new Date(req.body.end_date);
 		if (!(eventStartDate.getTime()) || !(meetupStartDate.getTime()) || !(meetupEndDate.getTime()) || meetupStartDate.getTime() > meetupEndDate.getTime()) {
 			done();
-
 			res.status(400).send('Invalid date');
 		} else {
-			client.query("START TRANSACTION");
+			client.query("BEGIN");
 			// Check if the user is registered for this event
 			var query = client.query({
 				text : "SELECT distinct customer.customer_username, event.event_end_date FROM is_a JOIN event ON is_a.event_name = event.event_name AND is_a.event_start_date = event.event_start_date AND is_a.event_location = event.event_location JOIN pays ON pays.event_name = event.event_name AND pays.event_start_date = event.event_start_date AND pays.event_location = event.event_location JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = pays.customer_username OR customer.customer_username = is_a.customer_username OR customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
@@ -1742,14 +1784,16 @@ var createMeetup = function(req, res, pg, conString) {
 				result.addRow(row);
 			});
 			query.on('error', function(error) {
+				client.query("ROLLBACK");
 				done();
 				console.log(error);
 				res.status(500).send(error);
 			});
 			query.on("end", function(result) {
-				if (result.rows.length > 0) {
+				if (result.rows.length) {
 					var eventEndDate = new Date(result.rows[0].event_end_date);
 					if (meetupEndDate.getTime() > eventEndDate.getTime()) {
+						client.query("ROLLBACK");
 						done();
 						res.status(400).send('Invalid date');
 					} else {
@@ -1758,8 +1802,9 @@ var createMeetup = function(req, res, pg, conString) {
 							values : [req.params.event, req.query.date, req.query.location, req.body.location, req.body.name, req.body.start_date, req.body.end_date, req.body.description, req.user.username]
 						}, function(err, result) {
 							if (err) {
-								res.status(500).send("Oh, no! Disaster!");
+								clent.query("ROLLBACK");
 								done();
+								res.status(500).send("Oh, no! Disaster!");
 							} else {
 								client.query("COMMIT");
 								done();
@@ -1779,6 +1824,7 @@ var createMeetup = function(req, res, pg, conString) {
 						});
 					}
 				} else {
+					client.query("ROLLBACK");
 					done();
 					res.status(403).send("You can't create a Meetup for this event");
 				}
@@ -1801,7 +1847,7 @@ var updateMeetup = function(req, res, pg, conString) {
 			done();
 			res.status(400).send('Invalid date');
 		} else {
-			client.query("START TRANSACTION");
+			client.query("BEGIN");
 			// Check if the user is registered for this event
 			var query = client.query({
 				text : "SELECT distinct customer.customer_username, event.event_end_date FROM meetup JOIN event ON meetup.event_name = event.event_name AND meetup.event_start_date = event.event_start_date AND meetup.event_location = event.event_location JOIN customer ON customer.customer_username = meetup.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND meetup.customer_username = $5 AND meetup.meetup_start_date = $6 AND meetup.meetup_location = $7 AND event.event_active",
@@ -1811,14 +1857,16 @@ var updateMeetup = function(req, res, pg, conString) {
 				result.addRow(row);
 			});
 			query.on('error', function(error) {
+				client.query("ROLLBACK");
 				done();
 				console.log(error);
 				res.status(500).send(error);
 			});
 			query.on("end", function(result) {
-				if (result.rows.length > 0) {
+				if (result.rows.length) {
 					var eventEndDate = new Date(result.rows[0].event_end_date);
 					if (meetupEndDate.getTime() > eventEndDate.getTime()) {
+						client.query("ROLLBACK");
 						done();
 						res.status(400).send('Invalid date');
 					} else {
@@ -1828,8 +1876,10 @@ var updateMeetup = function(req, res, pg, conString) {
 							values : [req.params.event, req.query.date, req.query.location, req.user.username, req.query.meetup_location, req.query.meetup_date, req.body.name, req.body.location, req.body.start_date, req.body.end_date, req.body.description]
 						}, function(err, result) {
 							if (err) {
-								res.status(500).send("Oh, no! Disaster!");
+								client.query("ROLLBACK");
 								done();
+								console.log(err);
+								res.status(500).send(err);
 							} else {
 								client.query("COMMIT");
 								done();
@@ -1838,6 +1888,7 @@ var updateMeetup = function(req, res, pg, conString) {
 						});
 					}
 				} else {
+					client.query("ROLLBACK");
 					done();
 					res.status(403).send("You can't update this review");
 				}
@@ -1860,7 +1911,7 @@ var addTournament = function(req, res, pg, conString) {
 			done();
 			res.status(400).send('Invalid date');
 		} else {
-			client.query("START TRANSACTION");
+			client.query("BEGIN");
 			// Check if the user is registered for this event
 			var query = client.query({
 				text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
@@ -1870,19 +1921,21 @@ var addTournament = function(req, res, pg, conString) {
 				result.addRow(row);
 			});
 			query.on('error', function(error) {
+				client.query("ROLLBACK");
 				done();
 				console.log(error);
 				res.status(500).send(error);
 			});
 			query.on("end", function(result) {
-				if (result.rows.length > 0) {
+				if (result.rows.length) {
 					client.query({
 						text : "INSERT INTO tournament (event_name, event_start_date, event_location, tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
 						values : [req.params.event, req.query.date, req.query.location, req.body.name, req.body.game, req.body.rules, req.body.teams, req.body.start_date, req.body.deadline, Math.floor(req.body.fee * 100) / 100, req.body.capacity, Math.floor(req.body.seed_money * 100) / 100, req.body.type, req.body.format, req.body.scoring, ((req.body.type === "Two-Stage") ? req.body.group_players : 0), ((req.body.type === "Two-Stage") ? req.body.group_winners : 0)]
 					}, function(err, result) {
 						if (err) {
-							res.status(500).send("Oh, no! Disaster!");
+							clent.query("ROLLBACK");
 							done();
+							res.status(500).send("Oh, no! Disaster!");
 						} else {
 							client.query("COMMIT");
 							done();
@@ -1896,6 +1949,7 @@ var addTournament = function(req, res, pg, conString) {
 						}
 					});
 				} else {
+					client.query("ROLLBACK");
 					done();
 					res.status(403).send("You can't add this tournament");
 				}
@@ -1919,7 +1973,7 @@ var removeTournament = function(req, res, pg, conString) {
 			done();
 			res.status(400).send('Invalid date');
 		} else {
-			client.query("START TRANSACTION");
+			client.query("BEGIN");
 			// Check if the user is registered for this event
 			var query = client.query({
 				text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
@@ -1929,19 +1983,21 @@ var removeTournament = function(req, res, pg, conString) {
 				result.addRow(row);
 			});
 			query.on('error', function(error) {
+				client.query("ROLLBACK");
 				done();
 				console.log(error);
 				res.status(500).send(error);
 			});
 			query.on("end", function(result) {
-				if (result.rows.length > 0) {
+				if (result.rows.length) {
 					client.query({
 						text : "DELETE FROM tournament WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4",
 						values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
 					}, function(err, result) {
 						if (err) {
-							res.status(500).send("Oh, no! Disaster!");
+							client.query("ROLLBACK");
 							done();
+							res.status(500).send(err);
 						} else {
 							client.query("COMMIT");
 							done();
@@ -1949,6 +2005,7 @@ var removeTournament = function(req, res, pg, conString) {
 						}
 					});
 				} else {
+					client.query("ROLLBACK");
 					done();
 					res.status(403).send("You can't delete this tournament");
 				}
@@ -1969,7 +2026,7 @@ var deleteEvent = function(req, res, pg, conString) {
 			done();
 			res.status(400).send('Invalid date');
 		} else {
-			client.query("START TRANSACTION");
+			client.query("BEGIN");
 			// Check if the user is registered for this event
 			var query = client.query({
 				text : "SELECT distinct customer.customer_username FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location LEFT OUTER JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active;",
@@ -1979,19 +2036,21 @@ var deleteEvent = function(req, res, pg, conString) {
 				result.addRow(row);
 			});
 			query.on('error', function(error) {
+				client.query("ROLLBACK");
 				done();
 				console.log(error);
 				res.status(500).send(error);
 			});
 			query.on("end", function(result) {
-				if (result.rows.length > 0) {
+				if (result.rows.length) {
 					client.query({
 						text : "UPDATE event SET event_active = FALSE WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
 						values : [req.params.event, req.query.date, req.query.location]
 					}, function(err, result) {
 						if (err) {
-							res.status(500).send("Oh, no! Disaster!");
+							client.query("ROLLBACK");
 							done();
+							res.status(500).send("Oh, no! Disaster!");
 						} else {
 							client.query("COMMIT");
 							done();
@@ -1999,6 +2058,7 @@ var deleteEvent = function(req, res, pg, conString) {
 						}
 					});
 				} else {
+					client.query("ROLLBACK");
 					done();
 					res.status(403).send("You can't delete this tournament");
 				}
@@ -2019,7 +2079,7 @@ var editEvent = function(req, res, pg, conString) {
 			done();
 			res.status(400).send('Invalid date');
 		} else {
-			client.query("START TRANSACTION");
+			client.query("BEGIN");
 			// Check if the user is an organizer for this event
 			var query = client.query({
 				text : "SELECT distinct customer.customer_username FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location LEFT OUTER JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active;",
@@ -2029,16 +2089,18 @@ var editEvent = function(req, res, pg, conString) {
 				result.addRow(row);
 			});
 			query.on('error', function(error) {
+				client.query("ROLLBACK");
 				done();
 				console.log(error);
 				res.status(500).send(error);
 			});
 			query.on("end", function(result) {
-				if (result.rows.length > 0) {
+				if (result.rows.length) {
 					var eventStartDate = new Date(req.body.event.start_date);
 					var eventEndDate = new Date(req.body.event.end_date);
 					var eventRegistrationDeadline = new Date(req.body.event.registration_deadline);
 					if (!(eventStartDate.getTime()) || !(eventEndDate.getTime()) || !(eventRegistrationDeadline.getTime()) || eventRegistrationDeadline.getTime() > eventStartDate.getTime() || eventStartDate.getTime() > eventEndDate.getTime()) {
+						client.query("ROLLBACK");
 						done();
 						res.status(400).send('Invalid date');
 					} else {
@@ -2079,7 +2141,7 @@ var editTournament = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		client.query("START TRANSACTION");
+		client.query("BEGIN");
 		// Check if the user is registered for this event
 		var query = client.query({
 			text : "SELECT distinct customer.customer_username FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location LEFT OUTER JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active;",
@@ -2142,6 +2204,7 @@ var getHome = function(res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on("end", function(result) {
+			done();
 			eventList.live = result.rows;
 
 			// Look for all the Regular Events that have not yet started
@@ -2152,6 +2215,7 @@ var getHome = function(res, pg, conString) {
 				result.addRow(row);
 			});
 			query.on("end", function(result) {
+				done();
 				eventList.regular = result.rows;
 
 				// Look for all Hosted Events that have not yet started
@@ -2162,6 +2226,7 @@ var getHome = function(res, pg, conString) {
 					result.addRow(row);
 				});
 				query.on("end", function(result) {
+					done();
 					eventList.hosted = result.rows;
 
 					// Look for most Popular Games

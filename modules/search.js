@@ -6,6 +6,7 @@ var getSearchResults = function(req, res, pg, conString) {
 
 		var searchresults = new Object();
 		// Query the database to find the accounts
+		client.query("BEGIN");
 		var query = client.query({
 			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_country FROM customer WHERE customer_first_name ||' '|| customer_last_name ILIKE '%" + req.params.parameter + "%' OR customer_tag ILIKE '%" + req.params.parameter + "%' AND customer_active"
 		});
@@ -13,6 +14,7 @@ var getSearchResults = function(req, res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on('error', function(error) {
+			client.query("ROLLBACK");
 			done();
 			console.log(error);
 			res.status(500).send(error);
@@ -28,6 +30,7 @@ var getSearchResults = function(req, res, pg, conString) {
 				result.addRow(row);
 			});
 			query.on('error', function(error) {
+				client.query("ROLLBACK");
 				done();
 				console.log(error);
 				res.status(500).send(error);
@@ -44,6 +47,7 @@ var getSearchResults = function(req, res, pg, conString) {
 					result.addRow(row);
 				});
 				query.on('error', function(error) {
+					client.query("ROLLBACK");
 					done();
 					console.log(error);
 					res.status(500).send(error);
@@ -59,6 +63,7 @@ var getSearchResults = function(req, res, pg, conString) {
 						result.addRow(row);
 					});
 					query.on('error', function(error) {
+						client.query("ROLLBACK");
 						done();
 						console.log(error);
 						res.status(500).send(error);
@@ -74,6 +79,7 @@ var getSearchResults = function(req, res, pg, conString) {
 							result.addRow(row);
 						});
 						query.on('error', function(error) {
+							client.query("ROLLBACK");
 							done();
 							console.log(error);
 							res.status(500).send(error);
@@ -89,6 +95,7 @@ var getSearchResults = function(req, res, pg, conString) {
 								result.addRow(row);
 							});
 							query.on('error', function(error) {
+								client.query("ROLLBACK");
 								done();
 								console.log(error);
 								res.status(500).send(error);
@@ -104,6 +111,7 @@ var getSearchResults = function(req, res, pg, conString) {
 									result.addRow(row);
 								});
 								query.on('error', function(error) {
+									client.query("ROLLBACK");
 									done();
 									console.log(error);
 									res.status(500).send(error);
@@ -119,6 +127,7 @@ var getSearchResults = function(req, res, pg, conString) {
 										result.addRow(row);
 									});
 									query.on('error', function(error) {
+										client.query("ROLLBACK");
 										done();
 										console.log(error);
 										res.status(500).send(error);
@@ -134,13 +143,15 @@ var getSearchResults = function(req, res, pg, conString) {
 											result.addRow(row);
 										});
 										query.on('error', function(error) {
+											client.query("ROLLBACK");
 											done();
 											console.log(error);
 											res.status(500).send(error);
 										});
 										query.on("end", function(result) {
-											searchresults.genres = result.rows;
+											client.query("COMMIT");
 											done();
+											searchresults.genres = result.rows;
 											res.status(200).json({
 												users : searchresults.users,
 												events : searchresults.events,

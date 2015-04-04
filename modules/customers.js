@@ -19,7 +19,6 @@ var getUserProfile = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		client.query("START TRANSACTION");
 		var profile = new Object();
 		// Query the database to find the user's account
 		var query = client.query({
@@ -35,15 +34,12 @@ var getUserProfile = function(req, res, pg, conString) {
 			res.status(500).send(error);
 		});
 		query.on("end", function(result) {
+			done();
 			if (result.rows.length) {
-				client.query("COMMIT");
-				done();
 				res.status(200).json(result.rows[0]);
 
 			} else {
-				done();
 				res.status(404).send('Oh, no! This user does not exist');
-
 			};
 		});
 	});
@@ -71,7 +67,6 @@ var getSubscriptions = function(req, res, pg, conString) {
 		query.on("end", function(result) {
 			done();
 			res.status(200).send(result.rows);
-
 		});
 	});
 	//pg.end();
@@ -152,7 +147,6 @@ var getEvents = function(req, res, pg, conString) {
 		query.on("end", function(result) {
 			done();
 			res.status(200).send(result.rows);
-
 		});
 	});
 	//pg.end();
@@ -184,7 +178,6 @@ var getRegisteredEvents = function(req, res, pg, conString) {
 			query.on("end", function(result) {
 				done();
 				res.status(200).send(result.rows);
-
 			});
 		} else if (req.query.type === "competitor") {
 			var query = client.query({
@@ -202,12 +195,10 @@ var getRegisteredEvents = function(req, res, pg, conString) {
 			query.on("end", function(result) {
 				done();
 				res.status(200).send(result.rows);
-
 			});
 		} else {
 			done();
 			res.status(400).send("No valid type specified. Posible values [spectator, competitor]");
-
 		}
 	});
 	//pg.end();
@@ -232,12 +223,10 @@ var subscribe = function(req, res, pg, conString) {
 					client.query("ROLLBACK");
 					done();
 					res.status(500).send("Oh, no! Disaster!");
-
 				} else {
 					client.query("COMMIT");
 					done();
 					res.status(201).send("Subscribed to: " + req.params.username);
-
 				}
 			});
 		}
@@ -260,12 +249,10 @@ var unsubscribe = function(req, res, pg, conString) {
 				client.query("ROLLBACK");
 				done();
 				res.status(500).send("Oh, no! Disaster!");
-
 			} else {
 				client.query("COMMIT");
 				done();
 				res.status(204).send("Unsubscribed from: " + req.params.username);
-
 			}
 		});
 	});
@@ -309,7 +296,6 @@ var editAccount = function(req, res, pg, conString) {
 		if (!req.body.firstname && !req.body.lastname && !req.body.tag && !req.body.paypal && !req.body.profilepic && !req.body.cover && !req.body.bio && !req.body.country) {
 			done();
 			res.status(401).send("Oh no! Disaster");
-
 		}
 
 		queryText += " WHERE customer_username = '" + req.user.username + "' AND customer_active";
@@ -320,7 +306,6 @@ var editAccount = function(req, res, pg, conString) {
 			if (err) {
 				done();
 				res.status(500).send("Oh, no! Disaster!");
-
 			} else {
 				done();
 				res.status(204).send('');
@@ -336,6 +321,7 @@ var deleteAccount = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
+		client.query("BEGIN");
 		var query = client.query({
 			text : "SELECT customer_username FROM captain_for NATURAL JOIN owns WHERE customer_username = $1 AND customer_active",
 			values : [req.user.username]
@@ -343,21 +329,30 @@ var deleteAccount = function(req, res, pg, conString) {
 		query.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			client.query("ROLLBACK");
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		query.on("end", function(result) {
-			if (result.rows.length > 0) {
+			if (result.rows.length) {
 				client.query({
 					text : "UPDATE customer SET customer_active = FALSE WHERE customer_username = $1",
 					values : [req.user.username]
 				}, function(err, result) {
 					if (err) {
+						client.query("ROLLBACK");
 						done();
 						res.status(500).send("Oh, no! Disaster!");
 					} else {
+						client.query("COMMIT");
 						done();
 						res.status(204).send('');
 					}
 				});
 			} else {
+				client.query("ROLLBACK");
 				done();
 				res.status(403).send("Oh, no! Relinquish your captain/owner titles before deleting dummy");
 
@@ -379,7 +374,7 @@ var createAccount = function(req, res, pg, conString, jwt, secret, crypto) {
 				throw err;
 			// var password = key.toString('hex');
 			// console.log("password: " + key.toString('hex'));
-			client.query("START TRANSACTION");
+			client.query("BEGIN");
 			client.query({
 				text : "INSERT INTO customer (customer_username, customer_first_name, customer_last_name, customer_tag, customer_password, customer_salt, customer_active) VALUES ($1, $2, $3, $4, $5, $6, TRUE)",
 				values : [req.body.username, // customer_username*
@@ -393,7 +388,6 @@ var createAccount = function(req, res, pg, conString, jwt, secret, crypto) {
 					client.query("ROLLBACK");
 					done();
 					res.status(500).send("Oh, no! Disaster!");
-
 				} else {
 					client.query({
 						text : "INSERT INTO of_email (customer_username, email_address) VALUES ($1, $2)",
@@ -417,7 +411,6 @@ var createAccount = function(req, res, pg, conString, jwt, secret, crypto) {
 							res.status(201).json({
 								token : token
 							});
-
 						}
 					});
 				}
@@ -434,8 +427,7 @@ var createTeam = function(req, res, pg, conString) {
 		}
 
 		console.log(req.body.info);
-		client.query("START TRANSACTION");
-
+		client.query("BEGIN");
 		var query = client.query({
 			text : "SELECT customer_username FROM customer WHERE customer_username = $1 AND customer_active",
 			values : [req.user.username]
@@ -444,6 +436,7 @@ var createTeam = function(req, res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on('error', function(error) {
+			client.query("ROLLBACK");
 			done();
 			console.log(error);
 			res.status(500).send(error);
@@ -461,6 +454,7 @@ var createTeam = function(req, res, pg, conString) {
 					if (err) {
 						client.query("ROLLBACK");
 						done();
+						console.log(err);
 						res.status(400).send("Oh, no! Disaster!");
 
 					} else {
@@ -470,25 +464,27 @@ var createTeam = function(req, res, pg, conString) {
 							]
 						}, function(err, result) {
 							if (err) {
+								client.query("ROLLBACK");
 								done();
-								res.status(400).send("Oh, no! Disaster in INSERT INTO plays_for!");
-
+								console.log(err);
+								res.status(400).send(err);
 							} else {
 								client.query({
 									text : "INSERT INTO captain_for (customer_username, team_name) VALUES ($1, $2)",
 									values : [req.user.username, req.body.name]
 								}, function(err, result) {
 									if (err) {
+										client.query("ROLLBACK");
 										done();
-										res.status(400).send("Oh, no! Disaster in INSERT INTO captain_for!");
+										console.log(err);
+										res.status(400).send(err);
 
 									} else {
+										client.query("COMMIT");
 										done();
 										res.status(201).json({
 											team_name : req.body.name
 										});
-										client.query("COMMIT");
-
 									}
 								});
 							}
@@ -496,9 +492,9 @@ var createTeam = function(req, res, pg, conString) {
 					}
 				});
 			} else {
+				client.query("ROLLBACK");
 				done();
 				res.status(401).send("Oh, no! It seems this user does not exist");
-
 			}
 		});
 	});
@@ -511,7 +507,7 @@ var requestOrganization = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		client.query("START TRANSACTION");
+		client.query("BEGIN");
 		client.query({
 			text : "INSERT INTO request (request_organization_name, customer_username, request_description) VALUES ($1, $2, $3)",
 			values : [req.body.name, req.user.username, req.body.description]
@@ -525,7 +521,6 @@ var requestOrganization = function(req, res, pg, conString) {
 				client.query("COMMIT");
 				done();
 				res.status(202).send("Request sent");
-
 			}
 		});
 	});
@@ -538,7 +533,7 @@ var createEvent = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		client.query("START TRANSACTION");
+		client.query("BEGIN");
 		var eventStartDate = new Date(req.body.event.start_date);
 		var eventEndDate = new Date(req.body.event.end_date);
 		var eventRegistrationDeadline = new Date(req.body.event.registration_deadline);
@@ -546,7 +541,6 @@ var createEvent = function(req, res, pg, conString) {
 			client.query("ROLLBACK");
 			done();
 			res.status(400).send('Invalid date');
-
 		} else {
 			client.query({
 				text : "INSERT INTO event (event_name, event_start_date, event_location, customer_username, event_venue, event_banner, event_logo, event_end_date, event_registration_deadline, event_rules, event_description, event_deduction_fee, event_is_online, event_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
@@ -555,8 +549,8 @@ var createEvent = function(req, res, pg, conString) {
 				if (err) {
 					client.query("ROLLBACK");
 					done();
-					res.status(500).send("Oh, no! Disaster!");
-
+					console.log(err);
+					res.status(500).send(err);
 				} else {
 					if (!req.query.hosted) {
 						var startDate = new Date(req.body.tournament[0].start_date);
@@ -588,7 +582,8 @@ var createEvent = function(req, res, pg, conString) {
 										if (err) {
 											client.query("ROLLBACK");
 											done();
-											res.status(500).send("Oh, no! Disaster!");
+											console.log(err);
+											res.status(500).send(err);
 
 										} else {
 											client.query("COMMIT");
@@ -605,7 +600,6 @@ var createEvent = function(req, res, pg, conString) {
 									client.query("ROLLBACK");
 									done();
 									res.status(404).send("Couldn't find the game: " + tournament[0].game);
-
 								}
 							});
 						}
@@ -640,6 +634,7 @@ var createEvent = function(req, res, pg, conString) {
 											if (err) {
 												client.query("ROLLBACK");
 												done();
+												console.log(err);
 												res.status(500).send("Oh, no! Disaster in tournament!");
 											}
 										});
@@ -647,7 +642,6 @@ var createEvent = function(req, res, pg, conString) {
 										client.query("ROLLBACK");
 										done();
 										res.status(404).send("Couldn't find the game: " + tournament[i].game);
-
 									}
 								});
 							}
@@ -664,8 +658,8 @@ var createEvent = function(req, res, pg, conString) {
 									if (err) {
 										client.query("ROLLBACK");
 										done();
+										console.log(err);
 										res.status(500).send("Oh, no! Disaster in fees!");
-
 									}
 								});
 							}
@@ -695,8 +689,8 @@ var createEvent = function(req, res, pg, conString) {
 												if (err) {
 													client.query("ROLLBACK");
 													done();
+													console.log(err);
 													res.status(500).send(err);
-
 												}
 											});
 										}
@@ -725,8 +719,8 @@ var createEvent = function(req, res, pg, conString) {
 												if (err) {
 													client.query("ROLLBACK");
 													done();
+													console.log(err);
 													res.status(500).send(err);
-
 												} else {
 													client.query("COMMIT");
 													done();
@@ -735,7 +729,6 @@ var createEvent = function(req, res, pg, conString) {
 														start_date : req.body.event.start_date,
 														location : req.body.event.location
 													});
-
 												}
 											});
 										} else {

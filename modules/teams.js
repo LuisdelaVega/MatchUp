@@ -31,6 +31,7 @@ var getTeam = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
+		client.query("BEGIN");
 		var query = client.query({
 			text : "SELECT team_name, team_logo, team_bio, team_cover_photo FROM team WHERE team_active AND team_name = $1",
 			values : [req.params.team]
@@ -39,6 +40,7 @@ var getTeam = function(req, res, pg, conString) {
 			result.addRow(row);
 		});
 		query.on('error', function(error) {
+			client.query("ROLLBACK");
 			done();
 			console.log(error);
 			res.status(500).send(error);
@@ -55,16 +57,19 @@ var getTeam = function(req, res, pg, conString) {
 					result.addRow(row);
 				});
 				query.on('error', function(error) {
+					client.query("ROLLBACK");
 					done();
 					console.log(error);
 					res.status(500).send(error);
 				});
 				playersQuery.on("end", function(result) {
-					team.players = result.rows;
+					client.query("COMMIT");
 					done();
+					team.players = result.rows;
 					res.json(team);
 				});
 			} else {
+				client.query("ROLLBACK");
 				done();
 				res.status(404).send('Oh, no! This team does not exist');
 			};
@@ -95,14 +100,18 @@ var editTeam = function(req, res, pg, conString) {
 		}
 
 		queryText += " WHERE team_name = '" + req.params.team + "' AND team_name IN (SELECT team_name FROM plays_for WHERE customer_username = '" + req.user.username + "' AND customer_active) AND team_active";
-		console.log(queryText);
+		// console.log(queryText);
+		client.query("BEGIN");
 		client.query({
 			text : queryText
 		}, function(err, result) {
 			if (err) {
+				client.query("ROLLBACK");
 				done();
-				res.status(400).send("Oh, no! Disaster!");
+				console.log(err);
+				res.status(500).send(err);
 			} else {
+				client.query("COMMIT");
 				done();
 				res.status(204).send('');
 			}
@@ -116,14 +125,18 @@ var deleteTeam = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
+		client.query("BEGIN");
 		client.query({
 			text : "UPDATE team SET team_active = FALSE WHERE team_name = $1 AND team_name IN (SELECT team_name FROM captain_for WHERE customer_username = $2)",
 			values : [req.params.team, req.user.username]
 		}, function(err, result) {
 			if (err) {
+				client.query("ROLLBACK");
 				done();
-				res.status(400).send("Oh, no! Disaster!");
+				console.log(err);
+				res.status(500).send("Oh, no! Disaster!");
 			} else {
+				client.query("COMMIT");
 				done();
 				res.status(204).send('');
 			}
@@ -162,7 +175,7 @@ var addTeamMember = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		client.query("START TRANSACTION");
+		client.query("BEGIN");
 		var query = client.query({
 			text : "SELECT team_name FROM plays_for NATURAL JOIN team WHERE customer_username = $1 AND team_active AND customer_active AND team_name = $2",
 			values : [req.user.username, req.params.team]
@@ -200,6 +213,7 @@ var addTeamMember = function(req, res, pg, conString) {
 							if (err) {
 								client.query("ROLLBACK");
 								done();
+								console.log(err);
 								res.status(400).send("Oh, no! This user already plays for this team dummy");
 							} else {
 								client.query("COMMIT");
@@ -228,7 +242,7 @@ var removeTeamMember = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		client.query("START TRANSACTION");
+		client.query("BEGIN");
 		// Look for whether or not the user that issued the request belongs to this team and if he/she captains the team
 		var query = client.query({
 			text : "SELECT customer_username, bool_and(customer_username IN (SELECT customer_username FROM captain_for WHERE team_name = $1)) AS is_captain FROM customer NATURAL JOIN plays_for NATURAL JOIN team WHERE team_name = $1 AND customer_username = $2 AND team_active AND customer_active GROUP BY customer_username",
@@ -261,7 +275,7 @@ var removeTeamMember = function(req, res, pg, conString) {
 					res.status(500).send(error);
 				});
 				query.on("end", function(result) {
-					if (result.rows.length > 0) {
+					if (result.rows.length) {
 						var member = result.rows[0];
 						// A member can't remove the captain, so if you're the captain make someone else captain, then try again
 						if (!member.is_captain) {
@@ -272,7 +286,8 @@ var removeTeamMember = function(req, res, pg, conString) {
 								if (err) {
 									client.query("ROLLBACK");
 									done();
-									res.status(400).send("Oh, no! Disaster!");
+									console.log(err);
+									res.status(500).send("Oh, no! Disaster!");
 								} else {
 									client.query("COMMIT");
 									done();
@@ -305,7 +320,7 @@ var makeCaptain = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		client.query("START TRANSACTION");
+		client.query("BEGIN");
 		var query = client.query({
 			text : "SELECT customer_username FROM customer NATURAL JOIN captain_for NATURAL JOIN team WHERE team_name = $1 AND customer_username = $2 AND team_active AND customer_active GROUP BY customer_username",
 			values : [req.params.team, req.user.username]
