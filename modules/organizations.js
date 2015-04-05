@@ -4,17 +4,23 @@ var getOrganizations = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var queryOrganizations = client.query({
+		var query = client.query({
 			text : "SELECT organization_name, organization_logo, organization_bio, organization_cover_photo FROM organization WHERE organization_active"
 		});
-		queryOrganizations.on("row", function(row, result) {
+		query.on("row", function(row, result) {
 			result.addRow(row);
 		});
-		queryOrganizations.on("end", function(result) {
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
+		query.on("end", function(result) {
+			done();
 			res.status(200).json(result.rows);
-			client.end();
 		});
 	});
+	//pg.end();
 };
 
 var getOrganization = function(req, res, pg, conString) {
@@ -23,25 +29,31 @@ var getOrganization = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var queryOrganization = client.query({
+		var query = client.query({
 			text : "SELECT organization_name, organization_logo, organization_bio, organization_cover_photo, bool_and(customer_username = $1) AS is_member FROM organization NATURAL JOIN belongs_to NATURAL JOIN customer WHERE organization_active AND customer_active AND organization_name = $2 GROUP BY organization_name",
 			values : [req.user.username, req.params.organization]
 		});
-		queryOrganization.on("row", function(row, result) {
+		query.on("row", function(row, result) {
 			result.addRow(row);
 		});
-		queryOrganization.on("end", function(result) {
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
+		query.on("end", function(result) {
+			done();
 			if (result.rows.length) {
-				client.end();
 				res.status(200).json(result.rows[0]);
 			} else {
-				client.end();
 				res.status(404).send('Oh, no! This organization does not exist');
 			};
 		});
 	});
+	//pg.end();
 };
 
+//TODO Send new Org info
 var editOrganization = function(req, res, pg, conString) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -60,23 +72,28 @@ var editOrganization = function(req, res, pg, conString) {
 		}
 
 		if (!req.body.logo && !req.body.bio && !req.body.cover) {
-			client.end();
-			return res.status(401).send('');
+			done();
+			res.status(401).send('');
 		}
-
+		
+		client.query("BEGIN");
 		queryText += " WHERE organization_name = $1 AND organization_name IN (SELECT organization_name FROM belongs_to NATURAL JOIN customer WHERE customer_username = $2 AND customer_active) AND organization_active";
-		var editQuery = client.query({
+		client.query({
 			text : queryText,
 			values : [req.params.organization, req.user.username]
 		}, function(err, result) {
 			if (err) {
-				res.status(400).send("Oh, no! Disaster!");
-				client.end();
+				client.query("ROLLBACK");
+				done();
+				res.status(500).send(err);
 			} else {
+				client.query("COMMIT");
+				done();
 				res.status(204).send('');
 			}
 		});
 	});
+	//pg.end();
 };
 
 // Turn an Organization inactive
@@ -86,18 +103,23 @@ var deleteOrganization = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var deleteQuery = client.query({
+		client.query("BEGIN");
+		client.query({
 			text : "UPDATE organization SET organization_active = FALSE WHERE organization_name = $1 AND organization_name IN (SELECT organization_name FROM owns NATURAL JOIN customer WHERE customer_username = $2 AND customer_active)",
 			values : [req.params.organization, req.user.username]
 		}, function(err, result) {
 			if (err) {
-				res.status(400).send("Oh, no! Disaster!");
-				client.end();
+				client.query("ROLLBACK");
+				done();
+				res.status(500).send(err);
 			} else {
+				client.query("COMMIT");
+				done();
 				res.status(204).send('');
 			}
 		});
 	});
+	//pg.end();
 };
 
 var getOrganizationMembers = function(req, res, pg, conString) {
@@ -113,11 +135,17 @@ var getOrganizationMembers = function(req, res, pg, conString) {
 		query.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		query.on("end", function(result) {
+			done();
 			res.status(200).json(result.rows);
-			client.end();
 		});
 	});
+	//pg.end();
 };
 
 var getOrganizationEvents = function(req, res, pg, conString) {
@@ -133,11 +161,17 @@ var getOrganizationEvents = function(req, res, pg, conString) {
 		query.on("row", function(row, result) {
 			result.addRow(row);
 		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
 		query.on("end", function(result) {
+			done();
 			res.status(200).json(result.rows);
-			client.end();
 		});
 	});
+	//pg.end();
 };
 
 var addOrganizationMember = function(req, res, pg, conString) {
@@ -146,42 +180,61 @@ var addOrganizationMember = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		client.query("START TRANSACTION");
-		var queryMe = client.query({
+		client.query("BEGIN");
+		var query = client.query({
 			text : "SELECT organization_name FROM customer NATURAL JOIN belongs_to NATURAL JOIN organization" + (!(req.query.owner) ? "" : " NATURAL JOIN owns") + " WHERE customer_username = $1 AND organization_active AND customer_active AND organization_name = $2",
 			values : [req.user.username, req.params.organization]
 		});
-		queryMe.on("row", function(row, result) {
+		query.on("row", function(row, result) {
 			result.addRow(row);
 		});
-		queryMe.on("end", function(result) {
-			if (result.rows.length > 0) {
+		query.on('error', function(error) {
+			client.query("ROLLBACK");
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
+		query.on("end", function(result) {
+			if (result.rows.length) {
 				if (req.query.owner) {
-					var queryMember = client.query({
+					var query = client.query({
 						text : "SELECT customer_username FROM customer WHERE customer_username = $1 AND customer_active",
 						values : [req.query.username]
 					});
-					queryMember.on("row", function(row, result) {
+					query.on("row", function(row, result) {
 						result.addRow(row);
 					});
-					queryMember.on("end", function(result) {
-						if (result.rows.length > 0) {
+					query.on('error', function(error) {
+						client.query("ROLLBACK");
+						done();
+						console.log(error);
+						res.status(500).send(error);
+					});
+					query.on("end", function(result) {
+						if (result.rows.length) {
 							client.query({
 								text : "INSERT INTO owns (customer_username, organization_name) VALUES ($1, $2)",
 								values : [req.query.username, req.params.organization]
 							}, function(err, result) {
 								if (err) {
-									res.status(400).send("Oh, no! This user is already an owner of this organization dummy");
-									client.end();
+									client.query("ROLLBACK");
+									done();
+									res.status(500).send(err);
 								} else {
-									var queryMember = client.query({
+									var query = client.query({
 										text : "SELECT organization_name FROM belongs_to NATURAL JOIN organization WHERE customer_username = $1 AND organization_active AND organization_name = $2",
 										values : [req.query.username, req.params.organization]
 									});
-									queryMember.on("row", function(row, result) {
+									query.on("row", function(row, result) {
 										result.addRow(row);
 									});
-									queryMember.on("end", function(result) {
+									query.on('error', function(error) {
+										client.query("ROLLBACK");
+										done();
+										console.log(error);
+										res.status(500).send(error);
+									});
+									query.on("end", function(result) {
 										// Add the user as a member if he/she wasn't a member already
 										if (!result.rows.length) {
 											client.query({
@@ -189,25 +242,29 @@ var addOrganizationMember = function(req, res, pg, conString) {
 												values : [req.query.username, req.params.organization]
 											}, function(err, result) {
 												if (err) {
-													res.status(500).send("Oh, no! Disaster!");
-													client.end();
+													client.query("ROLLBACK");
+													done();
+													console.log(err);
+													res.status(500).send(err);
+
 												} else {
 													client.query("COMMIT");
+													done();
 													res.status(201).send('This user has been added! Yay!');
-													client.end();
 												}
 											});
 										} else {
 											client.query("COMMIT");
+											done();
 											res.status(201).send("This member has been promoted! Yay!");
-											client.end();
 										}
 									});
 								}
 							});
 						} else {
-							res.status(400).send("Oh, no! This user does not exist");
-							client.end();
+							client.query("ROLLBACK");
+							done();
+							res.status(404).send("User not found");
 						}
 					});
 				} else {
@@ -216,20 +273,25 @@ var addOrganizationMember = function(req, res, pg, conString) {
 						values : [req.query.username, req.params.organization]
 					}, function(err, result) {
 						if (err) {
-							res.status(400).send("Oh, no! This user is already a member of this organization dummy");
-							client.end();
+							client.query("ROLLBACK");
+							done();
+							console.log(err);
+							res.status(500).send(err);
 						} else {
 							client.query("COMMIT");
+							done();
 							res.status(201).send("This member has been promoted! Yay!");
 						}
 					});
 				}
 			} else {
-				client.end();
+				client.query("ROLLBACK");
+				done();
 				res.status(401).send('Oh, no! It seems you are do not have enough privileges to do this');
 			}
 		});
 	});
+	//pg.end();
 };
 
 var getSponsors = function(req, res, pg, conString) {
@@ -237,19 +299,25 @@ var getSponsors = function(req, res, pg, conString) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
-		//select * from sponsors natural join shows where event_name = 'Event 01'
-		var queryOrganizers = client.query({
+		
+		var query = client.query({
 			text : "SELECT sponsor_name, sponsor_logo, sponsor_link FROM sponsors NATURAL JOIN is_confirmed WHERE organization_name = $1",
 			values : [req.params.organization]
 		});
-		queryOrganizers.on("row", function(row, result) {
+		query.on("row", function(row, result) {
 			result.addRow(row);
 		});
-		queryOrganizers.on("end", function(result) {
-			client.end();
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
+		query.on("end", function(result) {
+			done();
 			res.status(200).json(result.rows);
 		});
 	});
+	//pg.end();
 };
 
 var requestSponsor = function(req, res, pg, conString) {
@@ -258,35 +326,45 @@ var requestSponsor = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		client.query("START TRANSACTION");
-		var queryOrganizers = client.query({
+		client.query("BEGIN");
+		var query = client.query({
 			text : "SELECT customer_username FROM belongs_to NATURAL JOIN organization WHERE organization_name = $1 AND customer_username = $2 AND organization_active",
 			values : [req.params.organization]
 		});
-		queryOrganizers.on("row", function(row, result) {
+		query.on("row", function(row, result) {
 			result.addRow(row);
 		});
-		queryOrganizers.on("end", function(result) {
+		query.on('error', function(error) {
+			client.query("ROLLBACK");
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
+		query.on("end", function(result) {
 			if (result.rows.length) {
 				client.query({
 					text : "INSERT INTO request_sponsor (request_sponsor_name, organization_name, request_sponsor_link, request_sponsor_description) VALUES ($1, $2, $3, $4)",
 					values : [req.body.name, req.params.organization, req.body.link, req.body.description]
 				}, function(err, result) {
 					if (err) {
-						res.status(500).send("Oh, no! Disaster!");
-						client.end();
+						client.query("ROLLBACK");
+						done();
+						console.log(err);
+						res.status(500).send(err);
 					} else {
 						client.query("COMMIT");
-						client.end();
+						done();
 						res.status(202).send("Request sent");
 					}
 				});
 			} else {
-				client.end();
+				client.query("ROLLBACK");
+				done();
 				res.status(403).send("You are not part of this organization");
 			}
 		});
 	});
+	//pg.end();
 };
 
 var removeSponsor = function(req, res, pg, conString) {
@@ -295,36 +373,44 @@ var removeSponsor = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		client.query("START TRANSACTION");
-		var queryOrganizers = client.query({
+		client.query("BEGIN");
+		var query = client.query({
 			text : "SELECT customer_username FROM belongs_to NATURAL JOIN organization WHERE organization_name = $1 AND customer_username = $2 AND organization_active",
 			values : [req.params.organization, req.user.username]
 		});
-		queryOrganizers.on("row", function(row, result) {
+		query.on("row", function(row, result) {
 			result.addRow(row);
 		});
-		queryOrganizers.on("end", function(result) {
+		query.on('error', function(error) {
+			client.query("ROLLBACK");
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
+		query.on("end", function(result) {
 			if (result.rows.length) {
-				console.log("Gonna delete from is_confirmed now");
 				client.query({
 					text : "DELETE FROM is_confirmed WHERE organization_name = $1 AND sponsor_name = $2",
 					values : [req.params.organization, req.query.sponsor]
 				}, function(err, result) {
 					if (err) {
+						client.query("ROLLBACK");
+						done();
 						res.status(500).send("Oh, no! Disaster!");
-						client.end();
 					} else {
 						client.query("COMMIT");
-						client.end();
+						done();
 						res.status(204).send('');
 					}
 				});
 			} else {
-				client.end();
+				client.query("ROLLBACK");
+				done();
 				res.status(403).send("You are not part of this organization");
 			}
 		});
 	});
+	//pg.end();
 };
 
 var removeOrganizationMember = function(req, res, pg, conString) {
@@ -333,59 +419,82 @@ var removeOrganizationMember = function(req, res, pg, conString) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		client.query("START TRANSACTION");
+		client.query("BEGIN");
 		// Look for whether or not the user that issued the request belongs to this organization and if he/she owns the organization
-		var queryMe = client.query({
+		var query = client.query({
 			text : "SELECT customer_username, bool_and(customer_username IN (SELECT customer_username FROM owns WHERE organization_name = $1)) AS is_owner FROM customer NATURAL JOIN belongs_to NATURAL JOIN organization WHERE organization_name = $1 AND customer_username = $2 AND organization_active AND customer_active GROUP BY customer_username",
 			values : [req.params.organization, req.user.username]
 		});
-		queryMe.on("row", function(row, result) {
+		query.on("row", function(row, result) {
 			result.addRow(row);
 		});
-		queryMe.on("end", function(result) {
-			if (result.rows.length > 0) {
+		query.on('error', function(error) {
+			client.query("ROLLBACK");
+			done();
+			console.log(error);
+			res.status(500).send(error);
+		});
+		query.on("end", function(result) {
+			if (result.rows.length) {
 				var reqMember = result.rows[0];
 				// Do the same for the user that is to be removed
-				var queryMember = client.query({
+				var query = client.query({
 					text : "SELECT customer_username, bool_and(customer_username IN (SELECT customer_username FROM owns WHERE organization_name = $1)) AS is_owner FROM customer NATURAL JOIN belongs_to NATURAL JOIN organization WHERE organization_name = $1 AND customer_username = $2 AND organization_active AND customer_active GROUP BY customer_username",
 					values : [req.params.organization, req.query.username]
 				});
-				queryMember.on("row", function(row, result) {
+				query.on("row", function(row, result) {
 					result.addRow(row);
 				});
-				queryMember.on("end", function(result) {
-					if (result.rows.length > 0) {
+				query.on('error', function(error) {
+					client.query("ROLLBACK");
+					done();
+					console.log(error);
+					res.status(500).send(error);
+				});
+				query.on("end", function(result) {
+					if (result.rows.length) {
 						var member = result.rows[0];
 						if (member.customer_username === reqMember.customer_username && reqMember.is_owner) {
-							var queryMember = client.query({
+							var query = client.query({
 								text : "SELECT customer_username FROM owns NATURAL JOIN organization WHERE organization_name = $1 AND customer_username <> $2 AND organization_active GROUP BY customer_username",
 								values : [req.params.organization, reqMember.customer_username]
 							});
-							queryMember.on("row", function(row, result) {
+							query.on("row", function(row, result) {
 								result.addRow(row);
 							});
-							queryMember.on("end", function(result) {
+							query.on('error', function(error) {
+								client.query("ROLLBACK");
+								done();
+								console.log(error);
+								res.status(500).send(error);
+							});
+							query.on("end", function(result) {
 								if (!result.rows.length) {
+									client.query("ROLLBACK");
+									done();
 									res.status(403).send("Oh, no! You can't leave an organization without an owner dummy");
-									client.end();
 								} else {
 									client.query({
 										text : "DELETE FROM owns WHERE customer_username = $1 AND organization_name = $2",
 										values : [member.customer_username, req.params.organization]
 									}, function(err, result) {
 										if (err) {
+											client.query("ROLLBACK");
+											done();
 											res.status(500).send("Oh, no! Disaster!");
-											client.end();
 										} else {
 											client.query({
 												text : "DELETE FROM belongs_to WHERE customer_username = $1 AND organization_name = $2",
 												values : [member.customer_username, req.params.organization]
 											}, function(err, result) {
 												if (err) {
-													res.status(500).send("Oh, no! Disaster!");
-													client.end();
+													client.query("ROLLBACK");
+													done();
+													console.log(err);
+													res.status(500).send(err);
 												} else {
 													client.query("COMMIT");
+													done();
 													res.status(204).send('');
 												}
 											});
@@ -401,18 +510,23 @@ var removeOrganizationMember = function(req, res, pg, conString) {
 									values : [member.customer_username, req.params.organization]
 								}, function(err, result) {
 									if (err) {
-										res.status(400).send("Oh, no! Disaster");
-										client.end();
+										client.query("ROLLBACK");
+										done();
+										cosole.log(err);
+										res.status(500).send(err);
 									} else {
 										client.query({
 											text : "DELETE FROM belongs_to WHERE customer_username = $1 AND organization_name = $2",
 											values : [member.customer_username, req.params.organization]
 										}, function(err, result) {
 											if (err) {
-												res.status(400).send("Oh, no! Disaster!");
-												client.end();
+												client.query("ROLLBACK");
+												done();
+												console.log(err);
+												res.status(500).send(err);
 											} else {
 												client.query("COMMIT");
+												done();
 												res.status(204).send('');
 											}
 										});
@@ -424,29 +538,36 @@ var removeOrganizationMember = function(req, res, pg, conString) {
 									values : [member.customer_username, req.params.organization]
 								}, function(err, result) {
 									if (err) {
-										res.status(400).send("Oh, no! Disaster!");
-										client.end();
+										client.query("ROLLBACK");
+										done();
+										console.log(err);
+										res.status(500).send(err);
 									} else {
 										client.query("COMMIT");
+										done();
 										res.status(204).send('');
 									}
 								});
 							} else {
-								client.end();
-								return res.status(401).send('Oh, no! It seems you are do not have enough privileges to do this');
+								client.query("ROLLBACK");
+								done();
+								res.status(401).send('Oh, no! It seems you are do not have enough privileges to do this');
 							}
 						}
 					} else {
-						client.end();
-						return res.status(401).send('Oh, no! It seems this user is not a member of this organization');
+						client.query("ROLLBACK");
+						done();
+						res.status(401).send('Oh, no! It seems this user is not a member of this organization');
 					}
 				});
 			} else {
-				client.end();
-				return res.status(401).send('Oh, no! It seems you are not a member of this organization');
+				client.query("ROLLBACK");
+				done();
+				res.status(401).send('Oh, no! It seems you are not a member of this organization');
 			}
 		});
 	});
+	//pg.end();
 };
 
 module.exports.getOrganizations = getOrganizations;

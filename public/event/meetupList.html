@@ -1,29 +1,29 @@
-<div class="blur-cover">
-</div>
+<div class="blur-cover" ng-style="{'background': cover}"></div>
 <div class="panel-padding">
 	<!-- MeetUPs widget -->
 	<div class="widget-box">
 		<div class="widget-header bordered-bottom bordered-themesecondary">
 			<h3 class="widget-title themesecondary">MeetUps</h3>
-			<a class="widget-more" ui-sref="app.create_meetup"> Create MeetUp<i class="fa fa-plus panel-padding"></i> </a>
+			<a class="widget-more" ui-sref="app.create_meetup" ng-if ="endDate"> Create MeetUp<i class="fa fa-plus panel-padding"></i> </a>
 		</div>
 		<!--Widget Header-->
 		<div class="widget-body">
 			<div class="widget-main no-padding">
 				<div class="tickets-container">
 					<div class="row" style="padding-left: 15px">
-						<div class="col-md-3 col-sm-4 col-xs-6">
-							<a class="thumbnail">
+						<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat = "meetup in meetupsInfo">
+							<a class="thumbnail" ng-click="goToMeetup(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location, meetup.meetup_start_date, meetup.meetup_location)">
 								<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 											overflow: hidden;">
 									<p class="thumbnail-title" ui-sref="app.meetup">
-										MeetUp Name
+                                        {{noMeetup}}
+                                        {{meetup.meetup_name}}
 									</p>
 									<p class="thumbnail-paragraph">
-										Hilton Hotel, room 321
+                                        {{meetup.meetup_location}}
 									</p>
 									<p class="thumbnail-paragraph">
-										January 2, 8:00PM
+                                        {{meetup.meetup_start_date}}
 									</p>
 								</div>
 							</a>

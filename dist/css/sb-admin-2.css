@@ -4,14 +4,19 @@
  * For details, see http://www.apache.org/licenses/LICENSE-2.0.
  */
 
-body {
+html,body {
     background-color: #f8f8f8;
+	height: 100%;
+	margin: 0;
+	padding:0
 }
 
 
 #page-wrapper {
     background-color: #fff;
-	
+	min-height: 100%;
+	margin: 0px,
+	padding:0px
 }
 
 @media(min-width:768px) {
