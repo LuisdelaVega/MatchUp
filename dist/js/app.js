@@ -3,7 +3,7 @@ var myApp = angular.module('MatchUp', ['ui.router', 'ngResource', 'home', 'premi
 myApp.config(function ($stateProvider, $urlRouterProvider) {
     //
     // For any unmatched url, redirect to /home
-    $urlRouterProvider.otherwise("/login");
+    $urlRouterProvider.otherwise("/404");
     //
     // Now set up the states
     $stateProvider
@@ -38,6 +38,10 @@ myApp.config(function ($stateProvider, $urlRouterProvider) {
             url: "/404",
             templateUrl: "404.html"
         })
+        .state('400', {
+            url: "/404",
+            templateUrl: "404.html"
+        })
         
         
         /**
@@ -59,7 +63,7 @@ myApp.config(function ($stateProvider, $urlRouterProvider) {
         .state('app.myEvents', {
             url: "/myEvents",
             templateUrl: "event/my_events.html",
-            controller: "profileEventsController"
+            controller: "profileEventController"
         })
         .state('app.createEvent', {
             url: "/createEvent",

@@ -1,8 +1,14 @@
 var myApp = angular.module('regular-events', []);
 
-//If premium event with multiple tournaments. tournament that is to be displayed has to be passed using SharedDataService
-myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sharedDataService', '$window',
-function($scope, $http, $stateParams, sharedDataService, $window) {
+/* This controller will interact in two ways.
+ * The controller can managae data of a regular event or of a tournament
+ * Using angular we can choose what displays can be used through boolean variables and can use the same view for regular events and tournaments
+ * This is because regular events lack alot of added features that are present in premium events and are in essence a single tournament
+ *
+ * This controller will determine if the data sent is either a tournament from a premium event or a regular event and act accordingly
+ */
+myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sharedDataService', '$window', '$state',
+function($scope, $http, $stateParams, sharedDataService, $window, $state) {
 
 	var now = new Date();
 	var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
@@ -17,11 +23,11 @@ function($scope, $http, $stateParams, sharedDataService, $window) {
 
 		$scope.eventInfo = angular.fromJson(data);
 		console.log($scope.eventInfo);
-		if($scope.eventInfo.host == null)
+		if ($scope.eventInfo.host == null)
 			$scope.isHosted = false;
 		else
 			$scope.isHosted = true;
-	console.log($scope.isHosted);
+		console.log($scope.isHosted);
 
 		var startDate = new Date($scope.eventInfo.event_start_date);
 		$scope.cover = "linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2)), url(" + $scope.eventInfo.event_banner + ")";
@@ -48,14 +54,23 @@ function($scope, $http, $stateParams, sharedDataService, $window) {
 						$scope.numComp = $scope.competitors.length;
 						console.log($scope.competitors);
 
-					}).error(function(data, status, headers, config) {
+					}).error(function(data, status) {
+
+						if (status == 404 || status == 401 ||status == 400)
+							$state.go("" + status);
 						console.log("error in eventPremiumSummaryController");
 					});
-				}).error(function(data, status, headers, config) {
+				}).error(function(data, status) {
+
+					if (status == 404 || status == 401 ||status == 400)
+						$state.go("" + status);
 					console.log("error in eventPremiumSummaryController");
 				});
 
-			}).error(function(data, status, headers, config) {
+			}).error(function(data, status) {
+
+				if (status == 404 || status == 401 ||status == 400)
+					$state.go("" + status);
 				console.log("error in eventPremiumSummaryController");
 			});
 
@@ -84,17 +99,29 @@ function($scope, $http, $stateParams, sharedDataService, $window) {
 						$scope.numComp = $scope.competitors.length;
 						console.log($scope.competitors);
 
-					}).error(function(data, status, headers, config) {
+					}).error(function(data, status) {
+
+						if (status == 404 || status == 401 ||status == 400)
+							$state.go("" + status);
 						console.log("error in eventPremiumSummaryController");
 					});
-				}).error(function(data, status, headers, config) {
+				}).error(function(data, status) {
+
+					if (status == 404 || status == 401 ||status == 400)
+						$state.go("" + status);
 					console.log("error in eventPremiumSummaryController");
 				});
-			}).error(function(data, status, headers, config) {
+			}).error(function(data, status) {
+
+				if (status == 404 || status == 401 ||status == 400)
+					$state.go("" + status);
 				console.log("error in eventPremiumSummaryController");
 			});
 		}
-	}).error(function(data, status, headers, config) {
+	}).error(function(data, status) {
+
+		if (status == 404 || status == 401 ||status == 400)
+			$state.go("" + status);
 		console.log("error in eventPremiumSummaryController");
 	});
 

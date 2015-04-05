@@ -26,18 +26,30 @@ function($scope, $http, $state, sharedDataService, $window) {
 					//$http.get('./../dist/json/home/regular.json', config).success(function(data, status, headers, config) {
 					$scope.regularLiveEvents = angular.fromJson(data);
 
-				}).error(function(data, status, headers, config) {
+				}).error(function(data, status) {
+
+					if (status == 404 || status == 401 ||status == 400)
+						$state.go("" + status);
 					console.log("error in home controller. obtaining hosted upcoming events");
 				});
 
-			}).error(function(data, status, headers, config) {
+			}).error(function(data, status) {
+
+				if (status == 404 || status == 401 ||status == 400)
+					$state.go("" + status);
 				console.log("error in home controller. obtaining hosted upcoming events");
 			});
 
-		}).error(function(data, status, headers, config) {
+		}).error(function(data, status) {
+
+			if (status == 404 || status == 401 ||status == 400)
+				$state.go("" + status);
 			console.log("error in home controller. obtaining hosted upcoming events");
 		});
-	}).error(function(data, status, headers, config) {
+	}).error(function(data, status) {
+
+		if (status == 404 || status == 401 ||status == 400)
+			$state.go("" + status);
 		console.log("error in home controller. obtaining hosted upcoming events");
 	});
 
@@ -72,19 +84,31 @@ function($scope, $http, $state, sharedDataService, $window) {
 
 					$scope.popularGames = angular.fromJson(data);
 
-				}).error(function(data, status, headers, config) {
+				}).error(function(data, status) {
+
+					if (status == 404 || status == 401 ||status == 400)
+						$state.go("" + status);
 					console.log("error in popular games home view");
 				});
 
-			}).error(function(data, status, headers, config) {
+			}).error(function(data, status) {
+
+				if (status == 404 || status == 401 ||status == 400)
+					$state.go("" + status);
 				console.log("error in home controller. obtaining hosted upcoming events");
 			});
 
-		}).error(function(data, status, headers, config) {
+		}).error(function(data, status) {
+
+			if (status == 404 || status == 401 ||status == 400)
+				$state.go("" + status);
 			console.log("error in home controller. obtaining hosted upcoming events");
 		});
 
-	}).error(function(data, status, headers, config) {
+	}).error(function(data, status) {
+
+		if (status == 404 || status == 401 ||status == 400)
+			$state.go("" + status);
 		console.log("error in home controller. obtaining hosted upcoming events");
 	});
 
@@ -433,14 +457,12 @@ function($scope, $window, $http, $state) {
 		$window.sessionStorage.clear();
 		$state.go("login") //
 	}
-	
+
 	$scope.goToOrganizationProfile = function(organization) {
 		$state.go("app.organizationProfile", {
 			"organizationName" : organization
 		}) //
 	}
-	
-	
 	//go to a specific users in an event
 	$scope.goToUser = function(customer_username) {
 
@@ -448,10 +470,6 @@ function($scope, $window, $http, $state) {
 			"username" : customer_username
 		}) //
 	}
-	
-	
-	
-	
 	//changed to work
 	$scope.goToEvent = function(eventName, date, location) {
 
@@ -486,7 +504,10 @@ function($scope, $window, $http, $state) {
 				});
 			}
 
-		}).error(function(data, status, headers, config) {
+		}).error(function(data, status) {
+
+			if (status == 404 || status == 401 ||status == 400)
+				$state.go("" + status);
 			console.log("error in goToEvent");
 		});
 
@@ -526,7 +547,10 @@ function($scope, $http, $state, sharedDataService, $window) {
 	$http.get('http://matchup.neptunolabs.com/matchup/popular/games', config).success(function(data, status, headers, config) {
 		$scope.games = angular.fromJson(data);
 
-	}).error(function(data, status, headers, config) {
+	}).error(function(data, status) {
+
+		if (status == 404 || status == 401 ||status == 400)
+			$state.go("" + status);
 		console.log("error in game view controller.");
 	});
 
@@ -543,7 +567,10 @@ function($scope, $http, $state, sharedDataService, $window) {
 	$http.get('http://matchup.neptunolabs.com/matchup/popular/genres', config).success(function(data, status, headers, config) {
 		$scope.genres = angular.fromJson(data);
 
-	}).error(function(data, status, headers, config) {
+	}).error(function(data, status) {
+
+		if (status == 404 || status == 401 ||status == 400)
+			$state.go("" + status);
 		console.log("error in game view controller.");
 	});
 
@@ -584,22 +611,37 @@ function($scope, $http, $state, sharedDataService, $stateParams, $window) {
 					$http.get('http://136.145.116.232/matchup/events?filter=game&value=' + $stateParams.game + '&state=past', config).success(function(data, status, headers, config) {
 						$scope.gamesPast = angular.fromJson(data);
 
-					}).error(function(data, status, headers, config) {
+					}).error(function(data, status) {
+
+						if (status == 404 || status == 401 ||status == 400)
+							$state.go("" + status);
 						console.log("error in game profile controller.");
 					});
 
-				}).error(function(data, status, headers, config) {
+				}).error(function(data, status) {
+
+					if (status == 404 || status == 401 ||status == 400)
+						$state.go("" + status);
 					console.log("error in game profile controller.");
 				});
 
-			}).error(function(data, status, headers, config) {
+			}).error(function(data, status) {
+
+				if (status == 404 || status == 401 ||status == 400)
+					$state.go("" + status);
 				console.log("error in game profile controller.");
 			});
-		}).error(function(data, status, headers, config) {
+		}).error(function(data, status) {
+
+			if (status == 404 || status == 401 ||status == 400)
+				$state.go("" + status);
 			console.log("error in game profile controller.");
 		});
 
-	}).error(function(data, status, headers, config) {
+	}).error(function(data, status) {
+
+		if (status == 404 || status == 401 ||status == 400)
+			$state.go("" + status);
 		console.log("error in game profile controller.");
 	});
 
@@ -622,15 +664,24 @@ function($scope, $http, $state, sharedDataService, $stateParams, $window) {
 			$http.get('http://136.145.116.232/matchup/events?filter=genre&value=' + $stateParams.genre + '&state=past', config).success(function(data, status, headers, config) {
 				$scope.genresPast = angular.fromJson(data);
 
-			}).error(function(data, status, headers, config) {
+			}).error(function(data, status) {
+
+				if (status == 404 || status == 401 ||status == 400)
+					$state.go("" + status);
 				console.log("error in genres profile controller.");
 			});
 
-		}).error(function(data, status, headers, config) {
+		}).error(function(data, status) {
+
+			if (status == 404 || status == 401 ||status == 400)
+				$state.go("" + status);
 			console.log("error in genres profile controller.");
 		});
 
-	}).error(function(data, status, headers, config) {
+	}).error(function(data, status) {
+
+		if (status == 404 || status == 401 ||status == 400)
+			$state.go("" + status);
 		console.log("error in genres profile controller.");
 	});
 

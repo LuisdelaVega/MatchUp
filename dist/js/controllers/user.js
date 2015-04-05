@@ -1,10 +1,6 @@
 var myApp = angular.module('user', []);
 
-myApp.controller('ProfileController', function($scope, $state, sharedDataService) {
-
-	$scope.customerUsername = sharedDataService.get();
-});
-
+//Controller used to display the Users profile, manages certain user data such as basic information, profile pic, cover photo, the users teams, organizations and events.
 myApp.controller('profileSummaryController', function($scope, $state, $http, $stateParams, sharedDataService, $window) {
 
 	var config = {
@@ -16,7 +12,6 @@ myApp.controller('profileSummaryController', function($scope, $state, $http, $st
 	var customer = $stateParams.username;
 
 	//Get basic Customer Information, cover photo and profile picture
-
 	$http.get('http://136.145.116.232/matchup/profile/' + customer + '', config).success(function(data) {
 		$scope.profileData = angular.fromJson(data);
 		$scope.myProfile = $scope.profileData.my_profile;
@@ -26,8 +21,8 @@ myApp.controller('profileSummaryController', function($scope, $state, $http, $st
 
 	}).error(function(data, status) {
 
-		if (status == 404 || status == 401)
-			$state.go(status.toString);
+		if (status == 404 || status == 401 ||status == 400)
+			$state.go("" + status);
 	}).then(function() {
 		customerInfo(customer);
 	});
@@ -35,7 +30,7 @@ myApp.controller('profileSummaryController', function($scope, $state, $http, $st
 	function customerInfo(customer) {
 		console.log(customer);
 
-		//Get the teams the customer belongs to
+		//Get the teams this customer belongs to
 		$http.get('http://136.145.116.232/matchup/profile/' + customer + '/teams', config).success(function(data) {
 
 			$scope.getTeams = angular.fromJson(data);
@@ -56,29 +51,30 @@ myApp.controller('profileSummaryController', function($scope, $state, $http, $st
 					$scope.teams.push($scope.teamData.info);
 				}).error(function(data, status) {
 
-					if (status == 404 || status == 401)
-						$state.go(status.toString);
+					if (status == 404 || status == 401 ||status == 400)
+						$state.go("" + status);
 				});
 			}
 
 		}).error(function(data, status) {
 
-			if (status == 404 || status == 401)
-				$state.go(status.toString);
+			if (status == 404 || status == 401 ||status == 400)
+				$state.go("" + status);
 		});
-
+		
+		//Get the organization the customer belongs to
 		$http.get('http://136.145.116.232/matchup/profile/' + customer + '/organizations', config).success(function(data) {
 
 			$scope.organizations = angular.fromJson(data);
 
 		}).error(function(data, status) {
 
-			if (status == 404 || status == 401)
-				$state.go(status.toString);
+			if (status == 404 || status == 401 ||status == 400)
+				$state.go("" + status);
 		});
 	}
 
-
+	//function for going into a page that will display all the teams the customer belongs to
 	$scope.goToTeams = function(username) {
 		$state.go("app.userTeams", {
 			"username" : username
@@ -86,18 +82,21 @@ myApp.controller('profileSummaryController', function($scope, $state, $http, $st
 
 	}
 	
-		$scope.goToUserOrganizations = function(user){
+	//function for going into a page that will display all the organizations the customer belongs to
+	$scope.goToUserOrganizations = function(user){
 		$state.go("app.userOrganizations", {
 			"username" : user
 		}) //
 	}
 	
+	//function for going into a page that will display all the events the customer has created
 	$scope.goToUserEvents = function(user){
 		$state.go("app.userOrganizations", {
 			"username" : user
 		}) //
 	}
 	
+	//function for going into a page that will display the customers standings in different tournaments
 	$scope.goToUserStandings = function(user){
 		$state.go("app.userOrganizations", {
 			"username" : user
@@ -107,68 +106,7 @@ myApp.controller('profileSummaryController', function($scope, $state, $http, $st
 	
 });
 
-myApp.controller('profileEventsController', ['$scope', '$http', '$stateParams', '$window', 'sharedDataService', '$state',
-function($scope, $http, $stateParams, $window, sharedDataService, $state) {
-
-	console.log("entered profileEventsController");
-
-	var config = {
-		headers : {
-			'Authorization' : "Bearer " + $window.sessionStorage.token
-		}
-	};
- 	$http.get('http://136.145.116.232/matchup/profile/' + $stateParams.user + '', config).success(function(data, status, headers, config) {
-		$scope.events = angular.fromJson(data);
-
-		
-
-
-
-	}).error(function(data, status, headers, config) {
-		console.log("error in game profile controller.");
-	});
-
-
-	
-
-}]);
-
-myApp.controller('myMatchupViewController', ['$scope', '$http', '$stateParams',
-function($scope, $http, $stateParams) {
-
-	$scope.competitors = ['img/ron.jpg', 'img/ronpaul.gif'];
-
-}]);
-
-myApp.controller('profileTeamsController', ['$scope', '$http', '$stateParams', '$window', '$state',
-function($scope, $http, $stateParams, $window, $state) {
-
-	$scope.customerUsername = $stateParams.username;
-
-	var config = {
-		headers : {
-			'Authorization' : "Bearer " + $window.sessionStorage.token
-		}
-	};
-
-	$http.get('http://136.145.116.232/matchup/profile/' + $stateParams.username + '/teams', config).success(function(data) {
-
-		$scope.teams = angular.fromJson(data);
-
-	}).error(function(data, status) {
-
-		if (status == 404 || status == 401)
-			$state.go(status.toString);
-	});
-
-	$scope.gotToProfile = function(customerUsername) {
-		$state.go("app.profile.summary", {
-			"username" : customerUsername
-		});
-	};
-
-}]);
-
+//Controller used to display the Users Organizations page, manages data about the organizations a user belongs to.
 myApp.controller('userOrganizationsController', ['$scope', '$http', '$stateParams', '$window', '$state',
 function($scope, $http, $stateParams, $window, $state) {
 
@@ -190,8 +128,8 @@ function($scope, $http, $stateParams, $window, $state) {
 
 	}).error(function(data, status) {
 
-		if (status == 404 || status == 401)
-			$state.go(status.toString);
+		if (status == 404 || status == 401 ||status == 400)
+			$state.go("" + status);
 	});
 
 	$scope.gotToOrganizationProfile = function(organizationName) {
@@ -202,7 +140,7 @@ function($scope, $http, $stateParams, $window, $state) {
 
 }]);
 
-
+//Controller used to display the teams page for a user, manages data about the teams a user belongs to.
 myApp.controller('userTeamsController', ['$scope', '$http', '$stateParams', '$window', '$state',
 function($scope, $http, $stateParams, $window, $state) {
 
@@ -224,8 +162,8 @@ function($scope, $http, $stateParams, $window, $state) {
 
 	}).error(function(data, status) {
 
-		if (status == 404 || status == 401)
-			$state.go(status.toString);
+		if (status == 404 || status == 401 ||status == 400)
+			$state.go("" + status);
 	});
 
 	$scope.gotToTeamsProfile = function(teamName) {
@@ -236,8 +174,7 @@ function($scope, $http, $stateParams, $window, $state) {
 
 }]);
 
-
-
+//Controller used to display the end users subscription and acces the profiles of thoses he is subscribed to
 myApp.controller('mySubcriptionsController', ['$scope', '$http', '$stateParams', '$window', '$state',
 function($scope, $http, $stateParams, $window, $state) {
 
@@ -256,25 +193,10 @@ function($scope, $http, $stateParams, $window, $state) {
 
 	}).error(function(data, status) {
 
-		if (status == 404 || status == 401)
-			$state.go(status.toString);
+		if (status == 404 || status == 401 ||status == 400)
+			$state.go("" + status);
 	});
 
 
 }]);
 
-
-
-myApp.controller('subscriptionsController', ['$scope', '$http',
-function($scope, $http) {
-
-	$scope.isSubscribed = '-positive';
-
-	$scope.toggleSubscribe = function() {
-		if ($scope.isSubscribed == '-positive')
-			$scope.isSubscribed = '';
-		else
-			$scope.isSubscribed = '-positive';
-	};
-
-}]);

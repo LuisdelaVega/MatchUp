@@ -1,5 +1,5 @@
 var myApp = angular.module('premium-events', []);
-
+/* CURRENTLY NOT DONE
 myApp.controller('ratingsController', ['$scope', '$http',
 function($scope, $http) {
 
@@ -62,7 +62,10 @@ myApp.controller('premiumSignUpController', function($scope, $state, $http, $sta
 
 	}
 });
+*/
 
+
+//Controller used to manage the Premium event page, includes various tasks such as retriving participants, sponsors, the organization hosting the event, the different tournaments, meetups and news
 myApp.controller('eventPremiumSummaryController', function($scope, $state, $http, $stateParams, sharedDataService, $window) {
 
 	var now = new Date();
@@ -91,15 +94,18 @@ myApp.controller('eventPremiumSummaryController', function($scope, $state, $http
 				$scope.isOngoing = false;
 			else
 				$scope.isOngoing = true;
-				
-					//Get host information
-					$http.get('http://136.145.116.232/matchup/organizations/' + $scope.eventInfo.host +'', config).success(function(data, status, headers, config) {
 
-						$scope.hostInfo = angular.fromJson(data);
+			//Get host information
+			$http.get('http://136.145.116.232/matchup/organizations/' + $scope.eventInfo.host + '', config).success(function(data, status, headers, config) {
 
-					}).error(function(data, status, headers, config) {
-						console.log("error in eventPremiumSummaryController");
-					});
+				$scope.hostInfo = angular.fromJson(data);
+
+			}).error(function(data, status) {
+
+				if (status == 404 || status == 401 ||status == 400)
+					$state.go("" + status);
+				console.log("error in eventPremiumSummaryController");
+			});
 
 			//Get News posted for this particular server
 			$http.get('http://136.145.116.232/matchup/events/' + $stateParams.eventname + '/news?date=' + $stateParams.date + '&location=' + $stateParams.location + '', config).success(function(data, status, headers, config) {
@@ -118,23 +124,38 @@ myApp.controller('eventPremiumSummaryController', function($scope, $state, $http
 
 						$scope.tournamentsInfo = angular.fromJson(data);
 
-					}).error(function(data, status, headers, config) {
+					}).error(function(data, status) {
+
+						if (status == 404 || status == 401 ||status == 400)
+							$state.go("" + status);
 						console.log("error in eventPremiumSummaryController");
 					});
 
-				}).error(function(data, status, headers, config) {
+				}).error(function(data, status) {
+
+					if (status == 404 || status == 401 ||status == 400)
+						$state.go("" + status);
 					console.log("error in eventPremiumSummaryController");
 				});
 
-			}).error(function(data, status, headers, config) {
+			}).error(function(data, status) {
+
+				if (status == 404 || status == 401 ||status == 400)
+					$state.go("" + status);
 				console.log("error in eventPremiumSummaryController");
 			});
 
-		}).error(function(data, status, headers, config) {
+		}).error(function(data, status) {
+
+			if (status == 404 || status == 401 ||status == 400)
+				$state.go("" + status);
 			console.log("error in eventPremiumSummaryController");
 		});
 
-	}).error(function(data, status, headers, config) {
+	}).error(function(data, status) {
+
+		if (status == 404 || status == 401 ||status == 400)
+			$state.go("" + status);
 		console.log("error in eventPremiumSummaryController");
 	});
 
@@ -165,27 +186,9 @@ myApp.controller('eventPremiumSummaryController', function($scope, $state, $http
 		sharedDataService.set(selectedTournament);
 		$state.go("app.writereview")
 	}
- 
-	
 });
 
-//NPI
-//myApp.controller('meetupController', function ($scope, $state, $http, $stateParams, sharedDataService) {
-//
-//    var params = sharedDataService.get();
-//
-//    $scope.goToSummaryFromMeetup = function (eventName) {
-//
-//        $state.go("app.eventpremium.summary", {
-//            eventname: params[0],
-//            date: params[1],
-//            location: params[2]
-//        })
-//    }
-//
-//});
-
-//Meetup List controller, shows all meetups for a specific controller
+//Meetup List controller, shows all meetups for a specific event
 myApp.controller('meetupListController', ['$scope', '$http', '$state', '$stateParams', '$window',
 function($scope, $http, $state, $stateParams, $window) {
 	var config = {
@@ -206,7 +209,10 @@ function($scope, $http, $state, $stateParams, $window) {
 			console.log("hello");
 		}
 
-	}).error(function(data, status, headers, config) {
+	}).error(function(data, status) {
+
+		if (status == 404 || status == 401 ||status == 400)
+			$state.go("" + status);
 		console.log("error in meetupListController");
 	});
 
@@ -222,7 +228,10 @@ function($scope, $http, $state, $stateParams, $window) {
 		else
 			$scope.endDate = true;
 
-	}).error(function(data, status, headers, config) {
+	}).error(function(data, status) {
+
+		if (status == 404 || status == 401 ||status == 400)
+			$state.go("" + status);
 		console.log("error in eventPremiumSummaryController");
 	});
 
@@ -238,7 +247,7 @@ function($scope, $http, $state, $stateParams, $window) {
 	}
 }]);
 
-//Meetup List controller, shows all meetups for a specific controller
+//Meetup  controller, shows the details of a specific meetupr
 myApp.controller('meetupController', ['$scope', '$http', '$state', '$stateParams', '$window',
 function($scope, $http, $state, $stateParams, $window) {
 	var config = {
@@ -263,7 +272,10 @@ function($scope, $http, $state, $stateParams, $window) {
 			console.log("hello");
 		}
 
-	}).error(function(data, status, headers, config) {
+	}).error(function(data, status) {
+
+		if (status == 404 || status == 401 ||status == 400)
+			$state.go("" + status);
 		console.log("error in meetupListController");
 	});
 
@@ -289,18 +301,3 @@ function($scope, $http, $state, $stateParams, $window) {
 	//    });
 
 }]);
-
-myApp.controller('writeReviewController', function($scope, $state, $http, $stateParams, sharedDataService) {
-
-	var params = sharedDataService.get();
-
-	$scope.goToSummaryFromReview = function(eventName) {
-
-		$state.go("app.eventpremium.summary", {
-			eventname : params[0],
-			date : params[1],
-			location : params[2]
-		})
-
-	}
-});

@@ -1,5 +1,6 @@
 var myApp = angular.module('organization', []);
 
+//Controller that gets the corresponding general information for a specific organization as well as all of its members and displays it in the Organization page.
 myApp.controller('organizationProfileController', ['$scope', '$http', '$state', 'sharedDataService', '$window', '$stateParams',
 function($scope, $http, $state, sharedDataService, $window, $stateParams) {
 	var config = {
@@ -17,18 +18,27 @@ function($scope, $http, $state, sharedDataService, $window, $stateParams) {
 		$http.get('http://matchup.neptunolabs.com/matchup/organizations/' + $stateParams.organizationName + '/members', config).success(function(data, status, headers, config) {
 			$scope.members = angular.fromJson(data);
 			//get all users that belong to an organization
-		$http.get('http://matchup.neptunolabs.com/matchup/organizations/' + $stateParams.organizationName + '/events', config).success(function(data, status, headers, config) {
-			$scope.events = angular.fromJson(data);
+			$http.get('http://matchup.neptunolabs.com/matchup/organizations/' + $stateParams.organizationName + '/events', config).success(function(data, status, headers, config) {
+				$scope.events = angular.fromJson(data);
 
-		}).error(function(data, status, headers, config) {
+			}).error(function(data, status) {
+
+				if (status == 404 || status == 401 ||status == 400)
+					$state.go("" + status);
+				console.log("error in organization profile controller.");
+			});
+
+		}).error(function(data, status) {
+
+			if (status == 404 || status == 401 ||status == 400)
+				$state.go("" + status);
 			console.log("error in organization profile controller.");
 		});
+	}).error(function(data, status) {
 
-		}).error(function(data, status, headers, config) {
-			console.log("error in organization profile controller.");
-		});
-	}).error(function(data, status, headers, config) {
+		if (status == 404 || status == 401 ||status == 400)
+			$state.go("" + status);
 		console.log("error in organization profile controller.");
 	});
 
-}]); 
+}]);
