@@ -8,24 +8,24 @@ function($scope, $http, $state, sharedDataService, $window) {
 		}
 	};
 
-	//$http.get('http://matchup.neptunolabs.com/matchup/events?type=hosted&state=upcoming', config).success(function(data, status, headers, config) {
-	$http.get('./../dist/json/home/hosted.json', config).success(function(data, status, headers, config) {
+	$http.get('http://matchup.neptunolabs.com/matchup/events?type=hosted&state=upcoming', config).success(function(data, status, headers, config) {
+	//$http.get('./../dist/json/home/hosted.json', config).success(function(data, status, headers, config) {
 		$scope.hostedEvents = angular.fromJson(data);
 
 		//done
 
-		//$http.get('http://matchup.neptunolabs.com/matchup/events?type=regular&state=upcoming', config).success(function(data, status, headers, config) {
-		$http.get('./../dist/json/home/regular.json', config).success(function(data, status, headers, config) {
+		$http.get('http://matchup.neptunolabs.com/matchup/events?type=regular&state=upcoming', config).success(function(data, status, headers, config) {
+		//$http.get('./../dist/json/home/regular.json', config).success(function(data, status, headers, config) {
 			$scope.regularEvents = angular.fromJson(data);
 
 			//done
-			//$http.get('http://matchup.neptunolabs.com/matchup/events?state=live', config).success(function(data, status, headers, config) {
-				$http.get('./../dist/json/home/live.json', config).success(function(data, status, headers, config) {
+			$http.get('http://matchup.neptunolabs.com/matchup/events?state=live', config).success(function(data, status, headers, config) {
+				//$http.get('./../dist/json/home/live.json', config).success(function(data, status, headers, config) {
 
 				$scope.liveEvents = angular.fromJson(data);
 
-				//$http.get('http://matchup.neptunolabs.com/matchup/popular/games', config).success(function(data, status, headers, config) {
-					$http.get('./../dist/json/home/popularGames.json', config).success(function(data, status, headers, config) {
+				$http.get('http://matchup.neptunolabs.com/matchup/popular/games', config).success(function(data, status, headers, config) {
+					//$http.get('./../dist/json/home/popularGames.json', config).success(function(data, status, headers, config) {
 
 					$scope.popularGames = angular.fromJson(data);
 
