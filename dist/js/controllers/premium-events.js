@@ -48,7 +48,6 @@ myApp.controller('postNewsController', function($scope, $stateParams, $state, sh
 	};
 });
 
-
 myApp.controller('premiumSignUpController', function($scope, $state, $http, $stateParams, sharedDataService) {
 
 	var params = sharedDataService.get();
@@ -172,10 +171,9 @@ myApp.controller('eventPremiumSummaryController', function($scope, $state, $http
 	//go to a specific users in an event
 	$scope.goToUser = function(customer_username) {
 
-		//eventName = eventName.replace(" ", "%20");
-		//var params = [customer_username, bnhygyuhbgy,];
-		sharedDataService.set(customer_username);
-		$state.go("app.userProfile")
+		$state.go("app.userProfile", {
+			"username" : customer_username
+		}) //
 	}
 });
 
@@ -203,10 +201,9 @@ function($scope, $http, $state, $stateParams, $window) {
 			'Authorization' : "Bearer " + $window.sessionStorage.token
 		}
 	};
-	
-		var now = new Date();
-	var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
 
+	var now = new Date();
+	var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
 
 	$http.get('http://136.145.116.232/matchup/events/' + $stateParams.eventname + '/meetups?date=' + $stateParams.date + '&location=' + $stateParams.location + '', config).success(function(data, status, headers, config) {
 

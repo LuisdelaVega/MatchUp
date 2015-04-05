@@ -5,8 +5,7 @@ myApp.controller('ProfileController', function($scope, $state, sharedDataService
 	$scope.customerUsername = sharedDataService.get();
 });
 
-myApp.controller('profileSummaryController', ['$scope', '$http', '$window', 'sharedDataService',
-function($scope, $http, $window, sharedDataService) {
+myApp.controller('profileSummaryController', function($scope, $state, $http, $stateParams, sharedDataService, $window) {
 
 	var config = {
 		headers : {
@@ -14,58 +13,76 @@ function($scope, $http, $window, sharedDataService) {
 		}
 	};
 
-	var customer = sharedDataService.get();
+	var customer = $stateParams.username;
 
-	//Get basic Customer Information, cover photo and profile picture
-	$http.get('http://136.145.116.232/matchup/profile/' + customer + '', config).success(function(data) {
+		//Get basic Customer Information, cover photo and profile picture
 
-		$scope.profileData = angular.fromJson(data);
-		$scope.myProfile = $scope.profileData.my_profile;
-		$scope.userCover = "linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2)), url(" + $scope.profileData.customer_cover_photo + ")";
-		$scope.profilePicture = "url(" + $scope.profileData.customer_profile_pic + ")";
-		console.log($scope.profileData.customer_username);
+		$http.get('http://136.145.116.232/matchup/profile/' + customer + '', config).success(function(data) {
+			$scope.profileData = angular.fromJson(data);
+			$scope.myProfile = $scope.profileData.my_profile;
+			$scope.userCover = "linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2)), url(" + $scope.profileData.customer_cover_photo + ")";
+			$scope.profilePicture = "url(" + $scope.profileData.customer_profile_pic + ")";
+			//console.log($scope.profileData.customer_username);
 
-	}).error(function(err) {
-		console.log(err);
-	});
+		}).error(function(err) {
+			console.log(err);
+		}).then(function(){
+			customerInfo(customer);
+		});
 
-	//Get the teams the customer belongs to
-	$http.get('http://136.145.116.232/matchup/profile/' + customer + '/teams', config).success(function(data) {
+	
 
-		$scope.getTeams = angular.fromJson(data);
-		$scope.teams = [];
-		for (var i = 0; i < $scope.getTeams.length; i++) {
-			//Get the team information and players
-			var captain;
-			$http.get('http://136.145.116.232/matchup/teams/' + $scope.getTeams[i].team_name, config).success(function(data) {
-				$scope.teamData = angular.fromJson(data);
-				console.log($scope.teamData);
-				//Look for the team captain
-				for (var j = 0; j < $scope.teamData.players.length; j++) {
-					if ($scope.teamData.players[j].is_captain) {
-						captain = $scope.teamData.players[j].customer_tag;
+	function customerInfo(customer) {
+		console.log(customer);
+
+		//Get the teams the customer belongs to
+		$http.get('http://136.145.116.232/matchup/profile/' + customer + '/teams', config).success(function(data) {
+
+			$scope.getTeams = angular.fromJson(data);
+			$scope.teams = [];
+			for (var i = 0; i < $scope.getTeams.length; i++) {
+				//Get the team information and players
+				var captain;
+				$http.get('http://136.145.116.232/matchup/teams/' + $scope.getTeams[i].team_name, config).success(function(data) {
+					$scope.teamData = angular.fromJson(data);
+					console.log($scope.teamData);
+					//Look for the team captain
+					for (var j = 0; j < $scope.teamData.players.length; j++) {
+						if ($scope.teamData.players[j].is_captain) {
+							captain = $scope.teamData.players[j].customer_tag;
+						}
 					}
-				}
-				$scope.teamData.info.team_captain = captain;
-				$scope.teams.push($scope.teamData.info);
-			}).error(function(err) {
-				console.log(err);
-			});
-		}
+					$scope.teamData.info.team_captain = captain;
+					$scope.teams.push($scope.teamData.info);
+				}).error(function(err) {
+					console.log(err);
+				});
+			}
 
-	}).error(function(err) {
-		console.log(err);
-	});
+		}).error(function(err) {
+			console.log(err);
+		});
 
-	$http.get('http://136.145.116.232/matchup/profile/' + customer + '/organizations', config).success(function(data) {
+		$http.get('http://136.145.116.232/matchup/profile/' + customer + '/organizations', config).success(function(data) {
 
-		$scope.organizations = angular.fromJson(data);
+			$scope.organizations = angular.fromJson(data);
 
-	}).error(function(err) {
-		console.log(err);
-	});
+		}).error(function(err) {
+			console.log(err);
+		});
+	}
+	
+	
+	$scope.goToTeams = function(username){
+		$state.go("app.teams", {
+			"username" : username
+		}) //
+		
+	}
+	
+	
 
-}]);
+});
 
 myApp.controller('profileEventsController', ['$scope', '$http', '$stateParams', '$window', 'sharedDataService', '$state',
 function($scope, $http, $stateParams, $window, sharedDataService, $state) {
@@ -81,11 +98,11 @@ function($scope, $http, $stateParams, $window, sharedDataService, $state) {
 	//Your upcoming events
 	$http.get('./../dist/json/myUpcomingEvents.json', config).success(function(data) {
 		$scope.upcomingEventsData = data;
-		
+
 		//Your live events
 		$http.get('./../dist/json/myLiveEvents.json', config).success(function(data) {
 			$scope.liveEventsData = data;
-			
+
 			//YOUR past events
 			$http.get('./../dist/json/myPastEvents.json', config).success(function(data) {
 				$scope.pastEventsData = data;
@@ -214,4 +231,4 @@ function($scope, $http) {
 			$scope.isSubscribed = '-positive';
 	};
 
-}]); 
+}]);

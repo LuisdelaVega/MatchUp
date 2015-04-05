@@ -15,12 +15,13 @@ myApp.config(function ($stateProvider, $urlRouterProvider) {
         .state('app', {
             url: "/app",
             abstract: true,
-            templateUrl: "app.html"
+            templateUrl: "app.html",
+            controller: "sidebarController"
         })
         .state('app.home', {
             url: "/home",
             templateUrl: "home.html",
-            controller: "homeViewController"
+            controller: "homeViewController" 
         })
         /**
          *	Events
@@ -121,10 +122,10 @@ myApp.config(function ($stateProvider, $urlRouterProvider) {
          *
          */
         .state('app.userProfile', {
-            url: "/user",
+            url: "/user/:username",
             // using my profile for now to fix edit page
             // TODO change to user_profile and use ng-if
-            templateUrl: "user/my_profile.html",
+            templateUrl: "user/user_profile.html",
             controller: "profileSummaryController"
         })
         .state('app.userStandings', {
@@ -195,8 +196,8 @@ myApp.config(function ($stateProvider, $urlRouterProvider) {
             url: "/editTeam",
             templateUrl: "team/edit_team.html"
         })
-        .state('app.myTeams', {
-            url: "/myTeams",
+        .state('app.teams', {
+            url: "/user/:username/teams",
             templateUrl: "team/my_teams.html"
         })
         .state('app.createTeam', {
@@ -268,3 +269,4 @@ myApp.factory('sharedDataService', function () {
     }
 
 })
+

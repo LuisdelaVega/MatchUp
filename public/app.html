@@ -76,14 +76,14 @@
 			<a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i> </a>
 			<ul class="dropdown-menu dropdown-user">
 				<li>
-					<a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
+					<a ng-click="goToMyProfile()"><i class="fa fa-user fa-fw"></i> User Profile</a>
 				</li>
 				<li>
 					<a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
 				</li>
 				<li class="divider"></li>
 				<li>
-					<a href="login.html"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+					<a ng-click="logout()"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
 				</li>
 			</ul>
 			<!-- /.dropdown-user -->
@@ -109,7 +109,7 @@
 					<a ui-sref="app.home"><i class="fa fa-home fa-fw"></i> Home</a>
 				</li>
 				<li>
-					<a ui-sref="app.userProfile"><i class="fa fa-user fa-fw"></i> User Profile</a>
+					<a ng-click="goToMyProfile()"><i class="fa fa-user fa-fw"></i> User Profile</a>
 				</li>
 				<li>
 					<a href="tables.html"><i class="fa fa-calendar fa-fw"></i> Events<span class="fa arrow"></span></a>

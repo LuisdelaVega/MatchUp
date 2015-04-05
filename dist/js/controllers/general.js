@@ -9,13 +9,13 @@ function($scope, $http, $state, sharedDataService, $window) {
 	};
 
 	$http.get('http://matchup.neptunolabs.com/matchup/events?type=hosted&state=upcoming', config).success(function(data, status, headers, config) {
-	//$http.get('./../dist/json/home/hosted.json', config).success(function(data, status, headers, config) {
+		//$http.get('./../dist/json/home/hosted.json', config).success(function(data, status, headers, config) {
 		$scope.hostedEvents = angular.fromJson(data);
 
 		//done
 
 		$http.get('http://matchup.neptunolabs.com/matchup/events?type=regular&state=upcoming', config).success(function(data, status, headers, config) {
-		//$http.get('./../dist/json/home/regular.json', config).success(function(data, status, headers, config) {
+			//$http.get('./../dist/json/home/regular.json', config).success(function(data, status, headers, config) {
 			$scope.regularEvents = angular.fromJson(data);
 
 			//done
@@ -345,12 +345,16 @@ function($scope, $http, $state, $window) {
 				'Authorization' : AuHeader
 			}
 		};
+		$window.sessionStorage.user = $scope.credentials.userEmail;
+		console.log($window.sessionStorage.user);
 
 		$http.post('http://136.145.116.232/login', {}, config).success(function(data) {
 			var tokenObj = angular.fromJson(data);
 			// save token in session
 			$window.sessionStorage.token = tokenObj.token;
+
 			console.log($window.sessionStorage.token);
+
 			// reset error variable
 			$scope.error = false;
 			// change view
@@ -359,5 +363,82 @@ function($scope, $http, $state, $window) {
 			$scope.error = true;
 		});
 	};
+}]);
+
+myApp.controller('sidebarController', ['$scope', '$window', '$state',
+function($scope, $window, $state) {
+
+	var config = {
+		headers : {
+			'Authorization' : "Bearer " + $window.sessionStorage.token
+		}
+	};
+
+	$scope.goToMyProfile = function(customer_username) {
+		$state.go("app.userProfile", {
+			"username" : $window.sessionStorage.user
+		}) //
+	}
+	$scope.goToRegisteredEvents = function(customer_username) {
+		$state.go("app.userProfile", {
+			"username" : $window.sessionStorage.user
+		}) //
+	}
+
+	$scope.goToMyEvents = function(customer_username) {
+		$state.go("app.userProfile", {
+			"username" : $window.sessionStorage.user
+		}) //
+	}
+
+	$scope.goCreateEvent = function(customer_username) {
+		$state.go("app.userProfile", {
+			"username" : $window.sessionStorage.user
+		}) //
+	}
+
+	$scope.goToMyMatchUps = function(customer_username) {
+		$state.go("app.userProfile", {
+			"username" : $window.sessionStorage.user
+		}) //
+	}
+
+	$scope.goToMyTeams = function(customer_username) {
+		$state.go("app.userProfile", {
+			"username" : $window.sessionStorage.user
+		}) //
+	}
+
+	$scope.goToMyOrganizations = function(customer_username) {
+		$state.go("app.userProfile", {
+			"username" : $window.sessionStorage.user
+		}) //
+	}
+
+	$scope.goToMySubscribers = function(customer_username) {
+		$state.go("app.userProfile", {
+			"username" : $window.sessionStorage.user
+		}) //
+	}
+	
+		$scope.goToRegisteredEvents = function(customer_username) {
+		$state.go("app.userProfile", {
+			"username" : $window.sessionStorage.user
+		}) //
+	}
+
+
+	$scope.goToMyEvents = function(customer_username) {
+		$state.go("app.userProfile", {
+			"username" : $window.sessionStorage.user
+		}) //
+	}
+	
+	
+	$scope.logout = function() {
+		$window.sessionStorage.clear();
+		$state.go("login") //
+	}
+	
 }]);
 

@@ -1,17 +1,18 @@
-<div class="blur-cover"></div>
+<div class="blur-cover" ng-style="{'background': userCover}">
+</div>
 <div class="box box-margin">
 	<div class="row">
 		<div class="col-xs-12 col-md-6 col-lg-6">
-			<p class="info-title">
-				User Name
+			<p class="info-title" ng-if="myProfile">
+                {{profileData.customer_username}}
 			</p>
 			<div class="row" align="center">
-				<div class="profile-picture"></div>
+				<div class="profile-picture" ng-style="{'background-image': profilePicture}"></div>
 				<p class="info-title">
-					User tag
+                {{profileData.customer_tag}}
 				</p>
 				<p class="info-paragraph">
-					Country Name
+                {{profileData.customer_country}}
 				</p>
 				<div class="countryflag"></div>
 				<br />
@@ -22,14 +23,19 @@
 				<h3>About</h3>
 				<div class="center">
 					<p class="info-paragraph">
-						Raw denim Truffaut proident wolf, asymmetrical mollit exercitation. Tousled est art party wayfarers. Cupidatat ullamco gluten-free Schlitz listicle. Fixie literally normcore, DIY eu jean shorts Truffaut Helvetica actually mlkshk put a bird on it cold-pressed tilde. Tempor biodiesel Shoreditch ennui assumenda skateboard. Literally fixie fanny pack commodo organic, plaid raw denim viral delectus cornhole church-key tofu master cleanse pariatur. Food truck viral anim tilde aute PBR consequat leggings, aliqua single-origin coffee salvia quinoa enim qui wayfarers.
+                {{profileData.customer_bio}}
 					</p>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="btn-group btn-group-justified" role="group">
-		<div class="btn-group" role="group">
+	<div class="row">
+		<div class="col-md-3 col-md-offset-9">
+			<a class="btn btn-primary btn-block" ui-sref="app.editProfile" ng-if="myProfile">Edit</a>
+		</div>
+	</div>
+	<div class="btn-group btn-group-justified" role="group" ng-if="!myProfile">
+		<div class="btn-group" role="group" >
 			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#messageModal">
 				<i class="fa fa-envelope"></i> Message
 			</button>
@@ -79,11 +85,11 @@
 	</div>
 </div>
 
-<!-- Standings widget -->
+<!-- Standings widget  JAJAJAJAJAJAJ-->
 <div class="widget-box box-margin">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Standings</h3>
-		<a class="widget-more" onclick="window.location.href='user_standings.html'">
+		<a class="widget-more" ui-sref="app.userStandings">
 						See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
 					</a>
 	</div>
@@ -101,19 +107,19 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr class="cursor" onclick="window.location.href='tournament_page.html'">
+						<tr class="cursor" ui-sref="app.tournament">
 							<td>5th</td>
 							<td>Apex 2015</td>
 							<td>Halo 4</td>
 							<td>March 1, 2015</td>
 						</tr>
-						<tr class="cursor" onclick="window.location.href='tournament_page.html'">
+						<tr class="cursor" ui-sref="app.tournament">
 							<td>5th</td>
 							<td>Apex 2015</td>
 							<td>Halo 4</td>
 							<td>March 1, 2015</td>
 						</tr>
-						<tr class="cursor" onclick="window.location.href='tournament_page.html'">
+						<tr class="cursor" ui-sref="app.tournament">
 							<td>5th</td>
 							<td>Apex 2015</td>
 							<td>Halo 4</td>
@@ -131,7 +137,7 @@
 <div class="widget-box">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Teams</h3>
-		<a class="widget-more" onclick="window.location.href='user_teams.html'">
+		<a class="widget-more" ng-click="goToTeams(profileData.customer_username)">
 						See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
 					</a>
 	</div>
@@ -140,58 +146,16 @@
 		<div class="widget-main no-padding">
 			<div class="tickets-container">
 				<div class="row" style="padding-left: 15px">
-					<div class="col-md-3 col-sm-4 col-xs-6">
-						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='team_page.html'">
+					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat = "team in teams">
+						<a class="thumbnail"> <img ng-src="{{team.team_logo}}" alt="..." ui-sref="app.teamProfile">
 							<hr class="hr-custom-padding">
 							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 											overflow: hidden;">
-								<p class="thumbnail-title" onclick="window.location.href='team_page.html'">
-									Team Name
+								<p class="thumbnail-title" ui-sref="app.teamProfile">
+                                    {{team.team_name}}
 								</p>
 								<p class="thumbnail-paragraph">
-									Captain: Name
-								</p>
-							</div>
-						</a>
-					</div>
-					<div class="col-md-3 col-sm-4 col-xs-6">
-						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='team_page.html'">
-							<hr class="hr-custom-padding">
-							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-											overflow: hidden;">
-								<p class="thumbnail-title" onclick="window.location.href='team_page.html'">
-									Team Name
-								</p>
-								<p class="thumbnail-paragraph">
-									Captain: Name
-								</p>
-							</div>
-						</a>
-					</div>
-					<div class="col-md-3 col-sm-4 col-xs-6">
-						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='team_page.html'">
-							<hr class="hr-custom-padding">
-							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-											overflow: hidden;">
-								<p class="thumbnail-title" onclick="window.location.href='team_page.html'">
-									Team Name
-								</p>
-								<p class="thumbnail-paragraph">
-									Captain: Name
-								</p>
-							</div>
-						</a>
-					</div>
-					<div class="col-md-3 col-sm-4 col-xs-6">
-						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='team_page.html'">
-							<hr class="hr-custom-padding">
-							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-											overflow: hidden;">
-								<p class="thumbnail-title" onclick="window.location.href='team_page.html'">
-									Team Name
-								</p>
-								<p class="thumbnail-paragraph">
-									Captain: Name
+									Captain: {{team.team_captain}}
 								</p>
 							</div>
 						</a>
@@ -207,7 +171,7 @@
 <div class="widget-box">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">User Events</h3>
-		<a class="widget-more" onclick="window.location.href='user_events.html'">
+		<a class="widget-more" ui-sref="app.userEvents">
 						See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
 					</a>
 	</div>
@@ -217,62 +181,11 @@
 			<div class="tickets-container">
 				<div class="row" style="padding-left: 15px">
 					<div class="col-md-3 col-sm-4 col-xs-6">
-						<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
+						<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." ui-sref="app.event">
 							<hr class="hr-custom-padding">
 							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 											overflow: hidden;">
-								<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
-									Event Name
-								</p>
-								<p class="thumbnail-paragraph">
-									Staple Centersdafdfgdfgsdfgsdfgsdfgdfgsdfgasdfasdf
-								</p>
-								<p class="thumbnail-paragraph">
-									January 2, 8:00PM
-								</p>
-							</div>
-						</a>
-					</div>
-					<div class="col-md-3 col-sm-4 col-xs-6">
-						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
-							<hr class="hr-custom-padding">
-							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-											overflow: hidden;">
-								<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
-									Event Name
-								</p>
-								<p class="thumbnail-paragraph">
-									Staple Centersdafdfgdfgsdfgsdfgsdfgdfgsdfgasdfasdf
-								</p>
-								<p class="thumbnail-paragraph">
-									January 2, 8:00PM
-								</p>
-							</div>
-						</a>
-					</div>
-					<div class="col-md-3 col-sm-4 col-xs-6">
-						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
-							<hr class="hr-custom-padding">
-							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-											overflow: hidden;">
-								<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
-									Event Name
-								</p>
-								<p class="thumbnail-paragraph">
-									Staple Centersdafdfgdfgsdfgsdfgsdfgdfgsdfgasdfasdf
-								</p>
-								<p class="thumbnail-paragraph">
-									January 2, 8:00PM
-								</p>
-							</div>
-						</a>
-					</div>
-					<div class="col-md-3 col-sm-4 col-xs-6">
-						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='premium_event_page.html'">
-							<hr class="hr-custom-padding">
-							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-											overflow: hidden;">
-								<p class="thumbnail-title" onclick="window.location.href='premium_event_page.html'">
+								<p class="thumbnail-title" ui-sref="app.event">
 									Event Name
 								</p>
 								<p class="thumbnail-paragraph">
@@ -295,7 +208,7 @@
 <div class="widget-box">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Organizations</h3>
-		<a class="widget-more" onclick="window.location.href='user_organizations.html'">
+		<a class="widget-more" ui-sref="app.userOrganizations">
 						See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
 					</a>
 	</div>
@@ -304,46 +217,13 @@
 		<div class="widget-main no-padding">
 			<div class="tickets-container">
 				<div class="row" style="padding-left: 15px">
-					<div class="col-md-3 col-sm-4 col-xs-6">
-						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='organization_profile1.0.html'">
+					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat = "organization in organizations">
+						<a class="thumbnail"> <img ng-src="{{organization.organization_logo}}" alt="..." ui-sref="app.organizationProfile">
 							<hr class="hr-custom-padding">
 							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 											overflow: hidden;">
-								<p class="thumbnail-title" align="center" onclick="window.location.href='organization_profile1.0.html'">
-									Organization Name
-								</p>
-							</div>
-						</a>
-					</div>
-					<div class="col-md-3 col-sm-4 col-xs-6">
-						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='organization_profile1.0.html'">
-							<hr class="hr-custom-padding">
-							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-											overflow: hidden;">
-								<p class="thumbnail-title" align="center" onclick="window.location.href='organization_profile1.0.html'">
-									Organization Name
-								</p>
-							</div>
-						</a>
-					</div>
-					<div class="col-md-3 col-sm-4 col-xs-6">
-						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='organization_profile1.0.html'">
-							<hr class="hr-custom-padding">
-							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-											overflow: hidden;">
-								<p class="thumbnail-title" align="center" onclick="window.location.href='organization_profile1.0.html'">
-									Organization Name
-								</p>
-							</div>
-						</a>
-					</div>
-					<div class="col-md-3 col-sm-4 col-xs-6">
-						<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." onclick="window.location.href='organization_profile1.0.html'">
-							<hr class="hr-custom-padding">
-							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-											overflow: hidden;">
-								<p class="thumbnail-title" align="center" onclick="window.location.href='organization_profile1.0.html'">
-									Organization Name
+								<p class="thumbnail-title" align="center" ui-sref="app.organizationProfile">
+                                    {{organization.organization_name}}
 								</p>
 							</div>
 						</a>
