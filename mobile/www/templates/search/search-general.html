@@ -15,9 +15,9 @@
         </div>
 
         <div class="list" ng-if="users">
-            <a class="item item-avatar" href="#" ng-repeat="data in searchData">
+            <a class="item item-avatar" ng-click="goToUserProfile(data.customer_username)" ng-repeat="data in searchData">
                 <img ng-src="{{ data.customer_profile_pic }}">
-                <h2>{{ data.customer_username }}</h2>
+                <h2>{{ data.customer_tag }}</h2>
                 <p>{{ data.customer_country }}</p>
             </a>
         </div>

@@ -1,6 +1,6 @@
 var myApp = angular.module('user',[]);
 
-myApp.controller('ProfileController', function ($scope, $ionicPopover, $state, sharedDataService) {
+myApp.controller('ProfileController', function ($scope, $ionicPopover, $state, sharedDataService, $ionicPopup) {
     $ionicPopover.fromTemplateUrl('templates/profile/profile-popover.html', {
         scope: $scope,
     }).then(function (popover) {
@@ -22,7 +22,7 @@ myApp.controller('ProfileController', function ($scope, $ionicPopover, $state, s
     $scope.customerUsername = sharedDataService.get();
 });
 
-myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$stateParams', function ($scope, $http, $window, $stateParams) {
+myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$stateParams', '$ionicPopup', '$timeout', function ($scope, $http, $window, $stateParams, $ionicPopup, $timeout) {
 
     var config = {
         headers: {
@@ -31,34 +31,99 @@ myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$st
     };
 
     $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'', config).success(function (data) {
-        
+
         $scope.profileData = angular.fromJson(data);
         $scope.myProfile = $scope.profileData.my_profile;
-        
+
+        $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/teams', config).success(function (data) {
+
+            $scope.teams = angular.fromJson(data);
+
+            $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/organizations', config).success(function (data) {
+
+                $scope.organizations = angular.fromJson(data);
+
+            }).error(function (err) {
+                console.log(err);
+            });
+
+        }).error(function (err) {
+            console.log(err);
+        });
+
     }).error(function (err) {
         console.log(err);
     });
-    
-    $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/teams', config).success(function (data) {
-        
-        $scope.teams = angular.fromJson(data);
-        
-    }).error(function (err) {
-        console.log(err);
+
+
+
+
+
+    $scope.subscribeToUser = function(username){
+
+        var myPopup = $ionicPopup.show({
+            title: 'Do you want to subscribe?',
+            scope: $scope,
+            buttons: [
+                { text: 'No' },
+                {
+                    text: '<b>Yes</b>',
+                    type: 'button-positive',
+                    onTap: function(e) {
+
+                        $http.post('http://136.145.116.232/matchup/profile/'+username+'', {}, config).success(function (data) {
+                            console.log('http://136.145.116.232/matchup/profile/'+username+'');
+                            console.log("Subscribed to"+username+"");
+
+                        }).error(function (err) {
+                            console.log(err);
+                        });
+
+                    }
+                }
+            ]
+        });
+        $timeout(function() {
+            myPopup.close(); //close the popup after 3 seconds for some reason
+        }, 3000);
+
+    }
+
+}]);
+
+myApp.controller('mySubscriptionsController', ['$scope', '$http', '$window', '$stateParams', '$ionicPopup', '$timeout', 'sharedDataService', function ($scope, $http, $window, $stateParams, $ionicPopup, $timeout, sharedDataService) {
+
+    var customerUsername = sharedDataService.get();
+
+    $scope.$on('$ionicView.enter', function () {
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+        $http.get('http://136.145.116.232/matchup/profile/'+customerUsername+'/subscriptions', config).success(function (data) {
+
+            $scope.subscriptions = angular.fromJson(data);
+
+        }).error(function (err) {
+            console.log(err);
+        });
     });
-    
-    $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/organizations', config).success(function (data) {
-        
-        $scope.organizations = angular.fromJson(data);
-        
-    }).error(function (err) {
-        console.log(err);
-    });
-    
+
+    $scope.isSubscribed = '-positive';
+
+    $scope.toggleSubscribe = function () {
+        if ($scope.isSubscribed == '-positive')
+            $scope.isSubscribed = '';
+        else
+            $scope.isSubscribed = '-positive';
+    };
+
 }]);
 
 myApp.controller('profileEventsController', ['$scope', '$http', '$stateParams', '$window', 'sharedDataService', '$state', function ($scope, $http, $stateParams, $window, sharedDataService, $state) {
-    
+
     console.log("entered profileEventsController");
 
     var config = {
@@ -102,7 +167,7 @@ myApp.controller('profileEventsController', ['$scope', '$http', '$stateParams', 
         });
 
     };
-    
+
 }]);
 
 
@@ -124,9 +189,9 @@ myApp.controller('profileTeamsController', ['$scope', '$http', '$stateParams', '
     };
 
     $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/teams', config).success(function (data) {
-        
+
         $scope.teams = angular.fromJson(data);
-        
+
     }).error(function (err) {
         console.log(err);
     });
@@ -157,19 +222,6 @@ myApp.controller('profileOrganizationsController', ['$scope', '$http', '$statePa
 
     $scope.gotToProfile = function (customerUsername) {
         $state.go("app.profile.summary", {"username": customerUsername});
-    };
-
-}]);
-
-myApp.controller('subscriptionsController', ['$scope', '$http', function ($scope, $http) {
-
-    $scope.isSubscribed = '-positive';
-
-    $scope.toggleSubscribe = function () {
-        if ($scope.isSubscribed == '-positive')
-            $scope.isSubscribed = '';
-        else
-            $scope.isSubscribed = '-positive';
     };
 
 }]);

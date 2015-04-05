@@ -20,13 +20,13 @@ myApp.controller('EventController', function ($scope, $ionicPopover, $http, shar
 
             var eventData = angular.fromJson(data);
             
-            var isHosted = eventData.is_hosted; //Server returns organization that is hosting the event. If the event does not have a host than the value returned is null.
+            var isHosted = eventData.host; //Server returns organization that is hosting the event. If the event does not have a host than the value returned is null.
 
             sharedDataService.set(params);
 
             //If isHosted is null, than the user is requesting to go to a regular event. Otherwise the user is going to a premium event. 
-            if(isHosted != 'null'){
-                $state.go('app.eventpremium.summary', {"eventname": eventName, "date": date, "location": location});
+            if(isHosted != null){
+                $state.go('app.eventpremium', {"eventname": eventName, "date": date, "location": location});
 
             }
             else{
@@ -60,8 +60,6 @@ myApp.controller('PremiumEventController', function ($scope, $http, $window) {
     error(function(data, status, headers, config) {
         console.log("error in PremiumEventController");
     });
-
-
 
 });
 

@@ -200,7 +200,8 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     })
         .state('app.mysubscriptions', {
         url: "/mysubscriptions",
-        templateUrl: "templates/myStuff/my-subscriptions.html"
+        templateUrl: "templates/myStuff/my-subscriptions.html",
+        controller: "mySubscriptionsController"
     })
     //================================================================================
     // Game Profile
@@ -425,11 +426,13 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     $urlRouterProvider.otherwise('/login');
 
 
-
+/*
     //Authentication stuff
     $httpProvider.defaults.useXDomain = true;
+    
+    $httpProvider.useApplyAsync(true);
 
-    delete $httpProvider.defaults.headers.common["X-Requested-With"];
+    delete $httpProvider.defaults.headers.common["X-Requested-With"]; */
 
 })
 //Allows controllers to pass data between each other. Should be used only when values set will immediately used by another controller in a get.

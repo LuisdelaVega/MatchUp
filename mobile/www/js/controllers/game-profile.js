@@ -26,12 +26,12 @@ myApp.controller('gameProfileParentController', ['$scope', '$http', '$state', 's
 
             var eventData = angular.fromJson(data);
 
-            var isHosted = eventData.hosted; //Server returns organization that is hosting the event. If the event does not have a host than the value returned is null.
+            var isHosted = eventData.host; //Server returns organization that is hosting the event. If the event does not have a host than the value returned is null.
 
             sharedDataService.set(params);
             
             //If isHosted is null, than the user is requesting to go to a regular event. Otherwise the user is going to a premium event. 
-            if(isHosted != 'null'){
+            if(isHosted != null){
                 $state.go('app.eventpremium', {"eventname": eventName, "date": date, "location": location});
             }
             else{

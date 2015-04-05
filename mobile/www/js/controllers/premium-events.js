@@ -158,32 +158,34 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
         else
             $scope.isOngoing = true;
 
+        $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
+        success(function(data, status, headers, config) {
+
+            $scope.tournamentsInfo = angular.fromJson(data);
+
+            $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/sponsors?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
+            success(function(data, status, headers, config) {
+
+                $scope.sponsors = angular.fromJson(data);
+                
+                console.log($http.pendingRequests);
+
+
+            }).
+            error(function(data, status, headers, config) {
+                console.log("error in eventPremiumSummaryController");
+            });
+
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in eventPremiumSummaryController");
+        });
+
     }).
     error(function(data, status, headers, config) {
         console.log("error in eventPremiumSummaryController");
     });
 
-    $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
-    success(function(data, status, headers, config) {
-
-        $scope.tournamentsInfo = angular.fromJson(data);
-
-
-    }).
-    error(function(data, status, headers, config) {
-        console.log("error in eventPremiumSummaryController");
-    });
-
-    $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/sponsors?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
-    success(function(data, status, headers, config) {
-
-        $scope.sponsors = angular.fromJson(data);
-
-
-    }).
-    error(function(data, status, headers, config) {
-        console.log("error in eventPremiumSummaryController");
-    });
 
 
     $scope.goToSignUp = function (eventName, eventDate, eventLocation) {

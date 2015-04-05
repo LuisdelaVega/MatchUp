@@ -1,10 +1,9 @@
 <ion-view view-title="My Subscriptions">
     <ion-content>
-        <div class="list list-inset" ng-controller="subscriptionsController">
-            <a class="item center-item item-avatar item-button-right" href="#">
-                <img src="img/ron.jpg">
-                <h2>Ron Paul</h2>
-                <p>This is a description. GO LUGARO</p>
+        <div class="list list-inset">
+            <a class="item center-item item-avatar item-button-right" href="#" ng-repeat="subscription in subscriptions">
+                <img ng-src="{{subscription.customer_profile_pic}}">
+                <h2>{{subscription.customer_tag}}</h2>
                 <button class="button button{{isSubscribed}}" ng-click="toggleSubscribe()">
                     <i class="icon ion-person-add"></i>
                 </button>

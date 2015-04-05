@@ -1,6 +1,7 @@
 var myApp = angular.module('home',[]);
 
 myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedDataService', '$window', function ($scope, $http, $state, sharedDataService, $window) {
+
     var config = {
         headers: {
             'Authorization': "Bearer "+ $window.sessionStorage.token
@@ -13,43 +14,46 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
 
         $scope.hostedEvents = angular.fromJson(data);
 
+        //Obtain live and upcoming events
+        $http.get('http://matchup.neptunolabs.com/matchup/events?state=live', config).
+        success(function(data, status, headers, config) {
+
+            $scope.liveEvents = angular.fromJson(data);
+
+            $http.get('http://matchup.neptunolabs.com/matchup/events?type=regular&state=upcoming', config).
+            success(function(data, status, headers, config) {
+
+                $scope.regularEvents = angular.fromJson(data);
+
+
+
+                //Obtain popular games
+                $http.get('http://matchup.neptunolabs.com/matchup/popular/games', config).
+                success(function(data, status, headers, config) {
+
+                    $scope.popularGames = angular.fromJson(data);
+
+                }).
+                error(function(data, status, headers, config) {
+                    console.log("error in popular games home view");
+                });
+            }).
+            error(function(data, status, headers, config) {
+                console.log("error in home controller. obtaining hosted upcoming events");
+            });
+
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in home controller. obtaining hosted upcoming events");
+        });
     }).
     error(function(data, status, headers, config) {
         console.log("error in home controller. obtaining hosted upcoming events");
     });
 
-    //Obtain regular and upcoming events
-    $http.get('http://matchup.neptunolabs.com/matchup/events?type=regular&state=upcoming', config).
-    success(function(data, status, headers, config) {
 
-        $scope.regularEvents = angular.fromJson(data);
 
-    }).
-    error(function(data, status, headers, config) {
-        console.log("error in home controller. obtaining hosted upcoming events");
-    });
-    
-    //Obtain live and upcoming events
-    $http.get('http://matchup.neptunolabs.com/matchup/events?state=live', config).
-    success(function(data, status, headers, config) {
 
-        $scope.liveEvents = angular.fromJson(data);
-
-    }).
-    error(function(data, status, headers, config) {
-        console.log("error in home controller. obtaining hosted upcoming events");
-    });
-
-    //Obtain popular games
-    $http.get('http://matchup.neptunolabs.com/matchup/popular/games', config).
-    success(function(data, status, headers, config) {
-
-        $scope.popularGames = angular.fromJson(data);
-
-    }).
-    error(function(data, status, headers, config) {
-        console.log("error in popular games home view");
-    });
 
     //goToEvent requires the event name, date and location to access the specific event that is to be transitioned to.
     $scope.goToEvent = function(eventName, date, location){
@@ -68,12 +72,16 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
 
             var eventData = angular.fromJson(data);
 
-            var isHosted = eventData.hosted; //Server returns organization that is hosting the event. If the event does not have a host than the value returned is null.
+            console.log('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'');
+
+            var isHosted = eventData.host; //Server returns organization that is hosting the event. If the event does not have a host than the value returned is null.
 
             sharedDataService.set(params);
 
-             //If isHosted is null, than the user is requesting to go to a regular event. Otherwise the user is going to a premium event. 
-            if(isHosted != 'null'){
+            console.log(isHosted);
+
+            //If isHosted is null, than the user is requesting to go to a regular event. Otherwise the user is going to a premium event. 
+            if(isHosted != null){
                 $state.go('app.eventpremium', {"eventname": eventName, "date": date, "location": location});
             }
             else{
@@ -105,7 +113,7 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$
                 'Authorization': "Bearer "+ $window.sessionStorage.token
             }
         };
-        
+
         //Search only if there is content in the search box
         if(query.length > 0){
             $http.get('http://136.145.116.232/matchup/search/'+query+'', config).
@@ -131,7 +139,7 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$
                 console.log("error in search controller");
             });
         }
-        
+
         //Failsafe to make sure that if search parameters is 0 than there should be nothing displaying
         else{
 
@@ -166,12 +174,14 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$
 
             var eventData = angular.fromJson(data);
 
-            var isHosted = eventData.hosted; //Server returns organization that is hosting the event. If the event does not have a host than the value returned is null.
+            var isHosted = eventData.host; //Server returns organization that is hosting the event. If the event does not have a host than the value returned is null.
+
+            console.log(isHosted);
 
             sharedDataService.set(params);
 
             //If isHosted is null, than the user is requesting to go to a regular event. Otherwise the user is going to a premium event. 
-            if(isHosted != 'null'){
+            if(isHosted != null){
                 $state.go('app.eventpremium', {"eventname": eventName, "date": date, "location": location});
             }
             else{
@@ -190,6 +200,12 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$
         var params = [gameName, gameImage];
         sharedDataService.set(params);
         $state.go('app.game.summary', {"gamename": gameName});
+    };
+
+    $scope.goToUserProfile = function (userName) {
+        //Save parameters to array such that both can be sent through sharedDataServices
+        sharedDataService.set(userName);
+        $state.go('app.profile.summary', {"username": userName});
     };
 
 
@@ -271,13 +287,13 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
 
             var eventData = angular.fromJson(data);
 
-            var isHosted = eventData.hosted; //Server returns organization that is hosting the event. If the event does not have a host than the value returned is null.
+            var isHosted = eventData.host; //Server returns organization that is hosting the event. If the event does not have a host than the value returned is null.
 
             sharedDataService.set(params);
 
 
             //If isHosted is null, than the user is requesting to go to a regular event. Otherwise the user is going to a premium event. 
-            if(isHosted != 'null'){
+            if(isHosted != null){
                 $state.go('app.eventpremium', {"eventname": eventName, "date": date, "location": location});
             }
             else{
@@ -298,6 +314,11 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
         $state.go('app.game.summary', {"gamename": gameName});
     };
 
+    $scope.goToUserProfile = function (userName) {
+        //Save parameters to array such that both can be sent through sharedDataServices
+        sharedDataService.set(userName);
+        $state.go('app.profile.summary', {"username": userName});
+    };
 
 }]);
 
@@ -372,8 +393,8 @@ myApp.controller('popularGameViewController', ['$scope', '$http', '$state', 'sha
 
 myApp.controller('loginController', ['$scope', '$http', '$state', 'sharedDataService', '$window', function ($scope, $http, $state, sharedDataService, $window) {
 
-    
-    
+
+
     $scope.credentials = { }; //Tied to ng-model and stores user crdedentials. Username is stored in $scope.credentials.userEmail and password in $scope.credentials.userPassword
 
     $scope.error = false; //If true display error message. True if user inputs incorrect credentials.
@@ -404,48 +425,51 @@ myApp.controller('loginController', ['$scope', '$http', '$state', 'sharedDataSer
 myApp.controller('sidebarController', ['$scope', '$http', '$state', 'sharedDataService', '$window', function ($scope, $http, $state, sharedDataService, $window) {
 
     //Load profile information of currently logged in user. The token is used by the server to obtain user credentials.
-    $scope.$on('$ionicView.enter', function () {
+    var config = {
+        headers: {
+            'Authorization': "Bearer "+ $window.sessionStorage.token
+        }
+    };
 
-        var config = {
-            headers: {
-                'Authorization': "Bearer "+ $window.sessionStorage.token
-            }
-        };
+    $http.get('http://136.145.116.232/matchup/profile', config).success(function (data) {
 
+        $scope.loggedInUserProfileData = angular.fromJson(data);
+        //Used in ng-style to change CSS parameters. Used to place the cover photo in the sidebar.
+        $scope.coverPhotoCSS = "linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.6)), url("+data.customer_cover_photo+")";
+        //Used in ng-style to change CSS parameters. Used to place the profile picture in the sidebar.
+        $scope.profilePictureCSS =  "url("+data.customer_profile_pic+")";
 
-        $scope.goToProfile = function (customer_username) {
-
-            sharedDataService.set(customer_username);
-            $state.go('app.profile.summary', { "username":  customer_username});
-
-        };
-
-        $http.get('http://136.145.116.232/matchup/profile', config).success(function (data) {
-
-            $scope.loggedInUserProfileData = angular.fromJson(data);
-            //Used in ng-style to change CSS parameters. Used to place the cover photo in the sidebar.
-            $scope.coverPhotoCSS = "linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.6)), url("+data.customer_cover_photo+")";
-            //Used in ng-style to change CSS parameters. Used to place the profile picture in the sidebar.
-            $scope.profilePictureCSS =  "url("+data.customer_profile_pic+")";
-
-        }).error(function (err) {
-            console.log(err);
-
-        });
-
-        $scope.goToMyEvents = function (customer_username) {
-
-            sharedDataService.set(customer_username);
-            $state.go('app.myevents.melist', { "username":  customer_username});
-
-        };
-        
-        $scope.goToRegisteredEvents = function (customer_username) {
-
-            sharedDataService.set(customer_username);
-            $state.go('app.registeredevents.relist');
-
-        };
+    }).error(function (err) {
+        console.log(err);
 
     });
+
+    $scope.goToMyEvents = function (customer_username) {
+
+        sharedDataService.set(customer_username);
+        $state.go('app.myevents.melist', { "username":  customer_username});
+
+    };
+
+    $scope.goToRegisteredEvents = function (customer_username) {
+
+        sharedDataService.set(customer_username);
+        $state.go('app.registeredevents.relist');
+
+    };
+
+    $scope.goToMySubscriptions = function (customer_username) {
+
+        sharedDataService.set(customer_username);
+        $state.go('app.mysubscriptions');
+
+    };
+
+    $scope.goToProfile = function (customer_username) {
+
+        sharedDataService.set(customer_username);
+        $state.go('app.profile.summary', { "username":  customer_username});
+
+    };
+
 }]);

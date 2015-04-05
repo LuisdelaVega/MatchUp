@@ -44,7 +44,7 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
 
         
 
-        if($scope.eventInfo.is_hosted){
+        if($scope.eventInfo.host != null){
             var selectedTournament = sharedDataService.get();
 
             $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+selectedTournament+'?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
