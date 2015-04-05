@@ -11,7 +11,7 @@ var bodyParser = require('body-parser');
 var basicAuth = require('basic-auth');
 var pg = require('pg');
 pg.defaults.poolSize = 9000; // Power lvl
-pg.defaults.poolIdleTimeout = 3000;
+pg.defaults.poolIdleTimeout = 1000;
 var crypto = require('crypto');
 var bunyan = require('bunyan');
 
