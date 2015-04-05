@@ -1,4 +1,4 @@
-var myApp = angular.module('MatchUp', ['ui.router', 'ngResource', 'home', 'premium-events', 'regular-events', 'user']);
+var myApp = angular.module('MatchUp', ['ui.router', 'ngResource', 'home', 'premium-events', 'regular-events', 'user','as.sortable','ui.bootstrap.datetimepicker','organizer']);
 
 myApp.config(function ($stateProvider, $urlRouterProvider) {
     //
@@ -85,22 +85,25 @@ myApp.config(function ($stateProvider, $urlRouterProvider) {
             templateUrl: "organizer/tournament_list.html"
         })
         .state('app.registrations', {
-            url: "/registrations",
-            templateUrl: "organizer/registrations.html"
-        })
-        .state('app.stationAssignment', {
-            url: "/stationAssignment",
-            templateUrl: "organizer/station_assignment.html"
-        })
-        .state('app.seeding', {
-            url: "/seeding",
-            templateUrl: "organizer/seeding.html",
-            controller: "Seeding"
-        })
-        .state('app.reportList', {
-            url: "/reportList",
-            templateUrl: "organizer/report_list.html",
-        })
+			url: "/registrations",
+			templateUrl: "organizer/registrations.html",
+			controller: "RegistrationController"
+		})
+		.state('app.stationAssignment', {
+			url: "/stationAssignment",
+			templateUrl: "organizer/station_assignment.html",
+			controller: "StationController"
+		})
+		.state('app.seeding', {
+			url: "/seeding",
+			templateUrl: "organizer/seeding.html",
+			controller: "SeedingController"
+		})
+		.state('app.reportList', {
+			url: "/reportList",
+			templateUrl: "organizer/report_list.html",
+			controller: "ReportsController"
+		})
         /**
          *	Tournaments
          *

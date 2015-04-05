@@ -317,6 +317,13 @@ input[readonly] {
 	color: #fff;
 	transition: all 0.5s ease 0s;
 }
+
+/*LIST HOVER*/
+
+.list-group-item:hover{
+	background-color: #fafafa;
+}
+
 /*List snippe*/
 
 .tickets-container .tickets-list .ticket-item .ticket-state i {

@@ -1,31 +1,58 @@
-<!-- Nav tabs -->
-<ul class="nav nav-tabs nav-justified tab-padding-top">
-	<li ng-class="{active: $index==0}" ng-repeat="tab in test.tabs">
-		<a data-target="#{{tab.firstName}}" data-toggle="tab">firstName 1</a>
-	</li>
-</ul>
-
-<!-- Tab panes -->
-<div class="tab-content">
-	<div class="tab-pane fade in active" id="tournament1">
-		<div class="panel-padding">
-			<div class="row box-margin">
-				<div class="col-md-10 col-md-offset-1">
-					<ul ui-sortable ng-model="items">
-						<li ng-repeat="item in items">{{ item }}</li>
-					</ul>
+<div class="row">
+	<div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+		<div class="list-group">
+			<a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="tournament in tournaments" ng-click="getSeedingInfo($index)">
+				<h4 class="list-group-item-heading">{{tournament.name}}</h4>
+			</a>
+		</div>
+	</div>
+	<div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+		<div class="box">
+			<legend>Seed</legend>
+			<div class="row">
+				<div class="col-md-8 col-md-offset-2">
+					<table class="table table-hover" as-sortable="sortableOptions" ng-model="competitors" is-disabled="seedingCreated">
+						<thead>
+							<tr>
+								<th>Seed</th>
+								<th>Tag</th>
+								<th>Name</th>
+							</tr>
+						</thead>
+						<tbody ng-repeat="item in competitors" as-sortable-item class="as-sortable-item">
+							<tr as-sortable-item-handle class="as-sortable-item-handle">
+								<td style="width:10%">{{$index + 1}}</td>
+								<td data-ng-bind="item.name"></td>
+								<td data-ng-bind="item.firstName"></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="col-md-6 col-md-offset-3" ng-if="!seedingCreated">
+					<button class="btn btn-success btn-block" ng-click="createTournament()">Create Tournament Bracket</button>
 				</div>
 			</div>
 		</div>
-	</div>
-	<div class="tab-pane fade" id="tournament2">
-		<div class="panel-padding">
-			<div class="row box-margin">
-				<div class="col-md-10 col-md-offset-1">
-					<p>hi2</p>
+		<div class="box box-margin" ng-if="seedingCreated">
+			<legend>Group Stages</legend>
+			<div class="row">
+				<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-repeat="round in rounds">
+					<div class="dropdown">
+						<lable>{{round.name}}</lable>
+						<a class="dropdown-toggle" id="dropdown{{$index}}" role="button" data-toggle="dropdown">
+							<div class="input-group">
+								<input type="text" class="form-control" data-ng-model="round.date"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+							</div>
+						</a>
+						<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+							<datetimepicker data-ng-model="round.date" data-datetimepicker-config="{ dropdownSelector: '#dropdown{{$index}}' }" />
+						</ul>
+					</div>
+				</div>
+				<div class="col-md-6 col-md-offset-3 box-margin">
+					<button class="btn btn-success btn-block" ng-click="setDate()"> Set Dates </button>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
-<!--	tab content -->

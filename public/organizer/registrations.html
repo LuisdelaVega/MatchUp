@@ -1,151 +1,31 @@
-<!-- Nav tabs -->
-<ul class="nav nav-tabs nav-justified tab-padding-top">
-	<li class="active">
-		<a data-target="#spectators" data-toggle="tab">Spectators</a>
-	</li>
-	<li>
-		<a data-target="#tournament1" data-toggle="tab">Tournament 1</a>
-	</li>
-	<li>
-		<a data-target="#tournament2" data-toggle="tab">Tournament 2</a>
-	</li>
-</ul>
-
-<!-- Tab panes -->
-<div class="tab-content">
-	<div class="tab-pane fade in active" id="spectators">
-		<div class="panel-padding">
-			<div class="row box-margin">
-				<div class="col-md-10 col-md-offset-1">
-					<form role="form">
-						<div class="form-group">
-							<input class="form-control" id="searchinput" type="search" placeholder="Search Spectators..." />
-						</div>
-						<ul class="list-group">
-							<li class="list-group-item">
-								<div class="row">
-									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-										<img class="checkin-avatar" src="http://neptunolabs.com/images/badillo.jpg">
-										<h4 style="display:inline">Spectator <small style="margin-left:10px">VIP Pass</small></h4>
-									</div>
-									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-										<button class="btn btn-success pull-right">Check In</button>
-									</div>
-								</div>
-							</li>
-							<li class="list-group-item">
-								<div class="row">
-									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-										<img class="checkin-avatar" src="http://neptunolabs.com/images/badillo.jpg">
-										<h4 style="display:inline">Spectator<small style="margin-left:10px">One Day Pass</small></h4>
-									</div>
-									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-										<button class="btn btn-default pull-right">Check In</button>
-									</div>
-								</div>
-							</li>
-						</ul>
-					</form>
-
-				</div>
-			</div>
+<div class="row">
+	<div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+		<div class="list-group">
+			<a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="tournament in tournaments" ng-click="getRegistrationInfo($index)">
+				<h4 class="list-group-item-heading">{{tournament.name}}</h4>
+			</a>
 		</div>
 	</div>
-	<div class="tab-pane fade" id="tournament1">
-		<div class="panel-padding">
-			<div class="row box-margin">
-				<div class="col-md-10 col-md-offset-1">
-					<form role="form">
-						<div class="form-group">
-							<input class="form-control" id="searchinput" type="search" placeholder="Search Competitors..." />
-						</div>
-						<ul class="list-group">
-							<li class="list-group-item">
-								<div class="row">
-									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-										<img class="checkin-avatar" src="http://neptunolabs.com/images/badillo.jpg">
-										<h4 style="display:inline">Competitor</h4>
-									</div>
-									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-										<button class="btn btn-default pull-right">Check In</button>
-									</div>
-								</div>
-							</li>
-							<li class="list-group-item">
-								<div class="row">
-									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-										<img class="checkin-avatar" src="http://neptunolabs.com/images/badillo.jpg">
-										<h4 style="display:inline">Competitor</h4>
-									</div>
-									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-										<button class="btn btn-success pull-right">Check In</button>
-									</div>
-								</div>
-							</li>
-							<li class="list-group-item">
-								<div class="row">
-									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-										<img class="checkin-avatar" src="http://neptunolabs.com/images/badillo.jpg">
-										<h4 style="display:inline">Competitor</h4>
-									</div>
-									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-										<button class="btn btn-default pull-right">Check In</button>
-									</div>
-								</div>
-							</li>
-						</ul>
-					</form>
+	<div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+		<div class="box">
+			<form role="form">
+				<div class="form-group">
+					<input class="form-control" type="search" placeholder="Search Users..." ng-model="item"/>
 				</div>
-			</div>
-		</div>
-	</div>
-	<div class="tab-pane fade" id="tournament2">
-		<div class="panel-padding">
-			<div class="row box-margin">
-				<div class="col-md-10 col-md-offset-1">
-					<form role="form">
-						<div class="form-group">
-							<input class="form-control" id="searchinput" type="search" placeholder="Search Competitors..." />
+				<ul class="list-group">
+					<li class="list-group-item" ng-repeat="item in signups | filter:item | orderBy: 'customer_tag'">
+						<div class="row">
+							<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+								<img class="checkin-avatar" ng-src="{{item.customer_profile_pic}}">
+								<h4 style="display:inline">{{item.customer_tag}}<small style="margin-left:10px">({{item.customer_first_name}} {{item.customer_last_name}})</small><small style="margin-left:10px" ng-if="index==0">{{item.spec_fee_name}}</small></h4>
+							</div>
+							<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+								<button class="btn btn-default pull-right" ng-class="{ 'btn-success' : item.check_in}" ng-click="checkIn(item)">Check In</button>
+							</div>
 						</div>
-						<ul class="list-group">
-							<li class="list-group-item">
-								<div class="row">
-									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-										<img class="checkin-avatar" src="http://neptunolabs.com/images/badillo.jpg">
-										<h4 style="display:inline">Competitor</h4>
-									</div>
-									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-										<button class="btn btn-success pull-right">Check In</button>
-									</div>
-								</div>
-							</li>
-							<li class="list-group-item">
-								<div class="row">
-									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-										<img class="checkin-avatar" src="http://neptunolabs.com/images/badillo.jpg">
-										<h4 style="display:inline">Competitor</h4>
-									</div>
-									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-										<button class="btn btn-default pull-right">Check In</button>
-									</div>
-								</div>
-							</li>
-							<li class="list-group-item">
-								<div class="row">
-									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-										<img class="checkin-avatar" src="http://neptunolabs.com/images/badillo.jpg">
-										<h4 style="display:inline">Competitor</h4>
-									</div>
-									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-										<button class="btn btn-success pull-right">Check In</button>
-									</div>
-								</div>
-							</li>
-						</ul>
-					</form>
-				</div>
-			</div>
+					</li>
+				</ul>
+			</form>
 		</div>
 	</div>
 </div>
-<!--	tab content -->

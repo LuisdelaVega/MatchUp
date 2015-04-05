@@ -1,71 +1,32 @@
 <h1>Reports</h1>
 <div class="row">
-	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding">
-		<div class="box cursor" data-toggle="modal" data-target="#notResolvedModal">
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding" ng-repeat="item in reports">
+		<div class="box cursor" ng-click="reportModal($index)">
 			<div class="media">
-				<div class="media-left">
-					<a href="#"> <img class="media-object match-avatar" src="http://neptunolabs.com/images/badillo.jpg"> </a>
+				<div class="media-left" ng-if="item.img">
+					<img class="media-object match-avatar" ng-src="{{item.img}}">
 				</div>
 				<div class="media-body">
 					<div class="row">
 						<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-							<h4>Score dispute</h4>
+							<h4>{{item.type}}</h4>
 							<p>
-								Tournament name
-								<br> Round 3 Match 1 set 3
+								{{item.tournamentName}}
+								<br> {{item.round}}
+								<br> {{item.station}}
+								<br> {{item.date}}
 							</p>
 						</div>
 						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 							<div class="report-status">
-								<h4 style="text-align:center; color: red">Not Resolved</h4>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding">
-		<div class="box cursor" data-toggle="modal" data-target="#resolvedModal">
-			<div class="media">
-				<div class="media-left">
-					<a href="#"> <img class="media-object match-avatar" src="http://neptunolabs.com/images/badillo.jpg"> </a>
-				</div>
-				<div class="media-body">
-					<div class="row">
-						<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-							<h4>Faulty Equipment</h4>
-							<p>
-								Tournament name
-								<br> Round 2 Match 2 set 1
-							</p>
-						</div>
-						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
-							<div class="report-status">
-								<h4 style="text-align:center; color: green">Resolved</h4>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding">
-		<div class="box cursor" data-toggle="modal" data-target="#noshowReport">
-			<div class="media">
-				<div class="media-body">
-					<div class="row">
-						<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-							<h4>No Show</h4>
-							<p>
-								Tournament name
-								<br> Semifinals Match 2 set 2
-							</p>
-						</div>
-						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
-							<div class="no-pic-report-status">
-								<h4 style="text-align:center; color: green">Resolved</h4>
+								<div ng-switch on="item.status">
+									<div ng-switch-when="true">
+										<h4 style="text-align:center; color: green">Resolved</h4>
+									</div>
+									<div ng-switch-default>
+										<h4 style="text-align:center; color: red">Not Resolved</h4>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -76,41 +37,34 @@
 </div>
 
 <!-- modal not resolved report-->
-<div class="modal fade" id="notResolvedModal">
+<div class="modal fade" id="reportModal">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 class="modal-title">Score Dispute
-						<br>
-						<small>Station 2</small>
-						<br>
-						<small>Round 3 Match 1 set 3</small>
-						<br>
-						<small>Status: </small><small style="color: red">Not Resolved</small></h4>
+				<h4 class="modal-title">{{reports[index].type}}</h4>
+				<p>{{reports[index].station}}
+				<br>{{reports[index].round}}
+				<br>{{reports[index].date}}</p>
+				<div ng-switch on="reports[index].status">
+					<div ng-switch-when="true">
+						<p style="color: green">Resolved</p>
+					</div>
+					<div ng-switch-default>
+						<p style="color: red">Not Resolved</p>
+					</div>
+				</div>
 			</div>
 			<div class="modal-body">
-				<div class="row">
-					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-						<img style="width: 100%" src="http://neptunolabs.com/images/badillo.jpg">
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-						<h4>Issued by: Usertag
-								<br>
-								<small>Date issued</small>
-								<br>
-								<small>Hashtag before they sold out selvage Echo Park butcher tofu. Master cleanse salvia whatever kogi, forage irony mlkshk bicycle rights vegan Echo Park organic pug normcore. Fap plaid typewriter, narwhal polaroid put a bird on it yr PBR hella paleo Echo Park banh mi gastropub. Umami banjo photo booth Pinterest four dollar toast occupy deep v, freegan polaroid. Fashion axe vinyl street art. </small></h4>
-					</div>
-				</div>
+				<img style="width: 100%" ng-src="{{reports[index].img}}">
+				<p>{{reports[index].content}}</p>
 			</div>
 			<div class="modal-footer">
 				<div class="col-xs-12 col-md-6 col-lg-6">
-					<div class="row" align="center">
-						<button type="button" style="width: 80%" class="btn btn-primary" data-dismiss="modal">
+					<div class="row" align="center" ng-if="!reports[index].status">
+						<button type="button" style="width: 80%" class="btn btn-primary" data-dismiss="modal" ng-click="resolve()">
 							Resolve
 						</button>
 					</div>
@@ -121,93 +75,6 @@
 							Close
 						</button>
 					</div>
-				</div>
-			</div>
-		</div>
-		<!-- /.modal content -->
-	</div>
-	<!-- /.modal-dialog -->
-</div>
-<!-- /.modal fade -->
-
-<!-- modal resolved report-->
-<div class="modal fade" id="resolvedModal">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-				<h4 class="modal-title">Faulty Equipment
-						<br>
-						<small>Station 4</small>
-						<br>
-						<small>Round 2 Match 2 set 1</small>
-						<br >
-						<small>Status: </small><small style="color: green">Resolved</small></h4>
-			</div>
-			<div class="modal-body">
-				<div class="row">
-					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-						<img style="width: 100%" src="http://neptunolabs.com/images/badillo.jpg">
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-						<h4>Issued by: Usertag
-								<br>
-								<small>Date issued</small>
-								<br>
-								<small>Hashtag before they sold out selvage Echo Park butcher tofu. Master cleanse salvia whatever kogi, forage irony mlkshk bicycle rights vegan Echo Park organic pug normcore. Fap plaid typewriter, narwhal polaroid put a bird on it yr PBR hella paleo Echo Park banh mi gastropub. Umami banjo photo booth Pinterest four dollar toast occupy deep v, freegan polaroid. Fashion axe vinyl street art. </small></h4>
-					</div>
-				</div>
-			</div>
-			<div class="modal-footer">
-				<div class="row" align="center">
-					<button type="button" style="width: 75%" class="btn btn-default" data-dismiss="modal">
-						Close
-					</button>
-				</div>
-			</div>
-		</div>
-		<!-- /.modal content -->
-	</div>
-	<!-- /.modal-dialog -->
-</div>
-<!-- /.modal fade -->
-
-<!-- modal no show report-->
-<div class="modal fade" id="noshowReport">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-				<h4 class="modal-title">No Show
-						<br>
-						<small>Station 2</small>
-						<br>
-						<small>Semifinals Match 2 set 2</small>
-						<br>
-						<small>Status: </small><small style="color: green">Resolved</small></h4>
-			</div>
-			<div class="modal-body">
-				<div class="row">
-					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-						<h4>Issued by: Usertag
-								<br>
-								<small>Date issued</small>
-								<br>
-								<small>Hashtag before they sold out selvage Echo Park butcher tofu. Master cleanse salvia whatever kogi, forage irony mlkshk bicycle rights vegan Echo Park organic pug normcore. Fap plaid typewriter, narwhal polaroid put a bird on it yr PBR hella paleo Echo Park banh mi gastropub. Umami banjo photo booth Pinterest four dollar toast occupy deep v, freegan polaroid. Fashion axe vinyl street art. </small></h4>
-					</div>
-				</div>
-			</div>
-			<div class="modal-footer">
-				<div class="row" align="center">
-					<button type="button" style="width: 75%" class="btn btn-default" data-dismiss="modal">
-						Close
-					</button>
 				</div>
 			</div>
 		</div>
