@@ -1,142 +1,16 @@
 <h1>Subscriptions</h1>
 <div class="row">
-	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding">
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding" ng-repeat ="sub in subscriptions">
 		<div class="box">
 			<div class="media">
 				<div class="media-left media-middle">
-					<a href="my_profile.html"> <img class="media-object match-avatar" src="http://neptunolabs.com/images/badillo.jpg"> </a>
+					<a ng-click="goToUser(sub.customer_username)"> <img class="media-object match-avatar" ng-src="{{sub.customer_profile_pic}}"> </a>
 				</div>
 				<div class="media-body">
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-						<h4>Usertag</h4>
+						<h4>{{sub.customer_tag}}</h4>
 						<p>
-							Craft beer skateboard put a bird on it gentrify viral occupy. Four dollar toast meh messenger bag crucifix pour-over. Normcore chambray leggings, selfies cardigan health goth Neutra hashtag bitters YOLO readymade 8-bit.
-						</p>
-						<button type="button" class="btn btn-default btn-block">
-							<i class="fa fa-user"></i>
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding">
-		<div class="box">
-			<div class="media">
-				<div class="media-left media-middle">
-					<a href="my_profile.html"> <img class="media-object match-avatar" src="http://neptunolabs.com/images/badillo.jpg"> </a>
-				</div>
-				<div class="media-body">
-					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-						<h4>Usertag</h4>
-						<p>
-							Craft beer skateboard put a bird on it gentrify viral occupy. Four dollar toast meh messenger bag crucifix pour-over. Normcore chambray leggings, selfies cardigan health goth Neutra hashtag bitters YOLO readymade 8-bit.
-						</p>
-						<button type="button" class="btn btn-default btn-block">
-							<i class="fa fa-user"></i>
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding">
-		<div class="box">
-			<div class="media">
-				<div class="media-left media-middle">
-					<a href="my_profile.html"> <img class="media-object match-avatar" src="http://neptunolabs.com/images/badillo.jpg"> </a>
-				</div>
-				<div class="media-body">
-					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-						<h4>Usertag</h4>
-						<p>
-							Craft beer skateboard put a bird on it gentrify viral occupy. Four dollar toast meh messenger bag crucifix pour-over. Normcore chambray leggings, selfies cardigan health goth Neutra hashtag bitters YOLO readymade 8-bit.
-						</p>
-						<button type="button" class="btn btn-default btn-block">
-							<i class="fa fa-user"></i>
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding">
-		<div class="box">
-			<div class="media">
-				<div class="media-left media-middle">
-					<a href="my_profile.html"> <img class="media-object match-avatar" src="http://neptunolabs.com/images/badillo.jpg"> </a>
-				</div>
-				<div class="media-body">
-					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-						<h4>Usertag</h4>
-						<p>
-							Craft beer skateboard put a bird on it gentrify viral occupy. Four dollar toast meh messenger bag crucifix pour-over. Normcore chambray leggings, selfies cardigan health goth Neutra hashtag bitters YOLO readymade 8-bit.
-						</p>
-						<button type="button" class="btn btn-default btn-block">
-							<i class="fa fa-user"></i>
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-
-	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding">
-		<div class="box">
-			<div class="media">
-				<div class="media-left media-middle">
-					<a href="my_profile.html"> <img class="media-object match-avatar" src="http://neptunolabs.com/images/badillo.jpg"> </a>
-				</div>
-				<div class="media-body">
-					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-						<h4>Usertag</h4>
-						<p>
-							Craft beer skateboard put a bird on it gentrify viral occupy. Four dollar toast meh messenger bag crucifix pour-over. Normcore chambray leggings, selfies cardigan health goth Neutra hashtag bitters YOLO readymade 8-bit.
-						</p>
-						<button type="button" class="btn btn-default btn-block">
-							<i class="fa fa-user"></i>
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding">
-		<div class="box">
-			<div class="media">
-				<div class="media-left media-middle">
-					<a href="my_profile.html"> <img class="media-object match-avatar" src="http://neptunolabs.com/images/badillo.jpg"> </a>
-				</div>
-				<div class="media-body">
-					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-						<h4>Usertag</h4>
-						<p>
-							Craft beer skateboard put a bird on it gentrify viral occupy. Four dollar toast meh messenger bag crucifix pour-over. Normcore chambray leggings, selfies cardigan health goth Neutra hashtag bitters YOLO readymade 8-bit.
-						</p>
-						<button type="button" class="btn btn-default btn-block">
-							<i class="fa fa-user"></i>
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding">
-		<div class="box">
-			<div class="media">
-				<div class="media-left media-middle">
-					<a href="my_profile.html"> <img class="media-object match-avatar" src="http://neptunolabs.com/images/badillo.jpg"> </a>
-				</div>
-				<div class="media-body">
-					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-						<h4>Usertag</h4>
-						<p>
-							Craft beer skateboard put a bird on it gentrify viral occupy. Four dollar toast meh messenger bag crucifix pour-over. Normcore chambray leggings, selfies cardigan health goth Neutra hashtag bitters YOLO readymade 8-bit.
+							 {{somebio}}
 						</p>
 						<button type="button" class="btn btn-default btn-block">
 							<i class="fa fa-user"></i>

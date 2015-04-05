@@ -1,13 +1,13 @@
 <div class="box">
 	<h1>Genres</h1>
 	<div class="row">
-		<div class="col-md-3 col-sm-4 col-xs-6">
-			<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg" alt="..." ui-sref="app.genreProfile">
+		<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat= "genre in genres">
+			<a class="thumbnail" ng-click ="goToGenreProfile(genre.genre_name)"> <img ng-src="{{genre.genre_image}}" alt="{{genre.genre_name}}">
 				<hr class="hr-custom-padding">
 				<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 						overflow: hidden;">
-					<p class="thumbnail-title" align="center" ui-sref="app.genreProfile">
-						Genre Name
+					<p class="thumbnail-title" align="center" >
+						{{genre.genre_name}}
 					</p>
 				</div>
 			</a>

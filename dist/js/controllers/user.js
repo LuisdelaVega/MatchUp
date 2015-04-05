@@ -80,11 +80,31 @@ myApp.controller('profileSummaryController', function($scope, $state, $http, $st
 
 
 	$scope.goToTeams = function(username) {
-		$state.go("app.teams", {
+		$state.go("app.userTeams", {
 			"username" : username
 		}) //
 
 	}
+	
+		$scope.goToUserOrganizations = function(user){
+		$state.go("app.userOrganizations", {
+			"username" : user
+		}) //
+	}
+	
+	$scope.goToUserEvents = function(user){
+		$state.go("app.userOrganizations", {
+			"username" : user
+		}) //
+	}
+	
+	$scope.goToUserStandings = function(user){
+		$state.go("app.userOrganizations", {
+			"username" : user
+		}) //
+	}
+	
+	
 });
 
 myApp.controller('profileEventsController', ['$scope', '$http', '$stateParams', '$window', 'sharedDataService', '$state',
@@ -97,75 +117,19 @@ function($scope, $http, $stateParams, $window, sharedDataService, $state) {
 			'Authorization' : "Bearer " + $window.sessionStorage.token
 		}
 	};
+ 	$http.get('http://136.145.116.232/matchup/profile/' + $stateParams.user + '', config).success(function(data, status, headers, config) {
+		$scope.events = angular.fromJson(data);
 
-	//Your upcoming events
-	$http.get('./../dist/json/myUpcomingEvents.json', config).success(function(data) {
-		$scope.upcomingEventsData = data;
+		
 
-		//Your live events
-		$http.get('./../dist/json/myLiveEvents.json', config).success(function(data) {
-			$scope.liveEventsData = data;
 
-			//YOUR past events
-			$http.get('./../dist/json/myPastEvents.json', config).success(function(data) {
-				$scope.pastEventsData = data;
-				//console.log($scope.eventsData);
-			}).error(function(data, status) {
 
-				if (status == 404 || status == 401)
-					$state.go(status.toString);
-			});
-		}).error(function(data, status) {
-
-			if (status == 404 || status == 401)
-				$state.go(status.toString);
-		});
-	}).error(function(data, status) {
-
-		if (status == 404 || status == 401)
-			$state.go(status.toString);
+	}).error(function(data, status, headers, config) {
+		console.log("error in game profile controller.");
 	});
 
-	// $http.get('http://136.145.116.232/matchup/profile/' + $stateParams.username + '/events', config).success(function (data) {
-	// 		$scope.eventsData = angular.fromJson(data);
-	// }).error(function (err) {
-	// 		console.log(err);
-	// });
 
-	$scope.goToEvent = function(eventName, date, location) {
-
-		eventName = eventName.replace(" ", "%20");
-		var params = [eventName, date, location];
-
-		$http.get('http://136.145.116.232/matchup/events/' + eventName + '?date=' + date + '&location=' + location + '', config).success(function(data, status, headers, config) {
-
-			var eventData = angular.fromJson(data);
-
-			var isHosted = eventData.hosted;
-
-			sharedDataService.set(params);
-
-			if (isHosted) {
-				$state.go('app.eventpremium.summary', {
-					"eventname" : eventName,
-					"date" : date,
-					"location" : location
-				});
-			} else {
-				$state.go('app.regularevent', {
-					"eventname" : eventName,
-					"date" : date,
-					"location" : location
-				});
-			}
-
-		}).error(function(data, status) {
-
-			if (status == 404 || status == 401)
-				$state.go(status.toString);
-		});
-
-	};
+	
 
 }]);
 
@@ -205,10 +169,14 @@ function($scope, $http, $stateParams, $window, $state) {
 
 }]);
 
-myApp.controller('profileOrganizationsController', ['$scope', '$http', '$stateParams', '$window', '$state',
+myApp.controller('userOrganizationsController', ['$scope', '$http', '$stateParams', '$window', '$state',
 function($scope, $http, $stateParams, $window, $state) {
 
 	$scope.customerUsername = $stateParams.username;
+	if($scope.customerUsername == $window.sessionStorage.user)
+		$scope.isUser= true;
+	else
+		$scope.isUser= false;
 
 	var config = {
 		headers : {
@@ -226,13 +194,76 @@ function($scope, $http, $stateParams, $window, $state) {
 			$state.go(status.toString);
 	});
 
-	$scope.gotToProfile = function(customerUsername) {
-		$state.go("app.profile.summary", {
-			"username" : customerUsername
+	$scope.gotToOrganizationProfile = function(organizationName) {
+		$state.go("app.organizationProfile", {
+			"organizationName" : organizationName
 		});
 	};
 
 }]);
+
+
+myApp.controller('userTeamsController', ['$scope', '$http', '$stateParams', '$window', '$state',
+function($scope, $http, $stateParams, $window, $state) {
+
+	$scope.customerUsername = $stateParams.username;
+	if($scope.customerUsername == $window.sessionStorage.user)
+		$scope.isUser= true;
+	else
+		$scope.isUser= false;
+
+	var config = {
+		headers : {
+			'Authorization' : "Bearer " + $window.sessionStorage.token
+		}
+	};
+
+	$http.get('http://136.145.116.232/matchup/profile/' + $stateParams.username + '/teams', config).success(function(data) {
+
+		$scope.teamsData = angular.fromJson(data);
+
+	}).error(function(data, status) {
+
+		if (status == 404 || status == 401)
+			$state.go(status.toString);
+	});
+
+	$scope.gotToTeamsProfile = function(teamName) {
+		$state.go("app.teamProfile", {
+			"teamName" : teamName
+		});
+	};
+
+}]);
+
+
+
+myApp.controller('mySubcriptionsController', ['$scope', '$http', '$stateParams', '$window', '$state',
+function($scope, $http, $stateParams, $window, $state) {
+
+	$scope.customerUsername = $window.sessionStorage.user;
+	$scope.somebio = "I need to put some bio here, I know";
+	
+	var config = {
+		headers : {
+			'Authorization' : "Bearer " + $window.sessionStorage.token
+		}
+	};
+	$http.get('http://136.145.116.232/matchup/profile/' + $scope.customerUsername + '/subscriptions', config).success(function(data) {
+
+		$scope.subscriptions = angular.fromJson(data);
+		
+
+	}).error(function(data, status) {
+
+		if (status == 404 || status == 401)
+			$state.go(status.toString);
+	});
+
+
+}]);
+
+
 
 myApp.controller('subscriptionsController', ['$scope', '$http',
 function($scope, $http) {

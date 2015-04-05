@@ -53,7 +53,8 @@ myApp.config(function ($stateProvider, $urlRouterProvider) {
         })
         .state('app.generalEvents', {
             url: "/generalEvents",
-            templateUrl: "event/general_events.html"
+            templateUrl: "event/general_events.html",
+            controller: "generalViewController" 
         })
         .state('app.myEvents', {
             url: "/myEvents",
@@ -127,8 +128,9 @@ myApp.config(function ($stateProvider, $urlRouterProvider) {
          *
          */
         .state('app.tournament', {
-            url: "/tournament",
-            templateUrl: "tournament/tournament.html"
+            url: "/:eventname/tournament/:tournament/:date/:location",
+            templateUrl: "tournament/tournament.html",
+            controller: "tournamentController"
         })
         .state('app.tournamentLive', {
             url: "/tournamentLive",
@@ -146,20 +148,22 @@ myApp.config(function ($stateProvider, $urlRouterProvider) {
             controller: "profileSummaryController"
         })
         .state('app.userStandings', {
-            url: "/userStandings",
+            url: "/user/:username/standings",
             templateUrl: "user/user_standings.html"
         })
         .state('app.userTeams', {
-            url: "/userTeams",
-            templateUrl: "user/user_teams.html"
+            url: "/user/:username/teams",
+            templateUrl: "user/user_teams.html",
+            controller: "userTeamsController"
         })
         .state('app.userEvents', {
-            url: "/userEvents",
+            url: "/user/:username/events",
             templateUrl: "user/user_events.html"
         })
         .state('app.userOrganizations', {
-            url: "/userOrganizations",
-            templateUrl: "user/user_organizations.html"
+            url: "/user/:username/organizations",
+            templateUrl: "user/user_organizations.html",
+            controller: "userOrganizationsController"
         })
         .state('app.editProfile', {
             url: "/editProfile",
@@ -169,40 +173,45 @@ myApp.config(function ($stateProvider, $urlRouterProvider) {
             url: "/myMatchups",
             templateUrl: "user/my_matchups.html"
         })
-        .state('app.subscribed', {
-            url: "/subscribed",
-            templateUrl: "user/subscribed.html"
+        .state('app.subcriptions', {
+            url: "/subcriptions",
+            templateUrl: "user/subscribed.html",
+            controller: "mySubcriptionsController"
         })
         /**
          *	Game Profiles
          *
          */
         .state('app.gameProfile', {
-            url: "/gameProfile",
-            templateUrl: "game/game_profile.html"
+            url: "/gameProfile/:game",
+            templateUrl: "game/game_profile.html",
+            controller: "gameProfileController" 
         })
         .state('app.popularGames', {
             url: "/popularGames",
-            templateUrl: "game/popular_games.html"
+            templateUrl: "game/popular_games.html",
+            controller: "gameViewController" 
         })
         /**
          *	Genre Profiles
          *
          */
         .state('app.genreProfile', {
-            url: "/genreProfile",
-            templateUrl: "genre/genre_profile.html"
+            url: "/genreProfile/:genre",
+            templateUrl: "genre/genre_profile.html",
+            controller: "genreProfileController"
         })
         .state('app.genres', {
             url: "/genres",
-            templateUrl: "genre/genres.html"
+            templateUrl: "genre/genres.html",
+            controller: "genreViewController"
         })
         /**
          *	Team Stuff
          *
          */
         .state('app.teamProfile', {
-            url: "/teamProfile",
+            url: "/team/:teamName/profile",
             templateUrl: "team/team_profile.html"
         })
         .state('app.teamStandings', {
@@ -213,10 +222,6 @@ myApp.config(function ($stateProvider, $urlRouterProvider) {
             url: "/editTeam",
             templateUrl: "team/edit_team.html"
         })
-        .state('app.teams', {
-            url: "/user/:username/teams",
-            templateUrl: "team/my_teams.html"
-        })
         .state('app.createTeam', {
             url: "/createTeam",
             templateUrl: "team/create_team.html"
@@ -226,7 +231,7 @@ myApp.config(function ($stateProvider, $urlRouterProvider) {
          *
          */
         .state('app.organizationProfile', {
-            url: "/organizationProfile",
+            url: "/organization/:organizationName",
             templateUrl: "organization/organization_profile.html"
         })
         .state('app.editOrganization', {
@@ -286,4 +291,6 @@ myApp.factory('sharedDataService', function () {
     }
 
 })
+
+
 

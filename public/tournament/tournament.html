@@ -1,4 +1,4 @@
-<div class="blur-cover">
+<div class="blur-cover" ng-style="{'background': cover}">
 </div>
 <!-- Nav tabs -->
 <ul class="nav nav-tabs nav-justified tab-padding-top">
@@ -15,27 +15,34 @@
 	<div class="tab-pane fade in active" id="main">
 		<div class="panel-padding">
 			<div class="box box-margin">
-				<p class="info-title">Tournament Name
-					<br><small>Event Name</small>
+				<p class="info-title">{{currentTournament.tournament_name}}
+					<br><small>{{eventInfo.event_name}}</small>
 				</p>
 				<div class="row">
 					<div class="col-xs-12 col-md-6 col-lg-6">
 						<h4>Rules</h4>
-						<p class="info-paragraph">Raw denim Truffaut proident wolf, asymmetrical mollit exercitation. Tousled est art party wayfarers. Cupidatat ullamco gluten-free Schlitz listicle. Fixie literally normcore, DIY eu jean shorts Truffaut Helvetica actually mlkshk put a bird on it cold-pressed tilde. Tempor biodiesel Shoreditch ennui assumenda skateboard. Literally fixie fanny pack commodo organic, plaid raw denim viral delectus cornhole church-key tofu master cleanse pariatur. Food truck viral anim tilde aute PBR consequat leggings, aliqua single-origin coffee salvia quinoa enim qui wayfarers.</p>
+						<p class="info-paragraph"> {{currentTournament.tournament_rules}}</p>
 					</div>
 					<div class="col-xs-12  col-md-6 col-lg-6">
 						<h4>General Info</h4>
-						<dl class="info-paragraph">
+						<dl class="info-paragraph" ng-if="!hostedBy">
 							<dt>Tournament Start Date</dt>
-							<dd>Jan 9, 2015 8:00PM</dd>
+							<dd>{{currentTournament.tournament_start_date  | date: 'medium'}}</dd>
 							<dt>Event Start Date (Check-in)</dt>
-							<dd>Jan 5, 2015 12:00AM</dd>
+							<dd>{{eventInfo.event_start_date  | date: 'medium'}}</dd>
 							<dt>Check in Deadline</dt>
-							<dd>Jan 19, 2015 11:00PM</dd>
+							<dd>{{currentTournament.tournament_check_in_deadline  | date: 'medium'}}</dd>
 							<dt>Location</dt>
-							<dd>259 Blvd. Alfonso Valdez Cabian, Mayagüez</dd>
+							<dd>{{eventInfo.event_location  | date: 'medium'}}</dd>
 							<dt>Venue</dt>
-							<dd>Coliseo Mangual</dd>
+							<dd>{{eventInfo.event_venue  | date: 'medium'}}</dd>
+						</dl>
+						<dl class="info-paragraph" ng-if="hostedBy">
+							<dt>Tournament Start Date</dt>
+							<dd>{{currentTournament.tournament_start_date  | date: 'medium'}}</dd>
+						</br>
+							<dt>Check in Deadline</dt>
+							<dd>{{currentTournament.tournament_check_in_deadline  | date: 'medium'}}</dd>
 						</dl>
 					</div>
 				</div>
@@ -43,41 +50,73 @@
 				<div class="row">
 					<div class="col-lg-4 col-md-4 col-xs-12">
 						<a class="thumbnail">
-							<img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg">
-							<h4 align="center">League of Legends</h4>
+							<img ng-src="{{currentTournament.game_image}}">
+							<h4 align="center">{{currentTournament.game_name}}</h4>
 						</a>
 					</div>
 					<div class="col-lg-4 col-md-6 col-xs-12">
-						<dl class="info-paragraph">
+						<dl class="info-paragraph" ng-if="groupStage">
 							<dt>Tournament Type</dt>
-							<dd>Two Stage</dd>
+							<dd>{{currentTournament.tournament_type}}</dd>
 							<dt>Format</dt>
-							<dd>Single Elimination</dd>
+							<dd>{{currentTournament.tournament_format}}</dd>
 							<dt># of competitors per group</dt>
-							<dd>4</dd>
+							<dd>{{currentTournament.number_of_people_per_group}}</dd>
 							<dt># of competitors advancing</dt>
-							<dd>2</dd>
+							<dd>{{currentTournament.amount_of_winners_per_group}}</dd>
 						</dl>
+						<dl class="info-paragraph" ng-if="!groupStage">
+							<dt>Tournament Type</dt>
+							<dd>{{currentTournament.tournament_type}}</dd>
+							<dt>Format</dt>
+							<dd>{{currentTournament.tournament_format}}</dd>
+							<dt>Score Type</dt>
+							<dd>{{ currentTournament.score_type}}</dd>
+						</dl>
+						
+						
+						
 					</div>
 					<div class="col-lg-4 col-md-6 col-xs-12">
-						<dl class="info-paragraph">
+						<dl class="info-paragraph" ng-if="groupStage">
 							<dt>Score Type</dt>
-							<dd>By points</dd>
+							<dd>{{ currentTournament.score_type}}</dd>
 							<dt>Team Based</dt>
-							<dd>Yes (Size 5)</dd>
+							<dd ng-if="requiresTeam"> Yes (Size 5)</dd>
+							<dd ng-if="!requiresTeam"> Yes (Size 5)</dd>
+
 							<dt>Prize Pool</dt>
-							<dd>$50.00</dd>
+							<dd>{{currentTournament.seed_money}}</dd>
 							<dt>Competitor Fee</dt>
-							<dd>$10.00</dd>
+							<dd>{{currentTournament.competitor_fee}}</dd>
+						</dl>
+						<dl class="info-paragraph" ng-if="!groupStage">
+							<dt>Team Based</dt>
+							<dd ng-if="requiresTeam"> Yes (Size 5)</dd>
+							<dd ng-if="!requiresTeam"> No</dd>
+							<dt>Prize Pool</dt>
+							<dd>{{currentTournament.seed_money}}</dd>
+							<dt>Competitor Fee</dt>
+							<dd>{{currentTournament.competitor_fee}}</dd>
 						</dl>
 					</div>
 				</div>
-				<p class="info-title">Hosted By</p>
-				<div class="row">
+				
+				<div class="row" ng-if="hostedBy">
+					<p class="info-title">Hosted By</p>
 					<div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 center-block" style="float:none">
 						<a class="thumbnail">
-							<img src="http://neptunolabs.com/images/badillo.jpg">
-							<h3 align="center">Organizer</h3>
+							<img ng-src="{{host.organization_logo}}">
+							<h3 align="center">{{eventInfo.host}}</h3>
+						</a>
+					</div>
+				</div>
+				<div class="row" ng-if="!hostedBy">
+					<p class="info-title">Hosted By</p>
+					<div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 center-block" style="float:none">
+						<a class="thumbnail">
+							<img ng-src="{{creator.customer_profile_pic}}">
+							<h3 align="center">{{eventInfo.creator}}</h3>
 						</a>
 					</div>
 				</div>
@@ -85,7 +124,7 @@
 					<div class="btn-group" role="group">
 						<button type="button" class="btn btn-primary" data-target="#competitorSignUpModal" data-toggle="modal">Competitor Sign Up</button>
 					</div>
-					<div class="btn-group" role="group">
+					<div class="btn-group" role="group" ng-if ="is_organizer">
 						<button type="button" class="btn btn-default">Edit</button>
 					</div>
 				</div>
@@ -96,7 +135,7 @@
 		<div class="panel-padding">
 			<div class="widget-box">
 				<div class="widget-header bordered-bottom bordered-themesecondary">
-					<h4 class="widget-title themesecondary">Tournament Capacity(12/32)</h4>
+					<h4 class="widget-title themesecondary">Tournament Capacity({{numComp}}/{{currentTournament.tournament_max_capacity}})</h4>
 				</div>
 				<!--Widget Header-->
 				<div class="widget-body">

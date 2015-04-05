@@ -48,7 +48,7 @@
                     <div class="col-xs-12 col-md-4 col-lg-6">
                         <h4>Hosted by</h4>
                         <a class="thumbnail" style="display:inline-block">
-                            <img class="event-organzier-logo" src="http://neptunolabs.com/images/badillo.jpg">
+                            <img class="event-organzier-logo" ng-src="{{hostInfo.organization_cover_photo}}">
                         </a>
                     </div>
                 </div>
@@ -79,7 +79,7 @@
                 <p class="info-title">Tournaments</p>
                 <div class="row">
                     <div class="col-lg-3 col-md-4 col-xs-6" ng-repeat = "tournament in tournamentsInfo">
-                        <a class="thumbnail" ui-sref="app.tournament">
+                        <a class="thumbnail" ng-click="goToTournament(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location, tournament.tournament_name)">
                             <img ng-src="{{tournament.game_image}}">
                             <h4 align="center">{{tournament.tournament_name}}</h4>
                         </a>

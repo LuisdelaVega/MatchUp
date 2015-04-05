@@ -91,6 +91,15 @@ myApp.controller('eventPremiumSummaryController', function($scope, $state, $http
 				$scope.isOngoing = false;
 			else
 				$scope.isOngoing = true;
+				
+					//Get host information
+					$http.get('http://136.145.116.232/matchup/organizations/' + $scope.eventInfo.host +'', config).success(function(data, status, headers, config) {
+
+						$scope.hostInfo = angular.fromJson(data);
+
+					}).error(function(data, status, headers, config) {
+						console.log("error in eventPremiumSummaryController");
+					});
 
 			//Get News posted for this particular server
 			$http.get('http://136.145.116.232/matchup/events/' + $stateParams.eventname + '/news?date=' + $stateParams.date + '&location=' + $stateParams.location + '', config).success(function(data, status, headers, config) {
@@ -156,18 +165,7 @@ myApp.controller('eventPremiumSummaryController', function($scope, $state, $http
 		sharedDataService.set(selectedTournament);
 		$state.go("app.writereview")
 	}
-	//go to a specific tournament in this event
-	$scope.goToTournament = function(eventName, eventDate, eventLocation, selectedTournament) {
-
-		eventName = eventName.replace(" ", "%20");
-		var params = [eventName, eventDate, eventLocation];
-		sharedDataService.set(selectedTournament);
-		$state.go("app.regularevent", {
-			eventname : eventName,
-			date : eventDate,
-			location : eventLocation
-		})
-	}
+ 
 	//go to a specific users in an event
 	$scope.goToUser = function(customer_username) {
 
