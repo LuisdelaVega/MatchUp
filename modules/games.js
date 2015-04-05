@@ -1,6 +1,6 @@
 //TODO Implement offsets like in Spruce
 //TODO Implement all games and popular games in separate routes/queries. Same for genres
-var getPopularGames = function(res, pg, conString) {
+var getPopularGames = function(res, pg, conString, log) {
 	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -16,18 +16,22 @@ var getPopularGames = function(res, pg, conString) {
 		});
 		query.on('error', function(error) {
 			done();
-			console.log(error);
 			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
 		});
 		query.on("end", function(result) {
 			done();
-			res.json(result.rows);
+			res.status(200).json(result.rows);
+			log.info({
+				res : res
+			}, 'done response');
 		});
 	});
-	//pg.end();
 };
 
-var getPopularGenres = function(res, pg, conString) {
+var getPopularGenres = function(res, pg, conString, log) {
 	// Query the DB to find the local Events
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -43,15 +47,19 @@ var getPopularGenres = function(res, pg, conString) {
 		});
 		query.on('error', function(error) {
 			done();
-			console.log(error);
 			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
 		});
 		query.on("end", function(result) {
 			done();
-			res.json(result.rows);
+			res.status(200).json(result.rows);
+			log.info({
+				res : res
+			}, 'done response');
 		});
 	});
-	//pg.end();
 };
 
 // *Depreciated*
@@ -82,7 +90,6 @@ var getPopularStuff = function(res, pg, conString) {
 			});
 			query.on('error', function(error) {
 				done();
-				console.log(error);
 				res.status(500).send(error);
 			});
 			query.on("end", function(result) {
@@ -95,7 +102,6 @@ var getPopularStuff = function(res, pg, conString) {
 			});
 		});
 	});
-	//pg.end();
 };
 
 module.exports.getPopularGames = getPopularGames;

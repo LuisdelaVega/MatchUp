@@ -1,4 +1,4 @@
-var getSearchResults = function(req, res, pg, conString) {
+var getSearchResults = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -16,8 +16,10 @@ var getSearchResults = function(req, res, pg, conString) {
 		query.on('error', function(error) {
 			client.query("ROLLBACK");
 			done();
-			console.log(error);
 			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
 		});
 		query.on("end", function(result) {
 			searchresults.users = result.rows;
@@ -32,8 +34,10 @@ var getSearchResults = function(req, res, pg, conString) {
 			query.on('error', function(error) {
 				client.query("ROLLBACK");
 				done();
-				console.log(error);
 				res.status(500).send(error);
+				log.info({
+					res : res
+				}, 'done response');
 			});
 			query.on("end", function(result) {
 				searchresults.events = new Object();
@@ -49,8 +53,10 @@ var getSearchResults = function(req, res, pg, conString) {
 				query.on('error', function(error) {
 					client.query("ROLLBACK");
 					done();
-					console.log(error);
 					res.status(500).send(error);
+					log.info({
+						res : res
+					}, 'done response');
 				});
 				query.on("end", function(result) {
 					searchresults.events.past = result.rows;
@@ -65,8 +71,10 @@ var getSearchResults = function(req, res, pg, conString) {
 					query.on('error', function(error) {
 						client.query("ROLLBACK");
 						done();
-						console.log(error);
 						res.status(500).send(error);
+						log.info({
+							res : res
+						}, 'done response');
 					});
 					query.on("end", function(result) {
 						searchresults.events.regular = result.rows;
@@ -81,8 +89,10 @@ var getSearchResults = function(req, res, pg, conString) {
 						query.on('error', function(error) {
 							client.query("ROLLBACK");
 							done();
-							console.log(error);
 							res.status(500).send(error);
+							log.info({
+								res : res
+							}, 'done response');
 						});
 						query.on("end", function(result) {
 							searchresults.events.hosted = result.rows;
@@ -97,8 +107,10 @@ var getSearchResults = function(req, res, pg, conString) {
 							query.on('error', function(error) {
 								client.query("ROLLBACK");
 								done();
-								console.log(error);
 								res.status(500).send(error);
+								log.info({
+									res : res
+								}, 'done response');
 							});
 							query.on("end", function(result) {
 								searchresults.teams = result.rows;
@@ -113,8 +125,10 @@ var getSearchResults = function(req, res, pg, conString) {
 								query.on('error', function(error) {
 									client.query("ROLLBACK");
 									done();
-									console.log(error);
 									res.status(500).send(error);
+									log.info({
+										res : res
+									}, 'done response');
 								});
 								query.on("end", function(result) {
 									searchresults.organizations = result.rows;
@@ -129,8 +143,10 @@ var getSearchResults = function(req, res, pg, conString) {
 									query.on('error', function(error) {
 										client.query("ROLLBACK");
 										done();
-										console.log(error);
 										res.status(500).send(error);
+										log.info({
+											res : res
+										}, 'done response');
 									});
 									query.on("end", function(result) {
 										searchresults.games = result.rows;
@@ -145,8 +161,10 @@ var getSearchResults = function(req, res, pg, conString) {
 										query.on('error', function(error) {
 											client.query("ROLLBACK");
 											done();
-											console.log(error);
 											res.status(500).send(error);
+											log.info({
+												res : res
+											}, 'done response');
 										});
 										query.on("end", function(result) {
 											client.query("COMMIT");
@@ -160,6 +178,9 @@ var getSearchResults = function(req, res, pg, conString) {
 												games : searchresults.games,
 												genres : searchresults.genres
 											});
+											log.info({
+												res : res
+											}, 'done response');
 										});
 									});
 								});
@@ -170,7 +191,6 @@ var getSearchResults = function(req, res, pg, conString) {
 			});
 		});
 	});
-	//pg.end();
 };
 /*
  var searchSponsors = function(req, res, pg, conString) {

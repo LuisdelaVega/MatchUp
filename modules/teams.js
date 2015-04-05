@@ -1,6 +1,6 @@
 //TODO Register Team to Event
 
-var getTeams = function(req, res, pg, conString) {
+var getTeams = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -14,18 +14,23 @@ var getTeams = function(req, res, pg, conString) {
 		});
 		query.on('error', function(error) {
 			done();
-			console.log(error);
 			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
 		});
 		query.on("end", function(result) {
 			done();
-			res.json(result.rows);
+			res.status(200).json(result.rows);
+			log.info({
+				res : res
+			}, 'done response');
 		});
 	});
 };
 
 //TODO Look for Tournaments the team has participated and calculate their matches won/lost
-var getTeam = function(req, res, pg, conString) {
+var getTeam = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -42,8 +47,10 @@ var getTeam = function(req, res, pg, conString) {
 		query.on('error', function(error) {
 			client.query("ROLLBACK");
 			done();
-			console.log(error);
 			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
 		});
 		query.on("end", function(result) {
 			if (result.rows.length) {
@@ -59,25 +66,33 @@ var getTeam = function(req, res, pg, conString) {
 				query.on('error', function(error) {
 					client.query("ROLLBACK");
 					done();
-					console.log(error);
 					res.status(500).send(error);
+					log.info({
+						res : res
+					}, 'done response');
 				});
 				playersQuery.on("end", function(result) {
 					client.query("COMMIT");
 					done();
 					team.players = result.rows;
-					res.json(team);
+					res.status(200).json(team);
+					log.info({
+						res : res
+					}, 'done response');
 				});
 			} else {
 				client.query("ROLLBACK");
 				done();
 				res.status(404).send('Oh, no! This team does not exist');
+				log.info({
+					res : res
+				}, 'done response');
 			};
 		});
 	});
 };
 
-var editTeam = function(req, res, pg, conString) {
+var editTeam = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -97,10 +112,12 @@ var editTeam = function(req, res, pg, conString) {
 		if (!req.body.logo && !req.body.bio && !req.body.cover) {
 			done();
 			res.status(401).send("Oh no! Disaster");
+			log.info({
+				res : res
+			}, 'done response');
 		}
 
 		queryText += " WHERE team_name = '" + req.params.team + "' AND team_name IN (SELECT team_name FROM plays_for WHERE customer_username = '" + req.user.username + "' AND customer_active) AND team_active";
-		// console.log(queryText);
 		client.query("BEGIN");
 		client.query({
 			text : queryText
@@ -108,18 +125,20 @@ var editTeam = function(req, res, pg, conString) {
 			if (err) {
 				client.query("ROLLBACK");
 				done();
-				console.log(err);
 				res.status(500).send(err);
 			} else {
 				client.query("COMMIT");
 				done();
-				res.status(204).send('');
+				res.status(200).send("Team info here");
 			}
+			log.info({
+				res : res
+			}, 'done response');
 		});
 	});
 };
 
-var deleteTeam = function(req, res, pg, conString) {
+var deleteTeam = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -133,18 +152,20 @@ var deleteTeam = function(req, res, pg, conString) {
 			if (err) {
 				client.query("ROLLBACK");
 				done();
-				console.log(err);
 				res.status(500).send("Oh, no! Disaster!");
 			} else {
 				client.query("COMMIT");
 				done();
 				res.status(204).send('');
 			}
+			log.info({
+				res : res
+			}, 'done response');
 		});
 	});
 };
 
-var getTeamMembers = function(req, res, pg, conString) {
+var getTeamMembers = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -159,17 +180,22 @@ var getTeamMembers = function(req, res, pg, conString) {
 		});
 		query.on('error', function(error) {
 			done();
-			console.log(error);
 			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
 		});
 		query.on("end", function(result) {
 			done();
-			res.status(200).send(result.rows);
+			res.status(200).json(result.rows);
+			log.info({
+				res : res
+			}, 'done response');
 		});
 	});
 };
 
-var addTeamMember = function(req, res, pg, conString) {
+var addTeamMember = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -186,8 +212,10 @@ var addTeamMember = function(req, res, pg, conString) {
 		query.on('error', function(error) {
 			client.query("ROLLBACK");
 			done();
-			console.log(error);
 			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
 		});
 		query.on("end", function(result) {
 			if (result.rows.length) {
@@ -201,8 +229,10 @@ var addTeamMember = function(req, res, pg, conString) {
 				query.on('error', function(error) {
 					client.query("ROLLBACK");
 					done();
-					console.log(error);
 					res.status(500).send(error);
+					log.info({
+						res : res
+					}, 'done response');
 				});
 				query.on("end", function(result) {
 					if (result.rows.length) {
@@ -213,30 +243,38 @@ var addTeamMember = function(req, res, pg, conString) {
 							if (err) {
 								client.query("ROLLBACK");
 								done();
-								console.log(err);
-								res.status(400).send("Oh, no! This user already plays for this team dummy");
+								res.status(500).send(err);
 							} else {
 								client.query("COMMIT");
 								done();
 								res.status(201).send('This user has been added! Yay!');
 							}
+							log.info({
+								res : res
+							}, 'done response');
 						});
 					} else {
 						client.query("ROLLBACK");
 						done();
 						res.status(400).send("Oh, no! This user does not exist");
+						log.info({
+							res : res
+						}, 'done response');
 					}
 				});
 			} else {
 				client.query("ROLLBACK");
 				done();
 				res.status(401).send('Oh, no! It seems you are not part of this team');
+				log.info({
+					res : res
+				}, 'done response');
 			}
 		});
 	});
 };
 
-var removeTeamMember = function(req, res, pg, conString) {
+var removeTeamMember = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -254,8 +292,10 @@ var removeTeamMember = function(req, res, pg, conString) {
 		query.on('error', function(error) {
 			client.query("ROLLBACK");
 			done();
-			console.log(error);
 			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
 		});
 		query.on("end", function(result) {
 			if (result.rows.length) {
@@ -271,8 +311,10 @@ var removeTeamMember = function(req, res, pg, conString) {
 				query.on('error', function(error) {
 					client.query("ROLLBACK");
 					done();
-					console.log(error);
 					res.status(500).send(error);
+					log.info({
+						res : res
+					}, 'done response');
 				});
 				query.on("end", function(result) {
 					if (result.rows.length) {
@@ -286,35 +328,46 @@ var removeTeamMember = function(req, res, pg, conString) {
 								if (err) {
 									client.query("ROLLBACK");
 									done();
-									console.log(err);
 									res.status(500).send("Oh, no! Disaster!");
 								} else {
 									client.query("COMMIT");
 									done();
 									res.status(204).send('');
 								}
+								log.info({
+									res : res
+								}, 'done response');
 							});
 						} else {
 							client.query("ROLLBACK");
 							done();
 							res.status(401).send('Oh, no! It seems you are do not have enough privileges to do this');
+							log.info({
+								res : res
+							}, 'done response');
 						}
 					} else {
 						client.query("ROLLBACK");
 						done();
 						res.status(401).send('Oh, no! It seems this user is not a member of this team');
+						log.info({
+							res : res
+						}, 'done response');
 					}
 				});
 			} else {
 				client.query("ROLLBACK");
 				done();
 				res.status(401).send('Oh, no! It seems you are not a member of this team');
+				log.info({
+					res : res
+				}, 'done response');
 			}
 		});
 	});
 };
 
-var makeCaptain = function(req, res, pg, conString) {
+var makeCaptain = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -331,8 +384,10 @@ var makeCaptain = function(req, res, pg, conString) {
 		query.on('error', function(error) {
 			client.query("ROLLBACK");
 			done();
-			console.log(error);
 			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
 		});
 		query.on("end", function(result) {
 			if (result.rows.length) {
@@ -347,8 +402,10 @@ var makeCaptain = function(req, res, pg, conString) {
 				query.on('error', function(error) {
 					client.query("ROLLBACK");
 					done();
-					console.log(error);
 					res.status(500).send(error);
+					log.info({
+						res : res
+					}, 'done response');
 				});
 				query.on("end", function(result) {
 					if (result.rows.length) {
@@ -361,6 +418,9 @@ var makeCaptain = function(req, res, pg, conString) {
 								client.query("ROLLBACK");
 								done();
 								res.status(500).send(err);
+								log.info({
+									res : res
+								}, 'done response');
 							} else {
 								client.query({
 									text : "INSERT INTO captain_for (customer_username, team_name) VALUES ($1, $2)",
@@ -375,6 +435,9 @@ var makeCaptain = function(req, res, pg, conString) {
 										done();
 										res.status(201).send("Yay " + req.query.username + " has beed made captain!");
 									}
+									log.info({
+										res : res
+									}, 'done response');
 								});
 							}
 						});
@@ -382,12 +445,18 @@ var makeCaptain = function(req, res, pg, conString) {
 						client.query("ROLLBACK");
 						done();
 						res.status(401).send("Oh, no! It seems " + req.query.username + " is not a member of " + req.params.team);
+						log.info({
+							res : res
+						}, 'done response');
 					}
 				});
 			} else {
 				client.query("ROLLBACK");
 				done();
 				res.status(401).send("Oh no! It seems you (" + req.user.username + ") are not the captain of " + req.params.team);
+				log.info({
+					res : res
+				}, 'done response');
 			}
 		});
 	});
