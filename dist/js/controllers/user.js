@@ -15,22 +15,22 @@ myApp.controller('profileSummaryController', function($scope, $state, $http, $st
 
 	var customer = $stateParams.username;
 
-		//Get basic Customer Information, cover photo and profile picture
+	//Get basic Customer Information, cover photo and profile picture
 
-		$http.get('http://136.145.116.232/matchup/profile/' + customer + '', config).success(function(data) {
-			$scope.profileData = angular.fromJson(data);
-			$scope.myProfile = $scope.profileData.my_profile;
-			$scope.userCover = "linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2)), url(" + $scope.profileData.customer_cover_photo + ")";
-			$scope.profilePicture = "url(" + $scope.profileData.customer_profile_pic + ")";
-			//console.log($scope.profileData.customer_username);
+	$http.get('http://136.145.116.232/matchup/profile/' + customer + '', config).success(function(data) {
+		$scope.profileData = angular.fromJson(data);
+		$scope.myProfile = $scope.profileData.my_profile;
+		$scope.userCover = "linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2)), url(" + $scope.profileData.customer_cover_photo + ")";
+		$scope.profilePicture = "url(" + $scope.profileData.customer_profile_pic + ")";
+		//console.log($scope.profileData.customer_username);
 
-		}).error(function(err) {
-			console.log(err);
-		}).then(function(){
-			customerInfo(customer);
-		});
+	}).error(function(data, status) {
 
-	
+		if (status == 404 || status == 401)
+			$state.go(status.toString);
+	}).then(function() {
+		customerInfo(customer);
+	});
 
 	function customerInfo(customer) {
 		console.log(customer);
@@ -54,34 +54,37 @@ myApp.controller('profileSummaryController', function($scope, $state, $http, $st
 					}
 					$scope.teamData.info.team_captain = captain;
 					$scope.teams.push($scope.teamData.info);
-				}).error(function(err) {
-					console.log(err);
+				}).error(function(data, status) {
+
+					if (status == 404 || status == 401)
+						$state.go(status.toString);
 				});
 			}
 
-		}).error(function(err) {
-			console.log(err);
+		}).error(function(data, status) {
+
+			if (status == 404 || status == 401)
+				$state.go(status.toString);
 		});
 
 		$http.get('http://136.145.116.232/matchup/profile/' + customer + '/organizations', config).success(function(data) {
 
 			$scope.organizations = angular.fromJson(data);
 
-		}).error(function(err) {
-			console.log(err);
+		}).error(function(data, status) {
+
+			if (status == 404 || status == 401)
+				$state.go(status.toString);
 		});
 	}
-	
-	
-	$scope.goToTeams = function(username){
+
+
+	$scope.goToTeams = function(username) {
 		$state.go("app.teams", {
 			"username" : username
 		}) //
-		
-	}
-	
-	
 
+	}
 });
 
 myApp.controller('profileEventsController', ['$scope', '$http', '$stateParams', '$window', 'sharedDataService', '$state',
@@ -107,14 +110,20 @@ function($scope, $http, $stateParams, $window, sharedDataService, $state) {
 			$http.get('./../dist/json/myPastEvents.json', config).success(function(data) {
 				$scope.pastEventsData = data;
 				//console.log($scope.eventsData);
-			}).error(function(err) {
-				console.log(err);
+			}).error(function(data, status) {
+
+				if (status == 404 || status == 401)
+					$state.go(status.toString);
 			});
-		}).error(function(err) {
-			console.log(err);
+		}).error(function(data, status) {
+
+			if (status == 404 || status == 401)
+				$state.go(status.toString);
 		});
-	}).error(function(err) {
-		console.log(err);
+	}).error(function(data, status) {
+
+		if (status == 404 || status == 401)
+			$state.go(status.toString);
 	});
 
 	// $http.get('http://136.145.116.232/matchup/profile/' + $stateParams.username + '/events', config).success(function (data) {
@@ -150,8 +159,10 @@ function($scope, $http, $stateParams, $window, sharedDataService, $state) {
 				});
 			}
 
-		}).error(function(data, status, headers, config) {
-			console.log("error in goToEvent");
+		}).error(function(data, status) {
+
+			if (status == 404 || status == 401)
+				$state.go(status.toString);
 		});
 
 	};
@@ -180,8 +191,10 @@ function($scope, $http, $stateParams, $window, $state) {
 
 		$scope.teams = angular.fromJson(data);
 
-	}).error(function(err) {
-		console.log(err);
+	}).error(function(data, status) {
+
+		if (status == 404 || status == 401)
+			$state.go(status.toString);
 	});
 
 	$scope.gotToProfile = function(customerUsername) {
@@ -207,8 +220,10 @@ function($scope, $http, $stateParams, $window, $state) {
 
 		$scope.organizationsData = angular.fromJson(data);
 
-	}).error(function(err) {
-		console.log(err);
+	}).error(function(data, status) {
+
+		if (status == 404 || status == 401)
+			$state.go(status.toString);
 	});
 
 	$scope.gotToProfile = function(customerUsername) {

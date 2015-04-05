@@ -3,10 +3,11 @@ var myApp = angular.module('MatchUp', ['ui.router', 'ngResource', 'home', 'premi
 myApp.config(function ($stateProvider, $urlRouterProvider) {
     //
     // For any unmatched url, redirect to /home
-    $urlRouterProvider.otherwise("/login");
+    $urlRouterProvider.otherwise("/404");
     //
     // Now set up the states
     $stateProvider
+    
         .state('login', {
             url: "/login",
             templateUrl: "login.html",
@@ -23,6 +24,22 @@ myApp.config(function ($stateProvider, $urlRouterProvider) {
             templateUrl: "home.html",
             controller: "homeViewController" 
         })
+        /**
+         * Client Error Handling
+         *  
+         */
+         
+
+        .state('401', {
+            url: "/login",
+            templateUrl: "login.html"
+        })
+        .state('404', {
+            url: "/404",
+            templateUrl: "404.html"
+        })
+        
+        
         /**
          *	Events
          *

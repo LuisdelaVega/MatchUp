@@ -404,7 +404,7 @@ function($scope, $window, $state) {
 	}
 
 	$scope.goToMyTeams = function(customer_username) {
-		$state.go("app.userProfile", {
+		$state.go("app.teams", {
 			"username" : $window.sessionStorage.user
 		}) //
 	}
