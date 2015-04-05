@@ -3,7 +3,7 @@ var myApp = angular.module('MatchUp', ['ui.router', 'ngResource', 'home', 'premi
 myApp.config(function ($stateProvider, $urlRouterProvider) {
     //
     // For any unmatched url, redirect to /home
-    $urlRouterProvider.otherwise("/404");
+    $urlRouterProvider.otherwise("/login");
     //
     // Now set up the states
     $stateProvider
