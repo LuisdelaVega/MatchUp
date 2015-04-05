@@ -41,14 +41,6 @@ function($scope, $http, $state, sharedDataService, $window) {
 		console.log("error in home controller. obtaining hosted upcoming events");
 	});
 
-	$scope.goToGameProfile = function(gameName, gameImage) {
-		var params = [gameName, gameImage];
-		sharedDataService.set(params);
-		$state.go('app.game.summary', {
-			"gamename" : gameName
-		});
-	};
-
 }]);
 
 myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedDataService', '$window',
@@ -441,6 +433,25 @@ function($scope, $window, $http, $state) {
 		$window.sessionStorage.clear();
 		$state.go("login") //
 	}
+	
+	$scope.goToOrganizationProfile = function(organization) {
+		$state.go("app.organizationProfile", {
+			"organizationName" : organization
+		}) //
+	}
+	
+	
+	//go to a specific users in an event
+	$scope.goToUser = function(customer_username) {
+
+		$state.go("app.userProfile", {
+			"username" : customer_username
+		}) //
+	}
+	
+	
+	
+	
 	//changed to work
 	$scope.goToEvent = function(eventName, date, location) {
 
@@ -480,43 +491,27 @@ function($scope, $window, $http, $state) {
 		});
 
 	};
-	
-	
+
+	$scope.goToGameProfile = function(gameName) {
+		$state.go('app.gameProfile', {
+			"game" : gameName
+		});
+	};
+
 	$scope.goToTournament = function(eventName, date, location, tournament) {
-//ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location, tournament)"
+		//ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location, tournament)"
 		eventName = eventName.replace(" ", "%20");
 		location = location.replace(" ", "%20");
 		tournament = tournament.replace(" ", "%20");
 
-
 		$state.go('app.tournament', {
-					"eventname" : eventName,
-					"tournament" :tournament,
-					"date" : date,
-					"location" : location
-				});
+			"eventname" : eventName,
+			"tournament" : tournament,
+			"date" : date,
+			"location" : location
+		});
 
 	};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }]);
 
@@ -534,12 +529,6 @@ function($scope, $http, $state, sharedDataService, $window) {
 	}).error(function(data, status, headers, config) {
 		console.log("error in game view controller.");
 	});
-
-	$scope.goToGameProfile = function(gameName) {
-		$state.go('app.gameProfile', {
-			"game" : gameName
-		});
-	};
 
 }]);
 
@@ -573,13 +562,13 @@ function($scope, $http, $state, sharedDataService, $stateParams, $window) {
 			'Authorization' : "Bearer " + $window.sessionStorage.token
 		}
 	};
-	
+
 	//TODO Need a route to look for info about a specific game!
-	$scope.game ={
-       "game_name": "Got route?",
-       "game_image": "http://upload.wikimedia.org/wikipedia/en/9/92/Halo_4_box_artwork.png"
-  };
-	
+	$scope.game = {
+		"game_name" : "Got route?",
+		"game_image" : "http://upload.wikimedia.org/wikipedia/en/9/92/Halo_4_box_artwork.png"
+	};
+
 	$http.get('http://136.145.116.232/matchup/events?filter=game&value=' + $stateParams.game + '&state=upcoming&hosted=true', config).success(function(data, status, headers, config) {
 		$scope.gamesUpcomingHosted = angular.fromJson(data);
 

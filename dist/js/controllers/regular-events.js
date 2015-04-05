@@ -16,7 +16,13 @@ function($scope, $http, $stateParams, sharedDataService, $window) {
 	$http.get('http://136.145.116.232/matchup/events/' + $stateParams.eventname + '?date=' + $stateParams.date + '&location=' + $stateParams.location + '', config).success(function(data, status, headers, config) {
 
 		$scope.eventInfo = angular.fromJson(data);
-		$scope.isHosted = $scope.eventInfo.is_hosted;
+		console.log($scope.eventInfo);
+		if($scope.eventInfo.host == null)
+			$scope.isHosted = false;
+		else
+			$scope.isHosted = true;
+	console.log($scope.isHosted);
+
 		var startDate = new Date($scope.eventInfo.event_start_date);
 		$scope.cover = "linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2)), url(" + $scope.eventInfo.event_banner + ")";
 
@@ -24,19 +30,19 @@ function($scope, $http, $stateParams, sharedDataService, $window) {
 			$scope.isOngoing = false;
 		else
 			$scope.isOngoing = true;
- 		console.log($scope.isHosted);
 
-		if ($scope.eventInfo.is_hosted) {
-			$scope.hostedBy = true;
+		if ($scope.isHosted) {
+			console.log("this event is hosted");
 
 			$http.get('http://136.145.116.232/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '?date=' + $stateParams.date + '&location=' + $stateParams.location + '', config).success(function(data, status, headers, config) {
 
-				$scope.tournament = angular.fromJson(data);
+				$scope.currentTournament = angular.fromJson(data);
 				$scope.requiresTeam = $scope.currentTournament.is_team_based;
 				//get host info
 				$http.get('http://136.145.116.232/matchup/organizations/' + $scope.eventInfo.host + '', config).success(function(data, status, headers, config) {
 
 					$scope.host = angular.fromJson(data);
+					console.log($scope.host);
 					$http.get('http://136.145.116.232/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/competitors?date=' + $stateParams.date + '&location=' + $stateParams.location + '', config).success(function(data, status, headers, config) {
 						$scope.competitors = angular.fromJson(data);
 						$scope.numComp = $scope.competitors.length;
@@ -54,7 +60,6 @@ function($scope, $http, $stateParams, sharedDataService, $window) {
 			});
 
 		} else {
-			$scope.hostedBy = false;
 			$http.get('http://136.145.116.232/matchup/events/' + $stateParams.eventname + '/tournaments?date=' + $stateParams.date + '&location=' + $stateParams.location + '', config).success(function(data, status, headers, config) {
 
 				var tournamentJSON = angular.fromJson(data);

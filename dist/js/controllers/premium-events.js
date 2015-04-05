@@ -166,13 +166,7 @@ myApp.controller('eventPremiumSummaryController', function($scope, $state, $http
 		$state.go("app.writereview")
 	}
  
-	//go to a specific users in an event
-	$scope.goToUser = function(customer_username) {
-
-		$state.go("app.userProfile", {
-			"username" : customer_username
-		}) //
-	}
+	
 });
 
 //NPI

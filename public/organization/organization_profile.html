@@ -1,21 +1,20 @@
-<div class="blur-cover">
-</div>
+<div class="blur-cover" ng-style="{'background': cover}"></div>
+
 <div class="box box-margin">
 	<div class="row">
 		<div class="col-xs-12 col-md-6 col-lg-6">
 			<p class="info-title">
-				Organization Name
+				{{organization.organization_name}}
 			</p>
 			<div align="center">
-				<div class="organization-logo"></div>
+				<div class="organization-logo" ng-style="{'background-image': profilePicture}"></div>
 			</div>
 		</div>
 		<div class="col-xs-12 col-md-6 col-lg-6">
 			<div align="center">
 				<h3>About</h3>
 				<div class="center">
-					<p class="info-paragraph">
-						Raw denim Truffaut proident wolf, asymmetrical mollit exercitation. Tousled est art party wayfarers. Cupidatat ullamco gluten-free Schlitz listicle. Fixie literally normcore, DIY eu jean shorts Truffaut Helvetica actually mlkshk put a bird on it cold-pressed tilde. Tempor biodiesel Shoreditch ennui assumenda skateboard. Literally fixie fanny pack commodo organic, plaid raw denim viral delectus cornhole church-key tofu master cleanse pariatur. Food truck viral anim tilde aute PBR consequat leggings, aliqua single-origin coffee salvia quinoa enim qui wayfarers.
+					<p class="info-paragraph">{{organization.organization_bio}}
 					</p>
 				</div>
 			</div>
@@ -23,7 +22,7 @@
 	</div>
 	<div class="row">
 		<div class="col-md-3 col-md-offset-9">
-			<a class="btn btn-primary btn-block" ui-sref="app.editOrganization">Edit</a>
+			<a class="btn btn-primary btn-block" ui-sref="app.editOrganization" ng-if="organization.is_member">Edit</a>
 		</div>
 	</div>
 </div>
@@ -38,11 +37,11 @@
 			<div class="tickets-container">
 				<ul class="tickets-list">
 					<div class="row">
-						<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-							<li class="ticket-item" ui-sref="app.userProfile">
+						<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat = "member in members">
+							<li class="ticket-item" ng-click="goToUser(member.customer_username)">
 								<div class="ticket-user">
-									<img src="http://neptunolabs.com/images/badillo.jpg" class="user-avatar">
-									<span class="user-name">Edwin Badillo</span>
+									<img ng-src="{{member.customer_profile_pic}}" class="user-avatar">
+									<span class="user-name">{{member.customer_first_name}} {{member.customer_last_name}} </span>
 								</div>
 							</li>
 						</div>
@@ -67,19 +66,19 @@
 		<div class="widget-main no-padding">
 			<div class="tickets-container">
 				<div class="row" style="padding-left: 15px">
-					<div class="col-md-3 col-sm-4 col-xs-6">
-						<a class="thumbnail"> <img src="http://neptunolabs.com/images/ckmagic.jpg" alt="..." ui-sref="app.event">
+					<div class="col-md-3 col-sm-4 col-xs-6"ng-repeat="event in events">
+						<a class="thumbnail" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_logo}}">
 							<hr class="hr-custom-padding">
 							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 										overflow: hidden;">
-								<p class="thumbnail-title" ui-sref="app.event">
-									Event Name
+								<p class="thumbnail-title">
+									{{event.event_name}}
 								</p>
 								<p class="thumbnail-paragraph">
-									Staple Centersdafdfgdfgsdfgsdfgsdfgdfgsdfgasdfasdf
+									{{event.event_location}}
 								</p>
 								<p class="thumbnail-paragraph">
-									January 2, 8:00PM
+									{{ event.event_start_date | date: 'medium'}}
 								</p>
 							</div>
 						</a>

@@ -25,7 +25,7 @@
 					</div>
 					<div class="col-xs-12  col-md-6 col-lg-6">
 						<h4>General Info</h4>
-						<dl class="info-paragraph" ng-if="!hostedBy">
+						<dl class="info-paragraph" ng-if="!isHosted">
 							<dt>Tournament Start Date</dt>
 							<dd>{{currentTournament.tournament_start_date  | date: 'medium'}}</dd>
 							<dt>Event Start Date (Check-in)</dt>
@@ -37,7 +37,7 @@
 							<dt>Venue</dt>
 							<dd>{{eventInfo.event_venue  | date: 'medium'}}</dd>
 						</dl>
-						<dl class="info-paragraph" ng-if="hostedBy">
+						<dl class="info-paragraph" ng-if="isHosted">
 							<dt>Tournament Start Date</dt>
 							<dd>{{currentTournament.tournament_start_date  | date: 'medium'}}</dd>
 						</br>
@@ -49,7 +49,7 @@
 				<p class="info-title">Tournament Details</p>
 				<div class="row">
 					<div class="col-lg-4 col-md-4 col-xs-12">
-						<a class="thumbnail">
+						<a class="thumbnail" ng-click="goToGameProfile(currentTournament.game_name)">
 							<img ng-src="{{currentTournament.game_image}}">
 							<h4 align="center">{{currentTournament.game_name}}</h4>
 						</a>
@@ -77,6 +77,7 @@
 						
 						
 					</div>
+					</br>
 					<div class="col-lg-4 col-md-6 col-xs-12">
 						<dl class="info-paragraph" ng-if="groupStage">
 							<dt>Score Type</dt>
@@ -100,26 +101,28 @@
 							<dd>{{currentTournament.competitor_fee}}</dd>
 						</dl>
 					</div>
-				</div>
+					<div class="row" ng-if="isHosted">
+						</br>
+						<div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 center-block" style="float:none">
+							<p class="info-title">
+								Hosted By
+							</p>
+							<a class="thumbnail" ng-click="goToOrganizationProfile(eventInfo.host)"> <img ng-src="{{host.organization_logo}}"> <h3 align="center">{{eventInfo.host}}</h3> </a>
+						</div>
+					</div>
+					<div class="row" ng-if="!isHosted">
+						<div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 center-block" style="float:none">
+							<p class="info-title">
+								Hosted By
+							</p>
+
+							<a class="thumbnail"> <img ng-src="{{creator.customer_profile_pic}}"> <h3 align="center">{{eventInfo.creator}}</h3> </a>
+						</div>
+					</div>
+					</div>
 				
-				<div class="row" ng-if="hostedBy">
-					<p class="info-title">Hosted By</p>
-					<div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 center-block" style="float:none">
-						<a class="thumbnail">
-							<img ng-src="{{host.organization_logo}}">
-							<h3 align="center">{{eventInfo.host}}</h3>
-						</a>
-					</div>
-				</div>
-				<div class="row" ng-if="!hostedBy">
-					<p class="info-title">Hosted By</p>
-					<div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 center-block" style="float:none">
-						<a class="thumbnail">
-							<img ng-src="{{creator.customer_profile_pic}}">
-							<h3 align="center">{{eventInfo.creator}}</h3>
-						</a>
-					</div>
-				</div>
+				
+			
 				<div class="btn-group btn-group-justified" role="group">
 					<div class="btn-group" role="group">
 						<button type="button" class="btn btn-primary" data-target="#competitorSignUpModal" data-toggle="modal">Competitor Sign Up</button>
@@ -143,22 +146,15 @@
 						<div class="tickets-container">
 							<ul class="tickets-list">
 								<div class="row">
-									<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+									<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat ="competitor in competitors">
 										<li class="ticket-item">
 											<div class="ticket-user">
-												<img src="http://neptunolabs.com/images/badillo.jpg" class="user-avatar">
-												<span class="user-name" onclick="window.location.href='my_profile.html'">Player 1</span>
+												<img ng-src="{{competitor.customer_profile_pic}}" class="user-avatar">
+												<span class="user-name" >{{competitor.customer_tag}}</span>
 											</div>
 										</li>
 									</div>
-									<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-										<li class="ticket-item">
-											<div class="ticket-user">
-												<img src="http://bootdey.com/img/Content/user_1.jpg" class="user-avatar">
-												<span class="user-name" onclick="window.location.href='my_profile.html'">Adam Johnson</span>
-											</div>
-										</li>
-									</div>
+								 
 								</div>
 							</ul>
 						</div>

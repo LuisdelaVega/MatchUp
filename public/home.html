@@ -111,7 +111,7 @@
                 <div class="row" style="padding-left: 15px">
                     <div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="game in popularGames | limitTo: 6">
                         <a class="thumbnail" ui-sref="app.gameProfile">
-                            <img ng-src="{{ game.game_image }}" ng-click="goToGameProfile(game.game_name, game.game_image)">
+                            <img ng-src="{{ game.game_image }}" ng-click="goToGameProfile(game.game_name)">
                         </a>
                     </div>
                 </div>

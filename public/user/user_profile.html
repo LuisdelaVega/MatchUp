@@ -218,11 +218,11 @@
 			<div class="tickets-container">
 				<div class="row" style="padding-left: 15px">
 					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat = "organization in organizations">
-						<a class="thumbnail"> <img ng-src="{{organization.organization_logo}}" alt="..." ui-sref="app.organizationProfile">
+						<a class="thumbnail" ng-click="goToOrganizationProfile(organization.organization_name)"> <img ng-src="{{organization.organization_logo}}" alt="..."  >
 							<hr class="hr-custom-padding">
 							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 											overflow: hidden;">
-								<p class="thumbnail-title" align="center" ui-sref="app.organizationProfile">
+								<p class="thumbnail-title" align="center" >
                                     {{organization.organization_name}}
 								</p>
 							</div>
