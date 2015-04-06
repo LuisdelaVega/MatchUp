@@ -1,4 +1,4 @@
-var myApp = angular.module('MatchUp', ['ui.router', 'ngResource', 'home', 'premium-events', 'regular-events', 'user','as.sortable','ui.bootstrap.datetimepicker','organizer', 'organization']);
+var myApp = angular.module('MatchUp', ['ui.router', 'ngResource','as.sortable','ui.bootstrap.datetimepicker', 'home', 'premium-events', 'regular-events', 'user','organizer', 'organization', 'forms']);
 
 myApp.config(function ($stateProvider, $urlRouterProvider) {
     //
@@ -67,7 +67,8 @@ myApp.config(function ($stateProvider, $urlRouterProvider) {
         })
         .state('app.createEvent', {
             url: "/createEvent",
-            templateUrl: "event/create_event.html"
+            templateUrl: "event/create_event.html",
+			controller: "CreateEventController"
         })
         .state('app.registeredEvents', {
             url: "/registeredEvents",
