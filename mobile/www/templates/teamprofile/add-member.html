@@ -8,24 +8,14 @@
         <div class="list list-inset">
             <label class="item item-input">
                 <i class="icon ion-search placeholder-icon"></i>
-                <input type="text" placeholder="Search">
+                <input ng-model="query" ng-change="search(query)" type="text" placeholder="Search" />
             </label>
         </div>
-        <div class="list list-inset">
-            <a class="item item-avatar" ng-click="showConfirm('Ron',1)">
-                <img src="img/ron.jpg">
-                <h2>Ron Paul</h2>
-                <p>This is my info</p>
-            </a>
-            <a class="item item-avatar" ng-click="showConfirm('Ron',2)">
-                <img src="img/ron.jpg">
-                <h2>Ron Paul</h2>
-                <p>This is my info</p>
-            </a>
-            <a class="item item-avatar" ng-click="showConfirm('Ron',3)">
-                <img src="img/ron.jpg">
-                <h2>Ron Paul</h2>
-                <p>This is my info</p>
+        <div class="list list-inset" ng-repeat="user in users">
+            <a class="item item-avatar" ng-click="showConfirm(user.customer_tag)">
+                <img ng-src="{{ user.customer_profile_pic }}">
+                <h2>{{ user.customer_tag }}</h2>
+                <p>{{ user.customer_country }}</p>
             </a>
         </div>
     </ion-content>

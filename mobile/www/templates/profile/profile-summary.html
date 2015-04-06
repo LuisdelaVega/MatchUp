@@ -2,7 +2,7 @@
     <ion-nav-buttons side="right">
         <button class="button button-icon ion-android-alert">
         </button>
-        <button class="button button-icon" ng-click="popover.show($event)">
+        <button class="button button-icon" ng-click="popover.show($event)" ng-if="myProfile">
             <i class="ion-android-more-vertical"></i>
         </button>
     </ion-nav-buttons>
@@ -53,7 +53,7 @@
             </div>
             <div class="list">
 
-                <a class="item item-thumbnail-left" href="#" ng-repeat="team in teams | limitTo: 3">
+                <a class="item item-thumbnail-left" ng-click="goToTeamProfile(team.team_name)" ng-repeat="team in teams | limitTo: 3">
                     <img ng-src="{{ team.team_logo }}">
                     <h2>{{ team.team_name }}</h2>
                     <p>{{ team.team_bio }}</p>

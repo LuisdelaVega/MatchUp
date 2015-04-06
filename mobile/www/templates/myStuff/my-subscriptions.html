@@ -4,7 +4,7 @@
             <a class="item center-item item-avatar item-button-right" href="#" ng-repeat="subscription in subscriptions">
                 <img ng-src="{{subscription.customer_profile_pic}}">
                 <h2>{{subscription.customer_tag}}</h2>
-                <button class="button button{{isSubscribed}}" ng-click="toggleSubscribe()">
+                <button class="button button{{isSubscribed[$index]}}" ng-click="toggleSubscribe($index, subscription.customer_username)">
                     <i class="icon ion-person-add"></i>
                 </button>
             </a>

@@ -105,6 +105,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
         .state('app.editprofile', {
         url: "/editprofile/:username",
         templateUrl: "templates/profile/edit-profile.html",
+        controller: "editProfileController"
     })
     //================================================================================
     // Genres and Popular Games
@@ -280,17 +281,17 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     //================================================================================
 
         .state('app.teamprofile', {
-        url: "/teamprofile",
+        url: "/teamprofile/:teamname",
         templateUrl: "templates/teamprofile/team-profile.html",
         controller: "teamController"
     })
         .state('app.teamprofilemembers', {
-        url: "/teamprofilemembers",
+        url: "/teamprofilemembers/:teamname",
         templateUrl: "templates/teamprofile/team-profile-members.html",
         controller: "removeTeamMemberController"
     })
         .state('app.teamprofilestandings', {
-        url: "/teamprofilestandings",
+        url: "/teamprofilestandings/:teamname",
         templateUrl: "templates/teamprofile/team-profile-standings.html"
     })
         .state('app.createteam', {
@@ -298,12 +299,12 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
         templateUrl: "templates/teamprofile/create.html"
     })
         .state('app.addteammember', {
-        url: "/addteammember",
+        url: "/addteammember/:teamname",
         templateUrl: "templates/teamprofile/add-member.html",
         controller: "addTeamMemberController"
     })
         .state('app.editteam', {
-        url: "/editteam",
+        url: "/editteam/:teamname",
         templateUrl: "templates/teamprofile/edit.html",
     })
 
@@ -426,13 +427,11 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     $urlRouterProvider.otherwise('/login');
 
 
-/*
+
     //Authentication stuff
     $httpProvider.defaults.useXDomain = true;
-    
-    $httpProvider.useApplyAsync(true);
 
-    delete $httpProvider.defaults.headers.common["X-Requested-With"]; */
+    delete $httpProvider.defaults.headers.common["X-Requested-With"];
 
 })
 //Allows controllers to pass data between each other. Should be used only when values set will immediately used by another controller in a get.

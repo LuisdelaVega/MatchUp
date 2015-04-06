@@ -13,54 +13,15 @@
     </ion-nav-buttons>
     <ion-content>
         <div class="list list-inset">
-            <a class="item center-item item-avatar item-button-right">
-                <img src="img/ron.jpg">
-                <h2>Ron Paul</h2>
-                <p>This is my info</p>
+            <a class="item center-item item-avatar item-button-right" ng-repeat="player in players">
+                <img ng-src="{{player.customer_profile_pic}}">
+                <h2>{{player.customer_tag}}</h2>
+                <p>{{player.customer_first_name}} {{player.customer_last_name}}</p>
                 <div class="buttons">
                     <button class="button button-energized">
                         <i class="icon ion-android-star-outline"></i>
                     </button>
-                    <button class="button button-assertive" ng-click="showConfirm('Ron',1)">
-                        <i class="icon ion-close"></i>
-                    </button>
-                </div>
-            </a>
-            <a class="item center-item item-avatar item-button-right">
-                <img src="img/ron.jpg">
-                <h2>Ron Paul</h2>
-                <p>This is my info</p>
-                <div class="buttons">
-                    <button class="button button-energized">
-                        <i class="icon ion-android-star-outline"></i>
-                    </button>
-                    <button class="button button-assertive" ng-click="showConfirm('Ron',1)">
-                        <i class="icon ion-close"></i>
-                    </button>
-                </div>
-            </a>
-            <a class="item center-item item-avatar item-button-right">
-                <img src="img/ron.jpg">
-                <h2>Ron Paul</h2>
-                <p>This is my info</p>
-                <div class="buttons">
-                    <button class="button button-energized">
-                        <i class="icon ion-android-star-outline"></i>
-                    </button>
-                    <button class="button button-assertive" ng-click="showConfirm('Ron',1)">
-                        <i class="icon ion-close"></i>
-                    </button>
-                </div>
-            </a>
-            <a class="item center-item item-avatar item-button-right">
-                <img src="img/ron.jpg">
-                <h2>Ron Paul</h2>
-                <p>This is my info</p>
-                <div class="buttons">
-                    <button class="button button-energized">
-                        <i class="icon ion-android-star-outline"></i>
-                    </button>
-                    <button class="button button-assertive" ng-click="showConfirm('Ron',1)">
+                    <button class="button button-assertive" ng-click="showConfirm(player.customer_tag, $index)">
                         <i class="icon ion-close"></i>
                     </button>
                 </div>

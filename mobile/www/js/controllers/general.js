@@ -208,7 +208,9 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$
         $state.go('app.profile.summary', {"username": userName});
     };
 
-
+    $scope.goToTeamProfile = function (teamName) {
+        $state.go('app.teamprofile', {"teamname": teamName});
+    };
 
 }]);
 
@@ -412,6 +414,7 @@ myApp.controller('loginController', ['$scope', '$http', '$state', 'sharedDataSer
             var tokenObj = angular.fromJson(data);
             // save token in session
             $window.sessionStorage.token = tokenObj.token;
+            $window.sessionStorage.username = $scope.credentials.userEmail;
             // reset error variable
             $scope.error = false;
             // change view

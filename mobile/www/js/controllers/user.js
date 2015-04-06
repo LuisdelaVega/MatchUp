@@ -22,7 +22,7 @@ myApp.controller('ProfileController', function ($scope, $ionicPopover, $state, s
     $scope.customerUsername = sharedDataService.get();
 });
 
-myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$stateParams', '$ionicPopup', '$timeout', function ($scope, $http, $window, $stateParams, $ionicPopup, $timeout) {
+myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$stateParams', '$ionicPopup', '$timeout', '$state', function ($scope, $http, $window, $stateParams, $ionicPopup, $timeout, $state) {
 
     var config = {
         headers: {
@@ -88,6 +88,10 @@ myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$st
         }, 3000);
 
     }
+    
+    $scope.goToTeamProfile = function (teamName) {
+        $state.go('app.teamprofile', {"teamname": teamName});
+    };
 
 }]);
 
@@ -102,22 +106,48 @@ myApp.controller('mySubscriptionsController', ['$scope', '$http', '$window', '$s
             }
         };
 
+        $scope.isSubscribed = [];
+
         $http.get('http://136.145.116.232/matchup/profile/'+customerUsername+'/subscriptions', config).success(function (data) {
 
             $scope.subscriptions = angular.fromJson(data);
+
+            for(var i = 0; i < $scope.subscriptions.length; i++)
+                $scope.isSubscribed.push('-positive');
 
         }).error(function (err) {
             console.log(err);
         });
     });
 
-    $scope.isSubscribed = '-positive';
 
-    $scope.toggleSubscribe = function () {
-        if ($scope.isSubscribed == '-positive')
-            $scope.isSubscribed = '';
-        else
-            $scope.isSubscribed = '-positive';
+
+    $scope.toggleSubscribe = function (index, username) {
+
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+        if($scope.isSubscribed[index] === '-positive'){
+            $http.delete('http://136.145.116.232/matchup/profile/'+username+'', config).success(function (data) {
+
+                $scope.isSubscribed[index] = '-stable';
+
+            }).error(function (err) {
+                console.log(err);
+            });
+        }
+        else{
+
+            $http.post('http://136.145.116.232/matchup/profile/'+username+'', {}, config).success(function (data) {
+
+                $scope.isSubscribed[index] = '-positive';
+
+            }).error(function (err) {
+                console.log(err);
+            });
+        }          
     };
 
 }]);
@@ -174,6 +204,37 @@ myApp.controller('profileEventsController', ['$scope', '$http', '$stateParams', 
 myApp.controller('myMatchupViewController', ['$scope', '$http', '$stateParams', function ($scope, $http, $stateParams) {
 
     $scope.competitors = ['img/ron.jpg', 'img/ronpaul.gif'];
+
+}]);
+
+myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$window', function ($scope, $http, $stateParams, $window) {
+
+    $scope.$on('$ionicView.enter', function () {
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+        $http.get('http://136.145.116.232/matchup/profile/', config).success(function (data) {
+
+            var profileData = angular.fromJson(data);
+            
+            $scope.tag = profileData.customer_tag;
+            $scope.firstName = profileData.customer_first_name;
+            $scope.lastName = profileData.customer_last_name;
+            $scope.bio = profileData.customer_bio;
+            $scope.coverPhoto = profileData.customer_cover_photo;
+            $scope.profilePic = profileData.customer_profile_pic;
+
+
+        }).
+        error(function (err){
+            console.log("error in goToEvent");
+        });
+
+
+    });
 
 }]);
 
