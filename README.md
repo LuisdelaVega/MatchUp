@@ -1,11 +1,11 @@
-FORMAT: 1A
 HOST: http://matchup.neptunolabs.com
+API: http://matchup.neptunolabs.com/api
 
 # MatchUp API
 MatchUp is an eSports management platform and social network for gaming enthusiast and event organizers.
 The system aims to solve the biggest problem that event organizers face when producing an eSports event, the lack of a unified management tool.
 
-# Group Search
+# Search
 ## Search All [/matchup/search/{parameter}]
 MatchUp provides a "Global Search". By global we mean you can search for Users, Events (divided into Live(ongoing), Past, Regular Upcoming, and Hosted Upcoming), Teams, Organizations, Games, Genres, and ... wait, that's it
 
@@ -198,7 +198,7 @@ MatchUp provides a "Global Search". By global we mean you can search for Users, 
         
             Unauthorized
 
-# Group User Accounts
+# User Accounts
 These routes provide the necesary functionality to create a new account in MatchUp and to login to an existing account by providing a correct combination of username and password.
 MatchUp has it's own token session service. When a user succesfully logs into the system, they are provided a token. This token is required to access the rest of the MatchUp API.
 
@@ -670,7 +670,7 @@ The my_profile parameter indicates whether or not the user requested it is looki
 
         User: username1 was not not found
 
-# Group Organizations
+# Organizations
 Organizations represent real world Companies/Organizations that would like to host eSports Events using MatchUp. Users can send a request to create an Organization.
 Organizations may have many members, and more than one member can be recognized as an owner for the Organization. 
 All members of an Organization (owners included) are given Event Organizer privileges on any Event hosted by the Organization they belong.
@@ -1057,7 +1057,7 @@ Get all Events this Organization has hosted or is hosting.
 
         Couldn't find the organization: NeptunoLabs
 
-# Group Teams
+# Teams
 Teams are groups of players that compete together in Tournaments. Every team is composed of one captain, and other team members.
 
 ## All Teams [/matchup/teams]
@@ -1429,7 +1429,7 @@ Captains that try to remove themselves from their Teams can't do so unless they 
 
         You can't remove user: username1
 
-# Group Games/Genres
+# Games/Genres
 MatchUp features eSport Events, and thus contains a list of video games to choose from. These games are also of a specific genre. When a Tournament is created it must specify which game is going to be played. 
 By doing so, users can look for Events that feature specific games or genres.
 
@@ -1505,7 +1505,7 @@ Genres will be ordered by popularity. Popularity indicates how many Tournaments 
         
             Unauthorized
 
-# Group Events
+# Events
 Events are the most important aspect of MatchUp. Users can create Events complete with their own set of rules, logo, banner, registration deadlines, etc. These Events feature Tournaments where other users compete against one
 another in their favourite video games. Events may be hosted by Organizations. For now on, we'll call them Hosted Events when they are hosted by an Organization and Regular Events when not.
 Hosted Events have extra features like multiple Tournaments, featuring of Sponsors, etc.
@@ -1905,7 +1905,7 @@ Only Hosted Events may be able to feature more than one Tournament.
 
         You can't delete this tournament
 
-# Group Spectators
+# Spectators
 Like in all types of sports activities, the fans are the real MVPs. A user can sign up to spectate Hosted Events to watch and cheer the competitors from the sidelines.
 
 ## All Spectators [/matchup/events/{event}/spectators{?date,location}]
@@ -2008,7 +2008,7 @@ already in the Event.
 
         You can't check-in people for this event
 
-# Group News
+# News
 Event Organizers can post news about their Events. Any sudden changes or just updates before, during, and after the Event can be posted has news.
 
 ## All News [/matchup/events/{event}/news{?date,location}]
@@ -2238,7 +2238,7 @@ Act on a single News posted for an Event.
 
         You can't delete news in this event
 
-# Group Reviews
+# Reviews
 Participants of a Hosted Events (spectators and competitors) can post a review for an Event.
 
 ## All Reviews [/matchup/events/{event}/reviews{?date,location}]
@@ -2483,7 +2483,7 @@ Act on a single review for an Event.
 
         You can't delete this review
 
-# Group Meetups
+# Meetups
 Participants of a Hosted Events (spectators and competitors) can create Meetups tied to that Event. A Meetup is an activity that happens, before and during an Event where attendees get together to play in there spare time.
 A tipical scenario involves someone, or a group of people, posting that they will be playing X game in Room 626 at Rammiott Hotel from Saturday at 8:00pm until Sunday at 3:00am.
 Players meet new people, sometimes even pros attend, and have a good time/practice.
@@ -2731,7 +2731,7 @@ Act on a single review for an Event.
 
         You can't delete this review
 
-# Group Sponsors
+# Sponsors
 Hosted Events can display they sponsors. Sponsors are Companies and/or other types of Organizations that give money or resourses to make Events happen.
 
 ## Sponsors of an Organization [/matchup/organizations/{organization}/sponsors{?sponsor}]
@@ -2965,7 +2965,7 @@ Act on all sponsors for an Event.
 
         Sponsor #2 does not sponsor your Event
 
-# Group Stations
+# Stations
 A station is where a match takes place. Hosted Events may have multiple stations, while Regular Events have none. 
 Real world stations in eSports are usually composed of a surface (table, desk, etc.) where a console/pc is set and runs a game. 
 Sometimes the matches played in specific stations are streamed online for the fans to watch at home.
@@ -3255,7 +3255,7 @@ The link for the stream will be stored so that Organizers know what matches are/
 
         You can't remove streams in this event
 
-# Group Tournaments
+# Tournaments
 Tournaments are the heart and soul of Events. Players compete against one another to make their way to the top.
 Tournaments feature a single game, but multiple tournaments within a single Event may feature the same game.
 Hosted Events may be composed of several Tournaments, while Regular Events feature only one.
@@ -3598,7 +3598,7 @@ Act on all stations of a Tournament.
 
         You can't remove stations from this tournament
 
-# Group Competitors
+# Competitors
 Competitors are the hard core gamers who spend hours practicing to better themselves and their opponents. They sign up to play in Tournaments.
 
 ## Competitors [/matchup/events/{event}/tournaments/{tournament}/competitors{?date,location}]
