@@ -36,16 +36,14 @@ var getTeam = function(req, res, pg, conString, log) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		client.query("BEGIN");
 		var query = client.query({
-			text : "SELECT team_name, team_logo, team_bio, team_cover_photo FROM team WHERE team_active AND team_name = $1",
-			values : [req.params.team]
+			text : "SELECT team_name, team_logo, team_bio, team_cover_photo, bool_and(team_name IN (SELECT team_name FROM belongs_to WHERE customer_username = $2)) AS is_member FROM team WHERE team_active AND team_name = $1 GROUP BY team_name, team_logo, team_bio, team_cover_photo",
+			values : [req.params.team, req.user.username]
 		});
 		query.on("row", function(row, result) {
 			result.addRow(row);
 		});
 		query.on('error', function(error) {
-			client.query("ROLLBACK");
 			done();
 			res.status(500).send(error);
 			log.info({
@@ -53,37 +51,14 @@ var getTeam = function(req, res, pg, conString, log) {
 			}, 'done response');
 		});
 		query.on("end", function(result) {
+			done();
 			if (result.rows.length) {
-				var team = new Object();
-				team.info = result.rows[0];
-				var playersQuery = client.query({
-					text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, bool_and(customer_username IN (SELECT customer_username FROM captain_for WHERE team_name = $1)) AS is_captain FROM customer NATURAL JOIN plays_for WHERE customer_active AND team_name = $1 GROUP BY customer_username",
-					values : [req.params.team]
-				});
-				playersQuery.on("row", function(row, result) {
-					result.addRow(row);
-				});
-				query.on('error', function(error) {
-					client.query("ROLLBACK");
-					done();
-					res.status(500).send(error);
-					log.info({
-						res : res
-					}, 'done response');
-				});
-				playersQuery.on("end", function(result) {
-					client.query("COMMIT");
-					done();
-					team.players = result.rows;
-					res.status(200).json(team);
-					log.info({
-						res : res
-					}, 'done response');
-				});
+				res.status(200).json(result.rows[0]);
+				log.info({
+					res : res
+				}, 'done response');
 			} else {
-				client.query("ROLLBACK");
-				done();
-				res.status(404).send('Oh, no! This team does not exist');
+				res.status(404).send("Couldn't find team: " + req.params.team);
 				log.info({
 					res : res
 				}, 'done response');
@@ -111,7 +86,9 @@ var editTeam = function(req, res, pg, conString, log) {
 
 		if (!req.body.logo && !req.body.bio && !req.body.cover) {
 			done();
-			res.status(401).send("Oh no! Disaster");
+			res.status(400).json({
+				error : "Incomplete or invalid parameters"
+			});
 			log.info({
 				res : res
 			}, 'done response');
@@ -129,7 +106,7 @@ var editTeam = function(req, res, pg, conString, log) {
 			} else {
 				client.query("COMMIT");
 				done();
-				res.status(200).send("Team info here");
+				res.status(200).send("Team info updated");
 			}
 			log.info({
 				res : res
@@ -172,8 +149,8 @@ var getTeamMembers = function(req, res, pg, conString, log) {
 		}
 
 		var query = client.query({
-			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, bool_and(customer_username IN (SELECT customer_username FROM captain_for WHERE team_name = $1)) AS is_captain FROM customer NATURAL JOIN plays_for NATURAL JOIN team WHERE team_name = $1 AND team_active GROUP BY customer_username",
-			values : [req.params.team]
+			text : "SELECT team_name, team_logo, team_bio, team_cover_photo, bool_and(team_name IN (SELECT team_name FROM belongs_to WHERE customer_username = $2)) AS is_member FROM team WHERE team_active AND team_name = $1 GROUP BY team_name, team_logo, team_bio, team_cover_photo",
+			values : [req.params.team, req.user.username]
 		});
 		query.on("row", function(row, result) {
 			result.addRow(row);
@@ -186,11 +163,35 @@ var getTeamMembers = function(req, res, pg, conString, log) {
 			}, 'done response');
 		});
 		query.on("end", function(result) {
-			done();
-			res.status(200).json(result.rows);
-			log.info({
-				res : res
-			}, 'done response');
+			if (result.rows.length) {
+				var query = client.query({
+					text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, bool_and(customer_username IN (SELECT customer_username FROM captain_for WHERE team_name = $1)) AS is_captain FROM customer NATURAL JOIN plays_for NATURAL JOIN team WHERE team_name = $1 AND team_active GROUP BY customer_username",
+					values : [req.params.team]
+				});
+				query.on("row", function(row, result) {
+					result.addRow(row);
+				});
+				query.on('error', function(error) {
+					done();
+					res.status(500).send(error);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+				query.on("end", function(result) {
+					done();
+					res.status(200).json(result.rows);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+			} else {
+				done();
+				res.status(404).send("Couldn't find team: " + req.params.team);
+				log.info({
+					res : res
+				}, 'done response');
+			};
 		});
 	});
 };
@@ -247,7 +248,7 @@ var addTeamMember = function(req, res, pg, conString, log) {
 							} else {
 								client.query("COMMIT");
 								done();
-								res.status(201).send('This user has been added! Yay!');
+								res.status(201).send("User: " + req.query.username + " has been added");
 							}
 							log.info({
 								res : res
@@ -256,7 +257,7 @@ var addTeamMember = function(req, res, pg, conString, log) {
 					} else {
 						client.query("ROLLBACK");
 						done();
-						res.status(400).send("Oh, no! This user does not exist");
+						res.status(404).send("Couldn't find user: " + req.query.username);
 						log.info({
 							res : res
 						}, 'done response');
@@ -265,7 +266,7 @@ var addTeamMember = function(req, res, pg, conString, log) {
 			} else {
 				client.query("ROLLBACK");
 				done();
-				res.status(401).send('Oh, no! It seems you are not part of this team');
+				res.status(403).send("You are not a member of this team");
 				log.info({
 					res : res
 				}, 'done response');
@@ -341,7 +342,7 @@ var removeTeamMember = function(req, res, pg, conString, log) {
 						} else {
 							client.query("ROLLBACK");
 							done();
-							res.status(401).send('Oh, no! It seems you are do not have enough privileges to do this');
+							res.status(403).send("You can't remove user: " + req.queryusername);
 							log.info({
 								res : res
 							}, 'done response');
@@ -349,7 +350,7 @@ var removeTeamMember = function(req, res, pg, conString, log) {
 					} else {
 						client.query("ROLLBACK");
 						done();
-						res.status(401).send('Oh, no! It seems this user is not a member of this team');
+						res.status(403).send("User: " + req.query.username + " is not a member of " + req.params.team);
 						log.info({
 							res : res
 						}, 'done response');
@@ -358,7 +359,7 @@ var removeTeamMember = function(req, res, pg, conString, log) {
 			} else {
 				client.query("ROLLBACK");
 				done();
-				res.status(401).send('Oh, no! It seems you are not a member of this team');
+				res.status(403).send("You are not a member of " + req.params.team);
 				log.info({
 					res : res
 				}, 'done response');
@@ -433,7 +434,7 @@ var makeCaptain = function(req, res, pg, conString, log) {
 									} else {
 										client.query("COMMIT");
 										done();
-										res.status(201).send("Yay " + req.query.username + " has beed made captain!");
+										res.status(201).send("User: " + req.query.username + " has beed made captain");
 									}
 									log.info({
 										res : res
@@ -444,7 +445,7 @@ var makeCaptain = function(req, res, pg, conString, log) {
 					} else {
 						client.query("ROLLBACK");
 						done();
-						res.status(401).send("Oh, no! It seems " + req.query.username + " is not a member of " + req.params.team);
+						res.status(403).send("User: " + req.query.username + " is not a member of " + req.params.team);
 						log.info({
 							res : res
 						}, 'done response');
@@ -453,7 +454,7 @@ var makeCaptain = function(req, res, pg, conString, log) {
 			} else {
 				client.query("ROLLBACK");
 				done();
-				res.status(401).send("Oh no! It seems you (" + req.user.username + ") are not the captain of " + req.params.team);
+				res.status(403).send("You are not the captain of " + req.params.team);
 				log.info({
 					res : res
 				}, 'done response');

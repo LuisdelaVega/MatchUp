@@ -19,7 +19,6 @@ var getUserProfile = function(req, res, pg, conString, log) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var profile = new Object();
 		// Query the database to find the user's account
 		var query = client.query({
 			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, of_email.email_address, bool_and(customer_username = $1) AS my_profile FROM customer NATURAL JOIN of_email WHERE customer_username = $2 AND customer_active GROUP BY customer_username, email_address",
@@ -41,7 +40,7 @@ var getUserProfile = function(req, res, pg, conString, log) {
 				res.status(200).json(result.rows[0]);
 
 			} else {
-				res.status(404).send('Oh, no! This user does not exist');
+				res.status(404).send("User: " + req.params.username + " was not not found");
 			}
 			log.info({
 				res : res
@@ -56,9 +55,10 @@ var getSubscriptions = function(req, res, pg, conString, log) {
 			return console.error('error fetching client from pool', err);
 		}
 
+		// Query the database to find the user's account
 		var query = client.query({
-			text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic FROM customer JOIN subscribed_to ON customer.customer_username = subscribed_to.interest WHERE subscribed_to.subscriber = $1 AND customer.customer_active",
-			values : [req.params.username]
+			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, of_email.email_address, bool_and(customer_username = $1) AS my_profile FROM customer NATURAL JOIN of_email WHERE customer_username = $2 AND customer_active GROUP BY customer_username, email_address",
+			values : [req.user.username, req.params.username]
 		});
 		query.on("row", function(row, result) {
 			result.addRow(row);
@@ -71,11 +71,35 @@ var getSubscriptions = function(req, res, pg, conString, log) {
 			}, 'done response');
 		});
 		query.on("end", function(result) {
-			done();
-			res.status(200).send(result.rows);
-			log.info({
-				res : res
-			}, 'done response');
+			if (result.rows.length) {
+				var query = client.query({
+					text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic FROM customer JOIN subscribed_to ON customer.customer_username = subscribed_to.interest WHERE subscribed_to.subscriber = $1 AND customer.customer_active",
+					values : [req.params.username]
+				});
+				query.on("row", function(row, result) {
+					result.addRow(row);
+				});
+				query.on('error', function(error) {
+					done();
+					res.status(500).send(error);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+				query.on("end", function(result) {
+					done();
+					res.status(200).send(result.rows);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+			} else {
+				done();
+				res.status(404).send("User: " + req.params.username + " was not not found");
+				log.info({
+					res : res
+				}, 'done response');
+			}
 		});
 	});
 };
@@ -86,9 +110,10 @@ var getTeams = function(req, res, pg, conString, log) {
 			return console.error('error fetching client from pool', err);
 		}
 
+		// Query the database to find the user's account
 		var query = client.query({
-			text : "SELECT team_name, team_logo FROM team NATURAL JOIN plays_for WHERE customer_username = $1 AND team_active",
-			values : [req.params.username]
+			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, of_email.email_address, bool_and(customer_username = $1) AS my_profile FROM customer NATURAL JOIN of_email WHERE customer_username = $2 AND customer_active GROUP BY customer_username, email_address",
+			values : [req.user.username, req.params.username]
 		});
 		query.on("row", function(row, result) {
 			result.addRow(row);
@@ -101,11 +126,35 @@ var getTeams = function(req, res, pg, conString, log) {
 			}, 'done response');
 		});
 		query.on("end", function(result) {
-			done();
-			res.status(200).send(result.rows);
-			log.info({
-				res : res
-			}, 'done response');
+			if (result.rows.length) {
+				var query = client.query({
+					text : "SELECT team_name, team_logo, team_cover_photo FROM team NATURAL JOIN plays_for WHERE customer_username = $1 AND team_active",
+					values : [req.params.username]
+				});
+				query.on("row", function(row, result) {
+					result.addRow(row);
+				});
+				query.on('error', function(error) {
+					done();
+					res.status(500).send(error);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+				query.on("end", function(result) {
+					done();
+					res.status(200).send(result.rows);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+			} else {
+				done();
+				res.status(404).send("User: " + req.params.username + " was not not found");
+				log.info({
+					res : res
+				}, 'done response');
+			}
 		});
 	});
 };
@@ -117,8 +166,8 @@ var getOrganizations = function(req, res, pg, conString, log) {
 		}
 
 		var query = client.query({
-			text : "SELECT organization_name, organization_logo FROM organization NATURAL JOIN belongs_to WHERE customer_username = $1 AND organization_active",
-			values : [req.params.username]
+			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, of_email.email_address, bool_and(customer_username = $1) AS my_profile FROM customer NATURAL JOIN of_email WHERE customer_username = $2 AND customer_active GROUP BY customer_username, email_address",
+			values : [req.user.username, req.params.username]
 		});
 		query.on("row", function(row, result) {
 			result.addRow(row);
@@ -132,7 +181,31 @@ var getOrganizations = function(req, res, pg, conString, log) {
 		});
 		query.on("end", function(result) {
 			done();
-			res.status(200).send(result.rows);
+			if (result.rows.length) {
+				var query = client.query({
+					text : "SELECT organization_name, organization_logo, organization_cover_photo FROM organization NATURAL JOIN belongs_to WHERE customer_username = $1 AND organization_active",
+					values : [req.params.username]
+				});
+				query.on("row", function(row, result) {
+					result.addRow(row);
+				});
+				query.on('error', function(error) {
+					done();
+					res.status(500).send(error);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+				query.on("end", function(result) {
+					done();
+					res.status(200).send(result.rows);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+			} else {
+				res.status(404).send("User: " + req.params.username + " was not not found");
+			}
 			log.info({
 				res : res
 			}, 'done response');
@@ -147,8 +220,8 @@ var getEvents = function(req, res, pg, conString, log) {
 		}
 
 		var query = client.query({
-			text : "SELECT event_name, event_start_date, event_end_date, event_location, event_logo FROM event WHERE customer_username = $1 AND event_active",
-			values : [req.params.username]
+			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, of_email.email_address, bool_and(customer_username = $1) AS my_profile FROM customer NATURAL JOIN of_email WHERE customer_username = $2 AND customer_active GROUP BY customer_username, email_address",
+			values : [req.user.username, req.params.username]
 		});
 		query.on("row", function(row, result) {
 			result.addRow(row);
@@ -161,11 +234,36 @@ var getEvents = function(req, res, pg, conString, log) {
 			}, 'done response');
 		});
 		query.on("end", function(result) {
-			done();
-			res.status(200).send(result.rows);
-			log.info({
-				res : res
-			}, 'done response');
+			if (result.rows.length) {
+				var query = client.query({
+					text : "SELECT event_name, event_start_date, event_end_date, event_location, event_logo, event_banner FROM event WHERE customer_username = $1 AND event_active",
+					values : [req.params.username]
+				});
+				query.on("row", function(row, result) {
+					result.addRow(row);
+				});
+				query.on('error', function(error) {
+					done();
+					res.status(500).send(error);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+				query.on("end", function(result) {
+					done();
+					res.status(200).send(result.rows);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+
+			} else {
+				done();
+				res.status(404).send("User: " + req.params.username + " was not not found");
+				log.info({
+					res : res
+				}, 'done response');
+			}
 		});
 	});
 };
@@ -176,63 +274,88 @@ var getRegisteredEvents = function(req, res, pg, conString, log) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		if (!req.query.type) {
+		var query = client.query({
+			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, of_email.email_address, bool_and(customer_username = $1) AS my_profile FROM customer NATURAL JOIN of_email WHERE customer_username = $2 AND customer_active GROUP BY customer_username, email_address",
+			values : [req.user.username, req.params.username]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
 			done();
-			res.status(400).send("No type specified");
+			res.status(500).send(error);
 			log.info({
 				res : res
 			}, 'done response');
-		} else if (req.query.type === "spectator") {
-			var query = client.query({
-				text : "SELECT DISTINCT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_logo FROM pays JOIN event ON pays.event_name = event.event_name AND pays.event_start_date = event.event_start_date AND pays.event_location = event.event_location WHERE pays.customer_username = $1 AND event.event_active",
-				values : [req.params.username]
-			});
-			query.on("row", function(row, result) {
-				result.addRow(row);
-			});
-			query.on('error', function(error) {
+		});
+		query.on("end", function(result) {
+			if (result.rows.length) {
+				if (!req.query.type) {
+					done();
+					res.status(400).send("No type specified");
+					log.info({
+						res : res
+					}, 'done response');
+				} else if (req.query.type === "spectator") {
+					var query = client.query({
+						text : "SELECT DISTINCT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_logo, event_banner FROM pays JOIN event ON pays.event_name = event.event_name AND pays.event_start_date = event.event_start_date AND pays.event_location = event.event_location WHERE pays.customer_username = $1 AND event.event_active",
+						values : [req.params.username]
+					});
+					query.on("row", function(row, result) {
+						result.addRow(row);
+					});
+					query.on('error', function(error) {
+						done();
+						res.status(500).send(error);
+						log.info({
+							res : res
+						}, 'done response');
+					});
+					query.on("end", function(result) {
+						done();
+						res.status(200).send(result.rows);
+						log.info({
+							res : res
+						}, 'done response');
+					});
+				} else if (req.query.type === "competitor") {
+					var query = client.query({
+						text : "SELECT DISTINCT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_logo, event_banner FROM is_a JOIN event ON is_a.event_name = event.event_name AND is_a.event_start_date = event.event_start_date AND is_a.event_location = event.event_location WHERE is_a.customer_username = $1 AND event.event_active",
+						values : [req.params.username]
+					});
+					query.on("row", function(row, result) {
+						result.addRow(row);
+					});
+					query.on('error', function(error) {
+						done();
+						res.status(500).send(error);
+						log.info({
+							res : res
+						}, 'done response');
+					});
+					query.on("end", function(result) {
+						done();
+						res.status(200).send(result.rows);
+						log.info({
+							res : res
+						}, 'done response');
+					});
+				} else {
+					done();
+					res.status(400).send("No valid type specified. Posible values [spectator, competitor]");
+					log.info({
+						res : res
+					}, 'done response');
+				}
+
+			} else {
 				done();
-				res.status(500).send(error);
+				res.status(404).send("User: " + req.params.username + " was not not found");
 				log.info({
 					res : res
 				}, 'done response');
-			});
-			query.on("end", function(result) {
-				done();
-				res.status(200).send(result.rows);
-				log.info({
-					res : res
-				}, 'done response');
-			});
-		} else if (req.query.type === "competitor") {
-			var query = client.query({
-				text : "SELECT DISTINCT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_logo FROM is_a JOIN event ON is_a.event_name = event.event_name AND is_a.event_start_date = event.event_start_date AND is_a.event_location = event.event_location WHERE is_a.customer_username = $1 AND event.event_active",
-				values : [req.params.username]
-			});
-			query.on("row", function(row, result) {
-				result.addRow(row);
-			});
-			query.on('error', function(error) {
-				done();
-				res.status(500).send(error);
-				log.info({
-					res : res
-				}, 'done response');
-			});
-			query.on("end", function(result) {
-				done();
-				res.status(200).send(result.rows);
-				log.info({
-					res : res
-				}, 'done response');
-			});
-		} else {
-			done();
-			res.status(400).send("No valid type specified. Posible values [spectator, competitor]");
-			log.info({
-				res : res
-			}, 'done response');
-		}
+			}
+		});
 	});
 };
 
@@ -249,22 +372,49 @@ var subscribe = function(req, res, pg, conString, log) {
 				res : res
 			}, 'done response');
 		} else {
+			var profile = new Object();
 			client.query("START TRANSACTION");
-			client.query({
-				text : "INSERT INTO subscribed_to (subscriber, interest) VALUES ($1, $2)",
+			// Query the database to find the user's account
+			var query = client.query({
+				text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, of_email.email_address, bool_and(customer_username = $1) AS my_profile FROM customer NATURAL JOIN of_email WHERE customer_username = $2 AND customer_active GROUP BY customer_username, email_address",
 				values : [req.user.username, req.params.username]
-			}, function(err, result) {
-				if (err) {
-					client.query("ROLLBACK");
-					done();
-					res.status(500).send(err);
-					log.info({
-						res : res
-					}, 'done response');
+			});
+			query.on("row", function(row, result) {
+				result.addRow(row);
+			});
+			query.on('error', function(error) {
+				done();
+				res.status(500).send(error);
+				log.info({
+					res : res
+				}, 'done response');
+			});
+			query.on("end", function(result) {
+				if (result.rows.length) {
+					client.query({
+						text : "INSERT INTO subscribed_to (subscriber, interest) VALUES ($1, $2)",
+						values : [req.user.username, req.params.username]
+					}, function(err, result) {
+						if (err) {
+							client.query("ROLLBACK");
+							done();
+							res.status(500).send(err);
+							log.info({
+								res : res
+							}, 'done response');
+						} else {
+							client.query("COMMIT");
+							done();
+							res.status(201).send("Subscribed to: " + req.params.username);
+							log.info({
+								res : res
+							}, 'done response');
+						}
+					});
+
 				} else {
-					client.query("COMMIT");
 					done();
-					res.status(201).send("Subscribed to: " + req.params.username);
+					res.status(404).send("User: " + req.params.username + " was not not found");
 					log.info({
 						res : res
 					}, 'done response');
@@ -375,7 +525,7 @@ var deleteAccount = function(req, res, pg, conString, log) {
 
 		client.query("BEGIN");
 		var query = client.query({
-			text : "SELECT customer_username FROM captain_for NATURAL JOIN owns WHERE customer_username = $1 AND customer_active",
+			text : "SELECT NOT bool_or(customer_username IN (SELECT customer_username FROM captain_for) OR customer_username IN (SELECT customer_username FROM owns)) AS can_delete FROM customer WHERE customer_username = $1",
 			values : [req.user.username]
 		});
 		query.on("row", function(row, result) {
@@ -390,7 +540,7 @@ var deleteAccount = function(req, res, pg, conString, log) {
 			}, 'done response');
 		});
 		query.on("end", function(result) {
-			if (result.rows.length) {
+			if (result.rows[0].can_delete) {
 				client.query({
 					text : "UPDATE customer SET customer_active = FALSE WHERE customer_username = $1",
 					values : [req.user.username]
@@ -411,7 +561,7 @@ var deleteAccount = function(req, res, pg, conString, log) {
 			} else {
 				client.query("ROLLBACK");
 				done();
-				res.status(403).send("Oh, no! Relinquish your captain/owner titles before deleting dummy");
+				res.status(403).send("Can't delete account. Still captain or owner");
 				log.info({
 					res : res
 				}, 'done response');
@@ -562,7 +712,7 @@ var createTeam = function(req, res, pg, conString, log) {
 			} else {
 				client.query("ROLLBACK");
 				done();
-				res.status(401).send("Oh, no! It seems this user does not exist");
+				res.status(404).send("Couldn't find user: " + req.user.username);
 				log.info({
 					res : res
 				}, 'done response');
@@ -608,10 +758,12 @@ var createEvent = function(req, res, pg, conString, log) {
 		var eventStartDate = new Date(req.body.event.start_date);
 		var eventEndDate = new Date(req.body.event.end_date);
 		var eventRegistrationDeadline = new Date(req.body.event.registration_deadline);
-		if (!(eventStartDate.getTime()) || !(eventEndDate.getTime()) || !(eventRegistrationDeadline.getTime()) || eventRegistrationDeadline.getTime() > eventStartDate.getTime() || eventStartDate.getTime() > eventEndDate.getTime()) {
+		if (!(eventStartDate.getTime()) || !(eventEndDate.getTime()) || !(eventRegistrationDeadline.getTime()) || eventRegistrationDeadline.getTime() > eventStartDate.getTime() || eventStartDate.getTime() > eventEndDate.getTime() || !req.body.event.name || !req.body.event.location || !req.user.username || !req.body.event.venue || !req.body.event.banner || !req.body.event.logo || !req.body.event.rules || !req.body.event.description || isNaN(req.body.event.deduction_fee) || req.body.event.deduction_fee < 0 || !req.body.event.is_online || !req.body.event.type) {
 			client.query("ROLLBACK");
 			done();
-			res.status(400).send('Invalid date');
+			res.status(400).json({
+				error : "Incomplete or invalid parameters"
+			});
 			log.info({
 				res : res
 			}, 'done response');
@@ -631,19 +783,21 @@ var createEvent = function(req, res, pg, conString, log) {
 					if (!req.query.hosted) {
 						var startDate = new Date(req.body.tournament[0].start_date);
 						var checkInDeadline = new Date(req.body.tournament[0].deadline);
-						if (!(startDate.getTime()) || !(checkInDeadline.getTime()) || startDate.getTime() < checkInDeadline.getTime() || startDate.getTime() < eventStartDate.getTime() || startDate.getTime() > eventEndDate.getTime()) {
+						if (!(startDate.getTime()) || !(checkInDeadline.getTime()) || startDate.getTime() < checkInDeadline.getTime() || startDate.getTime() < eventStartDate.getTime() || startDate.getTime() > eventEndDate.getTime() || !tournament[0].name || !tournament[0].game || !tournament[0].rules || !tournament[0].teams || isNaN(tournament[0].fee) || tournament[0].fee < 0 || isNaN(tournament[0].capacity) || tournament[0].capacity < 0 || isNaN(tournament[0].seed_money) || tournament[0].seed_money < 0 || !tournament[0].type || !tournament[0].format || !tournament[0].scoring || isNaN(tournament[0].group_players) || tournament[0].group_players < 0 || isNaN(tournament[0].group_winners) || tournament[0].group_winners < 0) {
 							client.query("ROLLBACK");
 							done();
-							res.status(400).send('Invalid date');
+							res.status(400).json({
+								error : "Incomplete or invalid parameters"
+							});
 							log.info({
 								res : res
 							}, 'done response');
 						} else {
-							var queryGame = client.query({
+							var query = client.query({
 								text : "SELECT game_name FROM game WHERE game_name = $1",
 								values : [tournament[0].game]
 							});
-							queryGame.on("row", function(row, result) {
+							query.on("row", function(row, result) {
 								result.addRow(row);
 							});
 							query.on('error', function(error) {
@@ -654,7 +808,7 @@ var createEvent = function(req, res, pg, conString, log) {
 									res : res
 								}, 'done response');
 							});
-							queryGame.on("end", function(result) {
+							query.on("end", function(result) {
 								if (result.rows.length) {
 									client.query({
 										text : "INSERT INTO tournament (event_name, event_start_date, event_location, tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
@@ -680,7 +834,9 @@ var createEvent = function(req, res, pg, conString, log) {
 								} else {
 									client.query("ROLLBACK");
 									done();
-									res.status(404).send("Couldn't find the game: " + tournament[0].game);
+									res.status(404).json({
+										error : "Couldn't find the game: " + tournament[0].game
+									});
 									log.info({
 										res : res
 									}, 'done response');
@@ -691,19 +847,23 @@ var createEvent = function(req, res, pg, conString, log) {
 						var tournament = req.body.tournament;
 						var i = 0;
 						for ( i = 0; i < tournament.length; i++) {
-							if (!((new Date(req.body.tournament[i].start_date)).getTime()) || !((new Date(req.body.tournament[i].deadline)).getTime())) {
+							var startDate = new Date(req.body.tournament[i].start_date);
+							var checkInDeadline = new Date(req.body.tournament[i].deadline);
+							if (!(startDate.getTime()) || !(checkInDeadline.getTime()) || startDate.getTime() < checkInDeadline.getTime() || startDate.getTime() < eventStartDate.getTime() || startDate.getTime() > eventEndDate.getTime() || !tournament[i].name || !tournament[i].game || !tournament[i].rules || !tournament[i].teams || isNaN(tournament[i].fee) || tournament[i].fee < 0 || isNaN(tournament[i].capacity) || tournament[i].capacity < 0 || isNaN(tournament[i].seed_money) || tournament[i].seed_money < 0 || !tournament[i].type || !tournament[i].format || !tournament[i].scoring || isNaN(tournament[i].group_players) || tournament[i].group_players < 0 || isNaN(tournament[i].group_winners) || tournament[i].group_winners < 0) {
 								client.query("ROLLBACK");
 								done();
-								res.status(400).send('Invalid date');
+								res.status(400).json({
+									error : "Incomplete or invalid parameters"
+								});
 								log.info({
 									res : res
 								}, 'done response');
 							} else {
-								var queryGame = client.query({
+								var query = client.query({
 									text : "SELECT game_name FROM game WHERE game_name = $1",
 									values : [tournament[i].game]
 								});
-								queryGame.on("row", function(row, result) {
+								query.on("row", function(row, result) {
 									result.addRow(row);
 								});
 								query.on('error', function(error) {
@@ -714,7 +874,7 @@ var createEvent = function(req, res, pg, conString, log) {
 										res : res
 									}, 'done response');
 								});
-								queryGame.on("end", function(result) {
+								query.on("end", function(result) {
 									if (result.rows.length) {
 										client.query({
 											text : "INSERT INTO tournament (event_name, event_start_date, event_location, tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
@@ -732,7 +892,9 @@ var createEvent = function(req, res, pg, conString, log) {
 									} else {
 										client.query("ROLLBACK");
 										done();
-										res.status(404).send("Couldn't find the game: " + tournament[i].game);
+										res.status(404).json({
+											error : "Couldn't find the game: " + tournament[i].game
+										});
 										log.info({
 											res : res
 										}, 'done response');
@@ -744,19 +906,30 @@ var createEvent = function(req, res, pg, conString, log) {
 							var fees = req.body.fees;
 							var j = 0;
 							for ( j = 0; j < fees.length; j++) {
-								client.query({
-									text : "INSERT INTO spectator_fee (event_name, event_start_date, event_location, spec_fee_name, spec_fee_amount, spec_fee_description, spec_fee_amount_available) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-									values : [req.body.event.name, req.body.event.start_date, req.body.event.location, fees[j].name, Math.floor(fees[j].amount * 100) / 100, fees[j].description, fees[j].available]
-								}, function(err, result) {
-									if (err) {
-										client.query("ROLLBACK");
-										done();
-										res.status(500).send(err);
-										log.info({
-											res : res
-										}, 'done response');
-									}
-								});
+								if (!fees[j].name || isNaN(fees[j].amount) || fees[j].amount < 0 || !fees[j].description || isNaN(fees[j].available) || fees[j].available < 0) {
+									client.query({
+										text : "INSERT INTO spectator_fee (event_name, event_start_date, event_location, spec_fee_name, spec_fee_amount, spec_fee_description, spec_fee_amount_available) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+										values : [req.body.event.name, req.body.event.start_date, req.body.event.location, fees[j].name, Math.floor(fees[j].amount * 100) / 100, fees[j].description, fees[j].available]
+									}, function(err, result) {
+										if (err) {
+											client.query("ROLLBACK");
+											done();
+											res.status(500).send(err);
+											log.info({
+												res : res
+											}, 'done response');
+										}
+									});
+								} else {
+									client.query("ROLLBACK");
+									done();
+									res.status(400).json({
+										error : "Incomplete or invalid parameters"
+									});
+									log.info({
+										res : res
+									}, 'done response');
+								}
 							}
 							if (j == fees.length) {
 								var sponsors = req.body.sponsors;
@@ -837,7 +1010,9 @@ var createEvent = function(req, res, pg, conString, log) {
 										} else {
 											client.query("ROLLBACK");
 											done();
-											res.status(403).send("You are not a member of: " + req.body.host);
+											res.status(403).json({
+												error : "You are not a member of: " + req.body.host
+											});
 											log.info({
 												res : res
 											}, 'done response');

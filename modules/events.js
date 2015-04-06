@@ -1,5 +1,3 @@
-//TODO Take all dates and storee them in the DB using toUTCString
-
 var getEventsParams = {
 	type : ["regular", "hosted"],
 	filter : ["game", "genre"],
@@ -117,69 +115,60 @@ var getEvent = function(req, res, pg, conString, log) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var date = new Date(req.query.date);
-		if (!(date.getTime())) {
+		var event = new Object();
+		client.query("BEGIN");
+		var query = client.query({
+			text : "SELECT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_venue, event.event_banner, event.event_logo, event.event_registration_deadline, event.event_rules, event.event_description, event.event_deduction_fee, event.event_is_online, event.event_type, event.customer_username AS creator, hosts.organization_name AS host FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND event.event_active;",
+			values : [req.params.event, req.query.date, req.query.location]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			client.query("ROLLBACK");
 			done();
-			res.status(400).send('Invalid date');
+			res.status(500).send(error);
 			log.info({
 				res : res
 			}, 'done response');
-		} else {
-			var event = new Object();
-			client.query("BEGIN");
-			var query = client.query({
-				text : "SELECT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_venue, event.event_banner, event.event_logo, event.event_registration_deadline, event.event_rules, event.event_description, event.event_deduction_fee, event.event_is_online, event.event_type, event.customer_username AS creator, hosts.organization_name AS host FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND event.event_active;",
-				values : [req.params.event, req.query.date, req.query.location]
-			});
-			query.on("row", function(row, result) {
-				result.addRow(row);
-			});
-			query.on('error', function(error) {
-				client.query("ROLLBACK");
-				done();
-				res.status(500).send(error);
-				log.info({
-					res : res
-				}, 'done response');
-			});
-			query.on("end", function(result) {
-				if (result.rows.length) {
-					event = result.rows[0];
-					// Check if user is organizer
-					var query = client.query({
-						text : "SELECT distinct customer.customer_username FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location LEFT OUTER JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active;",
-						values : [req.params.event, req.query.date, req.query.location, req.user.username]
-					});
-					query.on("row", function(row, result) {
-						result.addRow(row);
-					});
-					query.on('error', function(error) {
-						client.query("ROLLBACK");
-						done();
-						res.status(500).send(error);
-						log.info({
-							res : res
-						}, 'done response');
-					});
-					query.on("end", function(result) {
-						client.query("COMMIT");
-						done();
-						event.is_organizer = (result.rows.length > 0);
-						res.status(200).json(event);
-						log.info({
-							res : res
-						}, 'done response');
-					});
-				} else {
+		});
+		query.on("end", function(result) {
+			if (result.rows.length) {
+				event = result.rows[0];
+				// Check if user is organizer
+				var query = client.query({
+					text : "SELECT distinct customer.customer_username FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location LEFT OUTER JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active;",
+					values : [req.params.event, req.query.date, req.query.location, req.user.username]
+				});
+				query.on("row", function(row, result) {
+					result.addRow(row);
+				});
+				query.on('error', function(error) {
 					client.query("ROLLBACK");
 					done();
-					res.status(404).send("Couldn't find the event: " + req.params.event + " starting on: " + req.query.date + " located at: " + req.query.location);
+					res.status(500).send(error);
 					log.info({
 						res : res
 					}, 'done response');
-				}
-			});
-		}
+				});
+				query.on("end", function(result) {
+					client.query("COMMIT");
+					done();
+					event.is_organizer = (result.rows.length > 0);
+					res.status(200).json(event);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+			} else {
+				client.query("ROLLBACK");
+				done();
+				res.status(404).send("Couldn't find the event: " + req.params.event + " starting on: " + req.query.date + " located at: " + req.query.location);
+				log.info({
+					res : res
+				}, 'done response');
+			}
+		});
 	});
 };
 
@@ -1064,7 +1053,7 @@ var addSponsorToEvent = function(req, res, pg, conString, log) {
 					} else {
 						client.query("ROLLBACK");
 						done();
-						res.status(403).send(req.query.sponsor + " does not sponsor your Organization");
+						res.status(404).send(req.query.sponsor + " does not sponsor your Organization");
 						log.info({
 							res : res
 						}, 'done response');
@@ -1143,7 +1132,7 @@ var removeSponsor = function(req, res, pg, conString, log) {
 					} else {
 						client.query("ROLLBACK");
 						done();
-						res.status(403).send(req.query.sponsor + " does not sponsor your Event");
+						res.status(404).send(req.query.sponsor + " does not sponsor your Event");
 						log.info({
 							res : res
 						}, 'done response');
@@ -2236,68 +2225,87 @@ var addTournament = function(req, res, pg, conString, log) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var eventStartDate = new Date(req.query.date);
-		var startDate = new Date(req.body.start_date);
-		var checkInDeadline = new Date(req.body.deadline);
-		if (!(eventStartDate.getTime()) || !(startDate.getTime()) || !(checkInDeadline.getTime()) || checkInDeadline.getTime() > startDate.getTime() || eventStartDate.getTime() > startDate.getTime()) {
+		client.query("BEGIN");
+		// Check if the user is registered for this event
+		var query = client.query({
+			text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
+			values : [req.params.event, req.query.date, req.query.location, req.user.username]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			client.query("ROLLBACK");
 			done();
-			res.status(400).send('Invalid date');
+			res.status(500).send(error);
 			log.info({
 				res : res
 			}, 'done response');
-		} else {
-			client.query("BEGIN");
-			// Check if the user is registered for this event
-			var query = client.query({
-				text : "SELECT distinct customer.customer_username FROM hosts JOIN event ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
-				values : [req.params.event, req.query.date, req.query.location, req.user.username]
-			});
-			query.on("row", function(row, result) {
-				result.addRow(row);
-			});
-			query.on('error', function(error) {
-				client.query("ROLLBACK");
-				done();
-				res.status(500).send(error);
-				log.info({
-					res : res
-				}, 'done response');
-			});
-			query.on("end", function(result) {
-				if (result.rows.length) {
-					client.query({
-						text : "INSERT INTO tournament (event_name, event_start_date, event_location, tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
-						values : [req.params.event, req.query.date, req.query.location, req.body.name, req.body.game, req.body.rules, req.body.teams, req.body.start_date, req.body.deadline, Math.floor(req.body.fee * 100) / 100, req.body.capacity, Math.floor(req.body.seed_money * 100) / 100, req.body.type, req.body.format, req.body.scoring, ((req.body.type === "Two-Stage") ? req.body.group_players : 0), ((req.body.type === "Two-Stage") ? req.body.group_winners : 0)]
-					}, function(err, result) {
-						if (err) {
-							clent.query("ROLLBACK");
-							done();
-							res.status(500).send(err);
-						} else {
-							client.query("COMMIT");
-							done();
-							var result = new Object();
-							result.event = new Object();
-							result.event.name = req.params.event;
-							result.event.start_date = req.query.date;
-							result.event.location = req.query.location;
-							result.tournament = req.body.name;
-							res.status(201).json(result);
-						}
-						log.info({
-							res : res
-						}, 'done response');
-					});
-				} else {
+		});
+		query.on("end", function(result) {
+			if (result.rows.length) {
+				var query = client.query({
+					text : "SELECT game_name FROM game WHERE game_name = $1",
+					values : [tournament[0].game]
+				});
+				query.on("row", function(row, result) {
+					result.addRow(row);
+				});
+				query.on('error', function(error) {
 					client.query("ROLLBACK");
 					done();
-					res.status(403).send("You are not an organizer or event not hosted");
+					res.status(500).send(error);
 					log.info({
 						res : res
 					}, 'done response');
-				}
-			});
-		}
+				});
+				query.on("end", function(result) {
+					if (result.rows.length) {
+						client.query({
+							text : "INSERT INTO tournament (event_name, event_start_date, event_location, tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
+							values : [req.params.event, req.query.date, req.query.location, req.body.name, req.body.game, req.body.rules, req.body.teams, req.body.start_date, req.body.deadline, Math.floor(req.body.fee * 100) / 100, req.body.capacity, Math.floor(req.body.seed_money * 100) / 100, req.body.type, req.body.format, req.body.scoring, ((req.body.type === "Two-Stage") ? req.body.group_players : 0), ((req.body.type === "Two-Stage") ? req.body.group_winners : 0)]
+						}, function(err, result) {
+							if (err) {
+								clent.query("ROLLBACK");
+								done();
+								res.status(500).send(err);
+							} else {
+								client.query("COMMIT");
+								done();
+								var result = new Object();
+								result.event = new Object();
+								result.event.name = req.params.event;
+								result.event.start_date = req.query.date;
+								result.event.location = req.query.location;
+								result.tournament = req.body.name;
+								res.status(201).json(result);
+							}
+							log.info({
+								res : res
+							}, 'done response');
+						});
+					} else {
+						client.query("ROLLBACK");
+						done();
+						res.status(404).json({
+							error : "Couldn't find the game: " + tournament[0].game
+						});
+						log.info({
+							res : res
+						}, 'done response');
+					}
+				});
+			} else {
+				client.query("ROLLBACK");
+				done();
+				res.status(403).json({
+					error : "You are not an organizer or event not hosted"
+				});
+				log.info({
+					res : res
+				}, 'done response');
+			}
+		});
 	});
 };
 
@@ -2436,74 +2444,56 @@ var editEvent = function(req, res, pg, conString, log) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var eventStartDate = new Date(req.query.date);
-		if (!(eventStartDate.getTime())) {
+		client.query("BEGIN");
+		// Check if the user is an organizer for this event
+		var query = client.query({
+			text : "SELECT distinct customer.customer_username FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location LEFT OUTER JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active;",
+			values : [req.params.event, req.query.date, req.query.location, req.user.username]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			client.query("ROLLBACK");
 			done();
-			res.status(400).send('Invalid date');
-		} else {
-			client.query("BEGIN");
-			// Check if the user is an organizer for this event
-			var query = client.query({
-				text : "SELECT distinct customer.customer_username FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location LEFT OUTER JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active;",
-				values : [req.params.event, req.query.date, req.query.location, req.user.username]
-			});
-			query.on("row", function(row, result) {
-				result.addRow(row);
-			});
-			query.on('error', function(error) {
-				client.query("ROLLBACK");
-				done();
-				res.status(500).send(error);
-				log.info({
-					res : res
-				}, 'done response');
-			});
-			query.on("end", function(result) {
-				if (result.rows.length) {
-					var eventStartDate = new Date(req.body.event.start_date);
-					var eventEndDate = new Date(req.body.event.end_date);
-					var eventRegistrationDeadline = new Date(req.body.event.registration_deadline);
-					if (!(eventStartDate.getTime()) || !(eventEndDate.getTime()) || !(eventRegistrationDeadline.getTime()) || eventRegistrationDeadline.getTime() > eventStartDate.getTime() || eventStartDate.getTime() > eventEndDate.getTime()) {
+			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+		query.on("end", function(result) {
+			if (result.rows.length) {
+				client.query({
+					text : "UPDATE event SET (event_name, event_start_date, event_location, event_venue, event_banner, event_logo, event_end_date, event_registration_deadline, event_rules, event_description, event_deduction_fee, event_is_online, event_type) = ($4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
+					values : [req.params.event, req.query.date, req.query.location, req.body.name, req.body.start_date, req.body.location, req.body.venue, req.body.banner, req.body.logo, req.body.end_date, req.body.registration_deadline, req.body.rules, req.body.description, req.body.deduction_fee, req.body.is_online, req.body.type]
+				}, function(err, result) {
+					if (err) {
 						client.query("ROLLBACK");
 						done();
-						res.status(400).send('Invalid date');
-						log.info({
-							res : res
-						}, 'done response');
+						res.status(500).send("Oh, no! Disaster!");
 					} else {
-						client.query({
-							text : "UPDATE event SET (event_name, event_start_date, event_location, event_venue, event_banner, event_logo, event_end_date, event_registration_deadline, event_rules, event_description, event_deduction_fee, event_is_online, event_type) = ($4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3",
-							values : [req.params.event, req.query.date, req.query.location, req.body.name, req.body.start_date, req.body.location, req.body.venue, req.body.banner, req.body.logo, req.body.end_date, req.body.registration_deadline, req.body.rules, req.body.description, req.body.deduction_fee, req.body.is_online, req.body.type]
-						}, function(err, result) {
-							if (err) {
-								client.query("ROLLBACK");
-								done();
-								res.status(500).send("Oh, no! Disaster!");
-							} else {
-								client.query("COMMIT");
-								done();
-								var result = new Object();
-								result.event = new Object();
-								result.event.name = req.body.name;
-								result.event.start_date = req.body.start_date;
-								result.event.location = req.body.location;
-								res.status(200).json(result);
-							}
-							log.info({
-								res : res
-							}, 'done response');
-						});
+						client.query("COMMIT");
+						done();
+						var result = new Object();
+						result.event = new Object();
+						result.event.name = req.body.name;
+						result.event.start_date = req.body.start_date;
+						result.event.location = req.body.location;
+						res.status(200).json(result);
 					}
-				} else {
-					client.query("ROLLBACK");
-					done();
-					res.status(403).send("You can't edit this event");
 					log.info({
 						res : res
 					}, 'done response');
-				}
-			});
-		}
+				});
+			} else {
+				client.query("ROLLBACK");
+				done();
+				res.status(403).send("You can't edit this event");
+				log.info({
+					res : res
+				}, 'done response');
+			}
+		});
 	});
 };
 

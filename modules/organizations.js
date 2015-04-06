@@ -52,7 +52,7 @@ var getOrganization = function(req, res, pg, conString, log) {
 			if (result.rows.length) {
 				res.status(200).json(result.rows[0]);
 			} else {
-				res.status(404).send('Oh, no! This organization does not exist');
+				res.status(404).send("Coudn't find the organization: " + req.params.organization);
 			}
 			log.info({
 				res : res
@@ -81,7 +81,9 @@ var editOrganization = function(req, res, pg, conString, log) {
 
 		if (!req.body.logo && !req.body.bio && !req.body.cover) {
 			done();
-			res.status(400).send('');
+			res.status(400).json({
+				error : "Incomplete or invalid parameters"
+			});
 			log.info({
 				res : res
 			}, 'done response');
@@ -103,7 +105,7 @@ var editOrganization = function(req, res, pg, conString, log) {
 			} else {
 				client.query("COMMIT");
 				done();
-				res.status(200).send('Organization info here');
+				res.status(200).send('Organization info udated');
 				log.info({
 					res : res
 				}, 'done response');
@@ -150,7 +152,7 @@ var getOrganizationMembers = function(req, res, pg, conString, log) {
 		}
 
 		var query = client.query({
-			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, bool_and(customer_username IN (SELECT customer_username FROM owns WHERE organization_name = $1)) AS is_owner FROM belongs_to NATURAL JOIN customer WHERE organization_name = $1 GROUP BY customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic",
+			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, bool_and(customer_username IN (SELECT customer_username FROM owns WHERE organization_name = $1)) AS is_owner FROM organization NATURAL JOIN belongs_to NATURAL JOIN customer WHERE organization_name = $1 AND organization_active GROUP BY customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic",
 			values : [req.params.organization]
 		});
 		query.on("row", function(row, result) {
@@ -165,7 +167,11 @@ var getOrganizationMembers = function(req, res, pg, conString, log) {
 		});
 		query.on("end", function(result) {
 			done();
-			res.status(200).json(result.rows);
+			if (result.rows.length) {
+				res.status(200).json(result.rows);
+			} else {
+				res.status(404).send("Couldn't find the organization: " + req.params.organization);
+			}
 			log.info({
 				res : res
 			}, 'done response');
@@ -180,8 +186,8 @@ var getOrganizationEvents = function(req, res, pg, conString, log) {
 		}
 
 		var query = client.query({
-			text : "SELECT event_name, event_location, event_venue, event_start_date, event_end_date, event_logo FROM event NATURAL JOIN hosts WHERE event_active AND organization_name = $1 ORDER BY event_start_date DESC",
-			values : [req.params.organization]
+			text : "SELECT organization_name, organization_logo, organization_bio, organization_cover_photo, bool_and(customer_username = $1) AS is_member FROM organization NATURAL JOIN belongs_to NATURAL JOIN customer WHERE organization_active AND customer_active AND organization_name = $2 GROUP BY organization_name",
+			values : [req.user.username, req.params.organization]
 		});
 		query.on("row", function(row, result) {
 			result.addRow(row);
@@ -194,11 +200,35 @@ var getOrganizationEvents = function(req, res, pg, conString, log) {
 			}, 'done response');
 		});
 		query.on("end", function(result) {
-			done();
-			res.status(200).json(result.rows);
-			log.info({
-				res : res
-			}, 'done response');
+			if (result.rows.length) {
+				var query = client.query({
+					text : "SELECT event_name, event_location, event_venue, event_start_date, event_end_date, event_logo FROM event NATURAL JOIN hosts WHERE event_active AND organization_name = $1 ORDER BY event_start_date DESC",
+					values : [req.params.organization]
+				});
+				query.on("row", function(row, result) {
+					result.addRow(row);
+				});
+				query.on('error', function(error) {
+					done();
+					res.status(500).send(error);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+				query.on("end", function(result) {
+					done();
+					res.status(200).json(result.rows);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+			} else {
+				done();
+				res.status(404).send("Coudn't find the organization: " + req.params.organization);
+				log.info({
+					res : res
+				}, 'done response');
+			}
 		});
 	});
 };
@@ -286,7 +316,7 @@ var addOrganizationMember = function(req, res, pg, conString, log) {
 												} else {
 													client.query("COMMIT");
 													done();
-													res.status(201).send('This user has been added! Yay!');
+													res.status(201).send("User: " + req.query.username + " has been added");
 												}
 												log.info({
 													res : res
@@ -295,7 +325,7 @@ var addOrganizationMember = function(req, res, pg, conString, log) {
 										} else {
 											client.query("COMMIT");
 											done();
-											res.status(201).send("This member has been promoted! Yay!");
+											res.status(200).send("User: " + req.query.username + " has been promoted");
 											log.info({
 												res : res
 											}, 'done response');
@@ -306,7 +336,7 @@ var addOrganizationMember = function(req, res, pg, conString, log) {
 						} else {
 							client.query("ROLLBACK");
 							done();
-							res.status(404).send("User not found");
+							res.status(404).send("Couldn't find user: " + req.query.username);
 							log.info({
 								res : res
 							}, 'done response');
@@ -324,7 +354,7 @@ var addOrganizationMember = function(req, res, pg, conString, log) {
 						} else {
 							client.query("COMMIT");
 							done();
-							res.status(201).send("This member has been promoted! Yay!");
+							res.status(201).send("User: " + req.query.username + " has been added");
 						}
 						log.info({
 							res : res
@@ -334,7 +364,7 @@ var addOrganizationMember = function(req, res, pg, conString, log) {
 			} else {
 				client.query("ROLLBACK");
 				done();
-				res.status(401).send('Oh, no! It seems you are do not have enough privileges to do this');
+				res.status(403).send("You don't own this Organization");
 				log.info({
 					res : res
 				}, 'done response');
@@ -350,8 +380,8 @@ var getSponsors = function(req, res, pg, conString, log) {
 		}
 
 		var query = client.query({
-			text : "SELECT sponsor_name, sponsor_logo, sponsor_link FROM sponsors NATURAL JOIN is_confirmed WHERE organization_name = $1",
-			values : [req.params.organization]
+			text : "SELECT organization_name, organization_logo, organization_bio, organization_cover_photo, bool_and(customer_username = $1) AS is_member FROM organization NATURAL JOIN belongs_to NATURAL JOIN customer WHERE organization_active AND customer_active AND organization_name = $2 GROUP BY organization_name",
+			values : [req.user.username, req.params.organization]
 		});
 		query.on("row", function(row, result) {
 			result.addRow(row);
@@ -364,11 +394,35 @@ var getSponsors = function(req, res, pg, conString, log) {
 			}, 'done response');
 		});
 		query.on("end", function(result) {
-			done();
-			res.status(200).json(result.rows);
-			log.info({
-				res : res
-			}, 'done response');
+			if (result.rows.length) {
+				var query = client.query({
+					text : "SELECT sponsor_name, sponsor_logo, sponsor_link FROM sponsors NATURAL JOIN is_confirmed WHERE organization_name = $1",
+					values : [req.params.organization]
+				});
+				query.on("row", function(row, result) {
+					result.addRow(row);
+				});
+				query.on('error', function(error) {
+					done();
+					res.status(500).send(error);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+				query.on("end", function(result) {
+					done();
+					res.status(200).json(result.rows);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+			} else {
+				done();
+				res.status(404).send("Coudn't find the organization: " + req.params.organization);
+				log.info({
+					res : res
+				}, 'done response');
+			}
 		});
 	});
 };
@@ -544,7 +598,7 @@ var removeOrganizationMember = function(req, res, pg, conString, log) {
 								if (!result.rows.length) {
 									client.query("ROLLBACK");
 									done();
-									res.status(403).send("Oh, no! You can't leave an organization without an owner dummy");
+									res.status(403).send("Organizations must have at least one owner");
 									log.info({
 										res : res
 									}, 'done response');
@@ -638,7 +692,7 @@ var removeOrganizationMember = function(req, res, pg, conString, log) {
 							} else {
 								client.query("ROLLBACK");
 								done();
-								res.status(401).send('Oh, no! It seems you are do not have enough privileges to do this');
+								res.status(403).send('You are not an owner of this Organization');
 								log.info({
 									res : res
 								}, 'done response');
@@ -647,7 +701,7 @@ var removeOrganizationMember = function(req, res, pg, conString, log) {
 					} else {
 						client.query("ROLLBACK");
 						done();
-						res.status(401).send('Oh, no! It seems this user is not a member of this organization');
+						res.status(403).send("User: " + req.query.username + " is not a member of this Organization");
 						log.info({
 							res : res
 						}, 'done response');
@@ -656,7 +710,7 @@ var removeOrganizationMember = function(req, res, pg, conString, log) {
 			} else {
 				client.query("ROLLBACK");
 				done();
-				res.status(401).send('Oh, no! It seems you are not a member of this organization');
+				res.status(403).send('You are not a member of this Organization');
 				log.info({
 					res : res
 				}, 'done response');

@@ -55,6 +55,7 @@ app.use(bodyParser.json());
 // Response sent when trying to access a protected route without a valid token
 app.use(function(err, req, res, next) {
 	if (err.constructor.name === 'UnauthorizedError') {
+		res.set('WWW-Authenticate', 'Bearer realm=Authorization Required');
 		res.status(401).send('Unauthorized');
 	}
 });
@@ -105,7 +106,7 @@ function authenticate(req, res) {
 		});
 		query.on("end", function(result) {
 			// Create the token with just the username
-			if (result.rows.length > 0) {
+			if (result.rows.length) {
 				crypto.pbkdf2(user.pass, result.rows[0].customer_salt, 4096, 127, 'sha256', function(err, key) {
 					if (err)
 						throw err;
@@ -159,7 +160,14 @@ app.get('/api', function(req, res) {
  */
 app.post('/create/account', function(req, res) {
 	log.info({ req: req }, 'start request');
-	customers.createAccount(req, res, pg, conString, jwt, secret, crypto, log);
+	if (!req.body.username || !req.body.password ||!req.body.firstname || !req.body.lastname || !req.body.tag || !req.body.email) {
+		res.status(400).json({
+			error : "Incomplete or invalid parameters"
+		});
+		log.info({res : res}, 'done response');
+	} else {
+		customers.createAccount(req, res, pg, conString, jwt, secret, crypto, log);
+	}
 });
 
 /* /login
@@ -207,15 +215,44 @@ app.route('/matchup/events')
 app.route('/matchup/events/:event')
 	.get(function(req, res) {
 		log.info({ req: req }, 'start request');
-		events.getEvent(req, res, pg, conString, log);
+		var date = new Date(req.query.date);
+		if (!(date.getTime()) || !req.params.event || !req.query.location) {
+			res.status(400).json({
+				error : "Incomplete or invalid parameters"
+			});
+			log.info({res : res}, 'done response');
+		} else {
+			events.getEvent(req, res, pg, conString, log);
+		}
 	})
 	.post(function(req, res) {
 		log.info({ req: req }, 'start request');
-		events.addTournament(req, res, pg, conString, log);
+		var eventStartDate = new Date(req.query.date);
+		var startDate = new Date(req.body.start_date);
+		var checkInDeadline = new Date(req.body.deadline);
+		if (!(eventStartDate.getTime()) || !(startDate.getTime()) || !(checkInDeadline.getTime()) || startDate.getTime() < checkInDeadline.getTime() || startDate.getTime() < eventStartDate.getTime() || startDate.getTime() > eventEndDate.getTime() || !req.body.name || !req.body.game || !req.body.rules || !req.body.teams || isNaN(req.body.fee) || req.body.fee < 0 || isNaN(req.body.capacity) || req.body.capacity < 0 || isNaN(req.body.seed_money) || req.body.seed_money < 0 || !req.body.type || !req.body.format || !req.body.scoring || isNaN(req.body.group_players) || req.body.group_players < 0 || isNaN(req.body.group_winners) || req.body.group_winners < 0) {
+			res.status(400).json({
+				error : "Incomplete or invalid parameters"
+			});
+			log.info({res : res}, 'done response');
+		} else {
+			events.addTournament(req, res, pg, conString, log);
+		}
 	})
 	.put(function(req, res) {
 		log.info({ req: req }, 'start request');
-		events.editEvent(req, res, pg, conString, log);
+		var eventStartDate = new Date(req.query.date);
+		var eventStartDate = new Date(req.body.event.start_date);
+		var eventEndDate = new Date(req.body.event.end_date);
+		var eventRegistrationDeadline = new Date(req.body.event.registration_deadline);
+		if (!(eventStartDate.getTime()) || !(eventStartDate.getTime()) || !(eventEndDate.getTime()) || !(eventRegistrationDeadline.getTime()) || eventRegistrationDeadline.getTime() > eventStartDate.getTime() || eventStartDate.getTime() > eventEndDate.getTime()) {
+			res.status(400).json({
+				error : "Incomplete or invalid parameters"
+			});
+			log.info({res : res}, 'done response');
+		} else {
+			events.editEvent(req, res, pg, conString, log);
+		}
 	})
 	.delete(function(req, res) {
 		log.info({ req: req }, 'start request');
@@ -360,8 +397,11 @@ app.route('/matchup/events/:event/tournaments/:tournament')
 		var eventStartDate = new Date(req.query.date);
 		var startDate = new Date(req.body.start_date);
 		var checkInDeadline = new Date(req.body.deadline);
-		if (!(eventStartDate.getTime()) || !(startDate.getTime()) || !(checkInDeadline.getTime()) || checkInDeadline.getTime() > startDate.getTime() || eventStartDate.getTime() > startDate.getTime() || !req.params.event || !req.params.tournament || !req.query.location) {
-			res.status(400).send("/matchup/events/"+req.params.event+"/tournaments/"+req.params.tournament+"?date="+req.query.date+"&location="+req.query.location);
+		if (!(eventStartDate.getTime()) || !(startDate.getTime()) || !(checkInDeadline.getTime()) || startDate.getTime() < checkInDeadline.getTime() || startDate.getTime() < eventStartDate.getTime() || startDate.getTime() > eventEndDate.getTime() || !req.body.name || !req.body.game || !req.body.rules || !req.body.teams || isNaN(req.body.fee) || req.body.fee < 0 || isNaN(req.body.capacity) || req.body.capacity < 0 || isNaN(req.body.seed_money) || req.body.seed_money < 0 || !req.body.type || !req.body.format || !req.body.scoring || isNaN(req.body.group_players) || req.body.group_players < 0 || isNaN(req.body.group_winners) || req.body.group_winners < 0) {
+			res.status(400).json({
+				error : "Incomplete or invalid parameters"
+			});
+			log.info({res : res}, 'done response');
 		} else {
 			events.editTournament(req, res, pg, conString, log);
 		}
@@ -558,7 +598,14 @@ app.route('/matchup/organizations')
 	})
 	.post(function(req, res) {
 		log.info({ req: req }, 'start request');
-		customers.requestOrganization(req, res, pg, conString, log);
+		if (!req.body.name || !req.body.description) {
+			res.status(400).json({
+				error: "Incomplete or invalid parameters"
+			});
+			log.info({res : res}, 'done response');
+		} else {
+			customers.requestOrganization(req, res, pg, conString, log);
+		}
 	});
 
 /* /matchup/organizations/:organization
@@ -661,7 +708,7 @@ app.get('/matchup/popular/genres', function(req, res) {
 	games.getPopularGenres(res, pg, conString, log);
 });
 
-//*\\\\\\\\\\* PROFILE *//////////*/
+//*\\\\\\\\\\* PROFILE *//////////*/ TODO Register as Spectator or Competitor ?? Ask if we should demo the sandbox money thing
 /* /matchup/profile
  *
  * [GET] Get the details of your account
@@ -780,7 +827,14 @@ app.route('/matchup/teams')
 	})
 	.post(function(req, res) {
 		log.info({ req: req }, 'start request');
-		customers.createTeam(req, res, pg, conString, log);
+		if (!req.body.name || !req.body.logo || !req.body.bio || !req.body.cover) {
+			res.status(400).json({
+				error: "Incomplete or invalid parameters"
+			});
+			log.info({res : res}, 'done response');
+		} else {
+			customers.createTeam(req, res, pg, conString, log);
+		}
 	});
 
 /* /matchup/teams/:team
@@ -817,15 +871,36 @@ app.route('/matchup/teams/:team/members')
 	})
 	.post(function(req, res) {
 		log.info({ req: req }, 'start request');
-		teams.addTeamMember(req, res, pg, conString, log);
+		if (!req.query.username) {
+			res.status(400).json({
+				error: "Incomplete or invalid parameters"
+			});
+			log.info({res : res}, 'done response');
+		} else {
+			teams.addTeamMember(req, res, pg, conString, log);
+		}
 	})
 	.put(function(req, res) {
 		log.info({ req: req }, 'start request');
-		teams.makeCaptain(req, res, pg, conString, log);
+		if (!req.query.username) {
+			res.status(400).json({
+				error: "Incomplete or invalid parameters"
+			});
+			log.info({res : res}, 'done response');
+		} else {
+			teams.makeCaptain(req, res, pg, conString, log);
+		}
 	})
 	.delete(function(req, res) {
 		log.info({ req: req }, 'start request');
-		teams.removeTeamMember(req, res, pg, conString, log);
+		if (!req.query.username) {
+			res.status(400).json({
+				error: "Incomplete or invalid parameters"
+			});
+			log.info({res : res}, 'done response');
+		} else {
+			teams.removeTeamMember(req, res, pg, conString, log);
+		}
 	});
 
 ///////////////////////////////////////////////// SERVER LISTEN
