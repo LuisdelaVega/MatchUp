@@ -451,49 +451,16 @@ var unsubscribe = function(req, res, pg, conString, log) {
 	});
 };
 
-//TODO Transaction
-//TODO This is the correct way to implement an edit. If time allows it, you should modify the other edits (UPDATES) in the server to work like this one
 var editAccount = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var queryText = "UPDATE customer SET";
-		if (req.body.firstname) {
-			queryText += ((queryText === "UPDATE customer SET") ? "" : ",") + " customer_first_name = '" + req.body.first_name + "'";
-		}
-		if (req.body.lastname) {
-			queryText += ((queryText === "UPDATE customer SET") ? "" : ",") + " customer_last_name = '" + req.body.last_name + "'";
-		}
-		if (req.body.tag) {
-			queryText += ((queryText === "UPDATE customer SET") ? "" : ",") + " customer_tag = '" + req.body.tag + "'";
-		}
-		if (req.body.profilepic) {
-			queryText += ((queryText === "UPDATE customer SET") ? "" : ",") + " customer_profile_pic = '" + req.body.profile_pic + "'";
-		}
-		if (req.body.cover) {
-			queryText += ((queryText === "UPDATE customer SET") ? "" : ",") + " customer_cover_photo = '" + req.body.cover + "'";
-		}
-		if (req.body.bio) {
-			queryText += ((queryText === "UPDATE customer SET") ? "" : ",") + " customer_bio = '" + req.body.bio + "'";
-		}
-		if (req.body.country) {
-			queryText += ((queryText === "UPDATE customer SET") ? "" : ",") + " customer_country = '" + req.body.country + "'";
-		}
-
-		// if (!req.body.firstname && !req.body.lastname && !req.body.tag && !req.body.profilepic && !req.body.cover && !req.body.bio && !req.body.country) {
-			// done();
-			// res.status(401).send("Oh no! Disaster");
-			// log.info({
-				// res : res
-			// }, 'done response');
-		// }
-
 		client.query("BEGIN");
-		queryText += " WHERE customer_username = '" + req.user.username + "' AND customer_active";
 		client.query({
-			text : queryText
+			text : "UPDATE customer SET (customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country) = ($1, $2, $3, $4, $5, $6, $7)",
+			values : [req.body.first_name, req.body.last_name, req.body.tag, req.body.profile_pic, req.body.cover, req.body.bio, req.body.country]
 		}, function(err, result) {
 			if (err) {
 				client.query("ROLLBACK");
