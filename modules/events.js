@@ -2428,7 +2428,7 @@ var deleteEvent = function(req, res, pg, conString, log) {
 				} else {
 					client.query("ROLLBACK");
 					done();
-					res.status(403).send("You can't delete this tournament");
+					res.status(403).send("You can't delete this event");
 					log.info({
 						res : res
 					}, 'done response');

@@ -758,7 +758,7 @@ var createEvent = function(req, res, pg, conString, log) {
 		var eventStartDate = new Date(req.body.event.start_date);
 		var eventEndDate = new Date(req.body.event.end_date);
 		var eventRegistrationDeadline = new Date(req.body.event.registration_deadline);
-		if (!(eventStartDate.getTime()) || !(eventEndDate.getTime()) || !(eventRegistrationDeadline.getTime()) || eventRegistrationDeadline.getTime() > eventStartDate.getTime() || eventStartDate.getTime() > eventEndDate.getTime() || !req.body.event.name || !req.body.event.location || !req.user.username || !req.body.event.venue || !req.body.event.banner || !req.body.event.logo || !req.body.event.rules || !req.body.event.description || isNaN(req.body.event.deduction_fee) || req.body.event.deduction_fee < 0 || !req.body.event.is_online || !req.body.event.type) {
+		if (!(eventStartDate.getTime()) || !(eventEndDate.getTime()) || !(eventRegistrationDeadline.getTime()) || eventRegistrationDeadline.getTime() > eventStartDate.getTime() || eventStartDate.getTime() > eventEndDate.getTime() || !req.body.event.name || !req.body.event.location || !req.user.username || !req.body.event.venue || !req.body.event.banner || !req.body.event.logo || !req.body.event.rules || !req.body.event.description || isNaN(req.body.event.deduction_fee) || req.body.event.deduction_fee < 0 || !req.body.event.type) {
 			client.query("ROLLBACK");
 			done();
 			res.status(400).json({
@@ -783,7 +783,7 @@ var createEvent = function(req, res, pg, conString, log) {
 					if (!req.query.hosted) {
 						var startDate = new Date(req.body.tournament[0].start_date);
 						var checkInDeadline = new Date(req.body.tournament[0].deadline);
-						if (!(startDate.getTime()) || !(checkInDeadline.getTime()) || startDate.getTime() < checkInDeadline.getTime() || startDate.getTime() < eventStartDate.getTime() || startDate.getTime() > eventEndDate.getTime() || !tournament[0].name || !tournament[0].game || !tournament[0].rules || !tournament[0].teams || isNaN(tournament[0].fee) || tournament[0].fee < 0 || isNaN(tournament[0].capacity) || tournament[0].capacity < 0 || isNaN(tournament[0].seed_money) || tournament[0].seed_money < 0 || !tournament[0].type || !tournament[0].format || !tournament[0].scoring || isNaN(tournament[0].group_players) || tournament[0].group_players < 0 || isNaN(tournament[0].group_winners) || tournament[0].group_winners < 0) {
+						if (!(startDate.getTime()) || !(checkInDeadline.getTime()) || startDate.getTime() < checkInDeadline.getTime() || startDate.getTime() < eventStartDate.getTime() || startDate.getTime() > eventEndDate.getTime() || !req.body.tournament[0].name || !req.body.tournament[0].game || !req.body.tournament[0].rules || isNaN(req.body.tournament[0].fee) || req.body.tournament[0].fee < 0 || isNaN(req.body.tournament[0].capacity) || req.body.tournament[0].capacity < 0 || isNaN(req.body.tournament[0].seed_money) || req.body.tournament[0].seed_money < 0 || !req.body.tournament[0].type || !req.body.tournament[0].format || !req.body.tournament[0].scoring || isNaN(req.body.tournament[0].group_players) || req.body.tournament[0].group_players < 0 || isNaN(req.body.tournament[0].group_winners) || req.body.tournament[0].group_winners < 0) {
 							client.query("ROLLBACK");
 							done();
 							res.status(400).json({
@@ -795,7 +795,7 @@ var createEvent = function(req, res, pg, conString, log) {
 						} else {
 							var query = client.query({
 								text : "SELECT game_name FROM game WHERE game_name = $1",
-								values : [tournament[0].game]
+								values : [req.body.tournament[0].game]
 							});
 							query.on("row", function(row, result) {
 								result.addRow(row);
@@ -849,9 +849,10 @@ var createEvent = function(req, res, pg, conString, log) {
 						for ( i = 0; i < tournament.length; i++) {
 							var startDate = new Date(req.body.tournament[i].start_date);
 							var checkInDeadline = new Date(req.body.tournament[i].deadline);
-							if (!(startDate.getTime()) || !(checkInDeadline.getTime()) || startDate.getTime() < checkInDeadline.getTime() || startDate.getTime() < eventStartDate.getTime() || startDate.getTime() > eventEndDate.getTime() || !tournament[i].name || !tournament[i].game || !tournament[i].rules || !tournament[i].teams || isNaN(tournament[i].fee) || tournament[i].fee < 0 || isNaN(tournament[i].capacity) || tournament[i].capacity < 0 || isNaN(tournament[i].seed_money) || tournament[i].seed_money < 0 || !tournament[i].type || !tournament[i].format || !tournament[i].scoring || isNaN(tournament[i].group_players) || tournament[i].group_players < 0 || isNaN(tournament[i].group_winners) || tournament[i].group_winners < 0) {
+							if (!(startDate.getTime()) || !(checkInDeadline.getTime()) || startDate.getTime() < checkInDeadline.getTime() || startDate.getTime() < eventStartDate.getTime() || startDate.getTime() > eventEndDate.getTime() || !req.body.tournament[i].name || !req.body.tournament[i].game || !req.body.tournament[i].rules || isNaN(req.body.tournament[i].fee) || req.body.tournament[i].fee < 0 || isNaN(req.body.tournament[i].capacity) || req.body.tournament[i].capacity < 0 || isNaN(req.body.tournament[i].seed_money) || req.body.tournament[i].seed_money < 0 || !req.body.tournament[i].type || !req.body.tournament[i].format || !req.body.tournament[i].scoring || isNaN(req.body.tournament[i].group_players) || req.body.tournament[i].group_players < 0 || isNaN(req.body.tournament[i].group_winners) || req.body.tournament[i].group_winners < 0) {
 								client.query("ROLLBACK");
 								done();
+								console.log("\n3\n");
 								res.status(400).json({
 									error : "Incomplete or invalid parameters"
 								});
@@ -861,7 +862,7 @@ var createEvent = function(req, res, pg, conString, log) {
 							} else {
 								var query = client.query({
 									text : "SELECT game_name FROM game WHERE game_name = $1",
-									values : [tournament[i].game]
+									values : [req.body.tournament[i].game]
 								});
 								query.on("row", function(row, result) {
 									result.addRow(row);
@@ -878,7 +879,7 @@ var createEvent = function(req, res, pg, conString, log) {
 									if (result.rows.length) {
 										client.query({
 											text : "INSERT INTO tournament (event_name, event_start_date, event_location, tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
-											values : [req.body.event.name, req.body.event.start_date, req.body.event.location, tournament[i].name, tournament[i].game, tournament[i].rules, tournament[i].teams, tournament[i].start_date, tournament[i].deadline, Math.floor(tournament[i].fee * 100) / 100, tournament[i].capacity, Math.floor(tournament[i].seed_money * 100) / 100, tournament[i].type, tournament[i].format, tournament[i].scoring, ((tournament[i].type === "Two-Stage") ? tournament[i].group_players : 0), ((tournament[i].type === "Two-Stage") ? tournament[i].group_winners : 0)]
+											values : [req.body.event.name, req.body.event.start_date, req.body.event.location, req.body.tournament[i].name, req.body.tournament[i].game, req.body.tournament[i].rules, req.body.tournament[i].teams, req.body.tournament[i].start_date, req.body.tournament[i].deadline, Math.floor(req.body.tournament[i].fee * 100) / 100, req.body.tournament[i].capacity, Math.floor(req.body.tournament[i].seed_money * 100) / 100, req.body.tournament[i].type, req.body.tournament[i].format, req.body.tournament[i].scoring, ((req.body.tournament[i].type === "Two-Stage") ? req.body.tournament[i].group_players : 0), ((req.body.tournament[i].type === "Two-Stage") ? req.body.tournament[i].group_winners : 0)]
 										}, function(err, result) {
 											if (err) {
 												client.query("ROLLBACK");
@@ -893,7 +894,7 @@ var createEvent = function(req, res, pg, conString, log) {
 										client.query("ROLLBACK");
 										done();
 										res.status(404).json({
-											error : "Couldn't find the game: " + tournament[i].game
+											error : "Couldn't find the game: " + req.body.tournament[i].game
 										});
 										log.info({
 											res : res
