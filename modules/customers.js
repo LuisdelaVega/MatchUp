@@ -542,7 +542,7 @@ var deleteAccount = function(req, res, pg, conString, log) {
 		query.on("end", function(result) {
 			if (result.rows[0].can_delete) {
 				client.query({
-					text : "UPDATE customer SET customer_active = FALSE WHERE customer_username = $1",
+					text : "UPDATE customer SET customer_active = false WHERE customer_username = $1",
 					values : [req.user.username]
 				}, function(err, result) {
 					if (err) {

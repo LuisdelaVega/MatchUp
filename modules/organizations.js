@@ -34,7 +34,7 @@ var getOrganization = function(req, res, pg, conString, log) {
 		}
 
 		var query = client.query({
-			text : "SELECT organization_name, organization_logo, organization_bio, organization_cover_photo, bool_and(customer_username = $1) AS is_member FROM organization NATURAL JOIN belongs_to NATURAL JOIN customer WHERE organization_active AND customer_active AND organization_name = $2 GROUP BY organization_name",
+			text : "SELECT organization_name, organization_logo, organization_bio, organization_cover_photo, bool_and(organization_name IN (SELECT organization_name FROM belongs_to WHERE customer_username = $1)) AS is_member FROM organization WHERE organization_active AND organization_name = $2 GROUP BY organization_name",
 			values : [req.user.username, req.params.organization]
 		});
 		query.on("row", function(row, result) {
@@ -68,48 +68,49 @@ var editOrganization = function(req, res, pg, conString, log) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var queryText = "UPDATE organization SET";
-		if (req.body.logo) {
-			queryText += " organization_logo = '" + req.body.logo + "'";
-		}
-		if (req.body.bio) {
-			queryText += " organization_bio = '" + req.body.bio + "'";
-		}
-		if (req.body.cover) {
-			queryText += " organization_cover = '" + req.body.cover + "'";
-		}
-
-		if (!req.body.logo && !req.body.bio && !req.body.cover) {
+		client.query("BEGIN");
+		var query = client.query({
+			text : "SELECT organization_name, organization_logo, organization_bio, organization_cover_photo, bool_and(organization_name IN (SELECT organization_name FROM belongs_to WHERE customer_username = $1)) AS is_member FROM organization WHERE organization_active AND organization_name = $2 GROUP BY organization_name",
+			values : [req.user.username, req.params.organization]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
 			done();
-			res.status(400).json({
-				error : "Incomplete or invalid parameters"
-			});
+			res.status(500).send(error);
 			log.info({
 				res : res
 			}, 'done response');
-		}
-
-		client.query("BEGIN");
-		queryText += " WHERE organization_name = $1 AND organization_name IN (SELECT organization_name FROM belongs_to NATURAL JOIN customer WHERE customer_username = $2 AND customer_active) AND organization_active";
-		client.query({
-			text : queryText,
-			values : [req.params.organization, req.user.username]
-		}, function(err, result) {
-			if (err) {
-				client.query("ROLLBACK");
-				done();
-				res.status(500).send(err);
-				log.info({
-					res : res
-				}, 'done response');
+		});
+		query.on("end", function(result) {
+			if (result.rows.length && result.rows[0].is_member) {
+				client.query({
+					text : "UPDATE organization SET (organization_logo, organization_bio, organization_cover_photo) = ($1, $2, $3) WHERE organization_name = $4",
+					values : [req.body.logo, req.body.bio, req.body.cover, req.params.organization]
+				}, function(err, result) {
+					if (err) {
+						client.query("ROLLBACK");
+						done();
+						res.status(500).send(err);
+						log.info({
+							res : res
+						}, 'done response');
+					} else {
+						client.query("COMMIT");
+						done();
+						res.status(200).send('Organization info udated');
+						log.info({
+							res : res
+						}, 'done response');
+					}
+				});
 			} else {
-				client.query("COMMIT");
-				done();
-				res.status(200).send('Organization info udated');
-				log.info({
-					res : res
-				}, 'done response');
+				res.status(404).send("Coudn't find the organization: " + req.params.organization);
 			}
+			log.info({
+				res : res
+			}, 'done response');
 		});
 	});
 };
@@ -436,7 +437,7 @@ var requestSponsor = function(req, res, pg, conString, log) {
 		client.query("BEGIN");
 		var query = client.query({
 			text : "SELECT customer_username FROM belongs_to NATURAL JOIN organization WHERE organization_name = $1 AND customer_username = $2 AND organization_active",
-			values : [req.params.organization]
+			values : [req.params.organization, req.user.username]
 		});
 		query.on("row", function(row, result) {
 			result.addRow(row);
