@@ -482,13 +482,13 @@ var editAccount = function(req, res, pg, conString, log) {
 			queryText += ((queryText === "UPDATE customer SET") ? "" : ",") + " customer_country = '" + req.body.country + "'";
 		}
 
-		if (!req.body.firstname && !req.body.lastname && !req.body.tag && !req.body.paypal && !req.body.profilepic && !req.body.cover && !req.body.bio && !req.body.country) {
-			done();
-			res.status(401).send("Oh no! Disaster");
-			log.info({
-				res : res
-			}, 'done response');
-		}
+		// if (!req.body.firstname && !req.body.lastname && !req.body.tag && !req.body.profilepic && !req.body.cover && !req.body.bio && !req.body.country) {
+			// done();
+			// res.status(401).send("Oh no! Disaster");
+			// log.info({
+				// res : res
+			// }, 'done response');
+		// }
 
 		client.query("BEGIN");
 		queryText += " WHERE customer_username = '" + req.user.username + "' AND customer_active";
