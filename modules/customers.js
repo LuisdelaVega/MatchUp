@@ -1,6 +1,3 @@
-//TODO Register for Event
-//TODO Register for Tournament
-
 //TODO Calculate the matches won/lost for the profile pages
 var getMyProfile = function(req, res, pg, conString, log) {
 	var username = new Object();
@@ -464,19 +461,16 @@ var editAccount = function(req, res, pg, conString, log) {
 
 		var queryText = "UPDATE customer SET";
 		if (req.body.firstname) {
-			queryText += ((queryText === "UPDATE customer SET") ? "" : ",") + " customer_first_name = '" + req.body.firstname + "'";
+			queryText += ((queryText === "UPDATE customer SET") ? "" : ",") + " customer_first_name = '" + req.body.first_name + "'";
 		}
 		if (req.body.lastname) {
-			queryText += ((queryText === "UPDATE customer SET") ? "" : ",") + " customer_last_name = '" + req.body.lastname + "'";
+			queryText += ((queryText === "UPDATE customer SET") ? "" : ",") + " customer_last_name = '" + req.body.last_name + "'";
 		}
 		if (req.body.tag) {
 			queryText += ((queryText === "UPDATE customer SET") ? "" : ",") + " customer_tag = '" + req.body.tag + "'";
 		}
-		if (req.body.paypal) {
-			queryText += ((queryText === "UPDATE customer SET") ? "" : ",") + " customer_paypal_info = '" + req.body.paypal + "'";
-		}
 		if (req.body.profilepic) {
-			queryText += ((queryText === "UPDATE customer SET") ? "" : ",") + " customer_profile_pic = '" + req.body.profilepic + "'";
+			queryText += ((queryText === "UPDATE customer SET") ? "" : ",") + " customer_profile_pic = '" + req.body.profile_pic + "'";
 		}
 		if (req.body.cover) {
 			queryText += ((queryText === "UPDATE customer SET") ? "" : ",") + " customer_cover_photo = '" + req.body.cover + "'";
@@ -496,23 +490,23 @@ var editAccount = function(req, res, pg, conString, log) {
 			}, 'done response');
 		}
 
+		client.query("BEGIN");
 		queryText += " WHERE customer_username = '" + req.user.username + "' AND customer_active";
 		client.query({
 			text : queryText
 		}, function(err, result) {
 			if (err) {
+				client.query("ROLLBACK");
 				done();
 				res.status(500).send(err);
-				log.info({
-					res : res
-				}, 'done response');
 			} else {
+				client.query("COMMIT");
 				done();
-				res.status(204).send('');
-				log.info({
-					res : res
-				}, 'done response');
+				res.status(200).send("Your account has been updated");
 			}
+			log.info({
+				res : res
+			}, 'done response');
 		});
 	});
 };
@@ -1031,6 +1025,7 @@ var createEvent = function(req, res, pg, conString, log) {
 
 module.exports.getMyProfile = getMyProfile;
 module.exports.getUserProfile = getUserProfile;
+module.exports.editAccount = editAccount;
 module.exports.createAccount = createAccount;
 module.exports.deleteAccount = deleteAccount;
 module.exports.createTeam = createTeam;
