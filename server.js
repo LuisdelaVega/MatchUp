@@ -800,7 +800,7 @@ app.get('/matchup/popular/genres', function(req, res) {
 /* /matchup/profile
  *
  * [GET] Get the details of your account
- * [PUT] Edit the details of your account TODO
+ * [PUT] Edit the details of your account
  * [DELETE] Remove your account from the system
  */
 app.route('/matchup/profile').get(function(req, res) {
@@ -808,6 +808,11 @@ app.route('/matchup/profile').get(function(req, res) {
 		req : req
 	}, 'start request');
 	customers.getMyProfile(req, res, pg, conString, log);
+}).put(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	customers.editAccount(req, res, pg, conString, log);
 }).delete(function(req, res) {
 	log.info({
 		req : req
