@@ -363,6 +363,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
         .state('app.createmeetup', {
         url: "/createmeetup/:eventname/:date/:location",
         templateUrl: "templates/meetup/create-meetup.html",
+        controller: "createMeetupController"
 
     })
 

@@ -1,6 +1,6 @@
 <ion-view view-title="Create Meetup">
     <ion-nav-buttons side="left">
-        <button class="button button-icon" ui-sref="app.meetups">
+        <button class="button button-icon" ng-click="goToMeetups()">
             <i class="icon ion-ios-arrow-back"></i>
         </button>
     </ion-nav-buttons>
@@ -26,7 +26,7 @@
                 <span class="input-label">Details</span>
                 <textarea rows="4"></textarea>
             </label>
-            <button class="button button-block button-balanced" ui-sref="app.meetups">
+            <button class="button button-block button-balanced" ng-click="goToMeetups()">
                 Submit
             </button>
         </div>

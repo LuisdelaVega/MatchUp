@@ -1,11 +1,11 @@
 <ion-view view-title="Meetups">
     <ion-nav-buttons side="left">
-        <button class="button button-icon" ng-click="goToSummaryFromMeetup(eventName)">
+        <button class="button button-icon" ng-click="goToSummaryFromMeetup()">
             <i class="icon ion-ios-arrow-back"></i>
         </button>
     </ion-nav-buttons>
     <ion-nav-buttons side="right">
-       <button class="button button-icon ion-plus" ui-sref="app.createmeetup">
+       <button class="button button-icon ion-plus" ng-click="goToCreateMeetup()">
         </button>
         <button class="button button-icon ion-android-alert">
         </button>
@@ -22,8 +22,9 @@
                     <br>{{meetup.meetup_description}}
                 </p>
             </div>
-            <div class="item">
-                <p>Created by: {{meetup.customer_username}}</p>
+            <div class="item item-avatar">
+                <img ng-src="{{meetup.customer_profile_pic}}">
+                <p>Created by: {{meetup.customer_tag}}</p>
             </div>
         </div>
     </ion-content>

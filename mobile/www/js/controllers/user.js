@@ -29,16 +29,20 @@ myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$st
             'Authorization': "Bearer "+ $window.sessionStorage.token
         }
     };
-
+    
+    //Synchronously fetch profile info from server
+    //Get profile information of specified user such as: tag, profile picture and cover photo. 
     $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'', config).success(function (data) {
 
         $scope.profileData = angular.fromJson(data);
         $scope.myProfile = $scope.profileData.my_profile;
 
+        //Get teams the user belongs to
         $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/teams', config).success(function (data) {
 
             $scope.teams = angular.fromJson(data);
 
+            //Get organizations the user belongs to
             $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/organizations', config).success(function (data) {
 
                 $scope.organizations = angular.fromJson(data);
@@ -70,7 +74,7 @@ myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$st
                     text: '<b>Yes</b>',
                     type: 'button-positive',
                     onTap: function(e) {
-
+                        //Call to subscribe to the user
                         $http.post('http://136.145.116.232/matchup/profile/'+username+'', {}, config).success(function (data) {
                             console.log('http://136.145.116.232/matchup/profile/'+username+'');
                             console.log("Subscribed to"+username+"");
@@ -88,7 +92,7 @@ myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$st
         }, 3000);
 
     }
-    
+
     $scope.goToTeamProfile = function (teamName) {
         $state.go('app.teamprofile', {"teamname": teamName});
     };
@@ -99,6 +103,7 @@ myApp.controller('mySubscriptionsController', ['$scope', '$http', '$window', '$s
 
     var customerUsername = sharedDataService.get();
 
+    //Ensuring the subscriptions list is refreshed everytime the user accesses the view. Can cause unpredictable or glitchy behaviour without.
     $scope.$on('$ionicView.enter', function () {
         var config = {
             headers: {
@@ -106,14 +111,16 @@ myApp.controller('mySubscriptionsController', ['$scope', '$http', '$window', '$s
             }
         };
 
+        //Array containing button class depending if user is subscribed or not to the user found in that index. -positive is subscribed. -stable is unsubscribed.
         $scope.isSubscribed = [];
 
+        //Call to get all subscriptions.
         $http.get('http://136.145.116.232/matchup/profile/'+customerUsername+'/subscriptions', config).success(function (data) {
 
             $scope.subscriptions = angular.fromJson(data);
 
             for(var i = 0; i < $scope.subscriptions.length; i++)
-                $scope.isSubscribed.push('-positive');
+                $scope.isSubscribed.push('-positive'); //All users are subscribed to at the time of make the call initially
 
         }).error(function (err) {
             console.log(err);
@@ -121,7 +128,7 @@ myApp.controller('mySubscriptionsController', ['$scope', '$http', '$window', '$s
     });
 
 
-
+    //Visually toggle and request the server remove/create subscriptions
     $scope.toggleSubscribe = function (index, username) {
 
         var config = {
@@ -129,20 +136,23 @@ myApp.controller('mySubscriptionsController', ['$scope', '$http', '$window', '$s
                 'Authorization': "Bearer "+ $window.sessionStorage.token
             }
         };
+        //isSubcribed is -positive, user is subscribed, therefore, call on server to unsubscribe. 
         if($scope.isSubscribed[index] === '-positive'){
+            //Server call to unsubscribe
             $http.delete('http://136.145.116.232/matchup/profile/'+username+'', config).success(function (data) {
 
-                $scope.isSubscribed[index] = '-stable';
+                $scope.isSubscribed[index] = '-stable'; //Visually change button state 
 
             }).error(function (err) {
                 console.log(err);
             });
         }
+        //If -stable, subscribe to user. 
         else{
-
+            //Server call to subscribe
             $http.post('http://136.145.116.232/matchup/profile/'+username+'', {}, config).success(function (data) {
 
-                $scope.isSubscribed[index] = '-positive';
+                $scope.isSubscribed[index] = '-positive'; //Visually change button state
 
             }).error(function (err) {
                 console.log(err);
@@ -154,14 +164,13 @@ myApp.controller('mySubscriptionsController', ['$scope', '$http', '$window', '$s
 
 myApp.controller('profileEventsController', ['$scope', '$http', '$stateParams', '$window', 'sharedDataService', '$state', function ($scope, $http, $stateParams, $window, sharedDataService, $state) {
 
-    console.log("entered profileEventsController");
-
     var config = {
         headers: {
             'Authorization': "Bearer "+ $window.sessionStorage.token
         }
     };
 
+    //Event call has to be called from a seperate controller due to it being a seperate tab, therefore, this call occurs when the parent view is selected and run asynchronously from the server calls found in the summary tab. Other option is to call from a parent controller (ProfileController). This approach was used to reduce the scope of the controller to only where it is necessary.
     $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/events', config).success(function (data) {
 
         $scope.eventsData = angular.fromJson(data);
@@ -219,7 +228,7 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
         $http.get('http://136.145.116.232/matchup/profile/', config).success(function (data) {
 
             var profileData = angular.fromJson(data);
-            
+
             $scope.tag = profileData.customer_tag;
             $scope.firstName = profileData.customer_first_name;
             $scope.lastName = profileData.customer_last_name;
