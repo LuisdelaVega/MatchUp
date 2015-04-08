@@ -935,7 +935,7 @@ var getTournament = function(req, res, pg, conString, log) {
 		}
 
 		var query = client.query({
-			text : "SELECT tournament_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group, game.* FROM tournament NATURAL JOIN game WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4",
+			text : "SELECT tournament_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group, game.* FROM tournament NATURAL JOIN game WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND tournament_active",
 			values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
 		});
 		query.on("row", function(row, result) {
@@ -1635,7 +1635,7 @@ var getReviews = function(req, res, pg, conString, log) {
 			}, 'done response');
 		} else {
 			var query = client.query({
-				text : "SELECT review_title, review_content, star_rating, review_date_created, customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, bool_and(customer_username IN (SELECT customer_username FROM review WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $4)) as is_writer FROM review NATURAL JOIN customer WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 GROUP BY review_title, review_content, star_rating, review_date_created, customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic ORDER BY review_date_created",
+				text : "SELECT review_title, review_content, star_rating, review_date_created, customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, bool_and(customer_username IN (SELECT customer_username FROM review WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND customer_username = $4)) as is_writer FROM review NATURAL JOIN customer WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 GROUP BY review_title, review_content, star_rating, review_date_created, customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic ORDER BY review_date_created DESC",
 				values : [req.params.event, req.query.date, req.query.location, req.user.username]
 			});
 			query.on("row", function(row, result) {
@@ -2246,7 +2246,7 @@ var addTournament = function(req, res, pg, conString, log) {
 			if (result.rows.length) {
 				var query = client.query({
 					text : "SELECT game_name FROM game WHERE game_name = $1",
-					values : [tournament[0].game]
+					values : [req.body.game]
 				});
 				query.on("row", function(row, result) {
 					result.addRow(row);
@@ -2346,7 +2346,7 @@ var removeTournament = function(req, res, pg, conString, log) {
 			query.on("end", function(result) {
 				if (result.rows.length) {
 					client.query({
-						text : "DELETE FROM tournament WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4",
+						text : "UPDATE tournament SET tournament_active = false WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4",
 						values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
 					}, function(err, result) {
 						if (err) {
@@ -2475,10 +2475,9 @@ var editEvent = function(req, res, pg, conString, log) {
 						client.query("COMMIT");
 						done();
 						var result = new Object();
-						result.event = new Object();
-						result.event.name = req.body.name;
-						result.event.start_date = req.body.start_date;
-						result.event.location = req.body.location;
+						result.name = req.body.name;
+						result.start_date = req.body.start_date;
+						result.location = req.body.location;
 						res.status(200).json(result);
 					}
 					log.info({

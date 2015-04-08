@@ -232,52 +232,52 @@ app.route('/matchup/events/:event').get(function(req, res) {
 	log.info({
 		req : req
 	}, 'start request');
-	// var date = new Date(req.query.date);
-	// if (!(date.getTime()) || !req.params.event || !req.query.location) {
-		// res.status(400).json({
-			// error : "Incomplete or invalid parameters"
-		// });
-		// log.info({
-			// res : res
-		// }, 'done response');
-	// } else {
+	var date = new Date(req.query.date);
+	if (!(date.getTime()) || !req.params.event || !req.query.location) {
+		res.status(400).json({
+			error : "Incomplete or invalid parameters"
+		});
+		log.info({
+			res : res
+		}, 'done response');
+	} else {
 		events.getEvent(req, res, pg, conString, log);
-	// }
+	}
 }).post(function(req, res) {
 	log.info({
 		req : req
 	}, 'start request');
-	// var eventStartDate = new Date(req.query.date);
-	// var startDate = new Date(req.body.start_date);
-	// var checkInDeadline = new Date(req.body.deadline);
-	// if (!(eventStartDate.getTime()) || !(startDate.getTime()) || !(checkInDeadline.getTime()) || startDate.getTime() < checkInDeadline.getTime() || startDate.getTime() < eventStartDate.getTime() || startDate.getTime() > eventEndDate.getTime() || !req.body.name || !req.body.game || !req.body.rules || !req.body.teams || isNaN(req.body.fee) || req.body.fee < 0 || isNaN(req.body.capacity) || req.body.capacity < 0 || isNaN(req.body.seed_money) || req.body.seed_money < 0 || !req.body.type || !req.body.format || !req.body.scoring || isNaN(req.body.group_players) || req.body.group_players < 0 || isNaN(req.body.group_winners) || req.body.group_winners < 0) {
-		// res.status(400).json({
-			// error : "Incomplete or invalid parameters"
-		// });
-		// log.info({
-			// res : res
-		// }, 'done response');
-	// } else {
+	var eventStartDate = new Date(req.query.date);
+	var startDate = new Date(req.body.start_date);
+	var checkInDeadline = new Date(req.body.deadline);
+	if (!(eventStartDate.getTime()) || !(startDate.getTime()) || !(checkInDeadline.getTime()) || startDate.getTime() < checkInDeadline.getTime() || startDate.getTime() < eventStartDate.getTime() || !req.body.name || !req.body.game || !req.body.rules || isNaN(req.body.fee) || req.body.fee < 0 || isNaN(req.body.capacity) || req.body.capacity < 0 || isNaN(req.body.seed_money) || req.body.seed_money < 0 || !req.body.type || !req.body.format || !req.body.scoring || isNaN(req.body.group_players) || req.body.group_players < 0 || isNaN(req.body.group_winners) || req.body.group_winners < 0) {
+		res.status(400).json({
+			error : "Incomplete or invalid parameters"
+		});
+		log.info({
+			res : res
+		}, 'done response');
+	} else {
 		events.addTournament(req, res, pg, conString, log);
-	// }
+	}
 }).put(function(req, res) {
 	log.info({
 		req : req
 	}, 'start request');
-	// var eventStartDate = new Date(req.query.date);
-	// var eventStartDate = new Date(req.body.event.start_date);
-	// var eventEndDate = new Date(req.body.event.end_date);
-	// var eventRegistrationDeadline = new Date(req.body.event.registration_deadline);
-	// if (!(eventStartDate.getTime()) || !(eventStartDate.getTime()) || !(eventEndDate.getTime()) || !(eventRegistrationDeadline.getTime()) || eventRegistrationDeadline.getTime() > eventStartDate.getTime() || eventStartDate.getTime() > eventEndDate.getTime()) {
-		// res.status(400).json({
-			// error : "Incomplete or invalid parameters"
-		// });
-		// log.info({
-			// res : res
-		// }, 'done response');
-	// } else {
+	var eventStartDate = new Date(req.query.date);
+	var eventStartDate = new Date(req.body.start_date);
+	var eventEndDate = new Date(req.body.end_date);
+	var eventRegistrationDeadline = new Date(req.body.registration_deadline);
+	if (!(eventStartDate.getTime()) || !(eventStartDate.getTime()) || !(eventEndDate.getTime()) || !(eventRegistrationDeadline.getTime()) || eventRegistrationDeadline.getTime() > eventStartDate.getTime() || eventStartDate.getTime() > eventEndDate.getTime()) {
+		res.status(400).json({
+			error : "Incomplete or invalid parameters"
+		});
+		log.info({
+			res : res
+		}, 'done response');
+	} else {
 		events.editEvent(req, res, pg, conString, log);
-	// }
+	}
 }).delete(function(req, res) {
 	log.info({
 		req : req

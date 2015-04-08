@@ -453,8 +453,8 @@ var requestSponsor = function(req, res, pg, conString, log) {
 		query.on("end", function(result) {
 			if (result.rows.length) {
 				client.query({
-					text : "INSERT INTO request_sponsor (request_sponsor_name, organization_name, request_sponsor_link, request_sponsor_description) VALUES ($1, $2, $3, $4)",
-					values : [req.body.name, req.params.organization, req.body.link, req.body.description]
+					text : "INSERT INTO request_sponsor (organization_name, request_sponsor_link, request_sponsor_description) VALUES ($1, $2, $3)",
+					values : [req.params.organization, req.body.link, req.body.description]
 				}, function(err, result) {
 					if (err) {
 						client.query("ROLLBACK");

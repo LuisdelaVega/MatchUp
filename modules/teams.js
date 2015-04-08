@@ -164,8 +164,8 @@ var getTeamMembers = function(req, res, pg, conString, log) {
 		}
 
 		var query = client.query({
-			text : "SELECT team_name, team_logo, team_bio, team_cover_photo, bool_and(team_name IN (SELECT team_name FROM belongs_to WHERE customer_username = $2)) AS is_member FROM team WHERE team_active AND team_name = $1 GROUP BY team_name, team_logo, team_bio, team_cover_photo",
-			values : [req.params.team, req.user.username]
+			text : "SELECT team_name FROM team WHERE team_active AND team_name = $1",
+			values : [req.params.team]
 		});
 		query.on("row", function(row, result) {
 			result.addRow(row);
@@ -357,7 +357,7 @@ var removeTeamMember = function(req, res, pg, conString, log) {
 						} else {
 							client.query("ROLLBACK");
 							done();
-							res.status(403).send("You can't remove user: " + req.queryusername);
+							res.status(403).send("You can't remove user: " + req.query.username);
 							log.info({
 								res : res
 							}, 'done response');
