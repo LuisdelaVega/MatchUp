@@ -18,7 +18,7 @@ var getUserProfile = function(req, res, pg, conString, log) {
 
 		// Query the database to find the user's account
 		var query = client.query({
-			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, of_email.email_address, bool_and(customer_username = $1) AS my_profile FROM customer NATURAL JOIN of_email WHERE customer_username = $2 AND customer_active GROUP BY customer_username, email_address",
+			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, customer_email, bool_and(customer_username = $1) AS my_profile FROM customer WHERE customer_username = $2 AND customer_active GROUP BY customer_username",
 			values : [req.user.username, req.params.username]
 		});
 		query.on("row", function(row, result) {
@@ -54,8 +54,8 @@ var getSubscriptions = function(req, res, pg, conString, log) {
 
 		// Query the database to find the user's account
 		var query = client.query({
-			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, of_email.email_address, bool_and(customer_username = $1) AS my_profile FROM customer NATURAL JOIN of_email WHERE customer_username = $2 AND customer_active GROUP BY customer_username, email_address",
-			values : [req.user.username, req.params.username]
+			text : "SELECT customer_username FROM customer WHERE customer_username = $1 AND customer_active",
+			values : [req.params.username]
 		});
 		query.on("row", function(row, result) {
 			result.addRow(row);
@@ -109,8 +109,8 @@ var getTeams = function(req, res, pg, conString, log) {
 
 		// Query the database to find the user's account
 		var query = client.query({
-			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, of_email.email_address, bool_and(customer_username = $1) AS my_profile FROM customer NATURAL JOIN of_email WHERE customer_username = $2 AND customer_active GROUP BY customer_username, email_address",
-			values : [req.user.username, req.params.username]
+			text : "SELECT customer_username FROM customer WHERE customer_username = $1 AND customer_active",
+			values : [req.params.username]
 		});
 		query.on("row", function(row, result) {
 			result.addRow(row);
@@ -163,8 +163,8 @@ var getOrganizations = function(req, res, pg, conString, log) {
 		}
 
 		var query = client.query({
-			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, of_email.email_address, bool_and(customer_username = $1) AS my_profile FROM customer NATURAL JOIN of_email WHERE customer_username = $2 AND customer_active GROUP BY customer_username, email_address",
-			values : [req.user.username, req.params.username]
+			text : "SELECT customer_username FROM customer WHERE customer_username = $1 AND customer_active",
+			values : [req.params.username]
 		});
 		query.on("row", function(row, result) {
 			result.addRow(row);
@@ -217,8 +217,8 @@ var getEvents = function(req, res, pg, conString, log) {
 		}
 
 		var query = client.query({
-			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, of_email.email_address, bool_and(customer_username = $1) AS my_profile FROM customer NATURAL JOIN of_email WHERE customer_username = $2 AND customer_active GROUP BY customer_username, email_address",
-			values : [req.user.username, req.params.username]
+			text : "SELECT customer_username FROM customer WHERE customer_username = $1 AND customer_active",
+			values : [req.params.username]
 		});
 		query.on("row", function(row, result) {
 			result.addRow(row);
@@ -272,8 +272,8 @@ var getRegisteredEvents = function(req, res, pg, conString, log) {
 		}
 
 		var query = client.query({
-			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, of_email.email_address, bool_and(customer_username = $1) AS my_profile FROM customer NATURAL JOIN of_email WHERE customer_username = $2 AND customer_active GROUP BY customer_username, email_address",
-			values : [req.user.username, req.params.username]
+			text : "SELECT customer_username FROM customer WHERE customer_username = $1 AND customer_active",
+			values : [req.params.username]
 		});
 		query.on("row", function(row, result) {
 			result.addRow(row);
@@ -370,11 +370,11 @@ var subscribe = function(req, res, pg, conString, log) {
 			}, 'done response');
 		} else {
 			var profile = new Object();
-			client.query("START TRANSACTION");
+			client.query("BEGIN");
 			// Query the database to find the user's account
 			var query = client.query({
-				text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, of_email.email_address, bool_and(customer_username = $1) AS my_profile FROM customer NATURAL JOIN of_email WHERE customer_username = $2 AND customer_active GROUP BY customer_username, email_address",
-				values : [req.user.username, req.params.username]
+				text : "SELECT customer_username FROM customer WHERE customer_username = $1 AND customer_active",
+				values : [req.params.username]
 			});
 			query.on("row", function(row, result) {
 				result.addRow(row);
@@ -427,7 +427,7 @@ var unsubscribe = function(req, res, pg, conString, log) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		client.query("START TRANSACTION");
+		client.query("BEGIN");
 		client.query({
 			text : "DELETE FROM subscribed_to WHERE subscriber = $1 AND interest = $2",
 			values : [req.user.username, req.params.username]
@@ -442,7 +442,7 @@ var unsubscribe = function(req, res, pg, conString, log) {
 			} else {
 				client.query("COMMIT");
 				done();
-				res.status(204).send("Unsubscribed from: " + req.params.username);
+				res.status(204).send('');
 				log.info({
 					res : res
 				}, 'done response');
@@ -459,8 +459,8 @@ var editAccount = function(req, res, pg, conString, log) {
 
 		client.query("BEGIN");
 		client.query({
-			text : "UPDATE customer SET (customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country) = ($1, $2, $3, $4, $5, $6, $7) WHERE customer_username = $8",
-			values : [req.body.first_name, req.body.last_name, req.body.tag, req.body.profile_pic, req.body.cover, req.body.bio, req.body.country, req.user.username]
+			text : "UPDATE customer SET (customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, customer_email) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE customer_username = $9",
+			values : [req.body.first_name, req.body.last_name, req.body.tag, req.body.profile_pic, req.body.cover, req.body.bio, req.body.country, req.body.email, req.user.username]
 		}, function(err, result) {
 			if (err) {
 				client.query("ROLLBACK");
@@ -543,52 +543,34 @@ var createAccount = function(req, res, pg, conString, jwt, secret, crypto, log) 
 				throw err;
 			client.query("BEGIN");
 			client.query({
-				text : "INSERT INTO customer (customer_username, customer_first_name, customer_last_name, customer_tag, customer_password, customer_salt, customer_active) VALUES ($1, $2, $3, $4, $5, $6, TRUE)",
-				values : [req.body.username, // customer_username*
-				req.body.firstname, // customer_first_name*
-				req.body.lastname, // customer_last_name*
-				req.body.tag, // customer_tag*
-				key.toString('hex'), // customer_password*
-				salt] // customer_salt
+				text : "INSERT INTO customer (customer_username, customer_first_name, customer_last_name, customer_tag, customer_password, customer_salt, customer_email, customer_active) VALUES ($1, $2, $3, $4, $5, $6, $7, TRUE)",
+				values : [req.body.username, // customer_username
+				req.body.first_name, // customer_first_name
+				req.body.last_name, // customer_last_name
+				req.body.tag, // customer_tag
+				key.toString('hex'), // customer_password
+				salt, // customer_salt
+				req.body.email] // customer_email
 			}, function(err, result) {
 				if (err) {
 					client.query("ROLLBACK");
 					done();
 					res.status(500).send(err);
-					log.info({
-						res : res
-					}, 'done response');
 				} else {
-					client.query({
-						text : "INSERT INTO of_email (customer_username, email_address) VALUES ($1, $2)",
-						values : [req.body.username, // customer_username*
-						req.body.email // email_address*
-						]
-					}, function(err, result) {
-						if (err) {
-							client.query("ROLLBACK");
-							done();
-							res.status(500).send(err);
-							log.info({
-								res : res
-							}, 'done response');
-						} else {
-							client.query("COMMIT");
-							done();
-							var response = {
-								username : req.body.username
-							};
-							// We are sending the username inside the token
-							var token = jwt.sign(response, secret);
-							res.status(201).json({
-								token : token
-							});
-							log.info({
-								res : res
-							}, 'done response');
-						}
+					client.query("COMMIT");
+					done();
+					var response = {
+						username : req.body.username
+					};
+					// We are sending the username inside the token
+					var token = jwt.sign(response, secret);
+					res.status(201).json({
+						token : token
 					});
 				}
+				log.info({
+					res : res
+				}, 'done response');
 			});
 		});
 	});
@@ -602,8 +584,8 @@ var createTeam = function(req, res, pg, conString, log) {
 
 		client.query("BEGIN");
 		var query = client.query({
-			text : "SELECT customer_username FROM customer WHERE customer_username = $1 AND customer_active",
-			values : [req.user.username]
+			text : "SELECT team_name FROM team WHERE team_name = $1",
+			values : [req.body.name]
 		});
 		query.on("row", function(row, result) {
 			result.addRow(row);
@@ -617,13 +599,13 @@ var createTeam = function(req, res, pg, conString, log) {
 			}, 'done response');
 		});
 		query.on("end", function(result) {
-			if (result.rows.length) {
+			if (!result.rows.length) {
 				client.query({
 					text : "INSERT INTO team (team_name, team_logo, team_bio, team_cover_photo, team_active) VALUES ($1, $2, $3, $4, TRUE)",
-					values : [req.body.name, // team_name*
-					req.body.logo, // team_logo*
-					req.body.bio, // team_bio*
-					req.body.cover // team_cover_photo*
+					values : [req.body.name, // team_name
+					req.body.logo, // team_logo
+					req.body.bio, // team_bio
+					req.body.cover // team_cover_photo
 					]
 				}, function(err, result) {
 					if (err) {
@@ -673,7 +655,7 @@ var createTeam = function(req, res, pg, conString, log) {
 			} else {
 				client.query("ROLLBACK");
 				done();
-				res.status(404).send("Couldn't find user: " + req.user.username);
+				res.status(403).send("Team: " + req.body.name + " already exists");
 				log.info({
 					res : res
 				}, 'done response');
@@ -696,7 +678,7 @@ var requestOrganization = function(req, res, pg, conString, log) {
 			if (err) {
 				client.query("ROLLBACK");
 				done();
-				res.status(500).send("Oh, no! Disaster!");
+				res.status(500).send(err);
 			} else {
 				client.query("COMMIT");
 				done();
@@ -708,6 +690,50 @@ var requestOrganization = function(req, res, pg, conString, log) {
 		});
 	});
 };
+
+function addTournament(req, res, tournament, client, done, log) {
+	var query = client.query({
+		text : "SELECT game_name FROM game WHERE game_name = $1",
+		values : [tournament.game]
+	});
+	query.on("row", function(row, result) {
+		result.addRow(row);
+	});
+	query.on('error', function(error) {
+		client.query("ROLLBACK");
+		done();
+		res.status(500).send(error);
+		log.info({
+			res : res
+		}, 'done response');
+	});
+	query.on("end", function(result) {
+		if (result.rows.length) {
+			client.query({
+				text : "INSERT INTO tournament (event_name, event_start_date, event_location, tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
+				values : [req.body.event.name, req.body.event.start_date, req.body.event.location, tournament.name, tournament.game, tournament.rules, tournament.teams, tournament.start_date, tournament.deadline, Math.floor(tournament.fee * 100) / 100, tournament.capacity, Math.floor(tournament.seed_money * 100) / 100, tournament.type, tournament.format, tournament.scoring, ((tournament.type === "Two-Stage") ? tournament.group_players : 0), ((tournament.type === "Two-Stage") ? tournament.group_winners : 0)]
+			}, function(err, result) {
+				if (err) {
+					client.query("ROLLBACK");
+					done();
+					res.status(500).send(err);
+					log.info({
+						res : res
+					}, 'done response');
+				}
+			});
+		} else {
+			client.query("ROLLBACK");
+			done();
+			res.status(404).json({
+				error : "Couldn't find the game: " + tournament.game
+			});
+			log.info({
+				res : res
+			}, 'done response');
+		}
+	});
+}
 
 var createEvent = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
@@ -805,15 +831,16 @@ var createEvent = function(req, res, pg, conString, log) {
 							});
 						}
 					} else {
+						console.log(req.body.tournament);
 						var tournament = req.body.tournament;
 						var i = 0;
 						for ( i = 0; i < tournament.length; i++) {
+							console.log(tournament[i].name);
 							var startDate = new Date(req.body.tournament[i].start_date);
 							var checkInDeadline = new Date(req.body.tournament[i].deadline);
-							if (!(startDate.getTime()) || !(checkInDeadline.getTime()) || startDate.getTime() < checkInDeadline.getTime() || startDate.getTime() < eventStartDate.getTime() || startDate.getTime() > eventEndDate.getTime() || !req.body.tournament[i].name || !req.body.tournament[i].game || !req.body.tournament[i].rules || isNaN(req.body.tournament[i].fee) || req.body.tournament[i].fee < 0 || isNaN(req.body.tournament[i].capacity) || req.body.tournament[i].capacity < 0 || isNaN(req.body.tournament[i].seed_money) || req.body.tournament[i].seed_money < 0 || !req.body.tournament[i].type || !req.body.tournament[i].format || !req.body.tournament[i].scoring || isNaN(req.body.tournament[i].group_players) || req.body.tournament[i].group_players < 0 || isNaN(req.body.tournament[i].group_winners) || req.body.tournament[i].group_winners < 0) {
+							if (!(startDate.getTime()) || !(checkInDeadline.getTime()) || startDate.getTime() < checkInDeadline.getTime() || startDate.getTime() < eventStartDate.getTime() || startDate.getTime() > eventEndDate.getTime() || !tournament[i].name || !tournament[i].game || !tournament[i].rules || isNaN(tournament[i].fee) || tournament[i].fee < 0 || isNaN(tournament[i].capacity) || tournament[i].capacity < 0 || isNaN(tournament[i].seed_money) || tournament[i].seed_money < 0 || !tournament[i].type || !tournament[i].format || !tournament[i].scoring || isNaN(tournament[i].group_players) || tournament[i].group_players < 0 || isNaN(tournament[i].group_winners) || tournament[i].group_winners < 0) {
 								client.query("ROLLBACK");
 								done();
-								console.log("\n3\n");
 								res.status(400).json({
 									error : "Incomplete or invalid parameters"
 								});
@@ -821,47 +848,15 @@ var createEvent = function(req, res, pg, conString, log) {
 									res : res
 								}, 'done response');
 							} else {
-								var query = client.query({
-									text : "SELECT game_name FROM game WHERE game_name = $1",
-									values : [req.body.tournament[i].game]
-								});
-								query.on("row", function(row, result) {
-									result.addRow(row);
-								});
-								query.on('error', function(error) {
-									client.query("ROLLBACK");
-									done();
-									res.status(500).send(error);
-									log.info({
-										res : res
-									}, 'done response');
-								});
-								query.on("end", function(result) {
-									if (result.rows.length) {
-										client.query({
-											text : "INSERT INTO tournament (event_name, event_start_date, event_location, tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
-											values : [req.body.event.name, req.body.event.start_date, req.body.event.location, req.body.tournament[i].name, req.body.tournament[i].game, req.body.tournament[i].rules, req.body.tournament[i].teams, req.body.tournament[i].start_date, req.body.tournament[i].deadline, Math.floor(req.body.tournament[i].fee * 100) / 100, req.body.tournament[i].capacity, Math.floor(req.body.tournament[i].seed_money * 100) / 100, req.body.tournament[i].type, req.body.tournament[i].format, req.body.tournament[i].scoring, ((req.body.tournament[i].type === "Two-Stage") ? req.body.tournament[i].group_players : 0), ((req.body.tournament[i].type === "Two-Stage") ? req.body.tournament[i].group_winners : 0)]
-										}, function(err, result) {
-											if (err) {
-												client.query("ROLLBACK");
-												done();
-												res.status(500).send(err);
-												log.info({
-													res : res
-												}, 'done response');
-											}
-										});
-									} else {
-										client.query("ROLLBACK");
-										done();
-										res.status(404).json({
-											error : "Couldn't find the game: " + req.body.tournament[i].game
-										});
-										log.info({
-											res : res
-										}, 'done response');
-									}
-								});
+								/* 
+								 * We have to perform this part in another function.
+								 * This is because of node's asynchronous nature.
+								 * Before we add a Tournament to the Event we created, we must check if the game exists in our DB.
+								 * While this query is happening, node will continue to execute the rest of the code, which in this case is to iterate again (We are in a for loop).
+								 * This means that by the time the Game query ends, i could have a value higher than it had when the query started.
+								 * Sending the tournament we want to this function takes care of this problem and we don't have to perform a blocking action on node. :-)
+								 */
+								addTournament(req, res, tournament[i], client, done, log);
 							}
 						}
 						if (i == tournament.length) {
@@ -869,6 +864,16 @@ var createEvent = function(req, res, pg, conString, log) {
 							var j = 0;
 							for ( j = 0; j < fees.length; j++) {
 								if (!fees[j].name || isNaN(fees[j].amount) || fees[j].amount < 0 || !fees[j].description || isNaN(fees[j].available) || fees[j].available < 0) {
+									client.query("ROLLBACK");
+									done();
+									console.log("\n3\n");
+									res.status(400).json({
+										error : "Incomplete or invalid parameters"
+									});
+									log.info({
+										res : res
+									}, 'done response');
+								} else {
 									client.query({
 										text : "INSERT INTO spectator_fee (event_name, event_start_date, event_location, spec_fee_name, spec_fee_amount, spec_fee_description, spec_fee_amount_available) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 										values : [req.body.event.name, req.body.event.start_date, req.body.event.location, fees[j].name, Math.floor(fees[j].amount * 100) / 100, fees[j].description, fees[j].available]
@@ -882,26 +887,17 @@ var createEvent = function(req, res, pg, conString, log) {
 											}, 'done response');
 										}
 									});
-								} else {
-									client.query("ROLLBACK");
-									done();
-									res.status(400).json({
-										error : "Incomplete or invalid parameters"
-									});
-									log.info({
-										res : res
-									}, 'done response');
 								}
 							}
 							if (j == fees.length) {
 								var sponsors = req.body.sponsors;
 								var k = 0;
 								for ( k = 0; k < sponsors.length; k++) {
-									var querySponsors = client.query({
+									var query = client.query({
 										text : "SELECT is_confirmed.sponsor_name FROM is_confirmed JOIN belongs_to ON is_confirmed.organization_name = belongs_to.organization_name WHERE customer_username = $1 AND sponsor_name = $2",
 										values : [req.user.username, sponsors[k]]
 									});
-									querySponsors.on("row", function(row, result) {
+									query.on("row", function(row, result) {
 										result.addRow(row);
 									});
 									query.on('error', function(error) {
@@ -912,7 +908,7 @@ var createEvent = function(req, res, pg, conString, log) {
 											res : res
 										}, 'done response');
 									});
-									querySponsors.on("end", function(result) {
+									query.on("end", function(result) {
 										if (result.rows.length) {
 											client.query({
 												text : "INSERT INTO shows (event_name, event_start_date, event_location, sponsor_name) VALUES ($1, $2, $3, $4)",
