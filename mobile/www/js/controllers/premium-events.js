@@ -8,6 +8,7 @@ myApp.controller('ratingsController', ['$scope', '$http', '$stateParams', '$wind
             'Authorization': "Bearer "+ $window.sessionStorage.token
         }
     };
+    
     //get the reviews from all values found in the server
     $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/reviews?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
     success(function(data, status, headers, config) {
@@ -81,7 +82,6 @@ myApp.controller('newsController', function ($scope, sharedDataService, $statePa
     $scope.clickEdit = function (id) {
         var values = [$scope.news[id], $stateParams.eventname, $stateParams.date, $stateParams.location]; 
         sharedDataService.set(values);
-        console.log("in click");
         $state.go("app.postnews", {
             type: "Edit",
             eventname: $stateParams.eventname,
@@ -89,8 +89,20 @@ myApp.controller('newsController', function ($scope, sharedDataService, $statePa
             location: $stateParams.location
         })
     }
+    
+    // Send data to post news controller
+    $scope.clickAdd = function (id) {
+        var values = [$scope.news[id], $stateParams.eventname, $stateParams.date, $stateParams.location]; 
+        sharedDataService.set(values);
+        $state.go("app.postnews", {
+            type: "Add",
+            eventname: $stateParams.eventname,
+            date: $stateParams.date,
+            location: $stateParams.location
+        })
+    }
+    
     $scope.goToEventFromNews = function () {
-
         $state.go("app.eventpremium", {
             eventname: $stateParams.eventname,
             date: $stateParams.date,
@@ -116,7 +128,6 @@ myApp.controller('createMeetupController', function ($scope, $state, $http, $sta
 
 
     $scope.goToMeetups = function () {
-
         $state.go("app.meetups", {
             eventname: $stateParams.eventname,
             date: $stateParams.date,
@@ -131,13 +142,11 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
     var params = sharedDataService.get();
 
     $scope.returnToPremiumEvent = function () {
-
         $state.go("app.eventpremium", {
             eventname: params[0],
             date: params[1],
             location: params[2]
         })
-
     }
 
 });
@@ -153,7 +162,7 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
     });
 
     var now = new Date(); 
-    var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
+    var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds()); //Get current date in UTC
 
 
     var config = {
@@ -162,6 +171,7 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
         }
     };
 
+    //Server call to get event info
     $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
     success(function(data, status, headers, config) {
         $scope.eventInfo = angular.fromJson(data);
@@ -212,7 +222,7 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 
     $scope.goToMeetup = function (eventName, eventDate, eventLocation) {
 
-        eventName = eventName.replace(" ", "%20");
+        eventName = eventName.replace(" ", "%20"); //Replace spaces with a %20
         $state.go("app.meetups", {
             eventname: eventName,
             date: eventDate,
@@ -222,7 +232,7 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 
     $scope.goToReview = function (eventName, eventDate, eventLocation, selectedTournament) {
 
-        eventName = eventName.replace(" ", "%20");
+        eventName = eventName.replace(" ", "%20"); //Replace spaces with a %20
         var params = [eventName, eventDate, eventLocation];
         sharedDataService.set(params);
         $state.go("app.writereview")
@@ -231,7 +241,7 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
     $scope.goToTournament = function (eventName, eventDate, eventLocation, selectedTournament) {
 
 
-        eventName = eventName.replace(" ", "%20");
+        eventName = eventName.replace(" ", "%20"); //Replace spaces with a %20
         var params = [eventName, eventDate, eventLocation];
         sharedDataService.set(selectedTournament);
         $state.go("app.regularevent", {
@@ -244,7 +254,7 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
     $scope.goToNews = function (eventName, eventDate, eventLocation, selectedTournament) {
 
 
-        eventName = eventName.replace(" ", "%20");
+        eventName = eventName.replace(" ", "%20"); //Replace spaces with a %20
         var params = [eventName, eventDate, eventLocation];
         sharedDataService.set(selectedTournament);
         $state.go("app.news", {
@@ -271,14 +281,12 @@ myApp.controller('meetupController', function ($scope, $state, $http, $statePara
 
         $scope.meetups = angular.fromJson(data);
 
-
     }).
     error(function(data, status, headers, config) {
         console.log("error in eventPremiumSummaryController");
     });
 
     $scope.goToSummaryFromMeetup = function () {
-
         $state.go("app.eventpremium", {
             eventname: $stateParams.eventname,
             date: $stateParams.date,
@@ -287,7 +295,6 @@ myApp.controller('meetupController', function ($scope, $state, $http, $statePara
     };
 
     $scope.goToCreateMeetup = function () {
-
         $state.go("app.createmeetup", {
             eventname: $stateParams.eventname,
             date: $stateParams.date,

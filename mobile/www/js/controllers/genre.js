@@ -60,6 +60,7 @@ myApp.controller('genreProfileController', function ($scope, $ionicPopover, shar
             }
         };
 
+        //Server call to get event information
         $http.get('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'', config).
         success(function(data, status, headers, config) {
 

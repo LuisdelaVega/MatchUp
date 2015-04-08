@@ -2,6 +2,7 @@ var myApp = angular.module('regular-events',[]);
 
 myApp.controller('REController', ['$scope', '$http', '$ionicPopup', function ($scope, $http, $ionicPopup) {
 
+    //Create popup when user clicks the sign up button
     $scope.showConfirm = function () {
         var confirmPopup = $ionicPopup.confirm({
             title: 'Sign Up',
@@ -48,8 +49,9 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
         
         //If user came from a premium event sharedDataService is used to find what tournament is to be displayed.
         if($scope.eventInfo.host != null){
-            var selectedTournament = sharedDataService.get();
+            var selectedTournament = sharedDataService.get(); //Get info from sharedDataService
 
+            //Server call to obtain tournament information from selected event
             $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+selectedTournament+'?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
             success(function(data, status, headers, config) {
 
@@ -63,6 +65,7 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
         }
         //If user is came from a regular event, the only tournament from a regular event is used to display the event.
         else{
+            //Server call to obtain tournament information from selected event
             $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
             success(function(data, status, headers, config) {
 

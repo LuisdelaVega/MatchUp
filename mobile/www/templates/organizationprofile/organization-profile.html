@@ -8,19 +8,19 @@
     </ion-nav-buttons>
     <ion-content>
         <div class="crop-banner">
-            <img class="crop-image" src="img/halo4.jpg">
+            <img class="crop-image" ng-src="{{organization.organization_cover_photo}}">
         </div>
         <div>
             <div class="center-text">
-                <img class="profile-pic" src="img/esportPR.png">
+                <img class="profile-pic" ng-src="{{organization.organization_logo}}">
             </div>
             <div class="card">
                 <div class="item item-text-wrap">
                     <div class="center-text">
-                        <h1 class="h1-username">Organization Name</h1>
+                        <h1 class="h1-username">{{organization.organization_name}}</h1>
                     </div>
                     <p>
-                        <br>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                        <br>{{organization.organization_bio}}
                     </p>
                 </div>
             </div>
@@ -30,15 +30,10 @@
                 Events
             </div>
             <div class="list">
-                <a class="item item-thumbnail-left" href="#">
-                    <img src="img/apex2015.png">
-                    <h2>Pretty Hate Machine</h2>
-                    <p>Nine Inch Nails</p>
-                </a>
-                <a class="item item-thumbnail-left" href="#">
-                    <img src="img/evo.png">
-                    <h2>Pretty Hate Machine</h2>
-                    <p>Nine Inch Nails</p>
+                <a class="item item-thumbnail-left" href="#" ng-repeat="event in events | limitTo : 3">
+                    <img ng-src="{{event.event_logo}}">
+                    <h2>{{event.event_name}}</h2>
+                    <p>{{event.event_location}}</p>
                 </a>
             </div>
             <a class="item item-icon-left dark" href="#/app/organizationprofileevents">
@@ -50,28 +45,15 @@
             <div class="item item-divider">
                 Organization Members
             </div>
-            <a class="item center-item item-avatar item-button-right" href="#">
-                <img src="img/ron.jpg">
-                <h2>Ron Paul</h2>
-                <p>This is my info</p>
+            <a class="item center-item item-avatar item-button-right" href="#" ng-repeat="member in members">
+                <img ng-src="{{member.customer_profile_pic}}">
+                <h2>{{member.customer_tag}}</h2>
+                <p>{{member.customer_first_name}} {{member.customer_last_name}}</p>
                 <div class="buttons">
-                    <button class="button button-clear">
+                    <button class="button button-clear" ng-if="{{member.is_owner}}">
                         <i class="icon ion-briefcase"></i>
                     </button>
                 </div>
-            </a>
-            <a class="item item-avatar" href="#">
-                <img src="img/ron.jpg">
-                <h2>Ron Paul</h2>
-                <p>This is my info</p>
-            </a>
-            <a class="item item-avatar" href="#">
-                <img src="img/ron.jpg">
-                <h2>Ron Paul</h2>
-                <p>This is my info</p>
-            </a>
-            <a class="item item-icon-left dark" href="#/app/organizationprofilemembers">
-                <i class="icon ion-android-arrow-forward"></i> See More
             </a>
         </div>
     </ion-content>

@@ -248,7 +248,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     // Organization Profile
     //================================================================================
         .state('app.organizationprofile', {
-        url: "/organizationprofile",
+        url: "/organizationprofile?:organizationname",
         templateUrl: "templates/organizationprofile/organization-profile.html",
         controller: "organizationController"
     })
@@ -429,7 +429,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
 
 
 
-    //Authentication stuff
+    //Used for authentication and complying with CORS
     $httpProvider.defaults.useXDomain = true;
 
     delete $httpProvider.defaults.headers.common["X-Requested-With"];

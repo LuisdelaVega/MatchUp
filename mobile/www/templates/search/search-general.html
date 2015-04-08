@@ -23,14 +23,14 @@
         </div>
         
         <div class="list" ng-if="teams">
-            <a class="item item-avatar" href="#" ng-repeat="data in searchData">
+            <a class="item item-avatar" ng-click="goToTeamProfile(data.team_name)" ng-repeat="data in searchData">
                 <img ng-src="{{ data.team_logo }}">
                 <h2>{{ data.team_name }}</h2>
             </a>
         </div>
         
         <div class="list" ng-if="organizations">
-            <a class="item item-avatar" href="#" ng-repeat="data in searchData">
+            <a class="item item-avatar" ng-click="goToOrganizationProfile(data.organization_name)" ng-repeat="data in searchData">
                 <img ng-src="{{ data.organization_logo }}">
                 <h2>{{ data.organization_name }}</h2>
             </a>

@@ -1,6 +1,7 @@
 var myApp = angular.module('user',[]);
 
 myApp.controller('ProfileController', function ($scope, $ionicPopover, $state, sharedDataService, $ionicPopup) {
+   //Create popover event that allows further navigation to profile owner
     $ionicPopover.fromTemplateUrl('templates/profile/profile-popover.html', {
         scope: $scope,
     }).then(function (popover) {
@@ -20,6 +21,7 @@ myApp.controller('ProfileController', function ($scope, $ionicPopover, $state, s
     }
 
     $scope.customerUsername = sharedDataService.get();
+    
 });
 
 myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$stateParams', '$ionicPopup', '$timeout', '$state', function ($scope, $http, $window, $stateParams, $ionicPopup, $timeout, $state) {
@@ -59,12 +61,9 @@ myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$st
         console.log(err);
     });
 
-
-
-
-
     $scope.subscribeToUser = function(username){
 
+        //Create popup asking if user want to subscribe. Is activated by pressing the subscribe button.
         var myPopup = $ionicPopup.show({
             title: 'Do you want to subscribe?',
             scope: $scope,
@@ -95,6 +94,10 @@ myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$st
 
     $scope.goToTeamProfile = function (teamName) {
         $state.go('app.teamprofile', {"teamname": teamName});
+    };
+    
+    $scope.goToOrganizationProfile = function (organizationName) {
+        $state.go('app.organizationprofile', {"organizationname": organizationName});
     };
 
 }]);
@@ -184,6 +187,7 @@ myApp.controller('profileEventsController', ['$scope', '$http', '$stateParams', 
         eventName = eventName.replace(" ", "%20");
         var params = [eventName, date, location];
 
+        //Server call to get event information
         $http.get('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'', config).
         success(function(data, status, headers, config) {
 
@@ -218,6 +222,7 @@ myApp.controller('myMatchupViewController', ['$scope', '$http', '$stateParams', 
 
 myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$window', function ($scope, $http, $stateParams, $window) {
 
+    //Ensures that server calls happens everytime user accesses the edit profile view with updated information
     $scope.$on('$ionicView.enter', function () {
         var config = {
             headers: {
@@ -225,6 +230,7 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
             }
         };
 
+        //Server call to obtain my own profile information
         $http.get('http://136.145.116.232/matchup/profile/', config).success(function (data) {
 
             var profileData = angular.fromJson(data);
@@ -250,7 +256,7 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
 
 myApp.controller('profileTeamsController', ['$scope', '$http', '$stateParams', '$window', '$state', function ($scope, $http, $stateParams, $window, $state) {
 
-    $scope.customerUsername = $stateParams.username;
+    $scope.customerUsername = $stateParams.username; //Store in the scope of this controller the username found in stateParams. Can also use $window.sessionStorage.token
 
     var config = {
         headers: {
@@ -258,6 +264,7 @@ myApp.controller('profileTeamsController', ['$scope', '$http', '$stateParams', '
         }
     };
 
+    //Server call to get the teams the specified user belongs to.
     $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/teams', config).success(function (data) {
 
         $scope.teams = angular.fromJson(data);
@@ -274,7 +281,7 @@ myApp.controller('profileTeamsController', ['$scope', '$http', '$stateParams', '
 
 myApp.controller('profileOrganizationsController', ['$scope', '$http', '$stateParams', '$window', '$state', function ($scope, $http, $stateParams, $window, $state) {
 
-    $scope.customerUsername = $stateParams.username;
+    $scope.customerUsername = $stateParams.username; //Store in the scope of this controller the username found in stateParams. Can also use $window.sessionStorage.token
 
     var config = {
         headers: {
@@ -282,6 +289,7 @@ myApp.controller('profileOrganizationsController', ['$scope', '$http', '$statePa
         }
     };
 
+    //Server call to get the organizations the specified user belongs to.
     $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/organizations', config).success(function (data) {
 
         $scope.organizationsData = angular.fromJson(data);

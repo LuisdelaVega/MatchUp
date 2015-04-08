@@ -58,7 +58,6 @@ myApp.controller('gameProfileSummaryController', ['$scope', '$http', 'sharedData
     //Obtain hosted events that are hosting a tournament with the specified game.
     $http.get('http://matchup.neptunolabs.com/matchup/events?filter=game&value='+$stateParams.gamename+'', config).
     success(function(data, status, headers, config) {
-        console.log('http://matchup.neptunolabs.com/matchup/events?filter=game&value='+$stateParams.gamename+'');
         $scope.promotedEvents = data;
 
     }).
@@ -81,8 +80,7 @@ myApp.controller('gameProfileUpcomingController', ['$scope', '$http', 'sharedDat
     //Obtain upcoming events that are hosting a tournament with the specified game.
     $http.get('http://matchup.neptunolabs.com/matchup/events?filter=game&value='+$stateParams.gamename+'&state=upcoming', config).
     success(function(data, status, headers, config) {
-
-        console.log('http://matchup.neptunolabs.com/matchup/events?type=hosted&filter=game&value='+$stateParams.gamename+'&state=upcoming');
+        
         $scope.upcomingEvents = angular.fromJson(data);
 
     }).
@@ -128,7 +126,6 @@ myApp.controller('gameProfileHistoryController', ['$scope', '$http', 'sharedData
     $http.get('http://matchup.neptunolabs.com/matchup/events?filter=game&value='+$stateParams.gamename+'&state=past', config).
     success(function(data, status, headers, config) {
 
-        console.log('http://matchup.neptunolabs.com/matchup/events?type=hosted&filter=game&value='+$stateParams.gamename+'&state=past');
         $scope.pastEvents = data;
 
     }).

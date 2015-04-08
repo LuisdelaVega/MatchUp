@@ -15,6 +15,7 @@ myApp.controller('myEventsParentController', function ($scope, $ionicPopover, $s
         }
     };
 
+    //Server call to obtain profile of selected user
     $http.get('http://136.145.116.232/matchup/profile/'+$scope.customerUsername+'', config).success(function (data) {
 
         var eventData = data.events;

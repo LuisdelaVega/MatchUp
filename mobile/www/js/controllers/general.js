@@ -8,6 +8,7 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
         }
     };
 
+    //Synchronously make server calls to reduce load on server.
     //Obtain hosted and upcoming events
     $http.get('http://matchup.neptunolabs.com/matchup/events?type=hosted&state=upcoming', config).
     success(function(data, status, headers, config) {
@@ -20,12 +21,11 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
 
             $scope.liveEvents = angular.fromJson(data);
 
+            //Obtain regular and upcoming events
             $http.get('http://matchup.neptunolabs.com/matchup/events?type=regular&state=upcoming', config).
             success(function(data, status, headers, config) {
 
                 $scope.regularEvents = angular.fromJson(data);
-
-
 
                 //Obtain popular games
                 $http.get('http://matchup.neptunolabs.com/matchup/popular/games', config).
@@ -51,10 +51,6 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
         console.log("error in home controller. obtaining hosted upcoming events");
     });
 
-
-
-
-
     //goToEvent requires the event name, date and location to access the specific event that is to be transitioned to.
     $scope.goToEvent = function(eventName, date, location){
 
@@ -66,19 +62,17 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
                 'Authorization': "Bearer "+ $window.sessionStorage.token
             }
         };
+        
 
+        //Get event information
         $http.get('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'', config).
         success(function(data, status, headers, config) {
 
             var eventData = angular.fromJson(data);
 
-            console.log('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'');
-
             var isHosted = eventData.host; //Server returns organization that is hosting the event. If the event does not have a host than the value returned is null.
 
             sharedDataService.set(params);
-
-            console.log(isHosted);
 
             //If isHosted is null, than the user is requesting to go to a regular event. Otherwise the user is going to a premium event. 
             if(isHosted != null){
@@ -96,7 +90,7 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
     };
 
     $scope.goToGameProfile = function (gameName, gameImage) {
-        var params = [gameImage, gameName];
+        var params = [gameImage, gameName]; //Stored in array to send both values at the same time through sharedDataService
         sharedDataService.set(params);
         $state.go('app.game.summary', {"gamename": gameName});
     };
@@ -116,6 +110,7 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$
 
         //Search only if there is content in the search box
         if(query.length > 0){
+            //Server call to obtain information on events, users, teams, organizations, games and genres based on user search input
             $http.get('http://136.145.116.232/matchup/search/'+query+'', config).
             success(function(data, status, headers, config) {
 
@@ -142,7 +137,7 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$
 
         //Failsafe to make sure that if search parameters is 0 than there should be nothing displaying
         else{
-
+            
             $scope.liveEvents.length = 0
             $scope.pastEvents.length = 0
             $scope.premiumEvents.length = 0
@@ -160,7 +155,7 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$
     //goToEvent requires the event name, date and location to access the specific event that is to be transitioned to.
     $scope.goToEvent = function(eventName, date, location){
 
-        eventName = eventName.replace(" ", "%20");
+        eventName = eventName.replace(" ", "%20"); //Replace spaces with %20
         var params = [eventName, date, location];
 
         var config = {
@@ -168,15 +163,15 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$
                 'Authorization': "Bearer "+ $window.sessionStorage.token
             }
         };
+        
 
+        //Server call to obtain event informtion
         $http.get('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'', config).
         success(function(data, status, headers, config) {
 
             var eventData = angular.fromJson(data);
 
             var isHosted = eventData.host; //Server returns organization that is hosting the event. If the event does not have a host than the value returned is null.
-
-            console.log(isHosted);
 
             sharedDataService.set(params);
 
@@ -197,7 +192,7 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$
 
     $scope.goToGameProfile = function (gameName, gameImage) {
         //Save parameters to array such that both can be sent through sharedDataServices
-        var params = [gameName, gameImage];
+        var params = [gameImage, gameName];
         sharedDataService.set(params);
         $state.go('app.game.summary', {"gamename": gameName});
     };
@@ -210,6 +205,10 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$
 
     $scope.goToTeamProfile = function (teamName) {
         $state.go('app.teamprofile', {"teamname": teamName});
+    };
+    
+    $scope.goToOrganizationProfile = function (organizationName) {
+        $state.go('app.organizationprofile', {"organizationname": organizationName});
     };
 
 }]);
@@ -284,6 +283,7 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
             }
         };
 
+        //Server call to obtain event information
         $http.get('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'', config).
         success(function(data, status, headers, config) {
 
@@ -310,7 +310,7 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
     };
 
     $scope.goToGameProfile = function (gameName, gameImage) {
-        //Params stored in array to send both at the same time through sharedDataService
+        //Save parameters to array such that both can be sent through sharedDataServices
         var params = [gameImage, gameName];
         sharedDataService.set(params);
         $state.go('app.game.summary', {"gamename": gameName});
@@ -321,6 +321,14 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
         sharedDataService.set(userName);
         $state.go('app.profile.summary', {"username": userName});
     };
+    
+    $scope.goToTeamProfile = function (teamName) {
+        $state.go('app.teamprofile', {"teamname": teamName});
+    };
+    
+    $scope.goToOrganizationProfile = function (organizationName) {
+        $state.go('app.organizationprofile', {"organizationname": organizationName});
+    };
 
 }]);
 
@@ -329,7 +337,7 @@ myApp.controller('cameraReportController', ['$scope', '$http', 'Camera', functio
     //Used to determine whether camera is taken or not and display it if it is. 
     $scope.picturetaken = false;
 
-    //Interacts with corresponding factory that calls on platform specific API to handle the taking of pictures
+    //Interacts with corresponding factory that calls on platform specific API (Android or iOS) to handle the taking of pictures
     $scope.takePicture = function () {
         console.log('Getting camera');
         Camera.getPicture().then(function (imageURI) {
@@ -365,7 +373,7 @@ myApp.controller('popularGameViewController', ['$scope', '$http', '$state', 'sha
         //Initial push of items to popularGames. Not all are pushed to ease load on mobile device not needing to render more than necessary
         for(var i = 0; i <= 6; i++){
             if(allGames.length > 0) //Only push if there is something to push onto popularGames
-                $scope.popularGames.push(allGames.pop());
+                $scope.popularGames.push(allGames.shift());
         }
     }).
     error(function(data, status, headers, config) {
@@ -375,7 +383,7 @@ myApp.controller('popularGameViewController', ['$scope', '$http', '$state', 'sha
     //Function called by infinite scroll
     $scope.add = function () {
         if(allGames.length > 0) //Only push if there is something to push onto popularGames
-            $scope.popularGames.push(allGames.pop());
+            $scope.popularGames.push(allGames.shift());
         $scope.$broadcast('scroll.infiniteScrollComplete'); //Broadcasts to infinite scroll that function has completed. 
     };
 
@@ -410,6 +418,7 @@ myApp.controller('loginController', ['$scope', '$http', '$state', 'sharedDataSer
             }
         }; 
 
+        //Server verifies credential. Credentials are passed through the header. If successful, server returns token
         $http.post('http://136.145.116.232/login', {}, config).success(function (data) {
             var tokenObj = angular.fromJson(data);
             // save token in session
@@ -434,6 +443,7 @@ myApp.controller('sidebarController', ['$scope', '$http', '$state', 'sharedDataS
         }
     };
 
+    //Server call to obtain profile information of currently logged in user
     $http.get('http://136.145.116.232/matchup/profile', config).success(function (data) {
 
         $scope.loggedInUserProfileData = angular.fromJson(data);

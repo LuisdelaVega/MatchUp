@@ -71,7 +71,7 @@
             <a class="item item-divider " href="#/app/searchgeneral/Organizations">
                 Organizations               
             </a>
-            <a class="item item-avatar" href="#" ng-repeat="organization in organizations | limitTo: 3">
+            <a class="item item-avatar" ng-click="goToOrganizationProfile(organization.organization_name)" ng-repeat="organization in organizations | limitTo: 3">
                 <img ng-src="{{ organization.organization_logo }}">
                 <h2>{{ organization.organization_name }}</h2>
             </a>

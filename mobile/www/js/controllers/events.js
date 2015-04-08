@@ -5,8 +5,8 @@ myApp.controller('EventController', function ($scope, $ionicPopover, $http, shar
 
     //goToEvent requires the event name, date and location to access the specific event that is to be transitioned to.
     $scope.goToEvent = function(eventName, date, location){
-
-        eventName = eventName.replace(" ", "%20");
+    
+        eventName = eventName.replace(" ", "%20"); //Replaces all space with %20.
         var params = [eventName, date, location];
 
         var config = {
@@ -15,6 +15,7 @@ myApp.controller('EventController', function ($scope, $ionicPopover, $http, shar
             }
         };
 
+        //Call to get event information.
         $http.get('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'', config).
         success(function(data, status, headers, config) {
 

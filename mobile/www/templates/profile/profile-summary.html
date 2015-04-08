@@ -69,7 +69,7 @@
             </div>
             <div class="list">
 
-                <a class="item item-thumbnail-left" ng-repeat="organization in organizations | limitTo: 3">
+                <a class="item item-thumbnail-left" ng-click="goToOrganizationProfile(organization.organization_name)" ng-repeat="organization in organizations | limitTo: 3">
                     <img ng-src="{{ organization.organization_logo }}">
                     <h2>{{ organization.organization_name }}</h2>
                 </a>

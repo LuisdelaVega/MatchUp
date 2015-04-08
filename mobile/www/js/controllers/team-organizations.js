@@ -2,7 +2,7 @@ var myApp = angular.module('team-organizations',[]);
 
 // Popup for adding a team member, change id to index when using ng-repeat
 myApp.controller("addTeamMemberController", ['$scope', '$ionicPopup', '$http', '$window', '$stateParams', function ($scope, $ionicPopup, $http, $window, $stateParams) {
-    // A confirm dialog
+    //Confirm dialogue asking whether the user would like to add specified user to the team
     $scope.showConfirm = function (name) {
         var confirmPopup = $ionicPopup.confirm({
             title: 'Remove Member',
@@ -33,7 +33,6 @@ myApp.controller("addTeamMemberController", ['$scope', '$ionicPopup', '$http', '
             success(function(data, status, headers, config) {
 
                 var searchData = angular.fromJson(data);
-
                 $scope.users = searchData.users;
 
             }).
@@ -76,24 +75,23 @@ myApp.controller("removeTeamMemberController", ['$scope', '$ionicPopup', '$http'
         }
     };
 
+    //Server call to obtain members of the specified team
     $http.get('http://136.145.116.232/matchup/teams/'+$stateParams.teamname+'/members', config).
     success(function(data, status, headers, config) {
 
         var teamProfileData = angular.fromJson(data);
-
         $scope.players = teamProfileData;
 
     }).
     error(function(data, status, headers, config) {
-
         console.log("error getting team info");    
-
     });
 
 }]);
 
 myApp.controller('teamController', function ($scope, $ionicPopover, $state, $ionicPopup, $stateParams, $http, $window) {
 
+    //Create popover event that allows further navigation to team members
     $ionicPopover.fromTemplateUrl('templates/teamprofile/popover.html', {
         scope: $scope,
     }).then(function (popover) {
@@ -109,6 +107,7 @@ myApp.controller('teamController', function ($scope, $ionicPopover, $state, $ion
         $scope.popover.hide();
         $state.go("app.editteam");
     }
+
     // A confirm dialog for deletion of team
     $scope.deleteTeamPopup = function () {
         $scope.closePopover();
@@ -157,27 +156,19 @@ myApp.controller('teamController', function ($scope, $ionicPopover, $state, $ion
                 if(player.customer_username == $window.sessionStorage.username)
                     $scope.loggedInUserIsMember = true;
             });
-
         }).
         error(function(data, status, headers, config) {
-
             console.log("error getting team info");    
-
         });
 
     }).
     error(function(data, status, headers, config) {
-
         console.log("error getting team info");    
-
     });
 
     $scope.goToTeamProfileMembers = function () {
-
         $state.go('app.teamprofilemembers', {"teamname": $stateParams.teamname});
-
     };
-
 
 });
 
@@ -223,7 +214,8 @@ myApp.controller("addOrganizationMemberController", ['$scope', '$ionicPopup', fu
 }]);
 
 /// TODO configure popvoer for edit and deletion of organization
-myApp.controller('organizationController', function ($scope, $ionicPopover, $state, $ionicPopup) {
+myApp.controller('organizationController', function ($scope, $ionicPopover, $state, $ionicPopup, $http, $window, $stateParams) {
+    //Create popover event that allows further navigation to organization members
     $ionicPopover.fromTemplateUrl('templates/organizationprofile/popover.html', {
         scope: $scope,
     }).then(function (popover) {
@@ -254,4 +246,44 @@ myApp.controller('organizationController', function ($scope, $ionicPopover, $sta
             }
         });
     };
+
+    var config = {
+        headers: {
+            'Authorization': "Bearer "+ $window.sessionStorage.token
+        }
+    };
+
+    //Synchronously make server calls to lessen server load
+    //Get organization information
+    $http.get('http://136.145.116.232/matchup/organizations/'+$stateParams.organizationname+'', config).
+    success(function(data, status, headers, config) {
+
+        $scope.organization = angular.fromJson(data);
+
+        //Get events hosted by the organization
+        $http.get('http://136.145.116.232/matchup/organizations/'+$stateParams.organizationname+'/events', config).
+        success(function(data, status, headers, config) {
+
+            $scope.events = angular.fromJson(data);
+            
+            //Get events hosted by the organization
+            $http.get('http://136.145.116.232/matchup/organizations/'+$stateParams.organizationname+'/members', config).
+            success(function(data, status, headers, config) {
+
+                $scope.members = angular.fromJson(data);
+
+            }).
+            error(function(data, status, headers, config) {
+                console.log("error in goToEvent");
+            });
+
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in goToEvent");
+        });
+
+    }).
+    error(function(data, status, headers, config) {
+        console.log("error in goToEvent");
+    });
 });
