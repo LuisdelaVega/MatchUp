@@ -6,11 +6,11 @@ myApp.controller("addTeamMemberController", ['$scope', '$ionicPopup', '$http', '
     $scope.showConfirm = function (name) {
         var confirmPopup = $ionicPopup.confirm({
             title: 'Remove Member',
-            template: 'Are you sure you want to remove ' + name + ''
+            template: 'Are you sure you want to add ' + name + ''
         });
         confirmPopup.then(function (res) {
             if (res) {
-                //HTTP call to remove member
+                //HTTP call to remove member. Will be implemented in integration
             } else {
                 //Do nothing
             }
@@ -35,16 +35,16 @@ myApp.controller("addTeamMemberController", ['$scope', '$ionicPopup', '$http', '
                 var searchData = angular.fromJson(data);
 
                 $scope.users = searchData.users;
-    
+
             }).
             error(function(data, status, headers, config) {
                 console.log("error in search controller");
             });
         }
 
-        //Failsafe to make sure that if search parameters is 0 than there should be nothing displaying
+        //Failsafe to make sure that if search parameter is 0 than there should be nothing displaying
         else{
-            
+
             $scope.users.length = 0
 
         }
@@ -63,7 +63,7 @@ myApp.controller("removeTeamMemberController", ['$scope', '$ionicPopup', '$http'
         });
         confirmPopup.then(function (res) {
             if (res) {
-                //HTTP call to remove member
+                //HTTP call to remove member. Will be implemented in integration
             } else {
                 //Do nothing
             }
@@ -76,12 +76,12 @@ myApp.controller("removeTeamMemberController", ['$scope', '$ionicPopup', '$http'
         }
     };
 
-    $http.get('http://136.145.116.232/matchup/teams/'+$stateParams.teamname+'', config).
+    $http.get('http://136.145.116.232/matchup/teams/'+$stateParams.teamname+'/members', config).
     success(function(data, status, headers, config) {
 
         var teamProfileData = angular.fromJson(data);
 
-        $scope.players = teamProfileData.players;
+        $scope.players = teamProfileData;
 
     }).
     error(function(data, status, headers, config) {
@@ -131,19 +131,38 @@ myApp.controller('teamController', function ($scope, $ionicPopover, $state, $ion
         }
     };
 
+    //Synchronously makes server calls
+    //Obtain general team information
     $http.get('http://136.145.116.232/matchup/teams/'+$stateParams.teamname+'', config).
     success(function(data, status, headers, config) {
 
         var teamProfileData = angular.fromJson(data);
 
-        $scope.info = teamProfileData.info;
+        $scope.info = teamProfileData;
 
-        $scope.players = teamProfileData.players;
-        $scope.loggedInUserIsMember = false;
+        $scope.players = teamProfileData;
 
-        angular.forEach($scope.players, function(player) {
-            if(player.customer_username == $window.sessionStorage.username)
-                $scope.loggedInUserIsMember = true;
+
+
+
+        //Get the members of the team
+        $http.get('http://136.145.116.232/matchup/teams/'+$stateParams.teamname+'/members', config).
+        success(function(data, status, headers, config) {
+
+            $scope.players = angular.fromJson(data);
+            $scope.loggedInUserIsMember = false;  //initialize variable. used to determine whether user can edit team info or is visiting team profile
+
+            //Iterate over all players and checking if the username is found in the list of players
+            angular.forEach($scope.players, function(player) {
+                if(player.customer_username == $window.sessionStorage.username)
+                    $scope.loggedInUserIsMember = true;
+            });
+
+        }).
+        error(function(data, status, headers, config) {
+
+            console.log("error getting team info");    
+
         });
 
     }).

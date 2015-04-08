@@ -2,6 +2,7 @@ var myApp = angular.module('genres',[]);
 
 myApp.controller('genreController', function ($scope, $ionicPopover, sharedDataService, $state, $http, $window) {
 
+    //Function called when user selects a genre
     $scope.goToGenreProfile = function(genreName){
         sharedDataService.set(genreName);
         $state.go('app.genreevents');
@@ -12,7 +13,8 @@ myApp.controller('genreController', function ($scope, $ionicPopover, sharedDataS
             'Authorization': "Bearer "+ $window.sessionStorage.token
         }
     };
-
+    
+    //Get a list of genres of games being played in tournaments
     $http.get('http://136.145.116.232/matchup/popular/genres', config).
     success(function(data, status, headers, config) {
 
@@ -27,7 +29,7 @@ myApp.controller('genreController', function ($scope, $ionicPopover, sharedDataS
 
 myApp.controller('genreProfileController', function ($scope, $ionicPopover, sharedDataService, $http, $window, $state) {
 
-    //get selected genre from shareDataService
+    //get selected genre from sharedDataService
     $scope.selectedGenre = sharedDataService.get();
 
     var config = {
@@ -35,7 +37,8 @@ myApp.controller('genreProfileController', function ($scope, $ionicPopover, shar
             'Authorization': "Bearer "+ $window.sessionStorage.token
         }
     };
-
+    
+    //Get list of events that have a game of the selected genre.
     $http.get('http://136.145.116.232/matchup/events?filter=genre&value='+$scope.selectedGenre+'', config).
     success(function(data, status, headers, config) {
 

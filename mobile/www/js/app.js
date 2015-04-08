@@ -216,6 +216,10 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
         .state('app.game.summary', {
         url: "/summary/:gamename",
         views: {
+            'game-summary-tab': {
+                templateUrl: "templates/gameProfile/game-summary.html",
+                controller: "gameProfileSummaryController"
+            },
             'game-upcoming-tab': {
                 templateUrl: "templates/gameProfile/game-upcoming.html",
                 controller: "gameProfileUpcomingController"
@@ -228,10 +232,6 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
                 templateUrl: "templates/gameProfile/game-history.html",
                 controller: "gameProfileHistoryController"
 
-            },
-            'game-summary-tab': {
-                templateUrl: "templates/gameProfile/game-summary.html",
-                controller: "gameProfileSummaryController"
             }
         }
     })
@@ -363,6 +363,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
         .state('app.createmeetup', {
         url: "/createmeetup/:eventname/:date/:location",
         templateUrl: "templates/meetup/create-meetup.html",
+        controller: "createMeetupController"
 
     })
 

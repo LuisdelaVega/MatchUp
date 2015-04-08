@@ -112,6 +112,20 @@ myApp.controller('eventPremiumParentController', function ($scope, $state, $http
     });
 });
 
+myApp.controller('createMeetupController', function ($scope, $state, $http, $stateParams, sharedDataService) {
+
+
+    $scope.goToMeetups = function () {
+
+        $state.go("app.meetups", {
+            eventname: $stateParams.eventname,
+            date: $stateParams.date,
+            location: $stateParams.location
+        })
+    };
+    
+});
+
 myApp.controller('premiumSignUpController', function ($scope, $state, $http, $stateParams, sharedDataService) {
 
     var params = sharedDataService.get();
@@ -167,7 +181,7 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
             success(function(data, status, headers, config) {
 
                 $scope.sponsors = angular.fromJson(data);
-                
+
                 console.log($http.pendingRequests);
 
 
@@ -250,19 +264,12 @@ myApp.controller('meetupController', function ($scope, $state, $http, $statePara
         }
     };
 
+
+    //Get meetups added to the event
     $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/meetups?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
     success(function(data, status, headers, config) {
 
         $scope.meetups = angular.fromJson(data);
-
-        $http.get('http://136.145.116.232/matchup/profile/'+$scope.meetup.customer_username+'', config).success(function (data) {
-
-            $scope.profilePictures = angular.fromJson(data);
-
-        }).error(function (err) {
-            console.log(err);
-
-        });
 
 
     }).
@@ -270,9 +277,18 @@ myApp.controller('meetupController', function ($scope, $state, $http, $statePara
         console.log("error in eventPremiumSummaryController");
     });
 
-    $scope.goToSummaryFromMeetup = function (eventName) {
+    $scope.goToSummaryFromMeetup = function () {
 
         $state.go("app.eventpremium", {
+            eventname: $stateParams.eventname,
+            date: $stateParams.date,
+            location: $stateParams.location
+        })
+    };
+
+    $scope.goToCreateMeetup = function () {
+
+        $state.go("app.createmeetup", {
             eventname: $stateParams.eventname,
             date: $stateParams.date,
             location: $stateParams.location
