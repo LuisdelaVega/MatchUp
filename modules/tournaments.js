@@ -32,7 +32,7 @@ var createTournament = function(req, res) {
 	}
 
 	var station = 0;
-	if (req.body.type === "Two-Stage") {
+	if (req.body.type === "Two Stage") {
 		tournament.groupStage = new Object();
 		tournament.groupStage.winnersPerGroup = req.body.winnersPerGroup;
 		tournament.groupStage.playersPerGroup = req.body.playersPerGroup;
@@ -202,7 +202,7 @@ function generateGroupStage(groupStage, players, tournament, station, assignStat
 			groupStage.groups[i].rounds[j].matches = new Array();
 			for (var k = 0; k < groupStage.groups[i].numOfMatchesPerRound; k++) {
 				groupStage.groups[i].rounds[j].matches[k] = new Object();
-				groupStage.groups[i].rounds[j].matches[k].name = "Match " + (k + 1);
+				groupStage.groups[i].rounds[j].matches[k].name = "Match " + (k + 1 + (groupStage.groups[(!(i) ? i:(i-1))].numOfMatchesPerRound * i));
 			}
 			if (!(groupStage.groups[i].players.length % 2)) {
 				var count = 0;
