@@ -106,7 +106,8 @@ myApp.config(function ($stateProvider, $urlRouterProvider) {
         })
         .state('app.tournamentList', {
             url: "/tournamentList",
-            templateUrl: "organizer/tournament_list.html"
+            templateUrl: "organizer/tournament_list.html",
+			controller: "editTournamentController"
         })
         .state('app.registrations', {
 			url: "/registrations",

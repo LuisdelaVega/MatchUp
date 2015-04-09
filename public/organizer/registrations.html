@@ -10,7 +10,7 @@
 		<div class="box">
 			<form role="form">
 				<div class="form-group">
-					<input class="form-control" type="search" placeholder="Search Users..." ng-model="item"/>
+					<input class="form-control" type="search" placeholder="Search Users by tag, name, or filter by fee name" ng-model="item"/>
 				</div>
 				<ul class="list-group">
 					<li class="list-group-item" ng-repeat="item in signups | filter:item | orderBy: 'customer_tag'">

@@ -2,17 +2,21 @@
 <div class="row">
 	<div class="col-md-8">
 		<div class="box">
-			<form>
+			<form name="organizationForm" ng-submit="submitOrganization(organizationForm.$valid)">
 				<legend>General Info</legend>
-				<div class="form-group">
+				<div class="form-group" ng-class="{ 'has-error' : organizationForm.name.$invalid && !organizationForm.name.$pristine }">
 					<label>Organization Name: </label>
-					<input class="form-control" placeholder="Enter Name" id="createOrganizationName">
+					<input class="form-control" name="name" ng-model="organization.name" ng-minlength="3" ng-maxlength="127" required>
+					<p ng-show="organizationForm.name.$error.minlength" class="help-block">Organization name is too short.</p>
+					<p ng-show="organizationForm.name.$error.maxlength" class="help-block">Organization name is too long.</p>
 				</div>
-				<div class="form-group">
+				<div class="form-group" ng-class="{ 'has-error' : organizationForm.description.$invalid && !organizationForm.description.$pristine }">
 					<label>Description:</label>
-					<textarea class="form-control" rows="4" id="createOrganizationDescription"></textarea>
+					<textarea class="form-control" name="description" rows="4" ng-model="organization.description" ng-minlength="10" ng-maxlength="255" required></textarea>
+					<p ng-show="organizationForm.description.$error.minlength" class="help-block">Organization description is too short.</p>
+					<p ng-show="organizationForm.description.$error.maxlength" class="help-block">Organization description must be 255 characters or less.</p>
 				</div>
-				<a class="btn btn-primary btn-block">Create</a>
+				<button type="submit" class="btn btn-success btn-block">Create</button>
 			</form>
 		</div>
 	</div>

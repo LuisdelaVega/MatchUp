@@ -1,36 +1,38 @@
 <div class="row">
 	<div class="col-md-8">
 		<div class="box">
-			<form>
+			<form name="teamForm" ng-submit="submitCreateTeam(teamForm.$valid)">
 				<legend>Create Team</legend>
-				<div class="form-group">
+				<div class="form-group" ng-class="{ 'has-error' : teamForm.name.$invalid && !teamForm.name.$pristine }">
 					<label>Team Name: </label>
-					<input class="form-control" placeholder="Enter Name" id="createTeamName">
+					<input class="form-control" name="name" ng-model="team.name" required ng-minlength="3" ng-maxlength="127">
+					<p ng-show="teamForm.name.$error.minlength" class="help-block">Team name is too short.</p>
+					<p ng-show="teamForm.name.$error.maxlength" class="help-block">Team name is too long.</p>
 				</div>
 				<div class="form-group">
-					<label>Description:</label>
-					<textarea class="form-control" rows="4" id="createTeamDescription"></textarea>
+					<label>Bio:</label>
+					<textarea class="form-control" rows="4" ng-model="team.bio" maxlength="255"></textarea>
 				</div>
 				<div class="form-group">
 					<label>Upload Banner:</label>
 					<div class="input-group">
 						<span class="group-span-filestyle input-group-btn" tabindex="0"> <label  class="btn btn-default btn-file"> <span class="glyphicon glyphicon-picture">   Browse&hellip;
-                           <input type="file"  id="createTeamBanner" onchange="upload(this.files[0], this.id + 'Label')"> </span></span>
-						<input id="createTeamBannerLabel" type="text" class="form-control" readonly>
+                           <input type="file"> </span></span>
+						<input type="text" ng-model="team.cover" class="form-control" readonly>
 					</div>
-					<span class="help-block">img resolution herem.....        </span>
+					<span class="help-block"></span>
 				</div>
 				<div class="form-group">
 					<label class="">Upload Logo:</label>
 					<div class="input-group">
 						<span class="group-span-filestyle input-group-btn" tabindex="0"> <label  class="btn btn-default btn-file"> <span class="glyphicon glyphicon-picture">   Browse&hellip;
-                           <input type="file" id="createTeamLogo" onchange="upload(this.files[0],'sellitemimg')"> </span>
+                           <input type="file"> </span>
 						</span>
-						<input type="text" class="form-control" readonly>
+						<input type="text" ng-model="team.logo" class="form-control" readonly>
 					</div>
-					<span class="help-block">img resolution herem.....        </span>
+					<span class="help-block"></span>
 				</div>
-				<a class="btn btn-primary btn-block">Create</a>
+				<button class="btn btn-success btn-block" type="submit">Create</button>
 			</form>
 		</div>
 	</div>
