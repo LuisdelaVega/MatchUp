@@ -106,7 +106,7 @@ var getEvents = function(req, res, pg, conString, log) {
 			break;
 		}
 
-		if (req.query.online != "false") {
+		if (req.query.online && req.query.online != "false") {
 			if (where) {
 				queryText += " AND event_is_online";
 			} else {
