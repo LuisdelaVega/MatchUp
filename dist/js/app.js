@@ -161,7 +161,8 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 		})
 		.state('app.userEvents', {
 			url: "/user/:username/events",
-			templateUrl: "user/user_events.html"
+			templateUrl: "user/user_events.html",
+			controller: "userEventsController"
 		})
 		.state('app.userOrganizations', {
 			url: "/user/:username/organizations",
@@ -214,8 +215,9 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 		 *
 		 */
 		.state('app.teamProfile', {
-			url: "/team/:teamName/profile",
-			templateUrl: "team/team_profile.html"
+			url: "/team/:teamName",
+			templateUrl: "team/team_profile.html",
+			controller: "teamProfileController"
 		})
 		.state('app.teamStandings', {
 			url: "/teamStandings",
@@ -243,8 +245,9 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			templateUrl: "organization/edit_organization.html"
 		})
 		.state('app.organizationEvents', {
-			url: "/organizationEvents",
-			templateUrl: "organization/organization_events.html"
+			url: "/organizationEvents/:organizationName",
+			templateUrl: "organization/organization_events.html",
+			controller: "organizationEventsController"
 		})
 		.state('app.myOrganizations', {
 			url: "/myOrganizations",
@@ -284,6 +287,7 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 				if (!AuthenticationService.isAuthenticated() || rejection.status == 401) {
 					$state.go("login");
 					AuthenticationService.clearCredentials();
+					console.log("hey");
 				}
 				// Handle other routes
 				else if (rejection.status == 404)
@@ -292,7 +296,7 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 					alert("HTTP error: 403")
 					$state.go("app.home");
 				} else
-					alert("HTTP error: " + rejection.status.toString)
+					alert("HTTP error: " + rejection.status)
 				return rejection;
 			}
 		}

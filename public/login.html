@@ -28,7 +28,7 @@
 									</div>
 									<div class="form-group" ng-class="{ 'has-error' : loginForm.password.$invalid && !loginForm.password.$pristine }">
 										<input class="form-control" ng-model="credentials.userPassword" placeholder="Password" name="password" type="password" required>
-
+										<span class="help-block" ng-show="badCredentials">Incorrect username or password</span>
 									</div>
 									<!-- Change this to a button or input when using this as a form -->
 									<button class="btn btn-lg btn-success btn-block" type="submit">
@@ -61,6 +61,7 @@
 									</div>
 									<div class="form-group">
 										<input class="form-control" placeholder="Confirm Password" name="password" type="password" ng-model="account.confirmPassword" required>
+										<span class="help-block" ng-show="incorrectPassword">Incorrect Password</span>
 									</div>									
 									<button class="btn btn-lg btn-success btn-block" type="submit">Sign up</button>
 								</fieldset>

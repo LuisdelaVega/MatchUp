@@ -28,7 +28,7 @@ angular.module('Authentication', [])
 		};
 
 		service.isAuthenticated = function () {
-			return ($window.sessionStorage.usernamename && $window.sessionStorage.token);
+			return ($window.sessionStorage.username && $window.sessionStorage.token);
 		}
 
 		service.clearCredentials = function () {

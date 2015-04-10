@@ -1,37 +1,81 @@
-<div class="blur-cover">
-</div>
-<div class="box box-margin">
-	<div class="row">
-		<div class="col-xs-12 col-md-6 col-lg-6">
-			<p class="info-title">
-				Team Name
-			</p>
-			<div align="center">
-				<div class="team-logo"></div>
-			</div>
-		</div>
-		<div class="col-xs-12 col-md-6 col-lg-6">
-			<div align="center">
-				<h3>About</h3>
-				<div class="center">
+<img class="banner-cover" ng-src="{{teamProfile.team_cover_photo}}"></img>
+<div class="row">
+	<div class="col-xs-12 col-md-12 col-lg-6">
+		<div class="box box-margin">
+			<div class="row">
+				<div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+					<img class="profile-picture" ng-src='{{teamProfile.team_logo}}'></img>
+				</div>
+				<div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+					<h2>{{teamProfile.team_name}}</h2>
+					<h3>About</h3>
 					<p class="info-paragraph">
-						Raw denim Truffaut proident wolf, asymmetrical mollit exercitation. Tousled est art party wayfarers. Cupidatat ullamco gluten-free Schlitz listicle. Fixie literally normcore, DIY eu jean shorts Truffaut Helvetica actually mlkshk put a bird on it cold-pressed tilde. Tempor biodiesel Shoreditch ennui assumenda skateboard. Literally fixie fanny pack commodo organic, plaid raw denim viral delectus cornhole church-key tofu master cleanse pariatur. Food truck viral anim tilde aute PBR consequat leggings, aliqua single-origin coffee salvia quinoa enim qui wayfarers.
+						{{teamProfile.team_bio}}
 					</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-3 col-md-offset-9">
+					<a class="btn btn-primary btn-block box-margin" ui-sref="app.editTeam" ng-if="teamProfile.is_member">Edit</a>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="row">
-		<div class="col-md-3 col-md-offset-9">
-			<a class="btn btn-primary btn-block" ui-sref="app.editTeam">Edit</a>
+	<div class="col-xs-12 col-md-12 col-lg-6">
+		<!-- Standings widget -->
+		<div class="widget-box box-margin">
+			<div class="widget-header bordered-bottom bordered-themesecondary">
+				<h3 class="widget-title themesecondary">Standings</h3>
+				<a class="widget-more" ui-sref="app.teamStandings">
+						See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
+					</a>
+			</div>
+			<!--Widget Header-->
+			<div class="widget-body">
+				<div class="widget-main no-padding">
+					<div class="tickets-container">
+						<table class="table table-striped table-hover">
+							<thead>
+								<tr>
+									<th>Placing</th>
+									<th>Event</th>
+									<th>Tournament</th>
+									<th>Date</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="cursor" ui-sref="app.tournament">
+									<td>5th</td>
+									<td>Apex 2015</td>
+									<td>Halo 4</td>
+									<td>March 1, 2015</td>
+								</tr>
+								<tr class="cursor" ui-sref="app.tournament">
+									<td>5th</td>
+									<td>Apex 2015</td>
+									<td>Halo 4</td>
+									<td>March 1, 2015</td>
+								</tr>
+								<tr class="cursor" ui-sref="app.tournament">
+									<td>5th</td>
+									<td>Apex 2015</td>
+									<td>Halo 4</td>
+									<td>March 1, 2015</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
 		</div>
+		<!-- Standings widget -->
 	</div>
 </div>
 
-<!-- Team member widget -->
-<div class="widget-box box-margin">
+<!-- Owners widget -->
+<div class="widget-box">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
-		<h3 class="widget-title themesecondary">Team members</h3>
+		<h3 class="widget-title themesecondary">Members</h3>
 	</div>
 	<!--Widget Header-->
 	<div class="widget-body">
@@ -39,11 +83,11 @@
 			<div class="tickets-container">
 				<ul class="tickets-list">
 					<div class="row">
-						<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-							<li class="ticket-item">
+						<div class="col-lg-3 col-md-6 col-sm-12 col-xs-12" ng-repeat="member in members | limitTo: 4">
+							<li class="ticket-item" ng-click="goToUser(member.customer_username)">
 								<div class="ticket-user">
-									<img src="http://neptunolabs.com/images/badillo.jpg" class="user-avatar">
-									<span class="user-name" ui-sref="app.userProfile">Edwin Badillo</span>
+									<img ng-src="{{member.customer_profile_pic}}" class="user-avatar">
+									<span class="user-name">{{member.customer_first_name}} {{member.customer_last_name}} </span>
 								</div>
 							</li>
 						</div>
@@ -53,52 +97,4 @@
 		</div>
 	</div>
 </div>
-<!-- Team Members widget -->
-
-<!-- Standings widget -->
-<div class="widget-box">
-	<div class="widget-header bordered-bottom bordered-themesecondary">
-		<h3 class="widget-title themesecondary">Standings</h3>
-		<a class="widget-more" ui-sref="app.teamStandings">
-						See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
-					</a>
-	</div>
-	<!--Widget Header-->
-	<div class="widget-body">
-		<div class="widget-main no-padding">
-			<div class="tickets-container">
-				<table class="table table-striped table-hover">
-					<thead>
-						<tr>
-							<th>Placing</th>
-							<th>Event</th>
-							<th>Tournament</th>
-							<th>Date</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr class="cursor" ui-sref="app.tournament">
-							<td>5th</td>
-							<td>Apex 2015</td>
-							<td>Halo 4</td>
-							<td>March 1, 2015</td>
-						</tr>
-						<tr class="cursor" ui-sref="app.tournament">
-							<td>5th</td>
-							<td>Apex 2015</td>
-							<td>Halo 4</td>
-							<td>March 1, 2015</td>
-						</tr>
-						<tr class="cursor" ui-sref="app.tournament">
-							<td>5th</td>
-							<td>Apex 2015</td>
-							<td>Halo 4</td>
-							<td>March 1, 2015</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</div>
-	</div>
-</div>
-<!-- Standings widget -->
+<!-- Owners widget -->

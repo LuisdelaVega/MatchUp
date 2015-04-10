@@ -316,14 +316,18 @@ function ($scope, $http, $state, sharedDataService, $q, $rootScope) {
 myApp.controller('loginController', ['$scope', '$http', '$state', '$window', 'AuthenticationService', '$rootScope',
 function ($scope, $http, $state, $window, AuthenticationService, $rootScope) {
 
+		$scope.incorrectPassword = false;
+		$scope.badCredentials = false;
+
 		$scope.login = function (valid) {
 			if (valid) {
 				AuthenticationService.Login($scope.credentials.username, $scope.credentials.userPassword, function (response, status) {
 					if (status == 200) {
 						AuthenticationService.SetCredentials($scope.credentials.username, response.token);
+						$scope.badCredentials = false;
 						$state.go("app.home");
 					} else {
-
+						$scope.badCredentials = true;
 					}
 				});
 			}
@@ -331,8 +335,12 @@ function ($scope, $http, $state, $window, AuthenticationService, $rootScope) {
 
 		$scope.createAccount = function (valid) {
 			if (valid) {
-				console.log("heya");
-				$http.post($rootScope.baseURL + '/create/account', $scope.account).success(function (response, status){
+				if ($scope.account.password != $scope.account.confirmPassword) {
+					$scope.incorrectPassword = true;
+					return;
+				}
+				$scope.incorrectPassword = false;
+				$http.post($rootScope.baseURL + '/create/account', $scope.account).success(function (response, status) {
 					AuthenticationService.SetCredentials($scope.account.username, response.token);
 					$state.go("app.home");
 				}).error(function (err, status) {

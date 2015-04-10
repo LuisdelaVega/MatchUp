@@ -1,18 +1,14 @@
 <div class="box">
-	<div class="row">
-		<div class="col-lg-9 col-md-8 col-sm-12 col-xs-12" ng-if="isUser">
-			<h1>My Organizations</h1>
-		</div>
-		<div class="col-lg-9 col-md-8 col-sm-12 col-xs-12" ng-if="!isUser">
-			<h1>{{customerUsername}}'s Organizations</h1>
-		</div>
-		<div class="col-lg-3 col-md-4 col-sm-12 col-xs-12 custom-padding" ng-if="isUser">
-			<a class="btn btn-primary btn-block" ui-sref="app.requestOrganization" role="button">Request Organization</a>
-		</div>
+	<div class="page-header" ng-if="isUser">
+		<a class="btn btn-primary pull-right" ui-sref="app.requestOrganization" role="button">Request Organization</a>
+		<h1>My Organizations</h1>
+	</div>
+	<div class="page-header" ng-if="!isUser">
+		<h1>{{customerUsername}}'s Organizations</h1>
 	</div>
 	<div class="row">
-		<div class="col-lg-3 col-md-3 col-sm-4 col-xs-6" ng-repeat ="org in organizationsData">
-			<a class="thumbnail" ng-click="gotToOrganizationProfile(org.organization_name)"> <img ng-src="{{org.organization_logo}}" alt="{{org.organization_name}}" >
+		<div class="col-lg-3 col-md-3 col-sm-4 col-xs-6" ng-repeat="org in organizationsData">
+			<a class="thumbnail" ng-click="gotToOrganizationProfile(org.organization_name)"> <img ng-src="{{org.organization_cover_photo}}" alt="{{org.organization_name}}">
 				<hr class="hr-custom-padding">
 				<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 						overflow: hidden;">

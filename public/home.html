@@ -8,9 +8,9 @@
         <div class="widget-main no-padding">
             <div class="tickets-container">
                 <div class="row" style="padding-left: 15px">
-                    <div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="event in liveEvents | limitTo: 8">
+                    <div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="event in liveEvents | limitTo: 4">
                         <!--REPEAT-->
-                        <a class="thumbnail"  ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_logo}}">
+                        <a class="thumbnail"  ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_banner}}">
                             <hr class="hr-custom-padding">
                             <div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 										overflow: hidden;">
@@ -45,9 +45,9 @@
             <div class="tickets-container">
 
                 <div class="row" style="padding-left: 15px">
-                    <div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="event in hostedEvents | limitTo: 8">
+                    <div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="event in hostedEvents | limitTo: 4">
                         <a class="thumbnail" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)" >
-                            <img ng-src="{{event.event_logo}}">
+                            <img ng-src="{{event.event_banner}}">
                             <hr class="hr-custom-padding">
                             <div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 										overflow: hidden;">
@@ -77,9 +77,9 @@
         <div class="widget-main no-padding">
             <div class="tickets-container">
                 <div class="row" style="padding-left: 15px">
-                    <div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="event in regularEvents | limitTo: 8">
+                    <div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="event in regularEvents | limitTo: 4">
                         <a class="thumbnail" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)">
-                            <img ng-src="{{event.event_logo}}">
+                            <img ng-src="{{event.event_banner}}">
                             <hr class="hr-custom-padding">
                             <div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 										overflow: hidden;">

@@ -1,18 +1,14 @@
 <div class="box">
-	<div class="row">
-		<div class="col-lg-9 col-md-8 col-sm-12 col-xs-12" ng-if="isUser">
-			<h1>My Teams</h1>
-		</div>
-		<div class="col-lg-9 col-md-8 col-sm-12 col-xs-12" ng-if="!isUser">
-			<h1>{{customerUsername}}'s Teamss</h1>
-		</div>
-		<div class="col-lg-3 col-md-4 col-sm-12 col-xs-12 custom-padding" ng-if="isUser">
-			<a class="btn btn-primary btn-block" ui-sref="app.createTeam" role="button">Create Team</a>
-		</div>
+	<div class="page-header" ng-if="isUser">
+		<a class="btn btn-primary pull-right" ui-sref="app.createTeam" role="button">Create Team</a>
+		<h1>My Teams</h1>
+	</div>
+	<div class="page-header" ng-if="!isUser">
+		<h1>{{customerUsername}}'s Teams</h1>
 	</div>
 	<div class="row">
-		<div class="col-lg-3 col-md-3 col-sm-4 col-xs-6" ng-repeat ="team in teamsData">
-			<a class="thumbnail" ng-click="gotToOrganizationProfile(team.team_name)"> <img ng-src="{{team.team_logo}}" alt="{{team.team_name}}" >
+		<div class="col-lg-3 col-md-3 col-sm-4 col-xs-6" ng-repeat="team in teamsData">
+			<a class="thumbnail" ng-click="gotToTeamsProfile(team.team_name)"> <img ng-src="{{team.team_cover_photo}}" alt="{{team.team_name}}">
 				<hr class="hr-custom-padding">
 				<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 						overflow: hidden;">

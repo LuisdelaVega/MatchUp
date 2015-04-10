@@ -1,63 +1,29 @@
-<div class="blur-cover" ng-style="{'background': cover}"></div>
-
+<img class="banner-cover" ng-src="{{organization.organization_cover_photo}}"></img>
 <div class="box box-margin">
 	<div class="row">
-		<div class="col-xs-12 col-md-6 col-lg-6">
-			<p class="info-title">
-				{{organization.organization_name}}
-			</p>
-			<div align="center">
-				<div class="organization-logo" ng-style="{'background-image': profilePicture}"></div>
-			</div>
+		<div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+			<img class="profile-picture" ng-src='{{organization.organization_logo}}'></img>
 		</div>
-		<div class="col-xs-12 col-md-6 col-lg-6">
-			<div align="center">
-				<h3>About</h3>
-				<div class="center">
-					<p class="info-paragraph">{{organization.organization_bio}}
-					</p>
-				</div>
-			</div>
+		<div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+			<h2>{{organization.organization_name}}</h2>
+			<h3>About</h3>
+			<p class="info-paragraph">
+				{{organization.organization_bio}}
+			</p>
 		</div>
 	</div>
 	<div class="row">
 		<div class="col-md-3 col-md-offset-9">
-			<a class="btn btn-primary btn-block" ui-sref="app.editOrganization" ng-if="organization.is_member">Edit</a>
+			<a class="btn btn-primary btn-block box-margin" ui-sref="app.editOrganization" ng-if="organization.is_member">Edit</a>
 		</div>
 	</div>
 </div>
-<!-- Owners widget -->
-<div class="widget-box box-margin">
-	<div class="widget-header bordered-bottom bordered-themesecondary">
-		<h3 class="widget-title themesecondary">Members</h3>
-	</div>
-	<!--Widget Header-->
-	<div class="widget-body">
-		<div class="widget-main no-padding">
-			<div class="tickets-container">
-				<ul class="tickets-list">
-					<div class="row">
-						<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat = "member in members">
-							<li class="ticket-item" ng-click="goToUser(member.customer_username)">
-								<div class="ticket-user">
-									<img ng-src="{{member.customer_profile_pic}}" class="user-avatar">
-									<span class="user-name">{{member.customer_first_name}} {{member.customer_last_name}} </span>
-								</div>
-							</li>
-						</div>
-					</div>
-				</ul>
-			</div>
-		</div>
-	</div>
-</div>
-<!-- Owners widget -->
 
 <!-- Events widget -->
-<div class="widget-box">
+<div class="widget-box box-margin">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Events</h3>
-		<a class="widget-more" ui-sref="app.organizationEvents">
+		<a class="widget-more" ui-sref="app.organizationEvents({organizationName: organization.organization_name})">
 						See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
 					</a>
 	</div>
@@ -66,8 +32,8 @@
 		<div class="widget-main no-padding">
 			<div class="tickets-container">
 				<div class="row" style="padding-left: 15px">
-					<div class="col-md-3 col-sm-4 col-xs-6"ng-repeat="event in events">
-						<a class="thumbnail" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_logo}}">
+					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="event in events | limitTo: 4">
+						<a class="thumbnail" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_banner}}">
 							<hr class="hr-custom-padding">
 							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 										overflow: hidden;">
@@ -82,10 +48,38 @@
 								</p>
 							</div>
 						</a>
-					</div>					
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
 <!-- Organization Events widget-->
+
+
+<!-- Owners widget -->
+<div class="widget-box">
+	<div class="widget-header bordered-bottom bordered-themesecondary">
+		<h3 class="widget-title themesecondary">Members</h3>
+	</div>
+	<!--Widget Header-->
+	<div class="widget-body">
+		<div class="widget-main no-padding">
+			<div class="tickets-container">
+				<ul class="tickets-list">
+					<div class="row">
+						<div class="col-lg-3 col-md-6 col-sm-12 col-xs-12" ng-repeat="member in members | limitTo: 4">
+							<li class="ticket-item" ng-click="goToUser(member.customer_username)">
+								<div class="ticket-user">
+									<img ng-src="{{member.customer_profile_pic}}" class="user-avatar">
+									<span class="user-name">{{member.customer_first_name}} {{member.customer_last_name}} </span>
+								</div>
+							</li>
+						</div>
+					</div>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Owners widget -->
