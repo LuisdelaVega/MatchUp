@@ -203,7 +203,7 @@ var getOrganizationEvents = function(req, res, pg, conString, log) {
 		query.on("end", function(result) {
 			if (result.rows.length) {
 				var query = client.query({
-					text : "SELECT event_name, event_location, event_venue, event_start_date, event_end_date, event_logo FROM event NATURAL JOIN hosts WHERE event_active AND organization_name = $1 ORDER BY event_start_date DESC",
+					text : "SELECT event_name, event_location, event_venue, event_start_date, event_end_date, event_logo, event_banner FROM event NATURAL JOIN hosts WHERE event_active AND organization_name = $1 ORDER BY event_start_date DESC",
 					values : [req.params.organization]
 				});
 				query.on("row", function(row, result) {

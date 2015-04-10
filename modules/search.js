@@ -26,7 +26,7 @@ var getSearchResults = function(req, res, pg, conString, log) {
 
 			// Look for all the Events that are currently in progress
 			var query = client.query({
-				text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event WHERE event_start_date < now() at time zone 'utc' AND event_end_date > now() at time zone 'utc' AND event_name ILIKE '%" + req.params.parameter + "%' AND event_active ORDER BY event_start_date DESC"
+				text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo, event_banner FROM event WHERE event_start_date < now() at time zone 'utc' AND event_end_date > now() at time zone 'utc' AND event_name ILIKE '%" + req.params.parameter + "%' AND event_active ORDER BY event_start_date DESC"
 			});
 			query.on("row", function(row, result) {
 				result.addRow(row);
@@ -45,7 +45,7 @@ var getSearchResults = function(req, res, pg, conString, log) {
 
 				// Look for all the Events that have already ended
 				var query = client.query({
-					text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event WHERE event_end_date < now() at time zone 'utc' AND event_name ILIKE '%" + req.params.parameter + "%' AND event_active ORDER BY event_start_date DESC"
+					text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo, event_banner FROM event WHERE event_end_date < now() at time zone 'utc' AND event_name ILIKE '%" + req.params.parameter + "%' AND event_active ORDER BY event_start_date DESC"
 				});
 				query.on("row", function(row, result) {
 					result.addRow(row);
@@ -63,7 +63,7 @@ var getSearchResults = function(req, res, pg, conString, log) {
 
 					// Look for all the Regular Events that have not yet started
 					var query = client.query({
-						text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event WHERE event_name ILIKE '%" + req.params.parameter + "%' AND event_start_date > now() at time zone 'utc' AND event_name NOT IN (SELECT event_name FROM event NATURAL JOIN hosts) AND event_active ORDER BY event_start_date"
+						text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo, event_banner FROM event WHERE event_name ILIKE '%" + req.params.parameter + "%' AND event_start_date > now() at time zone 'utc' AND event_name NOT IN (SELECT event_name FROM event NATURAL JOIN hosts) AND event_active ORDER BY event_start_date"
 					});
 					query.on("row", function(row, result) {
 						result.addRow(row);
@@ -81,7 +81,7 @@ var getSearchResults = function(req, res, pg, conString, log) {
 
 						// Look for all Hosted Events that have not yet started
 						var query = client.query({
-							text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event NATURAL JOIN hosts WHERE event_name ILIKE '%" + req.params.parameter + "%' AND event_start_date > now() at time zone 'utc' AND event_active ORDER BY event_start_date"
+							text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo, event_banner FROM event NATURAL JOIN hosts WHERE event_name ILIKE '%" + req.params.parameter + "%' AND event_start_date > now() at time zone 'utc' AND event_active ORDER BY event_start_date"
 						});
 						query.on("row", function(row, result) {
 							result.addRow(row);
@@ -192,58 +192,5 @@ var getSearchResults = function(req, res, pg, conString, log) {
 		});
 	});
 };
-/*
- var searchSponsors = function(req, res, pg, conString) {
- pg.connect(conString, function(err, client, done) {
- if (err) {
- return console.error('error fetching client from pool', err);
- }
-
- var query = client.query({
- text : "SELECT * FROM genre WHERE genre_name ILIKE '%" + req.params.parameter + "%'"
- });
- query.on("row", function(row, result) {
- result.addRow(row);
- });
- query.on("end", function(result) {
- searchresults.genres = result.rows;
-
- res.json({
- users : searchresults.users,
- events : searchresults.events,
- teams : searchresults.teams,
- organizations : searchresults.organizations,
- games : searchresults.games,
- genres : searchresults.genres
- });
- done();
-
- });
- });
- };
- */
-/*
- // Look for all relevant Genres
- var query = client.query({
- text : "SELECT * FROM genre WHERE genre_name ILIKE '%" + req.params.parameter + "%'"
- });
- query.on("row", function(row, result) {
- result.addRow(row);
- });
- query.on("end", function(result) {
- searchresults.genres = result.rows;
-
- res.json({
- users : searchresults.users,
- events : searchresults.events,
- teams : searchresults.teams,
- organizations : searchresults.organizations,
- games : searchresults.games,
- genres : searchresults.genres
- });
- done();
-
- });
- */
 
 module.exports.getSearchResults = getSearchResults;

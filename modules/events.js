@@ -1,7 +1,8 @@
 var getEventsParams = {
 	type : ["regular", "hosted"],
 	filter : ["game", "genre"],
-	state : ["live", "past", "upcoming"]
+	state : ["live", "past", "upcoming"],
+	magnitude : ["local", "regional", "national"]
 };
 
 //TODO Implement limit and offsets like in Spruce
@@ -16,15 +17,15 @@ var getEvents = function(req, res, pg, conString, log) {
 		var queryGroupBy = " GROUP BY event_name, event_start_date, event_location";
 		switch (req.query.type) {
 		case getEventsParams.type[0]:
-			queryText += "event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event WHERE concat(event_name, event_location, event_start_date) NOT IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)";
+			queryText += "event_name, event_start_date, event_end_date, event_location, event_venue, event_logo, event_banner FROM event WHERE concat(event_name, event_location, event_start_date) NOT IN (SELECT concat(event_name, event_location, event_start_date) FROM hosts)";
 			where = true;
 			break;
 		case getEventsParams.type[1]:
-			queryText += "event_name, event_start_date, event_end_date, event_location, event_venue, event_logo, organization_name, organization_logo FROM event NATURAL JOIN hosts NATURAL JOIN organization";
+			queryText += "event_name, event_start_date, event_end_date, event_location, event_venue, event_logo, event_banner, organization_name, organization_logo FROM event NATURAL JOIN hosts NATURAL JOIN organization";
 			queryGroupBy += ", organization_name, organization_logo";
 			break;
 		default:
-			queryText += "event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event";
+			queryText += "event_name, event_start_date, event_end_date, event_location, event_venue, event_logo, event_banner FROM event";
 		}
 		switch (req.query.filter) {
 		case getEventsParams.filter[0]:
@@ -74,6 +75,44 @@ var getEvents = function(req, res, pg, conString, log) {
 			}
 			queryText += "event_start_date > now() at time zone 'utc'";
 			break;
+		}
+		switch (req.query.magnitude) {
+		case getEventsParams.magnitude[0]:
+			if (where) {
+				queryText += " AND ";
+			} else {
+				queryText += " WHERE ";
+				where = true;
+			}
+			queryText += "event_type = 'Local'";
+			break;
+		case getEventsParams.magnitude[1]:
+			if (where) {
+				queryText += " AND ";
+			} else {
+				queryText += " WHERE ";
+				where = true;
+			}
+			queryText += "event_type = 'Regional'";
+			break;
+		case getEventsParams.magnitude[2]:
+			if (where) {
+				queryText += " AND ";
+			} else {
+				queryText += " WHERE ";
+				where = true;
+			}
+			queryText += "event_type = 'National'";
+			break;
+		}
+
+		if (req.query.online != "false") {
+			if (where) {
+				queryText += " AND event_is_online";
+			} else {
+				queryText += " WHERE event_is_online";
+				where = true;
+			}
 		}
 
 		if (where) {
@@ -232,7 +271,7 @@ var getCompetitors = function(req, res, pg, conString, log) {
 			return console.error('error fetching client from pool', err);
 		}
 		var query = client.query({
-			text : "SELECT distinct customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic, tournament.competitor_fee, competitor.competitor_check_in, competitor.competitor_seed, competitor.competitor_number FROM tournament JOIN is_a ON is_a.event_name = tournament.event_name AND is_a.event_start_date = tournament.event_start_date AND is_a.event_location = tournament.event_location AND is_a.tournament_name = tournament.tournament_name JOIN competitor ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN customer ON customer.customer_username = is_a.customer_username WHERE tournament.event_name = $1 AND tournament.event_start_date = $2 AND tournament.event_location = $3 AND tournament.tournament_name = $4",
+			text : "SELECT distinct customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic, tournament.competitor_fee, competitor.competitor_check_in, competitor.competitor_seed, competitor.competitor_number FROM tournament JOIN is_a ON is_a.event_name = tournament.event_name AND is_a.event_start_date = tournament.event_start_date AND is_a.event_location = tournament.event_location AND is_a.tournament_name = tournament.tournament_name JOIN competitor ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN customer ON customer.customer_username = is_a.customer_username WHERE tournament.event_name = $1 AND tournament.event_start_date = $2 AND tournament.event_location = $3 AND tournament.tournament_name = $4 ORDER BY competitor.competitor_seed",
 			values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
 		});
 		query.on("row", function(row, result) {
@@ -253,7 +292,6 @@ var getCompetitors = function(req, res, pg, conString, log) {
 			}, 'done response');
 		});
 	});
-	//pg.end();
 };
 
 //TODO Validate date 400
@@ -1513,10 +1551,12 @@ var createNews = function(req, res, pg, conString, log) {
 						}, 'done response');
 					});
 					query.on("end", function(result) {
-						var nextNews = result.rows[0].next_news;
+						var nextNews = (!(result.rows[0].next_news) ? 1 : result.rows[0].next_news);
+						console.log(result.rows[0].next_news);
+						console.log(!result.rows[0].next_news);
 						client.query({
 							text : "INSERT INTO news (event_name, event_start_date, event_location, news_number, news_title, news_content, news_date_posted) VALUES($1, $2, $3, $7, $4, $5, $6)",
-							values : [req.params.event, req.query.date, req.query.location, req.body.title, req.body.content, (new Date()).toUTCString(), result.rows[0].next_news]
+							values : [req.params.event, req.query.date, req.query.location, req.body.title, req.body.content, (new Date()).toUTCString(), nextNews]
 						}, function(err, result) {
 							if (err) {
 								client.query("ROLLBACK");
@@ -2263,7 +2303,7 @@ var addTournament = function(req, res, pg, conString, log) {
 					if (result.rows.length) {
 						client.query({
 							text : "INSERT INTO tournament (event_name, event_start_date, event_location, tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
-							values : [req.params.event, req.query.date, req.query.location, req.body.name, req.body.game, req.body.rules, req.body.teams, req.body.start_date, req.body.deadline, Math.floor(req.body.fee * 100) / 100, req.body.capacity, Math.floor(req.body.seed_money * 100) / 100, req.body.type, req.body.format, req.body.scoring, ((req.body.type === "Two-Stage") ? req.body.group_players : 0), ((req.body.type === "Two-Stage") ? req.body.group_winners : 0)]
+							values : [req.params.event, req.query.date, req.query.location, req.body.name, req.body.game, req.body.rules, req.body.teams, req.body.start_date, req.body.deadline, Math.floor(req.body.fee * 100) / 100, req.body.capacity, Math.floor(req.body.seed_money * 100) / 100, req.body.type, req.body.format, req.body.scoring, ((req.body.type === "Two Stage") ? req.body.group_players : 0), ((req.body.type === "Two Stage") ? req.body.group_winners : 0)]
 						}, function(err, result) {
 							if (err) {
 								clent.query("ROLLBACK");
@@ -2523,7 +2563,7 @@ var editTournament = function(req, res, pg, conString, log) {
 			if (result.rows.length) {
 				client.query({
 					text : "UPDATE tournament SET (tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) = ($5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4",
-					values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.body.name, req.body.game, req.body.rules, req.body.teams, req.body.start_date, req.body.deadline, Math.floor(req.body.fee * 100) / 100, req.body.capacity, Math.floor(req.body.seed_money * 100) / 100, req.body.type, req.body.format, req.body.scoring, ((req.body.type === "Two-Stage") ? req.body.group_players : 0), ((req.body.type === "Two-Stage") ? req.body.group_winners : 0)]
+					values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.body.name, req.body.game, req.body.rules, req.body.teams, req.body.start_date, req.body.deadline, Math.floor(req.body.fee * 100) / 100, req.body.capacity, Math.floor(req.body.seed_money * 100) / 100, req.body.type, req.body.format, req.body.scoring, ((req.body.type === "Two Stage") ? req.body.group_players : 0), ((req.body.type === "Two Stage") ? req.body.group_winners : 0)]
 				}, function(err, result) {
 					if (err) {
 						client.query("ROLLBACK");

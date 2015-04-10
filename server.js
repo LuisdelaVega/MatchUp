@@ -155,7 +155,9 @@ app.get('/api', function(req, res) {
 		req : req
 	}, 'start request');
 	res.status(302).redirect('http://docs.neptunolabsmatchup.apiary.io');
-
+	log.info({
+		res : res
+	}, 'done response');
 });
 
 //*\\\\\\\\\\* ACCOUNTS *//////////*/
@@ -280,11 +282,7 @@ app.route('/matchup/events/:event').get(function(req, res) {
 	events.deleteEvent(req, res, pg, conString, log);
 });
 
-/* DEPRECIATED
- * 	The routes /matchup/events/:event/spectators and /matchup/events/:event/competitors return more information about each type of
- * 	attendee for an Event.
- *
- * /matchup/events/:event/participants?date=date&location=string&spectators=true&competitors=true
+/* /matchup/events/:event/participants?date=date&location=string&spectators=true&competitors=true
  *
  * params:
  * 	spectators = Filters the participants to those who payed a spectator fee
