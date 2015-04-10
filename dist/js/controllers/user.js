@@ -111,7 +111,7 @@ myApp.controller('userOrganizationsController', ['$scope', '$http', '$stateParam
 function($scope, $http, $stateParams, $window, $state) {
 
 	$scope.customerUsername = $stateParams.username;
-	if($scope.customerUsername == $window.sessionStorage.user)
+	if($scope.customerUsername == $window.sessionStorage.username)
 		$scope.isUser= true;
 	else
 		$scope.isUser= false;
@@ -145,7 +145,7 @@ myApp.controller('userTeamsController', ['$scope', '$http', '$stateParams', '$wi
 function($scope, $http, $stateParams, $window, $state) {
 
 	$scope.customerUsername = $stateParams.username;
-	if($scope.customerUsername == $window.sessionStorage.user)
+	if($scope.customerUsername == $window.sessionStorage.username)
 		$scope.isUser= true;
 	else
 		$scope.isUser= false;
@@ -178,7 +178,7 @@ function($scope, $http, $stateParams, $window, $state) {
 myApp.controller('mySubcriptionsController', ['$scope', '$http', '$stateParams', '$window', '$state',
 function($scope, $http, $stateParams, $window, $state) {
 
-	$scope.customerUsername = $window.sessionStorage.user;
+	$scope.customerUsername = $window.sessionStorage.username;
 	$scope.somebio = "I need to put some bio here, I know";
 	
 	var config = {
