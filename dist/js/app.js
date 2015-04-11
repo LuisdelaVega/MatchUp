@@ -260,8 +260,9 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 
 
 	.state('app.search', {
-		url: "/search",
-		templateUrl: "search.html"
+		url: "/search/:query",
+		templateUrl: "search.html",
+		controller: "searchController"
 	});
 
 	$httpProvider.interceptors.push(function ($q, $timeout, $injector) {

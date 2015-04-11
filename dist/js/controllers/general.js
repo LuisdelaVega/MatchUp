@@ -77,99 +77,41 @@ function ($scope, $http, $state, sharedDataService, $q, $rootScope) {
 
 }]);
 
-/*
- myApp.controller('searchController', ['$scope', '$http', '$state', '$window', function ($scope, $http, $state, $window) {
 
- $scope.search = function (query) {
+ myApp.controller('searchController', ['$scope', '$http', '$state', '$window', '$stateParams', function ($scope, $http, $state, $window, $stateParams) {
 
- var config = {
- headers: {
- 'Authorization': "Bearer "+ $window.sessionStorage.token
- }
- };
+              $http.get('http://136.145.116.232/matchup/search/' +  $stateParams.query + '').
+             success(function (data, status, headers) {
 
- if(query.length > 0){
- $http.get('http://136.145.116.232/matchup/search/'+query+'').
- success(function(data, status, headers) {
+                 console.log('http://136.145.116.232/matchup/search/' + $stateParams.query + '');
 
- console.log('http://136.145.116.232/matchup/search/'+query+'');
+                 $scope.searchData = angular.fromJson(data);
+                 console.log($scope.searchData);
 
- $scope.searchData = angular.fromJson(data);
+                 $scope.liveEvents = $scope.searchData.events.live;
+                 $scope.pastEvents = $scope.searchData.events.past;
+                 $scope.premiumEvents = $scope.searchData.events.hosted;
+                 $scope.regularEvents = $scope.searchData.events.regular;
+                 $scope.users = $scope.searchData.users;
+                 $scope.teams = $scope.searchData.teams;
+                 $scope.organizations = $scope.searchData.organizations;
+                 $scope.games = $scope.searchData.games;
+                 $scope.genres = $scope.searchData.genres;
 
- $scope.liveEvents = $scope.searchData.events.live;
- $scope.pastEvents = $scope.searchData.events.past;
- $scope.premiumEvents = $scope.searchData.events.hosted;
- $scope.regularEvents = $scope.searchData.events.regular;
- $scope.users = $scope.searchData.users;
- $scope.teams = $scope.searchData.teams;
- $scope.organizations = $scope.searchData.organizations;
- $scope.games = $scope.searchData.games;
- $scope.genres = $scope.searchData.genres;
+                 //sharedDataService.set($scope.searchData);
+             }).
+             error(function (data, status, headers) {
+                 console.log("error in search controller");
+             });
+ 
+       
 
- sharedDataService.set($scope.searchData);
- }).
- error(function(data, status, headers) {
- console.log("error in search controller");
- });
- }
- else{
+ 
+      
 
- $scope.liveEvents.length = 0
- $scope.pastEvents.length = 0
- $scope.premiumEvents.length = 0
- $scope.regularEvents.length = 0
- $scope.users.length = 0
- $scope.teams.length = 0
- $scope.organizations.length = 0
- $scope.games.length = 0
- $scope.genres.length = 0
-
- }
-
- }
-
- $scope.goToEvent = function(eventName, date, location){
-
- eventName = eventName.replace(" ", "%20");
- var params = [eventName, date, location];
-
- var config = {
- headers: {
- 'Authorization': "Bearer "+ $window.sessionStorage.token
- }
- };
-
- $http.get('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'').
- success(function(data, status, headers) {
-
- var eventData = angular.fromJson(data);
-
- var isHosted = eventData.is_hosted;
-
- sharedDataService.set(params);
-
- if(isHosted){
- $state.go('app.eventpremium.summary', {"eventname": eventName, "date": date, "location": location});
- }
- else{
- $state.go('app.regularevent', {"eventname": eventName, "date": date, "location": location});
- }
-
- }).
- error(function(data, status, headers) {
- console.log("error in goToEvent");
- });
-
- };
-
- $scope.goToGameProfile = function (gameName, gameImage) {
- var params = [gameName, gameImage];
- sharedDataService.set(params);
- $state.go('app.game.summary', {"gamename": gameName});
- };
 
  }]);
-
+/*
  myApp.controller('searchResultController', ['$scope', '$stateParams', '$state', '$http', '$window', function ($scope, $stateParams, $state, $http, $window) {
 
  $scope.resultType = $stateParams.type;
@@ -266,7 +208,7 @@ function ($scope, $http, $state, sharedDataService, $q, $rootScope) {
  };
 
  }]);
-
+/*
  myApp.controller('popularGameViewController', ['$scope', '$http', '$state', '$window', function ($scope, $http, $state, $window) {
 
  var allGames = [ ];
@@ -311,7 +253,9 @@ function ($scope, $http, $state, sharedDataService, $q, $rootScope) {
  };
 
  }]);
+ 
  */
+ //de aqui pa lante no estaba commentado
 
 myApp.controller('loginController', ['$scope', '$http', '$state', '$window', 'AuthenticationService', '$rootScope',
 function ($scope, $http, $state, $window, AuthenticationService, $rootScope) {
@@ -352,6 +296,21 @@ function ($scope, $http, $state, $window, AuthenticationService, $rootScope) {
 
 myApp.controller('sidebarController', ['$scope', '$window', '$http', '$state', 'AuthenticationService',
 function ($scope, $window, $http, $state, AuthenticationService) {
+	
+	//$scope.goToSearch = function () {
+		
+	
+	$scope.goToSearch = function(query) {
+		//need undefined in case somebody pushes the button and they havent entered any text
+		if (query !== undefined) {
+			if (query.length > 0) {
+				$state.go("app.search", {
+					"query" : query
+				}) //
+			}
+		}
+	}
+
 
 		$scope.goToMyProfile = function () {
 			$state.go("app.userProfile", {
@@ -458,13 +417,20 @@ function ($scope, $window, $http, $state, AuthenticationService) {
 				console.log("error in goToEvent");
 			});
 
-		};
 
-		$scope.goToGameProfile = function (gameName) {
+		};
+	
+		$scope.goToGameProfile = function(gameName) {
 			$state.go('app.gameProfile', {
-				"game": gameName
+				"game" : gameName
 			});
 		};
+	
+		$scope.goToGenreProfile = function(genre) {
+			$state.go('app.genreProfile', {
+				"genre" : genre
+			});
+		}; 
 
 		$scope.goToTournament = function (eventName, date, location, tournament) {
 			//ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location, tournament)"
@@ -511,11 +477,7 @@ function ($scope, $http, $state, sharedDataService, $window) {
 			console.log("error in game view controller.");
 		});
 
-		$scope.goToGenreProfile = function (genre) {
-			$state.go('app.genreProfile', {
-				"genre": genre
-			});
-		};
+
 
 }]);
 
