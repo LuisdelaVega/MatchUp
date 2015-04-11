@@ -143,7 +143,7 @@ app.get('/bracket/:format/:numofplayers', tournaments.createBraket);
 // *Depreciated* Used for testing of the group stage algorithm
 app.post('/groupstage', tournaments.createGroupStage);
 // Read the details from the DB and only expect the array of players
-app.post('/tournament', tournaments.createTournament);
+// app.post('/tournament', tournaments.createTournament);
 
 //*\\\\\\\\\\* API *//////////*/
 /* /api
@@ -170,14 +170,14 @@ app.post('/create/account', function(req, res) {
 		req : req
 	}, 'start request');
 	// if (!req.body.username || !req.body.password || !req.body.firstname || !req.body.lastname || !req.body.tag || !req.body.email) {
-		// res.status(400).json({
-			// error : "Incomplete or invalid parameters"
-		// });
-		// log.info({
-			// res : res
-		// }, 'done response');
+	// res.status(400).json({
+	// error : "Incomplete or invalid parameters"
+	// });
+	// log.info({
+	// res : res
+	// }, 'done response');
 	// } else {
-		customers.createAccount(req, res, pg, conString, jwt, secret, crypto, log);
+	customers.createAccount(req, res, pg, conString, jwt, secret, crypto, log);
 	// }
 });
 
@@ -432,20 +432,31 @@ app.route('/matchup/events/:event/tournaments/:tournament').get(function(req, re
 	// var startDate = new Date(req.body.start_date);
 	// var checkInDeadline = new Date(req.body.deadline);
 	// if (!(eventStartDate.getTime()) || !(startDate.getTime()) || !(checkInDeadline.getTime()) || startDate.getTime() < checkInDeadline.getTime() || startDate.getTime() < eventStartDate.getTime() || startDate.getTime() > eventEndDate.getTime() || !req.body.name || !req.body.game || !req.body.rules || !req.body.teams || isNaN(req.body.fee) || req.body.fee < 0 || isNaN(req.body.capacity) || req.body.capacity < 0 || isNaN(req.body.seed_money) || req.body.seed_money < 0 || !req.body.type || !req.body.format || !req.body.scoring || isNaN(req.body.group_players) || req.body.group_players < 0 || isNaN(req.body.group_winners) || req.body.group_winners < 0) {
-		// res.status(400).json({
-			// error : "Incomplete or invalid parameters"
-		// });
-		// log.info({
-			// res : res
-		// }, 'done response');
+	// res.status(400).json({
+	// error : "Incomplete or invalid parameters"
+	// });
+	// log.info({
+	// res : res
+	// }, 'done response');
 	// } else {
-		events.editTournament(req, res, pg, conString, log);
+	events.editTournament(req, res, pg, conString, log);
 	// }
 }).delete(function(req, res) {
 	log.info({
 		req : req
 	}, 'start request');
 	events.removeTournament(req, res, pg, conString, log);
+});
+
+/* /matchup/events/:event/tournaments/:tournament/create
+ * 
+ * TODO [POST] Create the stages of a Tournament
+ */
+app.route('/matchup/events/:event/tournaments/:tournament/create').post(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	tournaments.createTournament(req, res, pg, conString, log);
 });
 
 /* /matchup/events/:event/tournaments/:tournament/stations?date=date&location=string&station=int
@@ -662,14 +673,14 @@ app.route('/matchup/organizations').get(function(req, res) {
 		req : req
 	}, 'start request');
 	// if (!req.body.name || !req.body.description) {
-		// res.status(400).json({
-			// error : "Incomplete or invalid parameters"
-		// });
-		// log.info({
-			// res : res
-		// }, 'done response');
+	// res.status(400).json({
+	// error : "Incomplete or invalid parameters"
+	// });
+	// log.info({
+	// res : res
+	// }, 'done response');
 	// } else {
-		customers.requestOrganization(req, res, pg, conString, log);
+	customers.requestOrganization(req, res, pg, conString, log);
 	// }
 });
 
@@ -929,14 +940,14 @@ app.route('/matchup/teams').get(function(req, res) {
 		req : req
 	}, 'start request');
 	// if (!req.body.name || !req.body.logo || !req.body.bio || !req.body.cover) {
-		// res.status(400).json({
-			// error : "Incomplete or invalid parameters"
-		// });
-		// log.info({
-			// res : res
-		// }, 'done response');
+	// res.status(400).json({
+	// error : "Incomplete or invalid parameters"
+	// });
+	// log.info({
+	// res : res
+	// }, 'done response');
 	// } else {
-		customers.createTeam(req, res, pg, conString, log);
+	customers.createTeam(req, res, pg, conString, log);
 	// }
 });
 
@@ -980,42 +991,42 @@ app.route('/matchup/teams/:team/members').get(function(req, res) {
 		req : req
 	}, 'start request');
 	// if (!req.query.username) {
-		// res.status(400).json({
-			// error : "Incomplete or invalid parameters"
-		// });
-		// log.info({
-			// res : res
-		// }, 'done response');
+	// res.status(400).json({
+	// error : "Incomplete or invalid parameters"
+	// });
+	// log.info({
+	// res : res
+	// }, 'done response');
 	// } else {
-		teams.addTeamMember(req, res, pg, conString, log);
+	teams.addTeamMember(req, res, pg, conString, log);
 	// }
 }).put(function(req, res) {
 	log.info({
 		req : req
 	}, 'start request');
 	// if (!req.query.username) {
-		// res.status(400).json({
-			// error : "Incomplete or invalid parameters"
-		// });
-		// log.info({
-			// res : res
-		// }, 'done response');
+	// res.status(400).json({
+	// error : "Incomplete or invalid parameters"
+	// });
+	// log.info({
+	// res : res
+	// }, 'done response');
 	// } else {
-		teams.makeCaptain(req, res, pg, conString, log);
+	teams.makeCaptain(req, res, pg, conString, log);
 	// }
 }).delete(function(req, res) {
 	log.info({
 		req : req
 	}, 'start request');
 	// if (!req.query.username) {
-		// res.status(400).json({
-			// error : "Incomplete or invalid parameters"
-		// });
-		// log.info({
-			// res : res
-		// }, 'done response');
+	// res.status(400).json({
+	// error : "Incomplete or invalid parameters"
+	// });
+	// log.info({
+	// res : res
+	// }, 'done response');
 	// } else {
-		teams.removeTeamMember(req, res, pg, conString, log);
+	teams.removeTeamMember(req, res, pg, conString, log);
 	// }
 });
 
