@@ -301,8 +301,10 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 				else if (rejection.status == 403) {
 					alert("HTTP error: 403")
 					$state.go("app.home");
-				} else
-					alert("HTTP error: " + rejection.status)
+				} else{
+					console.log("HTTP error: " + rejection.status);
+					$state.go("app.home");
+				}
 				return rejection;
 			}
 		}

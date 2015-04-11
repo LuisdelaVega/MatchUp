@@ -296,13 +296,9 @@ function ($scope, $window, $http, $state, AuthenticationService) {
 			location = location.replace(" ", "%20");
 			var params = [eventName, date, location];
 
-			$http.get('http://136.145.116.232/matchup/events/' + eventName + '?date=' + date + '&location=' + location + '').success(function (data, status, headers) {
+			$http.get('http://136.145.116.232/matchup/events/' + eventName + '?date=' + date + '&location=' + location + '').success(function (data, status) {
 
-				var eventData = angular.fromJson(data);
-
-				var host = eventData.host;
-
-				if (host != null) {
+				if (data.host != null) {
 					$state.go('app.premiumEvent', {
 						"eventname": eventName,
 						"date": date,

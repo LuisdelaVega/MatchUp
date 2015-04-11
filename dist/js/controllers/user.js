@@ -97,7 +97,7 @@ function ($scope, $http, $stateParams, $window, $state) {
 			console.log(status);
 		});
 
-		$scope.gotToOrganizationProfile = function (organizationName) {
+		$scope.goToOrganizationProfile = function (organizationName) {
 			$state.go("app.organizationProfile", {
 				"organizationName": organizationName
 			});
@@ -122,7 +122,7 @@ function ($scope, $http, $stateParams, $window, $state) {
 			console.log(status);
 		});
 
-		$scope.gotToTeamsProfile = function (teamName) {
+		$scope.goToTeamsProfile = function (teamName) {
 			$state.go("app.teamProfile", {
 				"teamName": teamName
 			});

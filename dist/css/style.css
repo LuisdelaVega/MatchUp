@@ -316,6 +316,7 @@ input[readonly] {
 
 .list-group-item:hover{
 	background-color: #fafafa;
+	cursor: pointer;
 }
 
 /*List snippe*/
