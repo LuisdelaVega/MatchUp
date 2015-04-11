@@ -3,14 +3,13 @@
 <div class="widget-box" ng-if="liveEvents.length>0">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Live</h3>
-		<a class="widget-more" ng-click="goToSearchResults('live-events', searchQuery)"> See More<i class="fa fa-arrow-circle-o-right panel-padding"></i> </a>
-	</div>
+ 	</div>
 	<!--Widget Header-->
 	<div class="widget-body">
 		<div class="widget-main no-padding">
 			<div class="tickets-container">
 				<div class="row" style="padding-left: 15px">
-					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="event in liveEvents | limitTo: 4">
+					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="event in liveEvents ">
 						<!--REPEAT-->
 						<a class="thumbnail"  ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_banner}}">
 						<hr class="hr-custom-padding">
@@ -36,7 +35,7 @@
 <div class="widget-box" ng-if="premiumEvents.length>0">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Premium</h3>
-				<a class="widget-more" ng-click="goToSearchResults('premium-events', searchQuery)"> See More<i class="fa fa-arrow-circle-o-right panel-padding"></i> </a>
+				
 
 	</div>
 	<!--Widget Header-->
@@ -44,7 +43,7 @@
 		<div class="widget-main no-padding">
 			<div class="tickets-container">
 				<div class="row" style="padding-left: 15px">
-					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="event in premiumEvents | limitTo: 4">
+					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="event in premiumEvents ">
 						<!--REPEAT-->
 						<a class="thumbnail"  ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_banner}}">
 						<hr class="hr-custom-padding">
@@ -69,15 +68,14 @@
 <div class="widget-box" ng-if="regularEvents.length>0">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Regular</h3>
-				<a class="widget-more" ng-click="goToSearchResults('regular-events', searchQuery)"> See More<i class="fa fa-arrow-circle-o-right panel-padding"></i> </a>
-
+ 
 	</div>
 	<!--Widget Header-->
 	<div class="widget-body">
 		<div class="widget-main no-padding">
 			<div class="tickets-container">
 				<div class="row" style="padding-left: 15px">
-					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="event in regularEvents | limitTo: 4">
+					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="event in regularEvents ">
 						<!--REPEAT-->
 						<a class="thumbnail"  ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_banner}}">
 						<hr class="hr-custom-padding">
@@ -103,15 +101,14 @@
 <div class="widget-box" ng-if="pastEvents.length>0">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Past Events</h3>
-				<a class="widget-more" ng-click="goToSearchResults('past-events', searchQuery)"> See More<i class="fa fa-arrow-circle-o-right panel-padding"></i> </a>
-
+ 
 	</div>
 	<!--Widget Header-->
 	<div class="widget-body">
 		<div class="widget-main no-padding">
 			<div class="tickets-container">
 				<div class="row" style="padding-left: 15px">
-					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="event in pastEvents | limitTo: 4">
+					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="event in pastEvents ">
 						<!--REPEAT-->
 						<a class="thumbnail"  ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_banner}}">
 						<hr class="hr-custom-padding">
@@ -137,15 +134,14 @@
 <div class="widget-box" ng-if="users.length>0">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Users</h3>
-				<a class="widget-more" ng-click="goToSearchResults('users', searchQuery)"> See More<i class="fa fa-arrow-circle-o-right panel-padding"></i> </a>
-
+ 
  	</div>
 	<!--Widget Header-->
 	<div class="widget-body">
 		<div class="widget-main no-padding">
 			<div class="tickets-container">
 				<div class="row">
-					<div id="userSearch" ng-repeat="user in users | limitTo: 4">
+					<div id="userSearch" ng-repeat="user in users ">
 						<div class="col-xs-12 col-md-12 col-lg-6" ng-click="goToUser(user.customer_username)">
 							<div class="box box-margin">
 								<div class="row">
@@ -175,14 +171,13 @@
 <div class="widget-box" ng-if="teams.length>0">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Teams</h3>
-		<a class="widget-more" ng-click="goToSearchResults('teams', searchQuery)"> See More<i class="fa fa-arrow-circle-o-right panel-padding"></i> </a>
-	</div>
+ 	</div>
 	<!--Widget Header-->
 	<div class="widget-body">
 		<div class="widget-main no-padding">
 			<div class="tickets-container">
 				<div class="row">
-					<div class="col-xs-12 col-md-12 col-lg-6" ng-repeat="team in teams | limitTo: 4">
+					<div class="col-xs-12 col-md-12 col-lg-6" ng-repeat="team in teams ">
 
 						<div class="box" ng-click="goToMyTeams(team.team_name)">
 							<div class="media">
@@ -205,14 +200,13 @@
 <div class="widget-box" ng-if="organizations.length>0">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Organizations</h3>
-		<a class="widget-more" ng-click="goToSearchResults('organizations', searchQuery)"> See More<i class="fa fa-arrow-circle-o-right panel-padding"></i> </a>
-	</div>
+ 	</div>
 	<!--Widget Header-->
 	<div class="widget-body">
 		<div class="widget-main no-padding">
 			<div class="tickets-container">
 				<div class="row">
-					<div class="col-xs-12 col-md-12 col-lg-6" ng-repeat="organization in organizations | limitTo: 4">
+					<div class="col-xs-12 col-md-12 col-lg-6" ng-repeat="organization in organizations ">
 
 						<div class="box" ng-click="goToOrganizationProfile(organization.organization_name)">
 							<div class="media">
@@ -238,14 +232,13 @@
 <div class="widget-box"  ng-if="games.length>0">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Games</h3>
-		<a class="widget-more" ng-click="goToSearchResults('games', searchQuery)"> See More<i class="fa fa-arrow-circle-o-right panel-padding"></i> </a>
-	</div>
+ 	</div>
 	<!--Widget Header-->
 	<div class="widget-body">
 		<div class="widget-main no-padding">
 			<div class="tickets-container">
 				<div class="row">
-					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="game in games | limitTo: 4">
+					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="game in games ">
 						<a class="thumbnail" ng-click="goToGameProfile(game.game_name)"> <img ng-src="{{game.game_image}}" alt="{{game.game_name}}" height="60%" width="60%">
 						<hr class="hr-custom-padding">
 						<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
@@ -265,14 +258,13 @@
 <div class="widget-box"  ng-if="genres.length>0">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Genres</h3>
-		<a class="widget-more" ng-click="goToSearchResults('genres', searchQuery)"> See More<i class="fa fa-arrow-circle-o-right panel-padding"></i> </a>
-	</div>
+ 	</div>
 	<!--Widget Header-->
 	<div class="widget-body">
 		<div class="widget-main no-padding">
 			<div class="tickets-container">
 				<div class="row">
-					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="genre in genres | limitTo: 4">
+					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="genre in genres ">
 						<a class="thumbnail" ng-click="goToGenreProfile(genre.genre_name)"> <img ng-src="{{genre.genre_image}}" alt="{{genre.genre_name}}" height="60%" width="60%">
 						<hr class="hr-custom-padding">
 						<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;

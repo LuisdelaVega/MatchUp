@@ -1,5 +1,5 @@
 var myApp = angular.module('MatchUp', ['ui.router', 'ngResource', 'as.sortable', 'ui.bootstrap.datetimepicker', 'Authentication', 'InputDirectives', 'home', 'premium-events', 'regular-events', 'user', 'organizer', 'organization', 'forms']);
-
+ 
 myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider) {
 	//
 	// For any unmatched url, redirect to /home
@@ -263,6 +263,11 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 		url: "/search/:query",
 		templateUrl: "search.html",
 		controller: "searchController"
+	})
+		.state('app.searchResults', {
+		url: "/search/:type/:query",
+		templateUrl: "searchResults.html",
+		controller: "searchResultsController"
 	});
 
 	$httpProvider.interceptors.push(function ($q, $timeout, $injector) {
@@ -321,6 +326,10 @@ myApp.run(function ($rootScope, $state, AuthenticationService, $window) {
 
 });
 
+   myApp.factory("MatchUpCache", function($cacheFactory) {
+       return $cacheFactory("cache");
+ 
+});
 myApp.factory('sharedDataService', function () {
 	var savedData = {}
 
