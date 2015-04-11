@@ -197,17 +197,18 @@ function ($scope, $window, $http, $state, AuthenticationService) {
 	//$scope.goToSearch = function () {
 		
 	
+
 	$scope.goToSearch = function(query) {
 		//need undefined in case somebody pushes the button and they havent entered any text
 		if (query !== undefined) {
 			if (query.length > 0) {
-				$state.go("app.search", {
-					"query" : query
-				}) //
+
+				$state.transitionTo("app.search", {"query" : query}, {reload : true,inherit : false, notify : false});
+
 			}
 		}
 	}
-	$scope.goToSearchResults = function(type, query) {
+$scope.goToSearchResults = function(type, query) {
 		//need undefined in case somebody pushes the button and they havent entered any text
 		if (query !== undefined) {//gpooo
 			if (query.length > 0) {//goooo
