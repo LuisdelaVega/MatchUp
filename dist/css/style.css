@@ -4,6 +4,7 @@ a:hover {
 
 .cursor:hover {
 	cursor: pointer;
+	background-color: #fafafa;
 }
 
 .cover-photo {
