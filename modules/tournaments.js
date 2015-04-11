@@ -1,101 +1,61 @@
-function addMatch(client, done, log, round) {
-	var query = client.query({
-		text : "SELECT max(match_number)+1 AS next_match FROM match WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_is_winner = $5",
-		values : [round.event_name, round.event_start_date, round.event_location, round.tournament_name, round.round_number, round.round_is_winner]
-	});
-	query.on("row", function(row, result) {
-		result.addRow(row);
-	});
-	query.on('error', function(error) {
-		client.query("ROLLBACK");
-		done();
-		res.status(500).send(error);
-		log.info({
-			res : res
-		}, 'done response');
-	});
-	query.on("end", function(result) {
-		var match = new Object();
-		match.event_name = round.event_name;
-		match.event_start_date = round.event_start_date;
-		match.event_location = round.event_location;
-		match.tournament_name = round.tournament_name;
-		match.round_number = round.round_number;
-		match.round_is_winner = round.round_is_winner;
-		match.match_number = (!(result.rows[0].next_match) ? 1 : result.rows[0].next_match);
-		match.is_favourite = false;
-		match.match_completed = false;
-		client.query({
-			text : "INSERT INTO match (event_name, event_start_date, event_location, tournament_name, round_number, round_is_winner, match_number, is_favourite, match_completed) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-			values : [match.event_name, match.event_start_date, match.event_location, match.tournament_name, match.round_number, match.round_is_winner, match.match_number, match.is_favourite, match.match_completed]
-		}, function(err, result) {
-			if (err) {
-				client.query("ROLLBACK");
-				done();
-				res.status(500).send(err);
-			} else {
-				//TODO Sets
-			}
-			log.info({
-				res : res
-			}, 'done response');
-		});
-	});
-}
-
-//TODO Maybe change req for a tournament object that includes the name and everything tournament related
-function addRound(client, done, log, isWinner, tournament) {
-	var query = client.query({
-		text : "SELECT max(round_number)+1 AS next_round FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_is_winner = $5",
-		values : [tournament.event_name, tournament.event_start_date, tournament.event_location, tournament.tournament_name, isWinner]
-	});
-	query.on("row", function(row, result) {
-		result.addRow(row);
-	});
-	query.on('error', function(error) {
-		client.query("ROLLBACK");
-		done();
-		res.status(500).send(error);
-		log.info({
-			res : res
-		}, 'done response');
-	});
-	query.on("end", function(result) {
-		var round = new Object();
-		round.event_name = tournament.event_name;
-		round.event_start_date = tournament.event_start_date;
-		round.event_location = tournament.event_location;
-		round.tournament_name = tournament.tournament_name;
-		round.round_number = (!(result.rows[0].next_round) ? 1 : result.rows[0].next_round);
-		round.round_is_winner = isWinner;
-		round.round_start_date = tournament.tournament_start_date;
-		round.round_pause = true;
-		round.round_completed = false;
-		round.round_best_of = 3;
-		client.query({
-			text : "INSERT INTO round (event_name, event_start_date, event_location, tournament_name, round_number, round_is_winner, round_start_date, round_paused, round_completed, round_best_of) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
-			values : [round.event_name, round.event_start_date, round.event_location, round.tournament_name, round.round_number, round.round_is_winner, round.round_start_date, round.round_pause, round.round_completed, round.round_best_of]
-		}, function(err, result) {
-			if (err) {
-				client.query("ROLLBACK");
-				done();
-				res.status(500).send(err);
-			} else {
-				addMatch(client, done, log, round);
-			}
-			log.info({
-				res : res
-			}, 'done response');
-		});
-	});
-}
-
-function addCompetitorToGroup(client, done, log, group, competitor) {
+function competes(res, client, done, log, competitor, match) {
 	client.query({
-		text : "INSERT INTO is_in (event_name, event_start_date, event_location, tournament_name, group_number, competitor_number) VALUES($1, $2, $3, $4, $5, $6)",
-		values : [group.event_name, group.event_start_date, group.event_location, group.tournament_name, group.group_number, group.players[competitor]]
+		text : "INSERT INTO competes (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, competitor_number) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
+		values : [match.event_name, match.event_start_date, match.event_location, match.tournament_name, match.round_number, match.round_of, match.match_number, competitor.competitor_number]
 	}, function(err, result) {
 		if (err) {
+			console.log("competes");
+			client.query("ROLLBACK");
+			done();
+			res.status(500).send(err);
+			log.info({
+				res : res
+			}, 'done response');
+		}
+	});
+}
+
+function is_set(res, client, done, log, match, set_seq) {
+	client.query({
+		text : "INSERT INTO is_set (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
+		values : [match.event_name, match.event_start_date, match.event_location, match.tournament_name, match.round_number, match.round_of, match.match_number, set_seq]
+	}, function(err, result) {
+		if (err) {
+			console.log("is_set");
+			client.query("ROLLBACK");
+			done();
+			res.status(500).send(err);
+			log.info({
+				res : res
+			}, 'done response');
+		}
+	});
+}
+
+function competitor_goes_to(res, client, done, log, competitor_goes_to, is_winner) {
+	client.query({
+		text : "INSERT INTO competitor_goes_to (event_name, event_start_date, event_location, tournament_name, past_round_number, past_round_of, past_match, future_round_number, future_round_of, future_match, is_winner) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+		values : [competitor_goes_to.event_name, competitor_goes_to.event_start_date, competitor_goes_to.event_location, competitor_goes_to.tournament_name, competitor_goes_to.past_round_number, competitor_goes_to.past_round_of, competitor_goes_to.past_match, competitor_goes_to.future_round_number, competitor_goes_to.future_round_of, competitor_goes_to.future_match, is_winner]
+	}, function(err, result) {
+		if (err) {
+			console.log("competitor_goes_to");
+			client.query("ROLLBACK");
+			done();
+			res.status(500).send(err);
+			log.info({
+				res : res
+			}, 'done response');
+		}
+	});
+}
+
+function addMatch(res, client, done, log, match, round_best_of) {
+	client.query({
+		text : "INSERT INTO match (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, is_favourite, match_completed) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+		values : [match.event_name, match.event_start_date, match.event_location, match.tournament_name, match.round_number, match.round_of, match.match_number, match.is_favourite, match.match_completed]
+	}, function(err, result) {
+		if (err) {
+			console.log(err);
 			client.query("ROLLBACK");
 			done();
 			res.status(500).send(err);
@@ -103,17 +63,100 @@ function addCompetitorToGroup(client, done, log, group, competitor) {
 				res : res
 			}, 'done response');
 		} else {
-			// Nothing comes to mind at the moment
+			// Sets
+			for (var i = 0; i < round_best_of; i++) {
+				is_set(res, client, done, log, match, (i + 1));
+			}
+			// competes
+			for (var i = 0; i < match.players.length; i++) {
+				competes(res, client, done, log, match.players[i], match);
+			}
+			// is_played_in
+			if (match.is_played_in) {
+				client.query({
+					text : "INSERT INTO is_played_in (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, station_number) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
+					values : [match.event_name, match.event_start_date, match.event_location, match.tournament_name, match.round_number, match.round_of, match.match_number, match.is_played_in]
+				}, function(err, result) {
+					if (err) {
+						console.log("is_played_in");
+						client.query("ROLLBACK");
+						done();
+						res.status(500).send(err);
+						log.info({
+							res : res
+						}, 'done response');
+					}
+				});
+			}
+			if (match.winnerGoesTo) {
+				competitor_goes_to(res, client, done, log, match.winnerGoesTo, true);
+			}
+			if (match.loserGoesTo) {
+				competitor_goes_to(res, client, done, log, match.loserGoesTo, false);
+			}
 		}
 	});
 }
 
-function createGroup(client, done, log, group) {
+function addRound(res, client, done, log, round) {
 	client.query({
-		text : "INSERT INTO group (event_name, event_start_date, event_location, tournament_name, group_number) VALUES($1, $2, $3, $4, $5)",
+		text : "INSERT INTO round (event_name, event_start_date, event_location, tournament_name, round_number, round_of, round_start_date, round_pause, round_completed, round_best_of) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+		values : [round.event_name, round.event_start_date, round.event_location, round.tournament_name, round.round_number, round.round_of, round.round_start_date, round.round_pause, round.round_completed, round.round_best_of]
+	}, function(err, result) {
+		if (err) {
+			console.log(err);
+			client.query("ROLLBACK");
+			done();
+			res.status(500).send(err);
+			log.info({
+				res : res
+			}, 'done response');
+		}
+	});
+}
+
+function addCompetitorToGroup(res, client, done, log, group, competitor) {
+	client.query({
+		text : "INSERT INTO is_in (event_name, event_start_date, event_location, tournament_name, group_number, competitor_number) VALUES($1, $2, $3, $4, $5, $6)",
+		values : [group.event_name, group.event_start_date, group.event_location, group.tournament_name, group.group_number, competitor.competitor_number]
+	}, function(err, result) {
+		if (err) {
+			console.log("addCompetitorToGroup");
+			client.query("ROLLBACK");
+			done();
+			res.status(500).send(err);
+			log.info({
+				res : res
+			}, 'done response');
+		}
+	});
+}
+
+function attachGroupToMatch(res, client, done, log, match, group_number) {
+	client.query({
+		text : "INSERT INTO has_a (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, group_number) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
+		values : [match.event_name, match.event_start_date, match.event_location, match.tournament_name, match.round_number, match.round_of, match.match_number, group_number]
+	}, function(err, result) {
+		if (err) {
+			console.log("attachGroupToMatch");
+			client.query("ROLLBACK");
+			done();
+			res.status(500).send(err);
+			log.info({
+				res : res
+			}, 'done response');
+		}
+	});
+}
+
+function createGroup(res, client, done, log, group) {
+	console.log(group.event_name, group.event_start_date, group.event_location, group.tournament_name, group.group_number);
+	client.query({
+		text : 'INSERT INTO "group" (event_name, event_start_date, event_location, tournament_name, group_number) VALUES($1, $2, $3, $4, $5)',
 		values : [group.event_name, group.event_start_date, group.event_location, group.tournament_name, group.group_number]
 	}, function(err, result) {
 		if (err) {
+			console.log(err);
 			client.query("ROLLBACK");
 			done();
 			res.status(500).send(err);
@@ -123,23 +166,26 @@ function createGroup(client, done, log, group) {
 		} else {
 			// Add the players of that group
 			for (var i = 0; i < group.players.length; i++) {
-				addCompetitorToGroup(client, done, log, group, i);
+				console.log(group.players[i]);
+				addCompetitorToGroup(res, client, done, log, group, group.players[i]);
+			}
+			for (var i = 0; i < group.rounds.length; i++) {
+				for (var j = 0; j < group.rounds[i].matches.length; j++) {
+					attachGroupToMatch(res, client, done, log, group.rounds[i].matches[j], group.group_number);
+				}
 			}
 		}
 	});
 }
 
-/*
- * TODO Query the DB to find the details of a Tournamnet (i.e., Single or Two-Stage, Single or Double Elimination, Winners per Group, Players per Group)
- * Right now I am taking all the details from the body of the request but in the end the body will only contain the array of players ordered by seed arrangement or
- * by group arrangement (i.e., Groups of 4 -> Group A players will be the first 4 in the array, and so on)
- */
 var createTournament = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
 
+		// And so it begins
+		client.query("BEGIN");
 		var query = client.query({
 			text : "SELECT tournament_name, tournament_start_date, tournament_type, tournament_format, number_of_people_per_group, amount_of_winners_per_group FROM tournament WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND tournament_active",
 			values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
@@ -148,6 +194,7 @@ var createTournament = function(req, res, pg, conString, log) {
 			result.addRow(row);
 		});
 		query.on('error', function(error) {
+			client.query("ROLLBACK");
 			done();
 			res.status(500).send(error);
 			log.info({
@@ -160,7 +207,8 @@ var createTournament = function(req, res, pg, conString, log) {
 				tournament.event_name = req.params.event;
 				tournament.event_start_date = req.query.date;
 				tournament.event_location = req.query.location;
-				// Get the competitors sorted by seed
+
+				// Get the competitors sorted by seed (i.e., The top seeded player would be at the first index with a seed value of 1)
 				var query = client.query({
 					text : "SELECT distinct competitor.competitor_number, competitor.competitor_seed FROM tournament JOIN is_a ON is_a.event_name = tournament.event_name AND is_a.event_start_date = tournament.event_start_date AND is_a.event_location = tournament.event_location AND is_a.tournament_name = tournament.tournament_name JOIN competitor ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN customer ON customer.customer_username = is_a.customer_username WHERE tournament.event_name = $1 AND tournament.event_start_date = $2 AND tournament.event_location = $3 AND tournament.tournament_name = $4 AND competitor_check_in ORDER BY competitor.competitor_seed",
 					values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
@@ -169,6 +217,7 @@ var createTournament = function(req, res, pg, conString, log) {
 					result.addRow(row);
 				});
 				query.on('error', function(error) {
+					client.query("ROLLBACK");
 					done();
 					res.status(500).send(error);
 					log.info({
@@ -185,6 +234,7 @@ var createTournament = function(req, res, pg, conString, log) {
 						result.addRow(row);
 					});
 					query.on('error', function(error) {
+						client.query("ROLLBACK");
 						done();
 						res.status(500).send(error);
 						log.info({
@@ -193,7 +243,7 @@ var createTournament = function(req, res, pg, conString, log) {
 					});
 					query.on("end", function(result) {
 						tournament.stations = result.rows;
-						console.log(tournament);
+						// console.log(tournament);
 						var station = 0;
 						if (tournament.tournament_type === "Two Stage") {
 							tournament.groupStage = new Object();
@@ -206,7 +256,7 @@ var createTournament = function(req, res, pg, conString, log) {
 								tournament.bracket.players = new Array();
 								for (var i = 0, k = 0; i < tournament.groupStage.numOfGroups; i++) {
 									for (var j = 0; j < tournament.groupStage.groups[i].numOfWinners; j++) {
-										tournament.bracket.players[k] = "Winner #" + (j + 1) + " of Group " + (i + 1);
+										tournament.bracket.players[k] = new String("Winner #" + (j + 1) + " of Group " + (i + 1));
 										k++;
 									}
 								}
@@ -219,7 +269,7 @@ var createTournament = function(req, res, pg, conString, log) {
 								tournament.group.players = new Array();
 								for (var i = 0, k = 0; i < tournament.groupStage.numOfGroups; i++) {
 									for (var j = 0; j < tournament.groupStage.groups[i].numOfWinners; j++) {
-										tournament.group.players[k] = "Winner #" + (j + 1) + " of Group " + (i + 1);
+										tournament.group.players[k] = new String("Winner #" + (j + 1) + " of Group " + (i + 1));
 										k++;
 									}
 								}
@@ -238,65 +288,66 @@ var createTournament = function(req, res, pg, conString, log) {
 							}
 						}
 
-						// Now you have everything needed to create the stages of a tournament in the database
+						// Now we have everything needed to create the stages of a tournament in the database
 						/*
 						* Perform the same check as before to handle node being an asynchronous a-hole.
 						* Since we need to perform various functions that also involve more than one query we need to be carefull and do things in order.
 						*/
+						// Just to be sure
+						var flag = false;
 						// Added the false statement because I don't want it to run just yet
-						if (tournament.tournament_type === "Two Stage" && false) {
+						if (tournament.tournament_type === "Two Stage") {
 							// Create the groups and connect the competitors with them
 							for (var i = 0; i < tournament.groupStage.groups.length; i++) {
-								createGroup(client, done, log, tournament.groupStage.groups[i]);
+								createGroup(res, client, done, log, tournament.groupStage.groups[i]);
 							}
-
-							/*
-							* TODO
-							* Ok. So I could do this in a different way. I could take the number of rounds for the first group.
-							* This group plays the highest amount of rounds, always. So, I could iterate like this:
-							* 	for (number of rounds of group 1)
-							* 		for (number of groups)
-							* 			for (number of matches in this round)
-							*
-							* This may work, I don't know. this way it should look something like this:
-							* 	Round 1
-							* 		Group 1
-							* 			M1
-							* 			M2
-							* 			M3
-							* 		Group 2
-							* 			M4
-							* 			M5
-							* 			M6
-							* 		Group 3
-							* 			M7
-							* 	Round 2
-							* 		Group 1
-							* 			M1
-							* 			M2
-							* 			M3
-							* 		Group 2
-							* 			M4
-							* 			M5
-							* 			M6
-							*
-							* Let's see what happens
-							*/
-							// for (var i = 0; i < ) {
-							//
-							// }
-
-							if (tournament.tournament_format === "Single Elimination" || tournament.tournament_format === "Double Elimination") {
-
+							for (var i = 0; i < tournament.groupStage.groups[0].numOfRounds; i++) {
+								addRound(res, client, done, log, tournament.groupStage.groups[0].rounds[i]);
+								for (var j = 0; j < tournament.groupStage.groups.length; j++) {
+									for (var k = 0; i < tournament.groupStage.groups[j].numOfRounds && k < tournament.groupStage.groups[j].rounds[i].matches.length; k++) {
+										// Add the matches for the current round
+										addMatch(res, client, done, log, tournament.groupStage.groups[j].rounds[i].matches[k], tournament.groupStage.groups[j].rounds[i].round_best_of);
+									}
+								}
 							}
-						} else {
-
 						}
-						done();
-						res.status(201).send(tournament);
+						if (tournament.tournament_format === "Single Elimination" || tournament.tournament_format === "Double Elimination") {
+							for (var i = 0; i < tournament.bracket.numOfWinnerRounds; i++) {
+								addRound(res, client, done, log, tournament.bracket.winnerRounds[i]);
+								for (var j = 0; j < tournament.bracket.winnerRounds[i].amountOfMatches; j++) {
+									addMatch(res, client, done, log, tournament.bracket.winnerRounds[i].matches[j], tournament.bracket.winnerRounds[i].round_best_of);
+								}
+							}
+							if (tournament.tournament_format === "Double Elimination") {
+								for (var i = 0; i < tournament.bracket.numOfLoserRounds; i++) {
+									addRound(res, client, done, log, tournament.bracket.loserRounds[i]);
+									for (var j = 0; j < tournament.bracket.loserRounds[i].amountOfMatches; j++) {
+										addMatch(res, client, done, log, tournament.bracket.loserRounds[i].matches[j], tournament.bracket.loserRounds[i].round_best_of);
+									}
+								}
+							}
+							flag = true;
+						} else {
+							createGroup(res, client, done, log, tournament.group.groups[0]);
+							for (var i = 0; i < tournament.group.groups[0].numOfRounds; i++) {
+								addRound(res, client, done, log, tournament.group.groups[0].rounds[i]);
+								for (var k = 0; i < tournament.group.groups[0].numOfRounds && k < tournament.group.groups[0].rounds[i].matches.length; k++) {
+									// Add the matches for the current round
+									addMatch(res, client, done, log, tournament.group.groups[0].rounds[i].matches[k], tournament.group.groups[0].rounds[i].round_best_of);
+								}
+							}
+							flag = true;
+						}
+
+						if (flag) {
+							client.query("COMMIT");
+							done();
+							res.status(201).send(tournament);
+						}
 					});
 				});
 			} else {
+				client.query("ROLLBACK");
 				done();
 				res.status(404).send("Tournament not found");
 				log.info({
@@ -426,7 +477,7 @@ function generateGroupStage(groupStage, players, tournament, station, assignStat
 			groupStage.groups[i].rounds[j].tournament_name = tournament.tournament_name;
 			groupStage.groups[i].rounds[j].round_number = (j + 1);
 			groupStage.groups[i].rounds[j].round_of = round_of;
-			groupStage.groups[i].rounds[j].tournament_start_date = tournament.tournament_start_date;
+			groupStage.groups[i].rounds[j].round_start_date = tournament.tournament_start_date;
 			groupStage.groups[i].rounds[j].round_pause = true;
 			groupStage.groups[i].rounds[j].round_completed = false;
 			groupStage.groups[i].rounds[j].round_best_of = 3;
@@ -442,24 +493,30 @@ function generateGroupStage(groupStage, players, tournament, station, assignStat
 				groupStage.groups[i].rounds[j].matches[k].match_number = (k + 1 + (groupStage.groups[(!(i) ? i : (i - 1))].numOfMatchesPerRound * i));
 				groupStage.groups[i].rounds[j].matches[k].is_favourite = false;
 				groupStage.groups[i].rounds[j].matches[k].match_completed = false;
+				groupStage.groups[i].rounds[j].matches[k].players = new Array();
 			}
 			if (!(groupStage.groups[i].players.length % 2)) {
 				var count = 0;
 				for (var l = 0; l < groupStage.groups[i].numOfMatchesPerRound * 2; l++) {
 					if (!l) {
-						groupStage.groups[i].rounds[j].matches[l].player1 = groupStage.groups[i].players[l];
+						// groupStage.groups[i].rounds[j].matches[l].player1 = groupStage.groups[i].players[l];
+						(groupStage.groups[i].players[l] instanceof String ? 'Do nothing' : groupStage.groups[i].rounds[j].matches[l].players.push(groupStage.groups[i].players[l]));
 					} else if (l < groupStage.groups[i].numOfMatchesPerRound) {
-						groupStage.groups[i].rounds[j].matches[l].player1 = groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)];
+						// groupStage.groups[i].rounds[j].matches[l].player1 = groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)];
+						(groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)] instanceof String ? 'Do nothing' : groupStage.groups[i].rounds[j].matches[l].players.push(groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)]));
 					} else {
-						groupStage.groups[i].rounds[j].matches[(groupStage.groups[i].numOfMatchesPerRound * 2) - l - 1].player2 = groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)];
+						// groupStage.groups[i].rounds[j].matches[(groupStage.groups[i].numOfMatchesPerRound * 2) - l - 1].player2 = groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)];
+						(groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)] instanceof String ? 'Do nothing' : groupStage.groups[i].rounds[j].matches[(groupStage.groups[i].numOfMatchesPerRound * 2) - l - 1].players.push(groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)]));
 					}
 				}
 			} else {
 				for (var l = 0; l < groupStage.groups[i].numOfMatchesPerRound * 2; l++) {
 					if (l < groupStage.groups[i].numOfMatchesPerRound) {
-						groupStage.groups[i].rounds[j].matches[l].player1 = groupStage.groups[i].players[(j + l) % groupStage.groups[i].players.length];
+						// groupStage.groups[i].rounds[j].matches[l].player1 = groupStage.groups[i].players[(j + l) % groupStage.groups[i].players.length];
+						(groupStage.groups[i].players[(j + l) % groupStage.groups[i].players.length] instanceof String ? 'Do nothing' : groupStage.groups[i].rounds[j].matches[l].players.push(groupStage.groups[i].players[(j + l) % groupStage.groups[i].players.length]));
 					} else {
-						groupStage.groups[i].rounds[j].matches[(groupStage.groups[i].numOfMatchesPerRound * 2) - l - 1].player2 = groupStage.groups[i].players[(j + l) % groupStage.groups[i].players.length];
+						// groupStage.groups[i].rounds[j].matches[(groupStage.groups[i].numOfMatchesPerRound * 2) - l - 1].player2 = groupStage.groups[i].players[(j + l) % groupStage.groups[i].players.length];
+						(groupStage.groups[i].players[(j + l) % groupStage.groups[i].players.length] instanceof String ? 'Do nothing' : groupStage.groups[i].rounds[j].matches[(groupStage.groups[i].numOfMatchesPerRound * 2) - l - 1].players.push(groupStage.groups[i].players[(j + l) % groupStage.groups[i].players.length]));
 					}
 				}
 			}
@@ -639,21 +696,24 @@ function singleEliminationBracket(bracket, players, tournament) {
 		for ( j = 0; j < winnerRounds[i].amountOfMatches; j++) {
 			winnerRounds[i].matches[j] = new Object();
 			winnerRounds[i].matches[j].event_name = tournament.event_name;
-			winnerRounds[i].matches[j].event_start_date = tournament.event_name;
-			winnerRounds[i].matches[j].event_location = tournament.event_name;
+			winnerRounds[i].matches[j].event_start_date = tournament.event_start_date;
+			winnerRounds[i].matches[j].event_location = tournament.event_location;
 			winnerRounds[i].matches[j].tournament_name = tournament.tournament_name;
 			winnerRounds[i].matches[j].round_number = winnerRounds[i].round_number;
 			winnerRounds[i].matches[j].round_of = winnerRounds[i].round_of;
 			winnerRounds[i].matches[j].match_number = (j + 1);
 			winnerRounds[i].matches[j].is_favourite = false;
 			winnerRounds[i].matches[j].match_completed = false;
+			winnerRounds[i].matches[j].players = new Array();
 		}
 	}
 
 	// Assign players for Winners Round 1 Matches
 	for ( i = 0; i < (bracket.numOfPlayers - bracket.byes) / 2; i++) {
-		winnerRounds[0].matches[i].player1 = players[bracket.byes + i/* - 1*/];
-		winnerRounds[0].matches[i].player2 = players[bracket.numOfPlayers - i - 1];
+		// winnerRounds[0].matches[i].player1 = players[bracket.byes + i/* - 1*/];
+		console.log(players[bracket.byes + i/* - 1*/] instanceof String); (players[bracket.byes + i/* - 1*/] instanceof String ? 'Do nothing' : winnerRounds[0].matches[i].players.push(players[bracket.byes + i/* - 1*/]));
+		// winnerRounds[0].matches[i].player2 = players[bracket.numOfPlayers - i - 1];
+		(players[bracket.numOfPlayers - i - 1] instanceof String ? 'Do nothing' : winnerRounds[0].matches[i].players.push(players[bracket.numOfPlayers - i - 1]));
 		//console.log(winnerRounds[0].name+", match: "+i+", player1: "+winnerRounds[0].matches[i].player1.seed+", player2: "+winnerRounds[0].matches[i].player2.seed);
 	}
 
@@ -662,11 +722,13 @@ function singleEliminationBracket(bracket, players, tournament) {
 		var count = 0;
 		for ( i = 0; i < bracket.byes; i++) {
 			if (i < winnerRounds[1].amountOfMatches) {
-				winnerRounds[1].matches[i].player1 = players[i];
+				// winnerRounds[1].matches[i].player1 = players[i];
+				(players[i] instanceof String ? 'Do nothing' : winnerRounds[1].matches[i].players.push(players[i]));
 				//console.log(winnerRounds[1].name+", match: "+i+", player1: "+winnerRounds[1].matches[i].player1.seed);
 			} else {
 				count++;
-				winnerRounds[1].matches[i - count].player2 = players[i];
+				// winnerRounds[1].matches[i - count].player2 = players[i];
+				(players[i] instanceof String ? 'Do nothing' : winnerRounds[1].matches[i - count].players.push(players[i]));
 				//console.log(winnerRounds[1].name+", match: "+(i-count)+", player1: "+winnerRounds[1].matches[i-count].player1.seed+", player2: "+winnerRounds[1].matches[i-count].player2.seed);
 				count++;
 			}
@@ -773,14 +835,15 @@ function doubleEliminationBracket(bracket, tournament) {
 	bracket.winnerRounds[bracket.numOfWinnerRounds].matches[0] = new Object();
 
 	bracket.winnerRounds[bracket.numOfWinnerRounds].matches[0].event_name = tournament.event_name;
-	bracket.winnerRounds[bracket.numOfWinnerRounds].matches[0].event_start_date = tournament.event_name;
-	bracket.winnerRounds[bracket.numOfWinnerRounds].matches[0].event_location = tournament.event_name;
+	bracket.winnerRounds[bracket.numOfWinnerRounds].matches[0].event_start_date = tournament.event_start_date;
+	bracket.winnerRounds[bracket.numOfWinnerRounds].matches[0].event_location = tournament.event_location;
 	bracket.winnerRounds[bracket.numOfWinnerRounds].matches[0].tournament_name = tournament.tournament_name;
 	bracket.winnerRounds[bracket.numOfWinnerRounds].matches[0].round_number = bracket.winnerRounds[bracket.numOfWinnerRounds].round_number;
 	bracket.winnerRounds[bracket.numOfWinnerRounds].matches[0].round_of = bracket.winnerRounds[bracket.numOfWinnerRounds].round_of;
 	bracket.winnerRounds[bracket.numOfWinnerRounds].matches[0].match_number = 1;
 	bracket.winnerRounds[bracket.numOfWinnerRounds].matches[0].is_favourite = false;
 	bracket.winnerRounds[bracket.numOfWinnerRounds].matches[0].match_completed = false;
+	bracket.winnerRounds[bracket.numOfWinnerRounds].matches[0].players = new Array();
 
 	// bracket.winnerRounds[bracket.numOfWinnerRounds].matches[0].name = "Winners Round " + (bracket.numOfWinnerRounds + 1) + " Match 1";
 	bracket.numOfWinnerRounds++;
@@ -884,14 +947,15 @@ function doubleEliminationBracket(bracket, tournament) {
 			loserRounds[i].matches[j] = new Object();
 
 			loserRounds[i].matches[j].event_name = tournament.event_name;
-			loserRounds[i].matches[j].event_start_date = tournament.event_name;
-			loserRounds[i].matches[j].event_location = tournament.event_name;
+			loserRounds[i].matches[j].event_start_date = tournament.event_start_date;
+			loserRounds[i].matches[j].event_location = tournament.event_location;
 			loserRounds[i].matches[j].tournament_name = tournament.tournament_name;
 			loserRounds[i].matches[j].round_number = loserRounds[i].round_number;
 			loserRounds[i].matches[j].round_of = loserRounds[i].round_of;
 			loserRounds[i].matches[j].match_number = (j + 1);
 			loserRounds[i].matches[j].is_favourite = false;
 			loserRounds[i].matches[j].match_completed = false;
+			loserRounds[i].matches[j].players = new Array();
 
 			// loserRounds[i].matches[j].name = "Losers Round " + (i + 1) + " Match " + (j + 1);
 			//console.log(loserRounds[i].matches[j].name);
