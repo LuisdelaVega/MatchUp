@@ -197,33 +197,8 @@ function ($scope, $http, $state, $window, AuthenticationService, $rootScope) {
 
 myApp.controller('sidebarController', ['$scope', '$window', '$http', '$state', 'AuthenticationService',
 function ($scope, $window, $http, $state, AuthenticationService) {
-<<<<<<< HEAD
-	
-	//$scope.goToSearch = function () {
-		
-	
-
-	$scope.goToSearch = function(query) {
-		//need undefined in case somebody pushes the button and they havent entered any text
-		if (query !== undefined) {
-			if (query.length > 0) {
-
-				$state.transitionTo("app.search", {"query" : query}, {reload : true,inherit : false, notify : false});
-
-			}
-		}
-	}
-$scope.goToSearchResults = function(type, query) {
-		//need undefined in case somebody pushes the button and they havent entered any text
-		if (query !== undefined) {//gpooo
-			if (query.length > 0) {//goooo
-				$state.go("app.searchResults", {
-					"type" : type,
-					"query" : query
-				}) //
-			}//goooooo
-=======
-
+ 	
+ 
 		$scope.goToSearch = function (query) {
 			//need undefined in case somebody pushes the button and they havent entered any text
 			if (query !== undefined) {
@@ -244,8 +219,7 @@ $scope.goToSearchResults = function(type, query) {
 						}) //
 				} //goooooo
 			}
->>>>>>> c5de59a214ecdbc57af41321a1e545581afcf942
-		}
+ 		}
 
 		$scope.goToMyProfile = function () {
 			$state.go("app.userProfile", {
