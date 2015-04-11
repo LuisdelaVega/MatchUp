@@ -58,9 +58,9 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			controller: "generalViewController"
 		})
 		.state('app.myEvents', {
-			url: "/myEvents",
+			url: "/myEvents/:username",
 			templateUrl: "event/my_events.html",
-			controller: "profileEventController"
+			controller: "myEventsController"
 		})
 		.state('app.createEvent', {
 			url: "/createEvent",
@@ -68,8 +68,9 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			controller: "CreateEventController"
 		})
 		.state('app.registeredEvents', {
-			url: "/registeredEvents",
-			templateUrl: "event/registered_events.html"
+			url: "/registeredEvents/:username",
+			templateUrl: "event/registered_events.html",
+			controller: "registeredEventsController"
 		})
 		.state('app.meetupList', {
 			url: "/meetupList/:eventname/:date/:location",
@@ -301,8 +302,10 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 				else if (rejection.status == 403) {
 					alert("HTTP error: 403")
 					$state.go("app.home");
-				} else
-					alert("HTTP error: " + rejection.status)
+				} else{
+					console.log("HTTP error: " + rejection.status);
+					$state.go("app.home");
+				}
 				return rejection;
 			}
 		}

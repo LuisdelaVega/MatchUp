@@ -28,7 +28,7 @@
 									</div>
 									<div class="form-group" ng-class="{ 'has-error' : loginForm.password.$invalid && !loginForm.password.$pristine }">
 										<input class="form-control" ng-model="credentials.userPassword" placeholder="Password" name="password" type="password" required>
-										<span class="help-block" ng-show="badCredentials">Incorrect username or password</span>
+										<span class="text-danger" ng-show="badCredentials">Incorrect username or password</span>
 									</div>
 									<!-- Change this to a button or input when using this as a form -->
 									<button class="btn btn-lg btn-success btn-block" type="submit">
@@ -42,27 +42,34 @@
 								<fieldset>
 									<br />
 									<div class="form-group">
-										<input class="form-control" placeholder="First name" name="first_name" type="text" ng-model="account.first_name" autofocus required>
+										<label>First Name</label>
+										<input class="form-control" name="first_name" type="text" ng-model="account.first_name" autofocus required>
 									</div>
 									<div class="form-group">
-										<input class="form-control" placeholder="Last name" name="last_name" type="text" ng-model="account.last_name" required>
+										<label>Last Name</label>
+										<input class="form-control" name="last_name" type="text" ng-model="account.last_name" required>
 									</div>
 									<div class="form-group">
-										<input class="form-control" placeholder="Usertag" name="usertag" type="text" ng-model="account.tag" required>
+										<label>Usertag</label>
+										<input class="form-control" name="usertag" type="text" ng-model="account.tag" required>
 									</div>
 									<div class="form-group">
-										<input class="form-control" placeholder="Username" name="username" type="text" ng-model="account.username" required>
+										<label>Username</label>
+										<input class="form-control" name="username" type="text" ng-model="account.username" required>
 									</div>
 									<div class="form-group">
-										<input class="form-control" placeholder="Email" name="email" type="email" ng-model="account.email" required>
+										<label>Email</label>
+										<input class="form-control" name="email" type="email" ng-model="account.email" required>
 									</div>
 									<div class="form-group">
-										<input class="form-control" placeholder="Password" name="password" type="password" ng-model="account.password" required>
+										<label>Password</label>
+										<input class="form-control" name="password" type="password" ng-model="account.password" required>
 									</div>
 									<div class="form-group">
-										<input class="form-control" placeholder="Confirm Password" name="password" type="password" ng-model="account.confirmPassword" required>
+										<label>Confirm Password</label>
+										<input class="form-control" name="password" type="password" ng-model="account.confirmPassword" required>
 										<span class="help-block" ng-show="incorrectPassword">Incorrect Password</span>
-									</div>									
+									</div>
 									<button class="btn btn-lg btn-success btn-block" type="submit">Sign up</button>
 								</fieldset>
 							</form>

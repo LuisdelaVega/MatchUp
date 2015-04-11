@@ -7,122 +7,110 @@ var myApp = angular.module('regular-events', []);
  *
  * This controller will determine if the data sent is either a tournament from a premium event or a regular event and act accordingly
  */
-myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sharedDataService', '$window', '$state',
-function($scope, $http, $stateParams, sharedDataService, $window, $state) {
+myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sharedDataService', '$q', '$state', '$rootScope',
+function ($scope, $http, $stateParams, sharedDataService, $q, $state, $rootScope) {
 
-	var now = new Date();
-	var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
+		var now_utc = new Date();
 
-	var config = {
-		headers : {
-			'Authorization' : "Bearer " + $window.sessionStorage.token
-		}
-	};
+		// Vairables that control what is shown in the tournament page
+		$scope.competitorsTab = false;
+		$scope.standingsTab = false;
+		$scope.groupStageTab = false;
+		$scope.roundsTab = false;
+		$scope.bracketTab = false;
+		$scope.canRegister = false;
 
-	$http.get('http://136.145.116.232/matchup/events/' + $stateParams.eventname + '?date=' + $stateParams.date + '&location=' + $stateParams.location + '', config).success(function(data, status, headers, config) {
+		// Get event Info
+		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '?date=' + $stateParams.date + '&location=' + $stateParams.location)
+			.success(function (data, status) {
+			$scope.eventInfo = data;
 
-		$scope.eventInfo = angular.fromJson(data);
-		console.log($scope.eventInfo);
-		if ($scope.eventInfo.host == null)
-			$scope.isHosted = false;
-		else
-			$scope.isHosted = true;
-		console.log($scope.isHosted);
+			// Check if event is premium
+			if ($scope.eventInfo.host)
+				getPremiumTournament();
+			else
+				getRegularTournament();
+		});
 
-		var startDate = new Date($scope.eventInfo.event_start_date);
-		$scope.cover = "linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2)), url(" + $scope.eventInfo.event_banner + ")";
+		var getPremiumTournament = function () {
+			// Get Tournament Information
+			$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data) {
+				$scope.tournamentInfo = data;
+				$q.all(
+						[
+							// Get Organization
+							$http.get($rootScope.baseURL + '/matchup/organizations/' + $scope.eventInfo.host),
+							// Competitors
+							$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/competitors?date=' + $stateParams.date + '&location=' + $stateParams.location),
 
-		if (startDate > now_utc)
-			$scope.isOngoing = false;
-		else
-			$scope.isOngoing = true;
-
-		if ($scope.isHosted) {
-			console.log("this event is hosted");
-
-			$http.get('http://136.145.116.232/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '?date=' + $stateParams.date + '&location=' + $stateParams.location + '', config).success(function(data, status, headers, config) {
-
-				$scope.currentTournament = angular.fromJson(data);
-				$scope.requiresTeam = $scope.currentTournament.is_team_based;
-				//get host info
-				$http.get('http://136.145.116.232/matchup/organizations/' + $scope.eventInfo.host + '', config).success(function(data, status, headers, config) {
-
-					$scope.host = angular.fromJson(data);
-					console.log($scope.host);
-					$http.get('http://136.145.116.232/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/competitors?date=' + $stateParams.date + '&location=' + $stateParams.location + '', config).success(function(data, status, headers, config) {
-						$scope.competitors = angular.fromJson(data);
-						$scope.numComp = $scope.competitors.length;
-						console.log($scope.competitors);
-
-					}).error(function(data, status) {
-
-						if (status == 404 || status == 401 ||status == 400)
-							$state.go("" + status);
-						console.log("error in eventPremiumSummaryController");
+							// Get Sponsors
+							$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/sponsors?date=' + $stateParams.date + '&location=' + $stateParams.location),
+						])
+					.then(function (results) {
+						// Get Organization
+						$scope.hostInfo = results[0].data;
+						// Get Competitors
+						$scope.competitors = results[1].data;
+						// Get sponsors
+						$scope.sponsors = results[2].data;
+						initStuff();
+					}, function (err) {
+						console.log(err);
+						console.log("Oh oh");
 					});
-				}).error(function(data, status) {
-
-					if (status == 404 || status == 401 ||status == 400)
-						$state.go("" + status);
-					console.log("error in eventPremiumSummaryController");
-				});
-
-			}).error(function(data, status) {
-
-				if (status == 404 || status == 401 ||status == 400)
-					$state.go("" + status);
-				console.log("error in eventPremiumSummaryController");
 			});
 
-		} else {
-			$http.get('http://136.145.116.232/matchup/events/' + $stateParams.eventname + '/tournaments?date=' + $stateParams.date + '&location=' + $stateParams.location + '', config).success(function(data, status, headers, config) {
-
-				var tournamentJSON = angular.fromJson(data);
-				$scope.currentTournament = tournamentJSON[0];
-				$scope.requiresTeam = $scope.currentTournament.is_team_based;
-				//console.log($scope.currentTournament);
-				if ($scope.currentTournament.tournament_format == 'Two Stage')
-					$scope.groupStage = true;
-				else
-					$scope.groupStage = false;
-				//Getting Competitors
-				///matchup/profile/
-				$http.get('http://136.145.116.232/matchup/profile/' + $scope.eventInfo.creator + '', config).success(function(data, status, headers, config) {
-					///matchup/events/:event/tournaments/:tournament/competitors?date=date&location=string
-
-					$scope.creator = angular.fromJson(data);
-
-					$http.get('http://136.145.116.232/matchup/events/' + $stateParams.eventname + '/tournaments/' + $scope.currentTournament.tournament_name + '/competitors?date=' + $stateParams.date + '&location=' + $stateParams.location + '', config).success(function(data, status, headers, config) {
-						///matchup/events/:event/tournaments/:tournament/competitors?date=date&location=string
-
-						$scope.competitors = angular.fromJson(data);
-						$scope.numComp = $scope.competitors.length;
-						console.log($scope.competitors);
-
-					}).error(function(data, status) {
-
-						if (status == 404 || status == 401 ||status == 400)
-							$state.go("" + status);
-						console.log("error in eventPremiumSummaryController");
-					});
-				}).error(function(data, status) {
-
-					if (status == 404 || status == 401 ||status == 400)
-						$state.go("" + status);
-					console.log("error in eventPremiumSummaryController");
-				});
-			}).error(function(data, status) {
-
-				if (status == 404 || status == 401 ||status == 400)
-					$state.go("" + status);
-				console.log("error in eventPremiumSummaryController");
-			});
 		}
-	}).error(function(data, status) {
 
-		if (status == 404 || status == 401 ||status == 400)
-			$state.go("" + status);
-		console.log("error in eventPremiumSummaryController");
-	});
+
+		var getRegularTournament = function () {
+			// get tournaments
+			$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments?date=' + $stateParams.date + '&location=' + $stateParams.location)
+				.then(function (data) {
+					$scope.tournamentInfo = data.data[0];
+					$scope.requiresTeam = $scope.tournamentInfo.is_team_based;
+					if ($scope.tournamentInfo.tournament_format == 'Two Stage')
+						$scope.groupStage = true;
+					else
+						$scope.groupStage = false;
+					$q.all(
+						[
+							// Get Creator
+							$http.get($rootScope.baseURL + '/matchup/profile/' + $scope.eventInfo.creator),
+							// Competitors
+							$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $scope.tournamentInfo.tournament_name + '/competitors?date=' + $stateParams.date + '&location=' + $stateParams.location),
+
+							// Get Sponsors
+							$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/sponsors?date=' + $stateParams.date + '&location=' + $stateParams.location),
+						])
+						.then(function (results) {
+							// Get Organization
+							$scope.hostInfo = results[0].data;
+							// Get Competitors
+							$scope.competitors = results[1].data;
+							initStuff();
+						}, function (err) {
+							console.log(err);
+							console.log("Oh oh");
+						});
+				});
+		}
+
+
+		var initStuff = function () {
+			
+			var start_date = new Date($scope.tournamentInfo.tournament_start_date);
+			// Check if ongoing
+			if (now_utc.getTime() > start_date.getTime()) {
+				// Tournament Started
+				$scope.standingsTab = true;
+
+			} else
+				// Tournament not started
+				$scope.competitorsTab = true;
+
+			// Check registration deadline with current time
+			$scope.canRegister = (new Date($scope.eventInfo.event_registration_deadline)).getTime() > now_utc.getTime();
+		}
 
 }]);

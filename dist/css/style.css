@@ -4,6 +4,7 @@ a:hover {
 
 .cursor:hover {
 	cursor: pointer;
+	background-color: #fafafa;
 }
 
 .cover-photo {
@@ -316,6 +317,7 @@ input[readonly] {
 
 .list-group-item:hover{
 	background-color: #fafafa;
+	cursor: pointer;
 }
 
 /*List snippe*/

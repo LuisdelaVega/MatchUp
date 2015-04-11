@@ -14,26 +14,23 @@
 <div class="tab-content panel-padding">
 	<div class="tab-pane fade in active" id="upcoming">
 		<div class="row">
-			<div class="col-lg-6 col-md-12 col-sm-12" ng-repeat = "event in upcomingEventsData">
-				<div class="panel" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)">
+			<div class="col-lg-6 col-md-12 col-sm-12" ng-repeat = "event in upcoming">
+				<div class="panel panel-default cursor" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)">
 					<div class="panel-body">
 						<img style="width:100%;" ng-src="{{event.event_banner}}">
 					</div>
 					<div class="panel-footer">
 						<div class="row">
 							<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-								<img class="event-organizer-thumbnail  center-block" src="http://neptunolabs.com/images/badillo.jpg">
+								<img class="event-organizer-thumbnail  center-block" ng-src="{{event.event_logo}}">
 							</div>
 							<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9">
 								<h3 class="event-footer-title">{{event.event_name}}</h3>
 								<p>
-									{{event.event_date}}
+									{{event.event_start_date | date:'medium'}}
 								</p>
 								<p>
 									{{event.event_location}}
-								</p>
-								<p>
-									Hosted by EsportsPR
 								</p>
 							</div>
 						</div>
@@ -43,28 +40,25 @@
 
 		</div>
 	</div>
-	<div class="tab-pane fade in active" id="live">
+	<div class="tab-pane fade" id="live">
 		<div class="row">
-			<div class="col-lg-6 col-md-12 col-sm-12" ng-repeat = "event in liveEventsData">
-				<div class="panel" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)">
+			<div class="col-lg-6 col-md-12 col-sm-12" ng-repeat = "event in live">
+				<div class="panel panel-default cursor" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)">
 					<div class="panel-body">
 						<img style="width:100%;" ng-src="{{event.event_banner}}">
 					</div>
 					<div class="panel-footer">
 						<div class="row">
 							<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-								<img class="event-organizer-thumbnail  center-block" src="http://neptunolabs.com/images/badillo.jpg">
+								<img class="event-organizer-thumbnail  center-block" ng-src="{{event.event_logo}}">
 							</div>
 							<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9">
 								<h3 class="event-footer-title">{{event.event_name}}</h3>
 								<p>
-									{{event.event_date}}
+									{{event.event_start_date | date:'medium'}}
 								</p>
 								<p>
 									{{event.event_location}}
-								</p>
-								<p>
-									Hosted by EsportsPR
 								</p>
 							</div>
 						</div>
@@ -74,28 +68,25 @@
 
 		</div>
 	</div>
-	<div class="tab-pane fade in active" id="history">
+	<div class="tab-pane fade" id="history">
 		<div class="row">
-			<div class="col-lg-6 col-md-12 col-sm-12" ng-repeat = "event in pastEventsData">
-				<div class="panel" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)">
+			<div class="col-lg-6 col-md-12 col-sm-12" ng-repeat = "event in history">
+				<div class="panel panel-default cursor" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)">
 					<div class="panel-body">
 						<img style="width:100%;" ng-src="{{event.event_banner}}">
 					</div>
 					<div class="panel-footer">
 						<div class="row">
 							<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-								<img class="event-organizer-thumbnail  center-block" src="http://neptunolabs.com/images/badillo.jpg">
+								<img class="event-organizer-thumbnail  center-block" ng-src="{{event.event_logo}}">
 							</div>
 							<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9">
 								<h3 class="event-footer-title">{{event.event_name}}</h3>
 								<p>
-									{{event.event_date}}
+									{{event.event_start_date | date:'medium'}}
 								</p>
 								<p>
 									{{event.event_location}}
-								</p>
-								<p>
-									Hosted by EsportsPR
 								</p>
 							</div>
 						</div>
