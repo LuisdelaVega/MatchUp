@@ -5,7 +5,6 @@ var getEventsParams = {
 	magnitude : ["local", "regional", "national"]
 };
 
-//TODO Implement limit and offsets like in Spruce
 var getEvents = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -157,7 +156,7 @@ var getEvent = function(req, res, pg, conString, log) {
 		var event = new Object();
 		client.query("BEGIN");
 		var query = client.query({
-			text : "SELECT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_venue, event.event_banner, event.event_logo, event.event_registration_deadline, event.event_rules, event.event_description, event.event_deduction_fee, event.event_is_online, event.event_type, event.customer_username AS creator, hosts.organization_name AS host FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND event.event_active;",
+			text : "SELECT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_venue, event.event_banner, event.event_logo, event.event_registration_deadline, event.event_rules, event.event_description, event.event_deduction_fee, event.event_is_online, event.event_type, event.customer_username AS creator, hosts.organization_name AS host FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND event.event_active",
 			values : [req.params.event, req.query.date, req.query.location]
 		});
 		query.on("row", function(row, result) {
@@ -176,7 +175,7 @@ var getEvent = function(req, res, pg, conString, log) {
 				event = result.rows[0];
 				// Check if user is organizer
 				var query = client.query({
-					text : "SELECT distinct customer.customer_username FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location LEFT OUTER JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active;",
+					text : "SELECT distinct customer.customer_username FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location LEFT OUTER JOIN belongs_to ON belongs_to.organization_name = hosts.organization_name JOIN customer ON customer.customer_username = event.customer_username OR customer.customer_username = belongs_to.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND customer.customer_username = $4 AND event.event_active",
 					values : [req.params.event, req.query.date, req.query.location, req.user.username]
 				});
 				query.on("row", function(row, result) {
@@ -211,7 +210,116 @@ var getEvent = function(req, res, pg, conString, log) {
 	});
 };
 
+var submitScore = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var event = new Object();
+		client.query("BEGIN");
+		var query = client.query({
+			text : "SELECT event_name, event_start_date, event_location FROM event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND event_active;",
+			values : [req.params.event, req.query.date, req.query.location]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			client.query("ROLLBACK");
+			done();
+			console.log(error);
+			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+		query.on("end", function(result) {
+			if (result.rows.length) {
+				event = result.rows[0];
+				// Check if user 
+				var query = client.query({
+					text : "SELECT competes.competitor_number, (submits.score IS NULL AND NOT is_set.set_completed) AS can_submit_score FROM is_set JOIN competes ON is_set.event_name = competes.event_name AND is_set.event_start_date = competes.event_start_date AND is_set.event_location = competes.event_location AND is_set.tournament_name = competes.tournament_name AND is_set.round_number = competes.round_number AND is_set.round_of = competes.round_of AND is_set.match_number = competes.match_number JOIN is_a ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number AND submits.set_seq = is_set.set_seq WHERE is_set.event_name = $1 AND is_set.event_start_date = $2 AND is_set.event_location = $3 AND is_set.tournament_name = $4 AND is_set.round_number = $5 AND is_set.round_of = $6 AND is_set.match_number = $7 AND is_set.set_seq = $8 AND is_a.customer_username = $9",
+					values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.user.username]
+				});
+				query.on("row", function(row, result) {
+					result.addRow(row);
+				});
+				query.on('error', function(error) {
+					client.query("ROLLBACK");
+					done();
+					console.log(error);
+					res.status(500).send(error);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+				query.on("end", function(result) {
+					if (result.rows.length && result.rows[0].can_submit_score) {
+						if (!isNaN(req.body.score)) {
+							client.query({
+								text : "INSERT INTO submits (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number, score) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+								values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, result.rows[0].competitor_number, req.body.score]
+							}, function(err, result) {
+								if (err) {
+									client.query("ROLLBACK");
+									done();
+									console.log(err);
+									res.status(500).send(err);
+									log.info({
+										res : res
+									}, 'done response');
+								} else {
+									/*
+									 * TODO There is a lot of logic that has to happen here. I need to check if the set is completed or not and do the appropriate changes.
+									 * Also, I think this will be the place to check if everything has completed, and by everything I mean, check if this match has completed, and if so
+									 * check if that completes the round, and if so check if that completes the stage we're at, and if so check if that completes the whole Tournament.
+									 * 
+									 * Dunno, I'll deal with it tomorrow...
+									 * 
+									 * For now, lets just report the score and celebrate
+									 */
+									client.query("COMMIT");
+									done();
+									res.status(200).send("Updated");
+									log.info({
+										res : res
+									}, 'done response');
+								}
+							});
+						} else {
+							client.query("ROLLBACK");
+							done();
+							res.status(403).json({
+								error : "Incomplete or invalid parameters"
+							});
+							log.info({
+								res : res
+							}, 'done response');
+						}
+					} else {
+						client.query("ROLLBACK");
+						done();
+						res.status(403).send("You can't submit score");
+						log.info({
+							res : res
+						}, 'done response');
+					}
+				});
+			} else {
+				client.query("ROLLBACK");
+				done();
+				res.status(404).send("Couldn't find the event: " + req.params.event + " starting on: " + req.query.date + " located at: " + req.query.location);
+				log.info({
+					res : res
+				}, 'done response');
+			}
+		});
+	});
+};
+
 //TODO Validate date
+// DEPRECIATED
 var getParticipants = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -326,36 +434,6 @@ var getEventSpectators = function(req, res, pg, conString, log) {
 	});
 };
 
-var getEventCompetitors = function(req, res, pg, conString, log) {
-	pg.connect(conString, function(err, client, done) {
-		if (err) {
-			return console.error('error fetching client from pool', err);
-		}
-
-		var query = client.query({
-			text : "SELECT distinct customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic, tournament.competitor_fee FROM event JOIN is_a ON is_a.event_name = event.event_name AND is_a.event_start_date = event.event_start_date AND is_a.event_location = event.event_location JOIN tournament ON tournament.event_name = event.event_name AND tournament.event_start_date = event.event_start_date AND tournament.event_location = event.event_location AND is_a.tournament_name = tournament.tournament_name JOIN customer ON customer.customer_username = is_a.customer_username WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3",
-			values : [req.params.event, req.query.date, req.query.location]
-		});
-		query.on("row", function(row, result) {
-			result.addRow(row);
-		});
-		query.on('error', function(error) {
-			done();
-			res.status(500).send(error);
-			log.info({
-				res : res
-			}, 'done response');
-		});
-		query.on("end", function(result) {
-			done();
-			res.status(200).json(result.rows);
-			log.info({
-				res : res
-			}, 'done response');
-		});
-	});
-};
-
 var getStationsForEvent = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -385,7 +463,6 @@ var getStationsForEvent = function(req, res, pg, conString, log) {
 			}, 'done response');
 		});
 	});
-	//pg.end();
 };
 
 var checkInSpectator = function(req, res, pg, conString, log) {
@@ -453,7 +530,6 @@ var checkInSpectator = function(req, res, pg, conString, log) {
 	});
 };
 
-//TODO Transaction
 var checkInCompetitor = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -519,9 +595,6 @@ var checkInCompetitor = function(req, res, pg, conString, log) {
 	});
 };
 
-//TODO Change API
-//TODO Log all errors
-//TODO Transaction
 var addStation = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -606,7 +679,6 @@ var addStation = function(req, res, pg, conString, log) {
 			});
 		}
 	});
-	//pg.end();
 };
 
 var removeStation = function(req, res, pg, conString, log) {
@@ -2596,76 +2668,8 @@ var editTournament = function(req, res, pg, conString, log) {
 	});
 };
 
-//TODO Limit the result to a maximum of 3 or something
-// *Depreciated*
-var getHome = function(res, pg, conString, log) {
-	pg.connect(conString, function(err, client, done) {
-		if (err) {
-			return console.error('error fetching client from pool', err);
-		}
-
-		var eventList = new Object();
-		// Look for all the Events that are currently in progress
-		var query = client.query({
-			text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event WHERE event_start_date < now() at time zone 'utc' and event_end_date > now() at time zone 'utc' AND event_active GROUP BY event_name, event_location, event_start_date ORDER BY event_start_date"
-		});
-		query.on("row", function(row, result) {
-			result.addRow(row);
-		});
-		query.on("end", function(result) {
-			done();
-			eventList.live = result.rows;
-
-			// Look for all the Regular Events that have not yet started
-			var query = client.query({
-				text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event WHERE event_start_date > now() at time zone 'utc' AND event_name NOT IN (SELECT event.event_name FROM event NATURAL JOIN hosts) AND event_active GROUP BY event_name, event_location, event_start_date ORDER BY event_start_date"
-			});
-			query.on("row", function(row, result) {
-				result.addRow(row);
-			});
-			query.on("end", function(result) {
-				done();
-				eventList.regular = result.rows;
-
-				// Look for all Hosted Events that have not yet started
-				var query = client.query({
-					text : "SELECT event_name, event_start_date, event_end_date, event_location, event_venue, event_logo FROM event NATURAL JOIN hosts WHERE event.event_start_date > now() at time zone 'utc' AND event_active GROUP BY event_name, event_location, event_start_date ORDER BY event_start_date"
-				});
-				query.on("row", function(row, result) {
-					result.addRow(row);
-				});
-				query.on("end", function(result) {
-					done();
-					eventList.hosted = result.rows;
-
-					// Look for most Popular Games
-					var gamesList = new Object();
-					var query = client.query({
-						text : "SELECT game.*, count(game.game_name) as popularity FROM event NATURAL JOIN tournament NATURAL JOIN game WHERE event_active GROUP BY game.game_name ORDER BY popularity DESC"
-					});
-					query.on("row", function(row, result) {
-						result.addRow(row);
-					});
-					query.on("end", function(result) {
-						gamesList.popular_games = result.rows;
-
-						res.json({
-							events : eventList,
-							popular_games : gamesList.popular_games
-						});
-						done();
-
-					});
-				});
-			});
-		});
-	});
-	//pg.end();
-};
-
 module.exports.getEvents = getEvents;
 module.exports.getEvent = getEvent;
-module.exports.getParticipants = getParticipants;
 module.exports.getCompetitors = getCompetitors;
 module.exports.getAllNews = getAllNews;
 module.exports.getNews = getNews;
@@ -2705,7 +2709,7 @@ module.exports.removeSponsor = removeSponsor;
 module.exports.getEventSpectators = getEventSpectators;
 module.exports.checkInSpectator = checkInSpectator;
 module.exports.checkInCompetitor = checkInCompetitor;
+module.exports.submitScore = submitScore;
 
-//** DEPRECIATED **
-module.exports.getHome = getHome;
-module.exports.getEventCompetitors = getEventCompetitors;
+// DEPRECIATED
+module.exports.getParticipants = getParticipants;

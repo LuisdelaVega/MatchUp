@@ -138,13 +138,6 @@ function authenticate(req, res) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
-// *Depreciated* Used for testing of the bracket generation algorithm
-app.get('/bracket/:format/:numofplayers', tournaments.createBraket);
-// *Depreciated* Used for testing of the group stage algorithm
-app.post('/groupstage', tournaments.createGroupStage);
-// Read the details from the DB and only expect the array of players
-// app.post('/tournament', tournaments.createTournament);
-
 //*\\\\\\\\\\* API *//////////*/
 /* /api
  *
@@ -282,8 +275,10 @@ app.route('/matchup/events/:event').get(function(req, res) {
 	events.deleteEvent(req, res, pg, conString, log);
 });
 
-/* /matchup/events/:event/participants?date=date&location=string&spectators=true&competitors=true
- *
+/* DEPRECIATED
+ * More data of spectators and competitors is given when their respective routes are called. This route is not in the API
+ * 
+ * /matchup/events/:event/participants?date=date&location=string&spectators=true&competitors=true
  * params:
  * 	spectators = Filters the participants to those who payed a spectator fee
  * 	competitors = Filters the participants to those who payed a competitor fee
@@ -318,23 +313,6 @@ app.route('/matchup/events/:event/spectators/:username').put(function(req, res) 
 		req : req
 	}, 'start request');
 	events.checkInSpectator(req, res, pg, conString, log);
-});
-
-/* DEPRECIATED
- * 	This route's functionality will be moved to /matchup/events/:event/tournaments/:tournament/competitors where the competitor details sent will be
- * 	for a specific Tournament. This makes more sense since different Tournament may have different fees and will also synergize better with the check-in function
- * 	because the same Customer may participate in more than one Tournament but these Tournaments may be played on separate dates, meaning that a Customer may
- * 	be present one day and absent on the other.
- *
- * /matchup/events/:event/competitors?date=date&location=string
- *
- * [GET] Get all Competitors that are registered for an event
- */
-app.route('/matchup/events/:event/competitors').get(function(req, res) {
-	log.info({
-		req : req
-	}, 'start request');
-	events.getEventCompetitors(req, res, pg, conString, log);
 });
 
 /* /matchup/events/:event/stations?date=date&location=string
@@ -449,14 +427,30 @@ app.route('/matchup/events/:event/tournaments/:tournament').get(function(req, re
 });
 
 /* /matchup/events/:event/tournaments/:tournament/create
+ * TODO Allow only event organizers to do this
  * 
- * TODO [POST] Create the stages of a Tournament
+ * [POST] Create the stages of a Tournament
  */
 app.route('/matchup/events/:event/tournaments/:tournament/create').post(function(req, res) {
 	log.info({
 		req : req
 	}, 'start request');
 	tournaments.createTournament(req, res, pg, conString, log);
+});
+
+/* /matchup/events/:event/tournaments/:tournament/rounds/:round/matches/:match/:set?date=date&location=string&round_of=string
+ * TODO Update in API
+ * 	Params:
+ * 		round_of = Indicates where the round was/it to be played. Posible values: [Group, Winner, Loser, Round Robin]
+ * 
+ * [POST] Submit the results of a Set
+ * [PUT] Update the results of a Set which you submitted TODO
+ */
+app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round/matches/:match/:set').post(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	events.submitScore(req, res, pg, conString, log);
 });
 
 /* /matchup/events/:event/tournaments/:tournament/stations?date=date&location=string&station=int
@@ -647,16 +641,6 @@ app.route('/matchup/events/:event/sponsors').get(function(req, res) {
 	events.removeSponsor(req, res, pg, conString, log);
 });
 
-//*\\\\\\\\\\* HOME *//////////*/
-
-// *Depreciated*
-app.get('/home', function(req, res) {
-	log.info({
-		req : req
-	}, 'start request');
-	events.getHome(res, pg, conString, log);
-});
-
 //*\\\\\\\\\\* ORGANIZATIONS *//////////*/
 /* /matchup/organizations
  *
@@ -770,14 +754,6 @@ app.route('/matchup/organizations/:organization/sponsors').get(function(req, res
 });
 
 //*\\\\\\\\\\* POPULAR *//////////*/
-// *Depreciated*
-app.get('/popular', function(req, res) {
-	log.info({
-		req : req
-	}, 'start request');
-	games.getPopularStuff(res, pg, conString, log);
-});
-
 /* /matchup/popular/games
  *
  * [GET] Get a list of all Games ordered by their popularity (Amount of Tournaments that feature them)
@@ -822,6 +798,21 @@ app.route('/matchup/profile').get(function(req, res) {
 		req : req
 	}, 'start request');
 	customers.deleteAccount(req, res, pg, conString, log);
+});
+
+/* /matchup/profile/matchups?state=string
+ * 
+ * 	params:
+ * 		state = Indicates whether to look for past matchups or current matchups. Possible values: [Past, Upcoming]
+ * 			note: Defaults to Upcoming
+ *
+ * [GET] Get a list of your upcoming or past matches
+ */
+app.route('/matchup/profile/matchups').get(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	customers.getMatchups(req, res, pg, conString, log);
 });
 
 /* /matchup/profile/:username
