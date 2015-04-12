@@ -257,6 +257,11 @@ var submitScore = function(req, res, pg, conString, log) {
 				query.on("end", function(result) {
 					if (result.rows.length && result.rows[0].can_submit_score) {
 						if (!isNaN(req.body.score)) {
+							
+							/*
+							 * TODO Before inserting the score, we must check to see if our opponent has submited his own score and compare it.
+							 * If the scores are the same (i.e., both say they won, score = 1), then send a 409 (Conflict) and explain the situation in the body
+							 */
 							client.query({
 								text : "INSERT INTO submits (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number, score) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 								values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, result.rows[0].competitor_number, req.body.score]
@@ -274,10 +279,6 @@ var submitScore = function(req, res, pg, conString, log) {
 									 * TODO There is a lot of logic that has to happen here. I need to check if the set is completed or not and do the appropriate changes.
 									 * Also, I think this will be the place to check if everything has completed, and by everything I mean, check if this match has completed, and if so
 									 * check if that completes the round, and if so check if that completes the stage we're at, and if so check if that completes the whole Tournament.
-									 * 
-									 * Dunno, I'll deal with it tomorrow...
-									 * 
-									 * For now, lets just report the score and celebrate
 									 */
 									client.query("COMMIT");
 									done();

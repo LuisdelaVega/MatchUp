@@ -814,9 +814,11 @@ var createEvent = function(req, res, pg, conString, log) {
 		var eventStartDate = new Date(req.body.event.start_date);
 		var eventEndDate = new Date(req.body.event.end_date);
 		var eventRegistrationDeadline = new Date(req.body.event.registration_deadline);
-		if (!(eventStartDate.getTime()) || !(eventEndDate.getTime()) || !(eventRegistrationDeadline.getTime()) || eventRegistrationDeadline.getTime() > eventStartDate.getTime() || eventStartDate.getTime() > eventEndDate.getTime() || !req.body.event.name || !req.body.event.location || !req.user.username || !req.body.event.venue || !req.body.event.banner || !req.body.event.logo || !req.body.event.rules || !req.body.event.description || isNaN(req.body.event.deduction_fee) || req.body.event.deduction_fee < 0 || !req.body.event.type) {
+		if (!(eventStartDate.getTime()) || !(eventEndDate.getTime()) || !(eventRegistrationDeadline.getTime()) || eventRegistrationDeadline.getTime() > eventStartDate.getTime() || eventStartDate.getTime() > eventEndDate.getTime() || !req.body.event.name || !req.body.event.location || !req.body.event.venue || !req.body.event.banner || !req.body.event.logo || !req.body.event.rules || !req.body.event.description || isNaN(req.body.event.deduction_fee) || req.body.event.deduction_fee < 0 || !req.body.event.type) {
 			client.query("ROLLBACK");
 			done();
+			console.log("1");
+			console.log(!(eventStartDate.getTime()), !(eventEndDate.getTime()), !(eventRegistrationDeadline.getTime()), eventRegistrationDeadline.getTime() > eventStartDate.getTime(), eventStartDate.getTime() > eventEndDate.getTime(), !req.body.event.name, !req.body.event.location, !req.body.event.venue, !req.body.event.banner, !req.body.event.logo, !req.body.event.rules, !req.body.event.description, isNaN(req.body.event.deduction_fee), req.body.event.deduction_fee < 0, !req.body.event.type);
 			res.status(400).json({
 				error : "Incomplete or invalid parameters"
 			});
@@ -826,22 +828,26 @@ var createEvent = function(req, res, pg, conString, log) {
 		} else {
 			client.query({
 				text : "INSERT INTO event (event_name, event_start_date, event_location, customer_username, event_venue, event_banner, event_logo, event_end_date, event_registration_deadline, event_rules, event_description, event_deduction_fee, event_is_online, event_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
-				values : [req.body.event.name, req.body.event.start_date, req.body.event.location, req.user.username, req.body.event.venue, req.body.event.banner, req.body.event.logo, req.body.event.end_date, req.body.event.registration_deadline, req.body.event.rules, req.body.event.description, req.body.event.deduction_fee, req.body.event.is_online, req.body.event.type]
+				values : [req.body.event.name, req.body.event.start_date, req.body.event.location, req.user.username, req.body.event.venue, req.body.event.banner, req.body.event.logo, req.body.event.end_date, req.body.event.registration_deadline, req.body.event.rules, req.body.event.description, ((!req.query.hosted && req.query.hosted != "true") ? 0 : req.body.event.deduction_fee), req.body.event.is_online, req.body.event.type]
 			}, function(err, result) {
 				if (err) {
 					client.query("ROLLBACK");
 					done();
+					console.log("2");
+					console.log(err);
 					res.status(500).send(err);
 					log.info({
 						res : res
 					}, 'done response');
 				} else {
-					if (!req.query.hosted) {
+					if (!req.query.hosted && req.query.hosted != "true") {
 						var startDate = new Date(req.body.tournament[0].start_date);
 						var checkInDeadline = new Date(req.body.tournament[0].deadline);
 						if (!(startDate.getTime()) || !(checkInDeadline.getTime()) || startDate.getTime() < checkInDeadline.getTime() || startDate.getTime() < eventStartDate.getTime() || startDate.getTime() > eventEndDate.getTime() || !req.body.tournament[0].name || !req.body.tournament[0].game || !req.body.tournament[0].rules || isNaN(req.body.tournament[0].fee) || req.body.tournament[0].fee < 0 || isNaN(req.body.tournament[0].capacity) || req.body.tournament[0].capacity < 0 || isNaN(req.body.tournament[0].seed_money) || req.body.tournament[0].seed_money < 0 || !req.body.tournament[0].type || !req.body.tournament[0].format || !req.body.tournament[0].scoring || isNaN(req.body.tournament[0].group_players) || req.body.tournament[0].group_players < 0 || isNaN(req.body.tournament[0].group_winners) || req.body.tournament[0].group_winners < 0) {
 							client.query("ROLLBACK");
 							done();
+							console.log("3");
+							console.log(!(startDate.getTime()), !(checkInDeadline.getTime()), startDate.getTime() < checkInDeadline.getTime(), startDate.getTime() < eventStartDate.getTime(), startDate.getTime() > eventEndDate.getTime(), !req.body.tournament[0].name, !req.body.tournament[0].game, !req.body.tournament[0].rules, isNaN(req.body.tournament[0].fee), req.body.tournament[0].fee < 0, isNaN(req.body.tournament[0].capacity), req.body.tournament[0].capacity < 0, isNaN(req.body.tournament[0].seed_money), req.body.tournament[0].seed_money < 0, !req.body.tournament[0].type, !req.body.tournament[0].format, !req.body.tournament[0].scoring, isNaN(req.body.tournament[0].group_players), req.body.tournament[0].group_players < 0, isNaN(req.body.tournament[0].group_winners), req.body.tournament[0].group_winners < 0);
 							res.status(400).json({
 								error : "Incomplete or invalid parameters"
 							});
@@ -859,6 +865,8 @@ var createEvent = function(req, res, pg, conString, log) {
 							query.on('error', function(error) {
 								client.query("ROLLBACK");
 								done();
+								console.log("4");
+								console.log(error);
 								res.status(500).send(error);
 								log.info({
 									res : res
@@ -873,6 +881,8 @@ var createEvent = function(req, res, pg, conString, log) {
 										if (err) {
 											client.query("ROLLBACK");
 											done();
+											console.log("5");
+											console.log(err);
 											res.status(500).send(err);
 										} else {
 											client.query("COMMIT");
@@ -900,7 +910,7 @@ var createEvent = function(req, res, pg, conString, log) {
 							});
 						}
 					} else {
-						console.log(req.body.tournament);
+						// console.log(req.body.tournament);
 						var tournament = req.body.tournament;
 						var i = 0;
 						for ( i = 0; i < tournament.length; i++) {
@@ -910,6 +920,8 @@ var createEvent = function(req, res, pg, conString, log) {
 							if (!(startDate.getTime()) || !(checkInDeadline.getTime()) || startDate.getTime() < checkInDeadline.getTime() || startDate.getTime() < eventStartDate.getTime() || startDate.getTime() > eventEndDate.getTime() || !tournament[i].name || !tournament[i].game || !tournament[i].rules || isNaN(tournament[i].fee) || tournament[i].fee < 0 || isNaN(tournament[i].capacity) || tournament[i].capacity < 0 || isNaN(tournament[i].seed_money) || tournament[i].seed_money < 0 || !tournament[i].type || !tournament[i].format || !tournament[i].scoring || isNaN(tournament[i].group_players) || tournament[i].group_players < 0 || isNaN(tournament[i].group_winners) || tournament[i].group_winners < 0) {
 								client.query("ROLLBACK");
 								done();
+								console.log("6");
+								console.log(!(startDate.getTime()), !(checkInDeadline.getTime()), startDate.getTime() < checkInDeadline.getTime(), startDate.getTime() < eventStartDate.getTime(), startDate.getTime() > eventEndDate.getTime(), !tournament[i].name, !tournament[i].game, !tournament[i].rules, isNaN(tournament[i].fee), tournament[i].fee < 0, isNaN(tournament[i].capacity), tournament[i].capacity < 0, isNaN(tournament[i].seed_money), tournament[i].seed_money < 0, !tournament[i].type, !tournament[i].format, !tournament[i].scoring, isNaN(tournament[i].group_players), tournament[i].group_players < 0, isNaN(tournament[i].group_winners), tournament[i].group_winners < 0);
 								res.status(400).json({
 									error : "Incomplete or invalid parameters"
 								});
@@ -935,7 +947,8 @@ var createEvent = function(req, res, pg, conString, log) {
 								if (!fees[j].name || isNaN(fees[j].amount) || fees[j].amount < 0 || !fees[j].description || isNaN(fees[j].available) || fees[j].available < 0) {
 									client.query("ROLLBACK");
 									done();
-									console.log("\n3\n");
+									console.log("7");
+									console.log(!fees[j].name, isNaN(fees[j].amount), fees[j].amount < 0, !fees[j].description, isNaN(fees[j].available), fees[j].available < 0);
 									res.status(400).json({
 										error : "Incomplete or invalid parameters"
 									});
@@ -950,6 +963,8 @@ var createEvent = function(req, res, pg, conString, log) {
 										if (err) {
 											client.query("ROLLBACK");
 											done();
+											console.log("8");
+											console.log(err);
 											res.status(500).send(err);
 											log.info({
 												res : res
@@ -972,6 +987,8 @@ var createEvent = function(req, res, pg, conString, log) {
 									query.on('error', function(error) {
 										client.query("ROLLBACK");
 										done();
+										console.log("9");
+										console.log(error);
 										res.status(500).send(error);
 										log.info({
 											res : res
@@ -986,6 +1003,8 @@ var createEvent = function(req, res, pg, conString, log) {
 												if (err) {
 													client.query("ROLLBACK");
 													done();
+													console.log("10");
+													console.log(err);
 													res.status(500).send(err);
 													log.info({
 														res : res
@@ -1006,6 +1025,8 @@ var createEvent = function(req, res, pg, conString, log) {
 									query.on('error', function(error) {
 										client.query("ROLLBACK");
 										done();
+										console.log("11");
+										console.log(error);
 										res.status(500).send(error);
 										log.info({
 											res : res
@@ -1020,6 +1041,8 @@ var createEvent = function(req, res, pg, conString, log) {
 												if (err) {
 													client.query("ROLLBACK");
 													done();
+													console.log("12");
+													console.log(err);
 													res.status(500).send(err);
 												} else {
 													client.query("COMMIT");

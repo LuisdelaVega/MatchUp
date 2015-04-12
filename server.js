@@ -444,7 +444,7 @@ app.route('/matchup/events/:event/tournaments/:tournament/create').post(function
  * 		round_of = Indicates where the round was/it to be played. Posible values: [Group, Winner, Loser, Round Robin]
  * 
  * [POST] Submit the results of a Set
- * [PUT] Update the results of a Set which you submitted TODO
+ * TODO [PUT] Update the results of a Set TODO Can be used by Organizers
  */
 app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round/matches/:match/:set').post(function(req, res) {
 	log.info({
