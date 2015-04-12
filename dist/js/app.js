@@ -95,19 +95,19 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 		 *
 		 */
 		.state('app.eventSettings', {
-			url: "/eventSettings",
+             url: "/settings/event/:eventName/:eventDate/:eventLocation",
 			templateUrl: "organizer/event_settings.html",
-            controller: "eventController"
+            controller: "eventSettingsController"
         
 		})
 		.state('app.editEvent', {
 			url: "/editEvent",
 			templateUrl: "organizer/edit_event.html"
 		})
-		.state('app.tournamentList', {
-			url: "/tournamentList",
-			templateUrl: "organizer/tournament_list.html",
-			controller: "editTournamentController"
+        .state('app.editTournament', {
+             url: "/settings/event/:eventName/:eventDate/:eventLocation/tournament/:tournamentName",
+            templateUrl: "organizer/edit_tournament.html",
+            controller: "editTournamentController"
 		})
 		.state('app.registrations', {
 			url: "/registrations",
