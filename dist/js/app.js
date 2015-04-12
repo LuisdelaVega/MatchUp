@@ -172,7 +172,8 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 		})
 		.state('app.editProfile', {
 			url: "/editProfile",
-			templateUrl: "user/edit_profile.html"
+			templateUrl: "user/edit_profile.html",
+			controller: "editProfileController"
 		})
 		.state('app.myMatchups', {
 			url: "/myMatchups",
@@ -315,6 +316,7 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 myApp.run(function ($rootScope, $state, AuthenticationService, $window) {
 
 	$rootScope.baseURL = "http://136.145.116.232";
+	$rootScope.imgurKey = "6528448c258cff474ca9701c5bab6927";
 
 	// Authenticated selected states, not used for capstone
 	//	$rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams,error) {
