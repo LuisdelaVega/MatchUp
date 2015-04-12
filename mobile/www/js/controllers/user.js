@@ -1,7 +1,7 @@
 var myApp = angular.module('user',[]);
 
 myApp.controller('ProfileController', function ($scope, $ionicPopover, $state, sharedDataService, $ionicPopup) {
-   //Create popover event that allows further navigation to profile owner
+    //Create popover event that allows further navigation to profile owner
     $ionicPopover.fromTemplateUrl('templates/profile/profile-popover.html', {
         scope: $scope,
     }).then(function (popover) {
@@ -21,7 +21,7 @@ myApp.controller('ProfileController', function ($scope, $ionicPopover, $state, s
     }
 
     $scope.customerUsername = sharedDataService.get();
-    
+
 });
 
 myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$stateParams', '$ionicPopup', '$timeout', '$state', function ($scope, $http, $window, $stateParams, $ionicPopup, $timeout, $state) {
@@ -31,7 +31,7 @@ myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$st
             'Authorization': "Bearer "+ $window.sessionStorage.token
         }
     };
-    
+
     //Synchronously fetch profile info from server
     //Get profile information of specified user such as: tag, profile picture and cover photo. 
     $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'', config).success(function (data) {
@@ -95,7 +95,7 @@ myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$st
     $scope.goToTeamProfile = function (teamName) {
         $state.go('app.teamprofile', {"teamname": teamName});
     };
-    
+
     $scope.goToOrganizationProfile = function (organizationName) {
         $state.go('app.organizationprofile', {"organizationname": organizationName});
     };
@@ -220,7 +220,10 @@ myApp.controller('myMatchupViewController', ['$scope', '$http', '$stateParams', 
 
 }]);
 
-myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$window', function ($scope, $http, $stateParams, $window) {
+myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$window', 'Camera', function ($scope, $http, $stateParams, $window, Camera) {
+
+    $http.defaults.useXDomain = true;
+    $http.defaults.headers.common['Authorization'] = 'Client-ID 44f5a38fc083775';
 
     //Ensures that server calls happens everytime user accesses the edit profile view with updated information
     $scope.$on('$ionicView.enter', function () {
@@ -250,6 +253,110 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
 
 
     });
+
+    $scope.uploadToImgurTest = function () {
+
+        var div = document.getElementById("preview"); //<img> containing image. called div to avoid calling it the same as img object
+        var c = document.getElementById("myCanvas"); //<canvas> where image will be drawn to obtain base64 encoding 
+
+        var ctx = c.getContext("2d");
+
+        var img = new Image();
+
+        //Avoids tainted canvas error
+        img.crossOrigin = 'Anonymous';
+
+        //new img object contains the profile picture
+        img.src = $scope.profilePic;
+
+        //Wait until image is loaded. avoids sending blank images to the imgur api
+        img.onload = function(){
+
+            //Set height and width of canvas to be equal to that of the image. This is so that the uploaded image is not cut off.
+            c.height = div.offsetHeight;
+            c.width  = div.offsetWidth;
+
+            //Draw image to canvas
+            ctx.drawImage(img, 0, -50);
+
+            //Get base64 encoding of image. binary file containing image contents
+            var imgE64 = c.toDataURL();
+
+            //Metadata -- imgur doesn't need this
+            imgE64 = imgE64.split(",")[1]
+
+            //Call to upload image to imgur
+            $http.post('https://api.imgur.com/3/upload', {
+                "image": imgE64
+            } ).success(function (data) {
+
+                console.log(data.data.link); //Here's the link
+
+            }).
+            error(function (err){
+                console.log("error in editProfileController");
+            });
+        }
+
+    }
+
+    //Interacts with corresponding factory that calls on platform specific API (Android or iOS) to handle the taking of pictures
+    $scope.takePicture = function () {
+        Camera.getPicture( {sourceType : Camera.PictureSourceType.PHOTOLIBRARY} ).then(function (imageURI) {
+
+            $scope.profilePic = imageURI;
+            
+            var div = document.getElementById("preview"); //<img> containing image. called div to avoid calling it the same as img object
+            var c = document.getElementById("myCanvas"); //<canvas> where image will be drawn to obtain base64 encoding 
+
+            var ctx = c.getContext("2d");
+
+            var img = new Image();
+
+            //Avoids tainted canvas error
+            img.crossOrigin = 'Anonymous';
+
+            //new img object contains the profile picture
+            img.src = $scope.profilePic;
+
+            //Wait until image is loaded. avoids sending blank images to the imgur api
+            img.onload = function(){
+
+                //Set height and width of canvas to be equal to that of the image. This is so that the uploaded image is not cut off.
+                c.height = div.offsetHeight;
+                c.width  = div.offsetWidth;
+
+                //Draw image to canvas
+                ctx.drawImage(img, 0, -50);
+
+                //Get base64 encoding of image. binary file containing image contents
+                var imgE64 = c.toDataURL();
+
+                //Metadata -- imgur doesn't need this
+                imgE64 = imgE64.split(",")[1]
+
+                //Call to upload image to imgur
+                $http.post('https://api.imgur.com/3/upload', {
+                    "image": imgE64
+                } ).success(function (data) {
+
+                    alert(data.data.link); //Here's the link
+
+                }).
+                error(function (err){
+                    console.log("error in editProfileController");
+                });
+            }
+
+        }, function (err) {
+            console.err(err);
+        }, {
+            quality: 75,
+            targetWidth: 320,
+            targetHeight: 320,
+            saveToPhotoAlbum: false
+        });
+    };
 
 }]);
 

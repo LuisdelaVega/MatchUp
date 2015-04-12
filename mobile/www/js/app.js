@@ -416,7 +416,8 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     //================================================================================
         .state('createaccount', {
         url: "/createaccount",
-        templateUrl: "templates/profile/create-account.html"
+        templateUrl: "templates/profile/create-account.html",
+        controller: "createAccountController"
     })
         .state('login', {
         url: "/login",

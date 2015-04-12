@@ -62,7 +62,7 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
                 'Authorization': "Bearer "+ $window.sessionStorage.token
             }
         };
-        
+
 
         //Get event information
         $http.get('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'', config).
@@ -137,7 +137,7 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$
 
         //Failsafe to make sure that if search parameters is 0 than there should be nothing displaying
         else{
-            
+
             $scope.liveEvents.length = 0
             $scope.pastEvents.length = 0
             $scope.premiumEvents.length = 0
@@ -163,7 +163,7 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$
                 'Authorization': "Bearer "+ $window.sessionStorage.token
             }
         };
-        
+
 
         //Server call to obtain event informtion
         $http.get('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'', config).
@@ -206,7 +206,7 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$
     $scope.goToTeamProfile = function (teamName) {
         $state.go('app.teamprofile', {"teamname": teamName});
     };
-    
+
     $scope.goToOrganizationProfile = function (organizationName) {
         $state.go('app.organizationprofile', {"organizationname": organizationName});
     };
@@ -321,11 +321,11 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
         sharedDataService.set(userName);
         $state.go('app.profile.summary', {"username": userName});
     };
-    
+
     $scope.goToTeamProfile = function (teamName) {
         $state.go('app.teamprofile', {"teamname": teamName});
     };
-    
+
     $scope.goToOrganizationProfile = function (organizationName) {
         $state.go('app.organizationprofile', {"organizationname": organizationName});
     };
@@ -341,8 +341,8 @@ myApp.controller('cameraReportController', ['$scope', '$http', 'Camera', functio
     $scope.takePicture = function () {
         console.log('Getting camera');
         Camera.getPicture().then(function (imageURI) {
-            console.log(imageURI);
             $scope.imageURL = imageURI;
+            $scope.picturetaken = true;
         }, function (err) {
             console.err(err);
         }, {
@@ -434,29 +434,55 @@ myApp.controller('loginController', ['$scope', '$http', '$state', 'sharedDataSer
     };
 }]);
 
+myApp.controller('createAccountController', ['$scope', '$http', '$state', 'sharedDataService', '$window', function ($scope, $http, $state, sharedDataService, $window) {
+
+    $scope.newAccount = { };
+
+    $scope.createAccount = function () {
+
+        $http.post('http://136.145.116.232/create/account', {
+            "username": $scope.newAccount.username,
+            "email": $scope.newAccount.email,
+            "first_name": $scope.newAccount.firstName,
+            "last_name": $scope.newAccount.lastName,
+            "tag": $scope.newAccount.Tag,
+            "password": $scope.newAccount.password
+        }).success(function (data) {
+
+            console.log("made account with username"+$scope.username);
+            $state.go('login');
+
+        }).error(function (err) {
+            console.log("error in createAccountController");
+        });
+    };
+
+}]);
+
 myApp.controller('sidebarController', ['$scope', '$http', '$state', 'sharedDataService', '$window', function ($scope, $http, $state, sharedDataService, $window) {
 
     //Load profile information of currently logged in user. The token is used by the server to obtain user credentials.
-    var config = {
-        headers: {
-            'Authorization': "Bearer "+ $window.sessionStorage.token
-        }
-    };
+    $scope.$on('$ionicView.enter', function () {
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
 
-    //Server call to obtain profile information of currently logged in user
-    $http.get('http://136.145.116.232/matchup/profile', config).success(function (data) {
+        //Server call to obtain profile information of currently logged in user
+        $http.get('http://136.145.116.232/matchup/profile', config).success(function (data) {
 
-        $scope.loggedInUserProfileData = angular.fromJson(data);
-        //Used in ng-style to change CSS parameters. Used to place the cover photo in the sidebar.
-        $scope.coverPhotoCSS = "linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.6)), url("+data.customer_cover_photo+")";
-        //Used in ng-style to change CSS parameters. Used to place the profile picture in the sidebar.
-        $scope.profilePictureCSS =  "url("+data.customer_profile_pic+")";
+            $scope.loggedInUserProfileData = angular.fromJson(data);
+            //Used in ng-style to change CSS parameters. Used to place the cover photo in the sidebar.
+            $scope.coverPhotoCSS = "linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.6)), url("+data.customer_cover_photo+")";
+            //Used in ng-style to change CSS parameters. Used to place the profile picture in the sidebar.
+            $scope.profilePictureCSS =  "url("+data.customer_profile_pic+")";
 
-    }).error(function (err) {
-        console.log(err);
+        }).error(function (err) {
+            console.log(err);
 
+        });
     });
-
     $scope.goToMyEvents = function (customer_username) {
 
         sharedDataService.set(customer_username);

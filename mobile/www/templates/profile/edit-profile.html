@@ -32,31 +32,29 @@
                 <span class="input-label">Bio</span>
                 <textarea rows="5" ng-model="bio"></textarea>
             </label>
-            <div class="item">
-                <button class="button button-block button-positive">
-                    Edit
-                </button>
-            </div>
+
         </div>
         <div class="card">
             <div class="item item-body">
-                <img class="full-image" ng-src="{{ coverPhoto }}">
+                <img class="full-image" ng-src="{{ profilePic }}" id="preview">
             </div>
             <div class="item">
-                <button class="button button-block button-positive">
-                    Change Cover
-                </button>
-            </div>
-        </div>
-        <div class="card">
-            <div class="item item-body">
-                <img class="full-image" ng-src="{{ profilePic }}">
-            </div>
-            <div class="item">
-                <button class="button button-block button-positive">
+                <button class="button button-block button-positive" ng-click="takePicture()">
                     Change Profile
                 </button>
             </div>
+        </div>
+
+        <div style="display: none;">
+            <div>
+                <canvas id="myCanvas"/>
+            </div>
+        </div>
+
+        <div class="item">
+            <button class="button button-block button-positive" ng-click="uploadToImgurTest()">
+                Edit
+            </button>
         </div>
     </ion-content>
 </ion-view>

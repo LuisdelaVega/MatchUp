@@ -36,7 +36,7 @@
                 <button class="button button-block" ng-click="takePicture()">
                     Picture
                 </button>
-                <div class="item item-body">
+                <div class="item item-body" ng-if="picturetaken">
                     <img class="full-image" ng-src="{{imageURL}}">
                 </div>
             </div>

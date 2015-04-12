@@ -14,29 +14,29 @@
         <div class="list list-inset">
             <label class="item item-input">
                 <span class="input-label">Username</span>
-                <input type="text">
+                <input type="text" ng-model="newAccount.username">
             </label>
             <label class="item item-input">
                 <span class="input-label">Email</span>
-                <input type="text">
+                <input type="text" ng-model="newAccount.email">
             </label>
             <label class="item item-input">
                 <span class="input-label">First Name</span>
-                <input type="text">
+                <input type="text" ng-model="newAccount.firstName">
             </label>
             <label class="item item-input">
                 <span class="input-label">Last Name</span>
-                <input type="text">
+                <input type="text" ng-model="newAccount.lastName">
             </label>
             <label class="item item-input">
                 <span class="input-label">Tag</span>
-                <input type="text">
+                <input type="text" ng-model="newAccount.Tag">
             </label>
             <label class="item item-input">
                 <span class="input-label">Password</span>
-                <input type="password">
+                <input type="password" ng-model="newAccount.password">
             </label>
-            <button class="button button-block button-positive" ui-sref="login">
+            <button class="button button-block button-positive" ng-click="createAccount()">
                 Create
             </button>
         </div>
