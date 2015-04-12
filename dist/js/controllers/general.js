@@ -197,6 +197,9 @@ function ($scope, $http, $state, $window, AuthenticationService, $rootScope) {
 
 myApp.controller('sidebarController', ['$scope', '$window', '$http', '$state', 'AuthenticationService',
 function ($scope, $window, $http, $state, AuthenticationService) {
+	
+	
+	
  	
  
 		$scope.goToSearch = function (query) {
