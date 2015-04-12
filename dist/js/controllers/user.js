@@ -47,14 +47,7 @@ myApp.controller('profileSummaryController', function ($scope, $state, $http, $s
 		$scope.userEvents = data;
 	});
 
-	//function for going into a page that will display all the teams the customer belongs to
-	$scope.goToTeams = function (username) {
-		$state.go("app.userTeams", {
-				"username": username
-			}) //
-
-	}
-
+	
 	//function for going into a page that will display all the organizations the customer belongs to
 	$scope.goToUserOrganizations = function (user) {
 		$state.go("app.userOrganizations", {
@@ -126,11 +119,7 @@ function ($scope, $http, $stateParams, $window, $state) {
 			console.log(status);
 		});
 
-		$scope.goToTeamsProfile = function (teamName) {
-			$state.go("app.teamProfile", {
-				"teamName": teamName
-			});
-		};
+
 
 }]);
 

@@ -117,8 +117,9 @@
 						</button>
 					</div>
 					<div class="btn-group" role="group" ng-if="eventInfo.is_organizer && !finished">
-						<button type="button" class="btn btn-primary" ui-sref="app.eventSettings">
+						<button type="button" class="btn btn-primary" ui-sref="app.eventSettings({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location })">
 							Settings
+                            
 						</button>
 					</div>
 				</div>
