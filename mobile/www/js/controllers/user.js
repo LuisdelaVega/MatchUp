@@ -220,7 +220,7 @@ myApp.controller('myMatchupViewController', ['$scope', '$http', '$stateParams', 
 
 }]);
 
-myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$window', 'Camera', function ($scope, $http, $stateParams, $window, Camera) {
+myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$window', '$cordovaCamera', function ($scope, $http, $stateParams, $window, $cordovaCamera) {
 
     $http.defaults.useXDomain = true;
     $http.defaults.headers.common['Authorization'] = 'Client-ID 44f5a38fc083775';
@@ -348,7 +348,7 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
                 //Call to upload image to imgur
                 $http.post('https://api.imgur.com/3/upload', {
                     "image": imgE64
-                } ).success(function (data) {
+                }).success(function (data) {
 
                     alert(data.data.link); //Here's the link
 
@@ -356,11 +356,9 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
                 error(function (err){
                     console.log("error in editProfileController");
                 });
-        }, function(err) {
-            // An error occured. Show a message to the user
-        });
+            }
+        })
     }
-
 }]);
 
 
