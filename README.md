@@ -1,14 +1,13 @@
 HOST: http://matchup.neptunolabs.com
 API: http://matchup.neptunolabs.com/api
 
-# MatchUp API
+# MatchUp
 MatchUp is an eSports management platform and social network for gaming enthusiast and event organizers.
 The system aims to solve the biggest problem that event organizers face when producing an eSports event, the lack of a unified management tool.
 
 # Search
-## Search All [/matchup/search/{parameter}]
 MatchUp provides a "Global Search". By global we mean you can search for Users, Events (divided into Live(ongoing), Past, Regular Upcoming, and Hosted Upcoming), Teams, Organizations, Games, Genres, and ... wait, that's it
-
+## Search MatchUp [/matchup/search/{parameter}]
 ### Search [GET]
 + Parameters
     + parameter (required, string, `uis d`) ... Whathever you want.
@@ -17,7 +16,7 @@ MatchUp provides a "Global Search". By global we mean you can search for Users, 
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -192,7 +191,7 @@ MatchUp provides a "Global Search". By global we mean you can search for Users, 
 
     + Headers
         
-            WWW-Authenticate: Basic realm=Authorization Required
+            WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
         
@@ -201,6 +200,15 @@ MatchUp provides a "Global Search". By global we mean you can search for Users, 
 # User Accounts
 These routes provide the necesary functionality to create a new account in MatchUp and to login to an existing account by providing a correct combination of username and password.
 MatchUp has it's own token session service. When a user succesfully logs into the system, they are provided a token. This token is required to access the rest of the MatchUp API.
+MatchUp's server makes use of tokens instead of sessions to be able for use with mobile devices (which don't have good support for cookies, i.e., cookie containers)
+
+To learn more about token services we recomend:
+
+http://jwt.io/
+
+https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41
+
+https://auth0.com/blog/2014/01/07/angularjs-authentication-with-cookies-vs-token/
 
 ## Create Account [/create/account]
 Create a new account in the system. After the account is created, the server will respond with a token that corresponds to that new account.
@@ -211,19 +219,19 @@ Create a new account in the system. After the account is created, the server wil
     + Body
 
             {
-                "username": "nyx",
-                "email": "nyx@gmail.com",
-                "firstname": "Nyx",
-                "lastname": "Assassin",
-                "tag": "Nyxnyxnyxnyxnyxnyx",
-                "password": "f0rNyX6473!"
+                "username": "apitest",
+                "email": "apitest@gmail.com",
+                "first_name": "Api",
+                "last_name": "Test",
+                "tag": "apitesttag",
+                "password": "apitest1!"
             }
                 
 
 + Response 201 (application/json; charset=utf-8)
         
         {
-            "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im55eCIsImlhdCI6MTQyNzU3OTQ3OX0.YTpzgwEVu3ckLDJQJSJq88XVcxocxqijtoOyhpY0WjQ"
+            "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFwaXRlc3QiLCJpYXQiOjE0Mjg0NTU1NTJ9.3wGxr60FeepcJmk6R7zcdm8zdWC_VbQegxlDQ-6uGMs"
         }
 
 + Response 400 (application/json; charset=utf-8)
@@ -245,7 +253,7 @@ Login to an existing account. If login is successful, the server will respond wi
 + Response 200 (application/json; charset=utf-8)
 
         {
-            "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c"
+            "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFwaXRlc3QiLCJpYXQiOjE0Mjg0NTU1NTJ9.3wGxr60FeepcJmk6R7zcdm8zdWC_VbQegxlDQ-6uGMs"
         }
 
 + Response 401 (text/html; charset=utf-8)
@@ -259,27 +267,27 @@ Login to an existing account. If login is successful, the server will respond wi
             Unauthorized
 
 ## My Profile [/matchup/profile]
-Show the information in your profile.
+Show your profile.
 
 ### Get my Profile [GET]
 + Request
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFwaXRlc3QiLCJpYXQiOjE0Mjg0NTU1NTJ9.3wGxr60FeepcJmk6R7zcdm8zdWC_VbQegxlDQ-6uGMs
 
 + Response 200 (application/json; charset=utf-8)
 
         {
-            "customer_username": "username1",
-            "customer_first_name": "First1",
-            "customer_last_name": "Last1",
-            "customer_tag": "tag1",
-            "customer_profile_pic": "http://neptunolabs.com/images/user.jpg",
+            "customer_username": "apitest",
+            "customer_first_name": "ApiEdit",
+            "customer_last_name": "TestEdit",
+            "customer_tag": "Api.Edit",
+            "customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
             "customer_cover_photo": "http://neptunolabs.com/images/cover.jpg",
-            "customer_bio": "Hi, I am First1, and I love to play video games!",
+            "customer_bio": "Hi, I am a test account",
             "customer_country": "Puerto Rico",
-            "email_address": "first1last1@gmail.com",
+            "customer_email": "apitestedit@gmail.com",
             "my_profile": true
         }
 
@@ -287,7 +295,41 @@ Show the information in your profile.
 
     + Headers
         
-            WWW-Authenticate: Basic realm=Authorization Required
+            WWW-Authenticate: Bearer realm=Authorization Required
+
+    + Body
+        
+            Unauthorized
+
+### Edit my Profile [PUT]
++ Request (application/json; charset=utf-8)
+
+    + Headers
+
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFwaXRlc3QiLCJpYXQiOjE0Mjg0NTU1NTJ9.3wGxr60FeepcJmk6R7zcdm8zdWC_VbQegxlDQ-6uGMs
+
+    + Body
+            
+            {
+              "first_name": "ApiEdit",
+              "last_name": "TestEdit",
+              "tag": "Api.Edit",
+              "profile_pic": "http://neptunolabs.com/images/luis.jpg",
+              "cover": "http://neptunolabs.com/images/cover.jpg",
+              "bio": "Hi, I am a test account",
+              "country": "Puerto Rico",
+              "email": "apitestedit@gmail.com"
+            }
+
++ Response 200 (text/html; charset=utf-8)
+
+        Your account has been updated
+
++ Response 401 (text/html; charset=utf-8)
+
+    + Headers
+        
+            WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
         
@@ -299,7 +341,7 @@ If a user wants to delete his account, the user must first remove his titles as 
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFwaXRlc3QiLCJpYXQiOjE0Mjg0NTU1NTJ9.3wGxr60FeepcJmk6R7zcdm8zdWC_VbQegxlDQ-6uGMs
 
 + Response 204
 
@@ -307,7 +349,7 @@ If a user wants to delete his account, the user must first remove his titles as 
 
     + Headers
         
-            WWW-Authenticate: Basic realm=Authorization Required
+            WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
         
@@ -317,40 +359,121 @@ If a user wants to delete his account, the user must first remove his titles as 
 
         Can't delete account. Still captain or owner
 
-## User Profiles [/matchup/profile/{username}]
-Show the information of a user's profile.
+## My Matchups [/matchup/profile/matchups{?state}]
+See what we did there? Matchups are the matches you have played, or will play, in Tournaments.
+This is serves as a quick way to know the matches that a user is scheduled to play, 
+or to see your historical triumphs against those who have opposed you.
 
-### Get Profile [GET]
-The my_profile parameter indicates whether or not the user requested it is looking at his own profile.
+### Get my Matchups [GET]
 + Parameters
-    + username (required, string, `test01`) ... The User's username.
-    
+    + state (optional, string) ... Indicates whether to look for past matchups or current matchups.
+
+        When value is not specified, or if the value isn't a valid one, the server will respond with the upcoming matchups
+        + Values
+            + `Upcoming`
+            + `Past`
+
 + Request
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InBhcGFsdWlzcmUiLCJpYXQiOjE0Mjg4MDEyMjd9.G8PuU2Lz4nDxM9TORIfRfX5eeTD-cv7CU9izCG0yGwY
 
 + Response 200 (application/json; charset=utf-8)
 
-        {
-            "customer_username": "username1",
-            "customer_first_name": "First1",
-            "customer_last_name": "Last1",
-            "customer_tag": "tag1",
-            "customer_profile_pic": "http://neptunolabs.com/images/user.jpg",
-            "customer_cover_photo": "http://neptunolabs.com/images/cover.jpg",
-            "customer_bio": "Hi, I am First1, and I love to play video games!",
-            "customer_country": "Puerto Rico",
-            "email_address": "first1last1@gmail.com",
-            "my_profile": false
-        }
+        [
+            {
+                "event_name": "Event 01",
+                "event_start_date": "2015-03-25T13:00:00.000Z",
+                "event_location": "miradero",
+                "tournament_name": "Mortal Kombat X Qualifiers",
+                "round_number": 1,
+                "round_of": "Group",
+                "match_number": 1,
+                "is_team_based": false,
+                "details":
+                [
+                    {
+                        "customer_tag": "FZN.PaPa",
+                        "customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+                        "score": 1
+                    },
+                    {
+                        "customer_tag": "rapol",
+                        "customer_profile_pic": "http://neptunolabs.com/images/rafa.jpg",
+                        "score": 0
+                    }
+                ]
+            },
+            {
+                "event_name": "Event 01",
+                "event_start_date": "2015-03-25T13:00:00.000Z",
+                "event_location": "miradero",
+                "tournament_name": "Mortal Kombat X Qualifiers",
+                "round_number": 3,
+                "round_of": "Group",
+                "match_number": 1,
+                "is_team_based": false,
+                "details":
+                [
+                    {
+                        "customer_tag": "FZN.PaPa",
+                        "customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+                        "score": null
+                    },
+                    {
+                        "customer_tag": "samdlt",
+                        "customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+                        "score": null
+                    }
+                ]
+            }
+        ]
 
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
         
-            WWW-Authenticate: Basic realm=Authorization Required
+            WWW-Authenticate: Bearer realm=Authorization Required
+
+    + Body
+        
+            Unauthorized
+
+## User Profiles [/matchup/profile/{username}]
+Show the information of a specific User's profile.
+
+### Get Profile [GET]
+The my_profile parameter indicates whether or not the user requested it is looking at his own profile.
++ Parameters
+    + username (required, string, `apitest`) ... The User's username.
+    
++ Request
+
+    + Headers
+
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFwaXRlc3QiLCJpYXQiOjE0Mjg0NTU1NTJ9.3wGxr60FeepcJmk6R7zcdm8zdWC_VbQegxlDQ-6uGMs
+
++ Response 200 (application/json; charset=utf-8)
+
+            {
+                "customer_username": "apitest",
+                "customer_first_name": "ApiEdit",
+                "customer_last_name": "TestEdit",
+                "customer_tag": "Api.Edit",
+                "customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+                "customer_cover_photo": "http://neptunolabs.com/images/cover.jpg",
+                "customer_bio": "Hi, I am a test account",
+                "customer_country": "Puerto Rico",
+                "customer_email": "apitestedit@gmail.com",
+                "my_profile": true
+            }
+
++ Response 401 (text/html; charset=utf-8)
+
+    + Headers
+        
+            WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
         
@@ -358,27 +481,27 @@ The my_profile parameter indicates whether or not the user requested it is looki
 
 + Response 404 (text/html; charset=utf-8)
 
-        User: username1 was not not found
+        User: apitest was not not found
 
 ### Subscribe [POST]
 + Parameters
-    + username (required, string, `test01`) ... The User's username.
+    + username (required, string, `apitest`) ... The User's username.
     
 + Request
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFwaXRlc3QiLCJpYXQiOjE0Mjg0NTU1NTJ9.3wGxr60FeepcJmk6R7zcdm8zdWC_VbQegxlDQ-6uGMs
 
 + Response 201 (text/html; charset=utf-8)
 
-        Subscribed to: username1
+        Subscribed to: apitest
 
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
         
-            WWW-Authenticate: Basic realm=Authorization Required
+            WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
         
@@ -390,18 +513,18 @@ The my_profile parameter indicates whether or not the user requested it is looki
 
 + Response 404 (text/html; charset=utf-8)
 
-        User: username1 was not not found
+        User: apitest was not not found
 
 ### Unsubscribe [DELETE]
-If a user requests to unsubscribe to another user to whom he/she is not subscribed, or if the other user doesn't exist, the server will still respond with a 204 but nothing will happen.
+If a User requests to unsubscribe from another User to whom he/she is not subscribed, or if the other User doesn't exist, the server will still respond with a 204 but nothing will happen.
 + Parameters
-    + username (required, string, `test01`) ... The User's username.
+    + username (required, string, `apitest`) ... The User's username.
     
 + Request
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFwaXRlc3QiLCJpYXQiOjE0Mjg0NTU1NTJ9.3wGxr60FeepcJmk6R7zcdm8zdWC_VbQegxlDQ-6uGMs
 
 + Response 204
 
@@ -409,24 +532,24 @@ If a user requests to unsubscribe to another user to whom he/she is not subscrib
 
     + Headers
         
-            WWW-Authenticate: Basic realm=Authorization Required
+            WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
         
             Unauthorized
 
 ## Teams [/matchup/profile/{username}/teams]
-Get the teams for which a user competes.
+Get the teams for which a specific User competes.
 
 ### Get Teams [GET]
 + Parameters
-    + username (required, string, `test01`) ... The User's username.
+    + username (required, string, `ollidab`) ... The User's username.
     
 + Request
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFwaXRlc3QiLCJpYXQiOjE0Mjg0NTU1NTJ9.3wGxr60FeepcJmk6R7zcdm8zdWC_VbQegxlDQ-6uGMs
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -447,7 +570,7 @@ Get the teams for which a user competes.
 
     + Headers
         
-            WWW-Authenticate: Basic realm=Authorization Required
+            WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
         
@@ -455,20 +578,20 @@ Get the teams for which a user competes.
 
 + Response 404 (text/html; charset=utf-8)
 
-        User: username1 was not not found
+        User: ollidab was not not found
 
 ## Organizations [/matchup/profile/{username}/organizations]
-Get the Organizations that a user belongs to.
+Get the Organizations that a specific User belongs to.
 
 ### Get Organizations [GET]
 + Parameters
-    + username (required, string, `test01`) ... The User's username.
+    + username (required, string, `ollidab`) ... The User's username.
     
 + Request
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFwaXRlc3QiLCJpYXQiOjE0Mjg0NTU1NTJ9.3wGxr60FeepcJmk6R7zcdm8zdWC_VbQegxlDQ-6uGMs
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -489,7 +612,7 @@ Get the Organizations that a user belongs to.
 
     + Headers
         
-            WWW-Authenticate: Basic realm=Authorization Required
+            WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
         
@@ -497,20 +620,20 @@ Get the Organizations that a user belongs to.
 
 + Response 404 (text/html; charset=utf-8)
 
-        User: username1 was not not found
+        User: ollidab was not not found
 
 ## Events [/matchup/profile/{username}/events]
 Get the Events that a user has created.
 
 ### Get Events [GET]
 + Parameters
-    + username (required, string, `test01`) ... The User's username.
+    + username (required, string, `ollidab`) ... The User's username.
     
 + Request
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFwaXRlc3QiLCJpYXQiOjE0Mjg0NTU1NTJ9.3wGxr60FeepcJmk6R7zcdm8zdWC_VbQegxlDQ-6uGMs
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -545,7 +668,7 @@ Get the Events that a user has created.
 
     + Headers
         
-            WWW-Authenticate: Basic realm=Authorization Required
+            WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
         
@@ -553,14 +676,14 @@ Get the Events that a user has created.
 
 + Response 404 (text/html; charset=utf-8)
 
-        User: username1 was not not found
+        User: ollidab was not not found
 
 ## Events Registered [/matchup/profile/{username}/events/registered{?type}]
-Get the Events that a user has registered to spectate or to compete.
+Get the Events where a specific User has registered to spectate or to compete.
 
 ### Get Events [GET]
 + Parameters
-    + username (required, string, `test01`) ... The User's username.
+    + username (required, string, `ollidab`) ... The User's username.
     + type (required, string) ... The type of attendee the user yas for an Event.
         + Values
             + `spectator`
@@ -570,7 +693,7 @@ Get the Events that a user has registered to spectate or to compete.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFwaXRlc3QiLCJpYXQiOjE0Mjg0NTU1NTJ9.3wGxr60FeepcJmk6R7zcdm8zdWC_VbQegxlDQ-6uGMs
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -613,7 +736,7 @@ Get the Events that a user has registered to spectate or to compete.
 
     + Headers
         
-            WWW-Authenticate: Basic realm=Authorization Required
+            WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
         
@@ -621,7 +744,7 @@ Get the Events that a user has registered to spectate or to compete.
 
 + Response 404 (text/html; charset=utf-8)
 
-        User: username1 was not not found
+        User: ollidab was not not found
 
 ## Subscriptions [/matchup/profile/{username}/subscriptions]
 Get the subscriptions of a given user.
@@ -629,30 +752,37 @@ Get the subscriptions of a given user.
 ### Get Subscriptions [GET]
 The my_profile parameter indicates whether or not the user requested it is looking at his own profile.
 + Parameters
-    + username (required, string, `test01`) ... The User's username.
+    + username (required, string, `ollidab`) ... The User's username.
     
 + Request
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFwaXRlc3QiLCJpYXQiOjE0Mjg0NTU1NTJ9.3wGxr60FeepcJmk6R7zcdm8zdWC_VbQegxlDQ-6uGMs
 
 + Response 200 (application/json; charset=utf-8)
 
         [
             {
-                "customer_username": "username3",
-                "customer_first_name": "First3",
-                "customer_last_name": "Last3",
-                "customer_tag": "tag3",
-                "customer_profile_pic": "http://neptunolabs.com/images/username3.jpg"
+                "customer_username": "papaluisre",
+                "customer_first_name": "Luis",
+                "customer_last_name": "de la Vega",
+                "customer_tag": "papaluisre",
+                "customer_profile_pic": "http://neptunolabs.com/images/luis.jpg"
             },
             {
-                "customer_username": "username2",
-                "customer_first_name": "First2",
-                "customer_last_name": "Last2",
-                "customer_tag": "tag2",
-                "customer_profile_pic": "http://neptunolabs.com/images/username2.jpg"
+                "customer_username": "rapol",
+                "customer_first_name": "Rafael",
+                "customer_last_name": "Pol",
+                "customer_tag": "rapol",
+                "customer_profile_pic": "http://neptunolabs.com/images/rafa.jpg"
+            },
+            {
+                "customer_username": "samdlt",
+                "customer_first_name": "Sam",
+                "customer_last_name": "de la Torre",
+                "customer_tag": "samdlt",
+                "customer_profile_pic": "http://neptunolabs.com/images/sam.jpg"
             }
         ]
 
@@ -660,7 +790,7 @@ The my_profile parameter indicates whether or not the user requested it is looki
 
     + Headers
         
-            WWW-Authenticate: Basic realm=Authorization Required
+            WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
         
@@ -668,7 +798,7 @@ The my_profile parameter indicates whether or not the user requested it is looki
 
 + Response 404 (text/html; charset=utf-8)
 
-        User: username1 was not not found
+        User: ollidab was not not found
 
 # Organizations
 Organizations represent real world Companies/Organizations that would like to host eSports Events using MatchUp. Users can send a request to create an Organization.
@@ -683,7 +813,7 @@ Act on all Organizations in the system.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFwaXRlc3QiLCJpYXQiOjE0Mjg0NTU1NTJ9.3wGxr60FeepcJmk6R7zcdm8zdWC_VbQegxlDQ-6uGMs
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -705,18 +835,6 @@ Act on all Organizations in the system.
                 "organization_logo": "http://neptunolabs.com/images/matchup-logo.png",
                 "organization_bio": "This is a test organization from the people that brought you this application!",
                 "organization_cover_photo": "http://neptunolabs.com/images/logoPlain.png"
-            },
-            {
-                "organization_name": "Test Org 02",
-                "organization_logo": "http://neptunolabs.com/images/matchup-logo.png",
-                "organization_bio": "This is a test organization from the people that brought you this application!",
-                "organization_cover_photo": "http://neptunolabs.com/images/logoPlain.png"
-            },
-            {
-                "organization_name": "Test Org 03",
-                "organization_logo": "http://neptunolabs.com/images/matchup-logo.png",
-                "organization_bio": "This is a test organization from the people that brought you this application!",
-                "organization_cover_photo": "http://neptunolabs.com/images/logoPlain.png"
             }
         ]
 
@@ -735,7 +853,7 @@ Act on all Organizations in the system.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFwaXRlc3QiLCJpYXQiOjE0Mjg0NTU1NTJ9.3wGxr60FeepcJmk6R7zcdm8zdWC_VbQegxlDQ-6uGMs
 
     + Body
         
@@ -776,7 +894,7 @@ If the user that issued the request belongs to the Organization, the value for t
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -785,7 +903,7 @@ If the user that issued the request belongs to the Organization, the value for t
             "organization_logo": "http://neptunolabs.com/images/matchup-logo.png",
             "organization_bio": "This is the organization that brought you this application!",
             "organization_cover_photo": "http://neptunolabs.com/images/logoPlain.png",
-            "is_member": false
+            "is_member": true
         }
 
 + Response 401 (text/html; charset=utf-8)
@@ -810,14 +928,14 @@ If the user that issued the request belongs to the Organization, the value for t
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
     + Body
         
             {
-                "cover": "http://neptunolabs.com/images/someBanner.jpg",
-                "logo": "http://neptunolabs.com/images/someLogo.jpg",
-                "bio": "My Organizations bio",
+                "cover": "http://neptunolabs.com/images/logoPlain.png",
+                "logo": "http://neptunolabs.com/images/matchup-logo.png",
+                "bio": "This is an edited message for the organization that brought you this application!"
             }
 
 + Response 200 (application/json; charset=utf-8)
@@ -855,7 +973,7 @@ it will respond with a 204 but will not remove the Organization.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 204
 
@@ -881,25 +999,25 @@ When a member of the Organization is also an owner the value for the parameter "
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
         [
             {
-                "customer_username": "username1",
-                "customer_first_name": "First1",
-                "customer_last_name": "Last1",
-                "customer_tag": "tag1",
-                "customer_profile_pic": "http://neptunolabs.com/images/username1.jpg",
+                "customer_username": "ollidab",
+                "customer_first_name": "Edwin",
+                "customer_last_name": "Badillo",
+                "customer_tag": "ollidab",
+                "customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
                 "is_owner": true
             },
             {
-                "customer_username": "username2",
-                "customer_first_name": "First2",
-                "customer_last_name": "Last2",
-                "customer_tag": "tag2",
-                "customer_profile_pic": "http://neptunolabs.com/images/username2.jpg",
+                "customer_username": "rapol",
+                "customer_first_name": "Rafael",
+                "customer_last_name": "Pol",
+                "customer_tag": "rapol",
+                "customer_profile_pic": "http://neptunolabs.com/images/rafa.jpg",
                 "is_owner": false
             }
         ]
@@ -923,22 +1041,22 @@ Owners of an Organization may add (or promote) other members to their Organizati
 
 + Parameters
     + organization (required, string, `NeptunoLabs`) ... The name of the Organization.
-    + username (required, string, `test01`) ... The username of the member to be added.
-    + owner (optional, boolean, `true`) ... Indicate if the member to be added also owns the Organizaiton.
+    + username (required, string, `papaluisre`) ... The username of the User to be added.
+    + owner (optional, boolean, `true`) ... Indicate if the user to be added also owns the Organizaiton.
 
 + Request (application/json; charset=utf-8)
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (text/html; charset=utf-8)
 
-        User: test01 has been promoted
+        User: papaluisre has been promoted
 
 + Response 201 (text/html; charset=utf-8)
 
-        User: test01 has been added
+        User: papaluisre has been added
 
 + Response 400 (application/json; charset=utf-8)
 
@@ -962,7 +1080,7 @@ Owners of an Organization may add (or promote) other members to their Organizati
 
 + Response 404 (text/html; charset=utf-8)
 
-        Couldn't find user: test01
+        Couldn't find user: papaluisre
 
 ### Remove a Member [DELETE]
 Any member can remove another member from an Organization, exept for owners, only owners can remove other owners. You ca also remove yourself from an Organization. 
@@ -971,13 +1089,13 @@ Owners in this situation must promote another member and try again. Removing eve
 
 + Parameters
     + organization (required, string, `NeptunoLabs`) ... The name of the Organization.
-    + username (required, string, `test01`) ... The username of the member to be added.
+    + username (required, string, `papaluisre`) ... The username of the member to be added.
 
 + Request
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 204
 
@@ -1001,7 +1119,7 @@ Owners in this situation must promote another member and try again. Removing eve
 
 + Response 403 (text/html; charset=utf-8)
 
-        User: test01 is not a member of this Organization
+        User: papaluisre is not a member of this Organization
 
 + Response 403 (text/html; charset=utf-8)
 
@@ -1017,40 +1135,27 @@ Get all Events this Organization has hosted or is hosting.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
         [
-          {
-            "event_name": "Event 01",
-            "event_start_date": "2015-03-25T09:00:00.000Z",
-            "event_end_date": "2015-03-27T22:00:00.000Z",
-            "event_location": "miradero",
-            "event_venue": "Student Center 3rd Floor",
-            "event_logo": "http://neptunolabs.com/images/matchup-logo.png"
-          }, {
-            "event_name": "Event 03",
-            "event_start_date": "2015-03-27T09:00:00.000Z",
-            "event_end_date": "2015-05-27T09:00:00.000Z",
-            "event_location": "miradero",
-            "event_venue": "Colosseum",
-            "event_logo": "http://neptunolabs.com/images/matchup-logo.png"
-          }, {
-            "event_name": "Event 02",
-            "event_start_date": "2015-05-05T09:00:00.000Z",
-            "event_end_date": "2015-05-07T22:00:00.000Z",
-            "event_location": "miradero",
-            "event_venue": "Colosseum",
-            "event_logo": "http://neptunolabs.com/images/matchup-logo.png"
-          }, {
-            "event_name": "Event 06",
-            "event_start_date": "2015-10-29T09:00:00.000Z",
-            "event_end_date": "2015-10-22T22:00:00.000Z",
-            "event_location": "1234 Calle Paloma, Mayaguez, PR 00681-9042",
-            "event_venue": "Hilton Activity Room",
-            "event_logo": "http://neptunolabs.com/images/matchup-logo.png"
-          }
+            {
+                "event_name": "Event 07",
+                "event_location": "30 Easton Ave, New Brunswick, NJ",
+                "event_venue": "Hilton Activity Room",
+                "event_start_date": "2015-12-01T13:00:00.000Z",
+                "event_end_date": "2015-11-20T13:00:00.000Z",
+                "event_logo": "http://neptunolabs.com/images/matchup-logo.png"
+            },
+            {
+                "event_name": "First Test",
+                "event_location": "miradero",
+                "event_venue": "S-113",
+                "event_start_date": "2015-10-19T13:00:00.000Z",
+                "event_end_date": "2015-10-23T02:00:00.000Z",
+                "event_logo": "http://neptunolabs.com/images/matchup-logo.png"
+            }
         ]
 
 + Response 404 (text/html; charset=utf-8)
@@ -1068,7 +1173,7 @@ Act on all Teams in the system.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -1090,18 +1195,6 @@ Act on all Teams in the system.
                 "team_logo": "http://i.imgur.com/SlUSvZJ.png",
                 "team_bio": "This is a test team 04. It was used to test this application.",
                 "team_cover_photo": "http://neptunolabs.com/images/logoPlain.png"
-            },
-            {
-                "team_name": "test team 06",
-                "team_logo": "http://i.imgur.com/pQOXLUQ.png",
-                "team_bio": "This is a test team 06. It was used to test this application.",
-                "team_cover_photo": "http://neptunolabs.com/images/logoPlain.png"
-            },
-            {
-                "team_name": "test team 07",
-                "team_logo": "http://i.imgur.com/KIkVRFL.png",
-                "team_bio": "This is a test team 07. It was used to test this application.",
-                "team_cover_photo": "http://neptunolabs.com/images/logoPlain.png"
             }
         ]
 
@@ -1121,13 +1214,13 @@ When a Team is created, the user that issued the request autometically becomes i
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
     + Body
         
             {
-                "name": "My Team",
-                "bio": "We play for big money",
+                "name": "API Team",
+                "bio": "Test team for MatchUp's API",
                 "logo": "http://neptunolabs.com/images/matchup-logo.png",
                 "cover": "http://neptunolabs.com/images/logoPlain.png"
             }
@@ -1135,7 +1228,7 @@ When a Team is created, the user that issued the request autometically becomes i
 + Response 201 (application/json; charset=utf-8)
 
         {
-            "team_name": "My Team"
+            "team_name": "API Team"
         }
 
 + Response 400 (application/json; charset=utf-8)
@@ -1154,9 +1247,9 @@ When a Team is created, the user that issued the request autometically becomes i
         
             Unauthorized
 
-+ Response 404 (text/html; charset=utf-8)
++ Response 403 (text/html; charset=utf-8)
 
-        Couldn't find user: username1
+        Team: API Team already exists
 
 ## One Team [/matchup/teams/{team}]
 Act on a specific Team in the system.
@@ -1170,7 +1263,7 @@ If the user that issued the request belongs to the Team, the value for the param
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -1197,7 +1290,7 @@ If the user that issued the request belongs to the Team, the value for the param
         Couldn't find the team: NeptunoLabs
 
 ### Edit the details of a Team [PUT]
-When a user requests to edit a Tema where he/she is not a member, the server will respond with a 20 but no Teams will be updated.
+When a user requests to edit a Team where he/she is not a member, the server will respond with a 204 but no Teams will be updated.
 + Parameters
     + team (required, string, `NeptunoLabs`) ... The name of the Team.
 
@@ -1205,14 +1298,14 @@ When a user requests to edit a Tema where he/she is not a member, the server wil
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
     + Body
         
             {
-                "cover": "http://neptunolabs.com/images/someBanner.jpg",
-                "logo": "http://neptunolabs.com/images/someLogo.jpg",
-                "bio": "My Team bio",
+                "bio": "This is the edited bio for the team that brought you this application!",
+                "logo": "http://neptunolabs.com/images/matchup-logo.png",
+                "cover": "http://neptunolabs.com/images/logoPlain.png"
             }
 
 + Response 200 (application/json; charset=utf-8)
@@ -1236,8 +1329,7 @@ When a user requests to edit a Tema where he/she is not a member, the server wil
             Unauthorized
 
 ### Remove a Team [DELETE]
-This request doesn't respond with a 403 even though team captains are the only ones allowed to remove them. If this request is called by someone who isn't a captain or even a member of the Organization
-it will respond with a 204 but will not remove the Team.
+When someone other than the Team's captain requests to delete a Team the server will respond with a 204 but no Teams will be removed.
 
 + Parameters
     + team (required, string, `NeptunoLabs`) ... The name of the Team.
@@ -1246,7 +1338,7 @@ it will respond with a 204 but will not remove the Team.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 204
 
@@ -1272,25 +1364,25 @@ When a member of the Organization is also a captain the value for the parameter 
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
         [
             {
-                "customer_username": "username1",
-                "customer_first_name": "First1",
-                "customer_last_name": "Last1",
-                "customer_tag": "tag1",
-                "customer_profile_pic": "http://neptunolabs.com/images/username1.jpg",
+                "customer_username": "ollidab",
+                "customer_first_name": "Edwin",
+                "customer_last_name": "Badillo",
+                "customer_tag": "ollidab",
+                "customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
                 "is_captain": true
             },
             {
-                "customer_username": "username2",
-                "customer_first_name": "First2",
-                "customer_last_name": "Last2",
-                "customer_tag": "tag2",
-                "customer_profile_pic": "http://neptunolabs.com/images/username2.jpg",
+                "customer_username": "rapol",
+                "customer_first_name": "Rafael",
+                "customer_last_name": "Pol",
+                "customer_tag": "rapol",
+                "customer_profile_pic": "http://neptunolabs.com/images/rafa.jpg",
                 "is_captain": false
             }
         ]
@@ -1314,17 +1406,17 @@ Owners of an Organization may add (or promote) other members to their Organizati
 
 + Parameters
     + team (required, string, `NeptunoLabs`) ... The name of the Team.
-    + username (required, string, `test01`) ... The username of the member to be added.
+    + username (required, string, `papaluisre`) ... The username of the User to be added to the Team.
 
 + Request (application/json; charset=utf-8)
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 201 (text/html; charset=utf-8)
 
-        User: test01 has been added
+        User: papaluisre has been added
 
 + Response 400 (application/json; charset=utf-8)
 
@@ -1346,22 +1438,26 @@ Owners of an Organization may add (or promote) other members to their Organizati
 
         You are not a member of this team
 
++ Response 404 (text/html; charset=utf-8)
+
+        Couldn't find user: papaluisre
+
 ### Make Captain [PUT]
 Captains may resign to their title and assign it to another member of their Team
 
 + Parameters
     + team (required, string, `NeptunoLabs`) ... The name of the Team.
-    + username (required, string, `test01`) ... The username of the member to be added.
+    + username (required, string, `papaluisre`) ... The username of the future team captain.
 
 + Request (application/json; charset=utf-8)
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 201 (text/html; charset=utf-8)
 
-        User: test01 has been made captain
+        User: papaluisre has been made captain
 
 + Response 400 (application/json; charset=utf-8)
 
@@ -1381,7 +1477,7 @@ Captains may resign to their title and assign it to another member of their Team
 
 + Response 403 (text/html; charset=utf-8)
 
-        User: username1 is not a member of this NeptunoLabs
+        User: papaluisre is not a member of this NeptunoLabs
 
 + Response 403 (text/html; charset=utf-8)
 
@@ -1389,21 +1485,21 @@ Captains may resign to their title and assign it to another member of their Team
 
 + Response 404 (text/html; charset=utf-8)
 
-        Couldn't find user: test01
+        Couldn't find user: papaluisre
 
 ### Remove a Member [DELETE]
-Any member can remove another member from an Organization, exept for captains, no member can remove the team captain. You can also remove yourself from a Team, exept for captains. 
-Captains that try to remove themselves from their Teams can't do so unless they assign another member as captain of the Team. 
+Any member can remove another member from a Team, exept for captains, no member can remove the team captain. You can also remove yourself from a Team, exept if you're the captain.
+Captains that try to exit their Teams can't do so unless they assign the title of captain to another team member.
 
 + Parameters
     + team (required, string, `NeptunoLabs`) ... The name of the Team.
-    + username (required, string, `test01`) ... The username of the member to be added.
+    + username (required, string, `papaluisre`) ... The username of the member to be removed.
 
 + Request
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 204
 
@@ -1423,11 +1519,11 @@ Captains that try to remove themselves from their Teams can't do so unless they 
 
 + Response 403 (text/html; charset=utf-8)
 
-        User: test01 is not a member of NeptunoLabs
+        User: papaluisre is not a member of NeptunoLabs
 
 + Response 403 (text/html; charset=utf-8)
 
-        You can't remove user: username1
+        You can't remove user: papaluisre
 
 # Games/Genres
 MatchUp features eSport Events, and thus contains a list of video games to choose from. These games are also of a specific genre. When a Tournament is created it must specify which game is going to be played. 
@@ -1442,20 +1538,25 @@ Games will be ordered by popularity. Popularity indicates how many Tournaments h
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
         [
             {
-                "game_name": "Super Ultra Alpha Poverty Fighter X: Retro Edition",
-                "game_image": "http://neptunolabs.com/images/games/game1.png",
+                "game_name": "Project M",
+                "game_image": "http://neptunolabs.com/images/games/Project M.png",
                 "popularity": "4"
             },
             {
-                "game_name": "Defense of the Nexus",
-                "game_image": "http://neptunolabs.com/images/games/game2.jpg",
-                "popularity": "1"
+                "game_name": "Super Smash Bros. Melee",
+                "game_image": "http://neptunolabs.com/images/games/Super_Smash_Bros_Melee_box_art.png",
+                "popularity": "3"
+            },
+            {
+                "game_name": "Ultra Street Fighter IV",
+                "game_image": "http://neptunolabs.com/images/games/USF4.jpg",
+                "popularity": "2"
             }
         ]
 
@@ -1478,7 +1579,7 @@ Genres will be ordered by popularity. Popularity indicates how many Tournaments 
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -1510,43 +1611,58 @@ Events are the most important aspect of MatchUp. Users can create Events complet
 another in their favourite video games. Events may be hosted by Organizations. For now on, we'll call them Hosted Events when they are hosted by an Organization and Regular Events when not.
 Hosted Events have extra features like multiple Tournaments, featuring of Sponsors, etc.
 
-## All Events [/matchup/events{?type,filter,value,state,hosted}]
-Act on all Events in the system. Events can be serched and filtered by various fields.
+## All Events [/matchup/events{?type,filter,value,state,magnitude,online,hosted}]
+Act on all Events in the system.
 
 ### Get All Events [GET]
+The list of Events can be filtered by one or more parameters.
 + Parameters
     + type (optional, string) ... The type of Event.
-    
+
         Events can be created/organized by a single customer or can be hosted by an organization. Organizations represent any group of people or “real world organizations” that would like to host Events.
         If an Event isn't hosted by an Organization it is denominated as a Regular Event.
         + Values
             + `regular`
             + `hosted`
-            
+
     + filter (optional, string) ... Filter Events by the games that are played or by a genre of games.
-        
+
         Events are composed of Tournaments where players compete in a specific Game. These Games are of specific Genres. After setting the value for the filter, you should specify the value of the filter (see below).
         + Values
             + `game`
             + `genre`
-            
+
     + value (optional, string, `DOTA 2`) ... The value for the filter.
-        
+
         Look for Events with Tournamnets that feature a specific game or games from a specific genre. If the filter is set (i.e., game) and the value is not specified the result will be an empty array.
 
     + state (optional, string) ... Filter Events by their current state.
-        
+
         Indicate if the list of Events will show only ongoing Events, upcoming Events, or past Events.
         + Values
             + `live`
             + `past`
             + `upcoming`
 
+    + magnitude (optional, string) ... Filter Events by their magnitude.
+
+        + Values
+            + `local`
+            + `regional`
+            + `national`
+
+    + online (optional, boolean) ... Filter Events by how they are to be carried out.
+
+        Indicate if the list of Events will show only Events that are carried out online.
+        + Values
+            + `true`
+            + `false`
+
 + Request
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -1585,17 +1701,17 @@ Act on all Events in the system. Events can be serched and filtered by various f
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 ### Create a new Event [POST]
 + Parameters
     + hosted (optional, boolean) ... Specify if the Event will be hosted.
-    
+
         Events can be created/organized by a single customer or can be hosted by an organization.
         + Values
             + `true`
@@ -1605,20 +1721,20 @@ Act on all Events in the system. Events can be serched and filtered by various f
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
     + Body
         
             {
                 "event": {
                     "name": "Cool Name",
-                    "start_date": "20XX-11-11 12:34:56",
+                    "start_date": "2022-11-11 12:34:56",
                     "location": "Enterprise",
                     "venue": "Captain's Quarters",
                     "banner": "http://neptunolabs.com/images/someBanner.jpg",
                     "logo": "http://neptunolabs.com/images/someLogo.jpg",
-                    "end_date": "20XX-11-12 12:34:56",
-                    "registration_deadline": "20XX-11-10 12:34:56",
+                    "end_date": "2022-11-12 12:34:56",
+                    "registration_deadline": "2022-11-10 12:34:56",
                     "rules": "No touching of the hair or face... And THAT'S IT!",
                     "description": "Come and play video games for money!",
                     "deduction_fee": 25,
@@ -1627,12 +1743,12 @@ Act on all Events in the system. Events can be serched and filtered by various f
                 },
                 "tournament": [
                     {
-                        "name": "Super Ultra Alpha Poverty Fighter X: Retro Edition Qualifiers",
-                        "game": "Super Ultra Alpha Poverty Fighter X: Retro Edition",
+                        "name": "Ultra Street Fighter IV Qualifiers",
+                        "game": "Ultra Street Fighter IV",
                         "rules": "Where we're playing we don't need rules",
                         "teams": false,
-                        "start_date": "20XX-11-11 13:34:56",
-                        "deadline": "20XX-11-11 12:56:56",
+                        "start_date": "2022-11-11 13:34:56",
+                        "deadline": "2022-11-11 12:56:56",
                         "fee": 3.50,
                         "capacity": 25,
                         "seed_money": 322,
@@ -1658,14 +1774,14 @@ Act on all Events in the system. Events can be serched and filtered by various f
                         "available": 20
                     }
                 ],
-                "sponsors": ["Super Company", "eSports Sponsor", "Weird Organization"]
+                "sponsors": ["BANDI TECH"]
             }
 
 + Response 201 (application/json; charset=utf-8)
 
         {
             "name": "Cool Name",
-            "start_date": "20XX-11-11T12:34:56.000Z",
+            "start_date": "2022-11-11 12:34:56",
             "location": "Enterprise"
         }
 
@@ -1698,7 +1814,7 @@ Act on all Events in the system. Events can be serched and filtered by various f
         }
 
 ## One Event [/matchup/events/{event}{?date,location}]
-Act on a specific event in the system. 
+Act on a specific Event in the system. 
 Like in the real world, Events have names, a start date, and a location where it will be carried out. 
 These aspects of Events are used to find the details of a desired Event
 
@@ -1713,27 +1829,27 @@ If the user that issued the request belongs to the hosting Organization or creat
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
         {
-            "event_name": "Cool Name",
-            "event_start_date": "20XX-11-11 12:34:56",
-            "event_end_date": "20XX-11-12 12:34:56",
-            "event_location": "Enterprise",
-            "event_venue": "Captain's Quarters",
-            "event_banner": "http://neptunolabs.com/images/someBanner.jpg",
-            "event_logo": "http://neptunolabs.com/images/someLogo.jpg",
-            "event_registration_deadline": "20XX-11-10 12:34:56",
-            "event_rules": "No touching of the hair or face... And THAT'S IT!",
-            "event_description": "Come and play video games for money!",
-            "event_deduction_fee": 25,
+            "event_name": "Event 01",
+            "event_start_date": "2015-03-25T13:00:00.000Z",
+            "event_end_date": "2015-03-28T02:00:00.000Z",
+            "event_location": "miradero",
+            "event_venue": "Student Center 3rd Floor",
+            "event_banner": "http://neptunolabs.com/images/logoPlain.png",
+            "event_logo": "http://neptunolabs.com/images/matchup-logo.png",
+            "event_registration_deadline": "2015-03-23T13:00:00.000Z",
+            "event_rules": "These would be the rules for a test event.",
+            "event_description": "Event 01 event to make sure the SQL queries for the tournament bracket and groups are working correctly",
+            "event_deduction_fee": "2.00",
             "event_is_online": false,
-            "event_type": "National",
-            "creator": "lion-o",
+            "event_type": "Local",
+            "creator": "ollidab",
             "host": "NeptunoLabs",
-            "is_organizer": false
+            "is_organizer": true
         }
 
 + Response 400 (application/json; charset=utf-8)
@@ -1754,7 +1870,7 @@ If the user that issued the request belongs to the hosting Organization or creat
 
 + Response 404 (text/html; charset=utf-8)
 
-        Couldn't find the event: Cool Name starting on: 20XX-11-11 12:34:56 located at: Enterprise
+        Couldn't find the event: Event 01 starting on: 2015-03-25T13:00:00.000Z located at: miradero
 
 ### Add a Tournament [POST]
 Only Hosted Events may be able to feature more than one Tournament.
@@ -1767,25 +1883,25 @@ Only Hosted Events may be able to feature more than one Tournament.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
     + Body        
             
             {
-                "name": "Defense of the Nexus Qualifiers",
-                "game": "Defense of the Nexus",
-                "rules": "Where we're playing we don't need rules",
+                "name": "Dota 2 Qualifiers",
+                "rules": "Rules of the rules with rules comprised of rules",
                 "teams": true,
-                "start_date": "20XX-11-11 13:34:56",
-                "deadline": "20XX-11-11 12:56:56",
-                "fee": 3.50,
-                "capacity": 25,
-                "seed_money": 322,
+                "start_date": "2015-03-25 11:00:00",
+                "deadline": "2015-03-25 10:00:00",
+                "fee": "10.00",
+                "capacity": 32,
+                "seed_money": "100.00",
                 "type": "Single Stage",
-                "format": "Double Elimination",
+                "format": "Single Elimination",
                 "scoring": "Match",
                 "group_players": 0,
-                "group_winners": 0
+                "group_winners": 0,
+                "game": "Dota 2"
             }
 
 + Response 201 (application/json; charset=utf-8)
@@ -1799,18 +1915,20 @@ Only Hosted Events may be able to feature more than one Tournament.
             "tournament": "Another Cool Name! Wow!"
         }
 
-+ Response 400 (text/html; charset=utf-8)
++ Response 400 (application/json; charset=utf-8)
 
-        Invalid Date
+        {
+            "error" : "Incomplete or invalid parameters"
+        }
 
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 403 (text/html; charset=utf-8)
@@ -1827,19 +1945,19 @@ Only Hosted Events may be able to feature more than one Tournament.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
     + Body
         
             {
-                "name": "Cool Name",
-                "start_date": "20XX-11-11 12:34:56",
-                "location": "Enterprise",
+                "name": "Event 01",
+                "start_date": "2015-03-25T09:00:00.000Z",
+                "location": "miradero",
                 "venue": "Captain's Quarters",
-                "banner": "http://neptunolabs.com/images/someBanner.jpg",
-                "logo": "http://neptunolabs.com/images/someLogo.jpg",
-                "end_date": "20XX-11-12 12:34:56",
-                "registration_deadline": "20XX-11-10 12:34:56",
+                "banner": "http://neptunolabs.com/images/logoPlain.png",
+                "logo": "http://neptunolabs.com/images/matchup-logo.png",
+                "end_date": "2015-03-27T22:00:00.000Z",
+                "registration_deadline": "2015-03-23T09:00:00.000Z",
                 "rules": "No touching of the hair or face... And THAT'S IT!",
                 "description": "Come and play video games for money!",
                 "deduction_fee": 25,
@@ -1850,14 +1968,16 @@ Only Hosted Events may be able to feature more than one Tournament.
 + Response 200 (application/json; charset=utf-8)
 
         {
-            "name": "Cool Name",
-            "start_date": "20XX-11-11T12:34:56.000Z",
-            "location": "Enterprise"
+            "name": "Event 01",
+            "start_date": "2015-03-25T09:00:00.000Z",
+            "location": "miradero"
         }
 
-+ Response 400 (text/html; charset=utf-8)
++ Response 400 (application/json; charset=utf-8)
 
-        Invalid Date
+        {
+            "error" : "Incomplete or invalid parameters"
+        }
 
 + Response 401 (text/html; charset=utf-8)
 
@@ -1883,7 +2003,7 @@ Only Hosted Events may be able to feature more than one Tournament.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 204
 
@@ -1903,7 +2023,7 @@ Only Hosted Events may be able to feature more than one Tournament.
 
 + Response 403 (text/html; charset=utf-8)
 
-        You can't delete this tournament
+        You can't delete this event
 
 # Spectators
 Like in all types of sports activities, the fans are the real MVPs. A user can sign up to spectate Hosted Events to watch and cheer the competitors from the sidelines.
@@ -1921,7 +2041,7 @@ Act on all attendees of an Event that payed a spectator fee.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -1978,13 +2098,13 @@ already in the Event.
     + event (required, string, `Event 01`) ... The name of the Event.
     + date (required, string, `2015-03-25T09:00:00.000Z`) ... The start date of the Event.
     + location (required, string, `miradero`) ... The location of the Event.
-    + username (required, string, `test02`) ... The spectators username
+    + username (required, string, `test02`) ... The spectators username.
 
 + Request
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (text/html; charset=utf-8)
         
@@ -2024,7 +2144,7 @@ Act on all News posted for an Event.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -2032,26 +2152,31 @@ Act on all News posted for an Event.
             {
                 "news_number": 5,
                 "news_title": "Test News 05",
+                "news_content": "I am gonna keep my word, this was the last one",
                 "news_date_posted": "2015-03-27T11:00:00.000Z"
             },
             {
                 "news_number": 4,
                 "news_title": "Test News 04",
+                "news_content": "Do not worry just one more of these and i will stop",
                 "news_date_posted": "2015-03-27T10:00:00.000Z"
             },
             {
                 "news_number": 3,
                 "news_title": "Test News 03",
+                "news_content": "Here we go again, just making sure everything is right with the world",
                 "news_date_posted": "2015-03-27T09:00:00.000Z"
             },
             {
                 "news_number": 2,
                 "news_title": "Test News 02",
+                "news_content": "This is a second news test, just making sure everything is right with the world",
                 "news_date_posted": "2015-03-27T08:00:00.000Z"
             },
             {
                 "news_number": 1,
                 "news_title": "Test News 01 Updated",
+                "news_content": "This message has been updated. :D So this is a news article. So I think I am gonna go ahead and do that.",
                 "news_date_posted": "2015-03-26T13:00:00.000Z"
             }
         ]
@@ -2080,7 +2205,7 @@ Act on all News posted for an Event.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
             
     + Body
             
@@ -2133,7 +2258,7 @@ Act on a single News posted for an Event.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -2169,11 +2294,18 @@ Act on a single News posted for an Event.
     + location (required, string, `miradero`) ... The location of the Event.
     + news (required, int, `5`) ... The numeric news id.
 
-+ Request
++ Request (application/json; charset=utf-8)
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
+
+    + Body
+
+            {
+                "title": "Test API News",
+                "content": "Hello Edited"
+            }
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -2216,7 +2348,7 @@ Act on a single News posted for an Event.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 204
 
@@ -2227,11 +2359,11 @@ Act on a single News posted for an Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 403 (text/html; charset=utf-8)
@@ -2254,42 +2386,45 @@ Act on all reviews for an Event.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
         [
             {
                 "review_title": "Greatest Test Event Ever!",
-                "star_rating": 4.5,
+                "review_content": "Best experience ever, if other events hosted by Neptuno Labs are like this then I am in",
+                "star_rating": 5,
                 "review_date_created": "2015-03-25T13:00:00.000Z",
-                "customer_username": "thecap2",
-                "customer_first_name": "Jean-Luc",
-                "customer_last_name": "Picard",
-                "customer_tag": "The Real Cap",
-                "customer_profile_pic": "http://neptunolabs.com/images/luc.png",
-                "is_writer": true
-            },
-            {
-                "review_title": "Best Test Event! No doubt!",
-                "star_rating": 2,
-                "review_date_created": "2015-03-25T13:00:00.000Z",
-                "customer_username": "thecap1",
-                "customer_first_name": "James",
-                "customer_last_name": "Kirk",
-                "customer_tag": "The Real Cap",
-                "customer_profile_pic": "http://neptunolabs.com/images/kirk.png",
+                "customer_username": "test01",
+                "customer_first_name": "Fletcher",
+                "customer_last_name": "Brook",
+                "customer_tag": "fbrook",
+                "customer_profile_pic": "http://i.imgur.com/pSTPtbA.png",
                 "is_writer": false
             },
             {
-                "review_title": "It was meh",
-                "star_rating": 5,
+                "review_title": "Lorem ipsum dolor sit amet!",
+                "review_content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce at lacus lacinia, pulvinar orci ac, elementum ligula. Donec gravida elementum tortor, vitae lacinia turpis finibus tincidunt. Suspendiss",
+                "star_rating": 1,
                 "review_date_created": "2015-03-25T13:00:00.000Z",
-                "customer_username": "thecap",
-                "customer_first_name": "Jonathan",
-                "customer_last_name": "Archer",
-                "customer_tag": "The Real Cap",
-                "customer_profile_pic": "http://neptunolabs.com/images/Archer.png",
+                "customer_username": "test10",
+                "customer_first_name": "Jolyon",
+                "customer_last_name": "Sempers",
+                "customer_tag": "sempers",
+                "customer_profile_pic": "http://i.imgur.com/rQvLZSZ.png",
+                "is_writer": false
+            },
+            {
+                "review_title": "Lorem ipsum dolor sit amet!",
+                "review_content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce at lacus lacinia, pulvinar orci ac, elementum ligula. Donec gravida elementum tortor, vitae lacinia turpis finibus tincidunt. Suspendiss",
+                "star_rating": 2,
+                "review_date_created": "2015-03-25T13:00:00.000Z",
+                "customer_username": "test04",
+                "customer_first_name": "Madlyn",
+                "customer_last_name": "Pris",
+                "customer_tag": "pris",
+                "customer_profile_pic": "http://i.imgur.com/ptNakXV.png",
                 "is_writer": false
             }
         ]
@@ -2297,11 +2432,11 @@ Act on all reviews for an Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 ### Create Review [POST]
@@ -2314,18 +2449,18 @@ Act on all reviews for an Event.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
-            
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InBhcGFsdWlzcmUiLCJpYXQiOjE0Mjg0NjE0OTd9.2zkt3AswHdGGPZibS2mPWe-FqsksSXAPGnM_dFX2pPI
+
     + Body
-            
+
             {
-                "title": "Mock Review",
-                "content": "Kapparino Cappuccino",
-                "rating": 3.5
+                "title": "Greatest Test Event Ever!",
+                "content": "Best experience ever, if other events hosted by Neptuno Labs are like this then I am in",
+                "rating": 3
             }
 
 + Response 201 (application/json; charset=utf-8)
-        
+
         {
             "event":
             {
@@ -2333,7 +2468,7 @@ Act on all reviews for an Event.
                 "date": "2015-03-25 09:00:00",
                 "location": "miradero"
             },
-            "username": "thecap1"
+            "username": "papaluisre"
         }
 
 + Response 400 (text/html; charset=utf-8)
@@ -2343,11 +2478,11 @@ Act on all reviews for an Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 403 (text/html; charset=utf-8)
@@ -2366,26 +2501,26 @@ Act on a single review for an Event.
     + event (required, string, `Event 01`) ... The name of the Event.
     + date (required, string, `2015-03-25T09:00:00.000Z`) ... The start date of the Event.
     + location (required, string, `miradero`) ... The location of the Event.
-    + username (required, string, ``) ... The username of the writer.
+    + username (required, string, `papaluisre`) ... The username of the writer.
 
 + Request
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InBhcGFsdWlzcmUiLCJpYXQiOjE0Mjg0NjE0OTd9.2zkt3AswHdGGPZibS2mPWe-FqsksSXAPGnM_dFX2pPI
 
 + Response 200 (application/json; charset=utf-8)
 
         {
             "review_title": "Greatest Test Event Ever!",
             "review_content": "Best experience ever, if other events hosted by Neptuno Labs are like this then I am in",
-            "star_rating": 4.5,
+            "star_rating": 3,
             "review_date_created": "2015-03-25T13:00:00.000Z",
-            "customer_username": "thecap2",
-            "customer_first_name": "Jean-Luc",
-            "customer_last_name": "Picard",
-            "customer_tag": "The Real Cap",
-            "customer_profile_pic": "http://neptunolabs.com/images/luc.png",
+            "customer_username": "papaluisre",
+            "customer_first_name": "Luis",
+            "customer_last_name": "de la Vega",
+            "customer_tag": "papaluisre",
+            "customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
             "is_writer": true
         }
 
@@ -2396,11 +2531,11 @@ Act on a single review for an Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 404 (text/html; charset=utf-8)
@@ -2414,11 +2549,19 @@ Act on a single review for an Event.
     + location (required, string, `miradero`) ... The location of the Event.
     + username (required, string, ``) ... The username of the writer.
 
-+ Request
++ Request (application/json; charset=utf-8)
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InBhcGFsdWlzcmUiLCJpYXQiOjE0Mjg0NjE0OTd9.2zkt3AswHdGGPZibS2mPWe-FqsksSXAPGnM_dFX2pPI
+
+    + Body
+
+            {
+                "title": "Greatest Test Event Ever!",
+                "content": "Best edited experience ever!",
+                "rating": 5
+            }
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -2439,11 +2582,11 @@ Act on a single review for an Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 403 (text/html; charset=utf-8)
@@ -2461,7 +2604,7 @@ Act on a single review for an Event.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InBhcGFsdWlzcmUiLCJpYXQiOjE0Mjg0NjE0OTd9.2zkt3AswHdGGPZibS2mPWe-FqsksSXAPGnM_dFX2pPI
 
 + Response 204
 
@@ -2472,11 +2615,11 @@ Act on a single review for an Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 403 (text/html; charset=utf-8)
@@ -2501,7 +2644,7 @@ Act on all Meetups for an Event.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InBhcGFsdWlzcmUiLCJpYXQiOjE0Mjg0NjE0OTd9.2zkt3AswHdGGPZibS2mPWe-FqsksSXAPGnM_dFX2pPI
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -2535,11 +2678,11 @@ Act on all Meetups for an Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 ### Create Meetup [POST]
@@ -2552,10 +2695,10 @@ Act on all Meetups for an Event.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
-            
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InBhcGFsdWlzcmUiLCJpYXQiOjE0Mjg0NjE0OTd9.2zkt3AswHdGGPZibS2mPWe-FqsksSXAPGnM_dFX2pPI
+
     + Body
-            
+
             {
                 "name": "Mock Meetup",
                 "location": "Mock Location",
@@ -2565,7 +2708,7 @@ Act on all Meetups for an Event.
             }
 
 + Response 201 (application/json; charset=utf-8)
-        
+
         {
             "event": {
                 "name": "Event 01",
@@ -2588,11 +2731,11 @@ Act on all Meetups for an Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 403 (text/html; charset=utf-8)
@@ -2603,33 +2746,34 @@ Act on all Meetups for an Event.
 Act on a single review for an Event.
 
 ### Get Meetup details [GET]
+When the User that created the meetup is the one that requested this route, the "is_organizer" parameter will be set true. Otherwise, false.
 + Parameters
     + event (required, string, `Event 01`) ... The name of the Event.
     + date (required, string, `2015-03-25T09:00:00.000Z`) ... The start date of the Event.
     + location (required, string, `miradero`) ... The location of the Event.
-    + username (required, string, ``) ... The username of the writer.
-    + meetup_date (required, string, ``) ... The username of the writer.
-    + meetup_location (required, string, ``) ... The username of the writer.
+    + username (required, string, `papaluisre`) ... The username of the writer.
+    + meetup_date (required, string, `2015-03-23 09:00:00`) ... The start date of the Meetup.
+    + meetup_location (required, string, `Mock Location`) ... The location of the Meetup.
 
 + Request
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InBhcGFsdWlzcmUiLCJpYXQiOjE0Mjg0NjE0OTd9.2zkt3AswHdGGPZibS2mPWe-FqsksSXAPGnM_dFX2pPI
 
 + Response 200 (application/json; charset=utf-8)
 
         {
             "meetup_name": "Mock Meetup",
-            "meetup_start_date": "2015-03-24T17:00:00.000Z",
-            "meetup_end_date": "2015-03-25T02:05:06.000Z",
-            "meetup_location": "Activity Room Carribe Hotel",
-            "meetup_description": "Practice Matches for the tournaments",
-            "customer_username": "thecap2",
-            "customer_first_name": "Jean-Luc",
-            "customer_last_name": "Picard",
-            "customer_tag": "The Real Cap",
-            "customer_profile_pic": "http://neptunolabs.com/images/luc.png",
+            "meetup_start_date": "2015-03-23T13:00:00.000Z",
+            "meetup_end_date": "2015-03-23T20:00:00.000Z",
+            "meetup_location": "Mock Location",
+            "meetup_description": "Kapparino Cappuccino",
+            "customer_username": "papaluisre",
+            "customer_first_name": "Luis",
+            "customer_last_name": "de la Vega",
+            "customer_tag": "papaluisre",
+            "customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
             "is_organizer": true
         }
 
@@ -2640,11 +2784,11 @@ Act on a single review for an Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 404 (text/html; charset=utf-8)
@@ -2656,15 +2800,25 @@ Act on a single review for an Event.
     + event (required, string, `Event 01`) ... The name of the Event.
     + date (required, string, `2015-03-25T09:00:00.000Z`) ... The start date of the Event.
     + location (required, string, `miradero`) ... The location of the Event.
-    + username (required, string, ``) ... The username of the writer.
-    + meetup_date (required, string, ``) ... The username of the writer.
-    + meetup_location (required, string, ``) ... The username of the writer.
+    + username (required, string, `papaluisre`) ... The username of the writer.
+    + meetup_date (required, string, `2015-03-23 09:00:00`) ... The username of the writer.
+    + meetup_location (required, string, `Mock Location`) ... The username of the writer.
 
-+ Request
++ Request (application/json; charset=utf-8)
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InBhcGFsdWlzcmUiLCJpYXQiOjE0Mjg0NjE0OTd9.2zkt3AswHdGGPZibS2mPWe-FqsksSXAPGnM_dFX2pPI
+
+    + Body
+
+            {
+                "name": "Mock Meetup",
+                "location": "Mock Location",
+                "start_date": "2015-03-23 09:00:00",
+                "end_date": "2015-03-23 16:00:00",
+                "description": "Edited description"
+            }
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -2685,11 +2839,11 @@ Act on a single review for an Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 403 (text/html; charset=utf-8)
@@ -2697,6 +2851,9 @@ Act on a single review for an Event.
         You can't update this review
 
 ### Delete Meetup [DELETE]
+Meetups can be removed by it creator, as well as by Organizers of the Event to which the Meetup is attached.
+This is due to the fact that for some reason, an Event organizer may not want he's/her Event to be associated to what is going on in some Meetup.
+
 + Parameters
     + event (required, string, `Event 01`) ... The name of the Event.
     + date (required, string, `2015-03-25T09:00:00.000Z`) ... The start date of the Event.
@@ -2709,7 +2866,7 @@ Act on a single review for an Event.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 204
 
@@ -2720,11 +2877,11 @@ Act on a single review for an Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 403 (text/html; charset=utf-8)
@@ -2745,7 +2902,7 @@ Act on all sponsors for an Event.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -2770,11 +2927,11 @@ Act on all sponsors for an Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 404 (text/html; charset=utf-8)
@@ -2784,12 +2941,19 @@ Act on all sponsors for an Event.
 ### Request Sponsor [POST]
 + Parameters
     + organization (required, string, `NeptunoLabs`) ... The name of the Organization.
-
+    
 + Request
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
+
+    + Body
+
+            {
+                "link": "http://neptunolabs.com/",
+                "description": "I want this sponsor"
+            }
 
 + Response 202 (text/html; charset=utf-8)
 
@@ -2798,11 +2962,11 @@ Act on all sponsors for an Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 403 (text/html; charset=utf-8)
@@ -2813,19 +2977,20 @@ Act on all sponsors for an Event.
 When someone who tries to delete a sponsor that is not attached to an Organization, the server will respond with a 204 but nothing will happen.
 + Parameters
     + organization (required, string, `NeptunoLabs`) ... The name of the Organization.
+    + sponsor (required, string, `See Puerto Rico`) ... The name of the Sponsor.
 
 + Request
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 204
 
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
@@ -2849,25 +3014,25 @@ Act on all sponsors for an Event.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
         [
             {
-                "sponsor_name": "Sponsor #1",
-                "sponsor_logo": "http://linktosponsor.com/logo.png",
-                "sponsor_link": "http://linktosponsor.com/"
+                "sponsor_name": "E-Sports PR",
+                "sponsor_logo": "http://esportspr.com/wp-content/uploads/2014/05/Esports-banner-2-tight-300x60.png",
+                "sponsor_link": "http://esportspr.com/"
             },
             {
-                "sponsor_name": "Sponsor #2",
-                "sponsor_logo": "http://linktosponsor.com/logo.png",
-                "sponsor_link": "http://linktosponsor.com/"
+                "sponsor_name": "See Puerto Rico",
+                "sponsor_logo": "http://neptunolabs.com/images/sponsors/Turismo-Logo.png",
+                "sponsor_link": "http://www.seepuertorico.com/"
             },
             {
-                "sponsor_name": "Sponsor #3",
-                "sponsor_logo": "http://linktosponsor.com/logo.png",
-                "sponsor_link": "http://linktosponsor.com/"
+                "sponsor_name": "American Petroleum",
+                "sponsor_logo": "http://neptunolabs.com/images/sponsors/American-Petroleum.png",
+                "sponsor_link": "http://www.americanpetroleumpr.com/"
             }
         ]
 
@@ -2878,11 +3043,11 @@ Act on all sponsors for an Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 404 (text/html; charset=utf-8)
@@ -2894,13 +3059,13 @@ Act on all sponsors for an Event.
     + event (required, string, `Event 01`) ... The name of the Event.
     + date (required, string, `2015-03-25T09:00:00.000Z`) ... The start date of the Event.
     + location (required, string, `miradero`) ... The location of the Event.
-    + sponsor (required, string, `Sponsor #2`) ... The name of the Sponsor.
+    + sponsor (required, string, `FIRST ATTACK`) ... The name of the Sponsor.
 
 + Request
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 201 (text/html; charset=utf-8)
 
@@ -2913,11 +3078,11 @@ Act on all sponsors for an Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 403 (text/html; charset=utf-8)
@@ -2933,13 +3098,13 @@ Act on all sponsors for an Event.
     + event (required, string, `Event 01`) ... The name of the Event.
     + date (required, string, `2015-03-25T09:00:00.000Z`) ... The start date of the Event.
     + location (required, string, `miradero`) ... The location of the Event.
-    + sponsor (required, string, `Sponsor #2`) ... The name of the Sponsor.
+    + sponsor (required, string, `FIRST ATTACK`) ... The name of the Sponsor.
 
 + Request
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 204
 
@@ -2950,7 +3115,7 @@ Act on all sponsors for an Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
@@ -2984,7 +3149,7 @@ Act on all stations of a Hosted Event.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -2992,7 +3157,7 @@ Act on all stations of a Hosted Event.
             {
                 "station_number": 1,
                 "station_in_use": false,
-                "stream_link": "http://www.streamserviceofchoice.tv/your_channel"
+                "stream_link": "http://www.twitch.tv/ollidab"
             },
             {
                 "station_number": 2,
@@ -3023,11 +3188,11 @@ Act on all stations of a Hosted Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 ### Add Station to Event [POST]
@@ -3040,11 +3205,18 @@ Act on all stations of a Hosted Event.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 201 (text/html; charset=utf-8)
 
-        Created new station
+        {
+            "event": {
+                "name": "Event 01",
+                "date": "2015-03-25T09:00:00.000Z",
+                "location": "miradero"
+            },
+            "number": 7
+        }
 
 + Response 400 (text/html; charset=utf-8)
 
@@ -3053,11 +3225,11 @@ Act on all stations of a Hosted Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 403 (text/html; charset=utf-8)
@@ -3075,7 +3247,7 @@ Act on all stations of a Hosted Event.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 204
 
@@ -3086,11 +3258,11 @@ Act on all stations of a Hosted Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 403 (text/html; charset=utf-8)
@@ -3111,14 +3283,14 @@ Act on a single station of a Hosted Event.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
         {
             "station_number": 4,
             "station_in_use": false,
-            "stream_link": "http://www.streamserviceofchoice.tv/your_channel"
+            "stream_link": "http://www.streamserviceofchoice.tv/your_channel",
             "tournaments": [
                 "Super Ultra Alpha Poverty Fighter X: Retro Edition Qualifiers", 
                 "Defense of the Nexus Qualifiers"
@@ -3132,11 +3304,11 @@ Act on a single station of a Hosted Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 ### Add Stream to Station [POST]
@@ -3151,7 +3323,7 @@ The link for the stream will be stored so that Organizers know what matches are/
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
     + Body
 
@@ -3159,9 +3331,16 @@ The link for the stream will be stored so that Organizers know what matches are/
                 "stream": "http://www.streamserviceofchoice.tv/your_channel"
             }
 
-+ Response 201 (text/html; charset=utf-8)
++ Response 201 (application/json; charset=utf-8)
 
-        Stream link: http://www.streamserviceofchoice.tv/your_channel added to Station #4
+        {
+            "event": {
+                "name": "Event 01",
+                "date": "2015-03-25T09:00:00.000Z",
+                "location": "miradero"
+            },
+            "number": 4
+        }
 
 + Response 400 (text/html; charset=utf-8)
 
@@ -3170,11 +3349,11 @@ The link for the stream will be stored so that Organizers know what matches are/
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 403 (text/html; charset=utf-8)
@@ -3192,7 +3371,7 @@ The link for the stream will be stored so that Organizers know what matches are/
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
     + Body
 
@@ -3200,9 +3379,16 @@ The link for the stream will be stored so that Organizers know what matches are/
                 "stream": "http://www.otherstreamserviceofchoice.tv/your_channel"
             }
 
-+ Response 200 (text/html; charset=utf-8)
++ Response 200 (application/json; charset=utf-8)
 
-        Changed the stream link to: http://www.otherstreamserviceofchoice.tv/your_channel on Station #4
+        {
+            "event": {
+                "name": "Event 01",
+                "date": "2015-03-25T09:00:00.000Z",
+                "location": "miradero"
+            },
+            "number": 4
+        }
 
 + Response 400 (text/html; charset=utf-8)
 
@@ -3211,11 +3397,11 @@ The link for the stream will be stored so that Organizers know what matches are/
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 403 (text/html; charset=utf-8)
@@ -3233,7 +3419,7 @@ The link for the stream will be stored so that Organizers know what matches are/
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 204
 
@@ -3244,11 +3430,11 @@ The link for the stream will be stored so that Organizers know what matches are/
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 403 (text/html; charset=utf-8)
@@ -3273,10 +3459,10 @@ Act on all Tournaments in a specific Event
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
-        
+
         [
             {
                 "tournament_name": "Super Ultra Alpha Poverty Fighter X: Retro Edition Qualifiers",
@@ -3321,11 +3507,11 @@ Act on all Tournaments in a specific Event
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 ## One Tournament [/matchup/events/{event}/tournaments/{tournament}{?date,location,station}]
@@ -3342,10 +3528,10 @@ Act on a single Tournament from an Event.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
-        
+
         {
             "tournament_name": "Super Ultra Alpha Poverty Fighter X: Retro Edition Qualifiers",
             "tournament_rules": "Rules of the rules with rules comprised of rules",
@@ -3371,11 +3557,11 @@ Act on a single Tournament from an Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 ### Attach Station [POST]
@@ -3390,11 +3576,11 @@ Act on a single Tournament from an Event.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 201 (text/html; charset=utf-8)
 
-        Attached Station #4 to Super Ultra Alpha Poverty Fighter X: Retro Edition Qualifiers
+        Attached Station #4 to Super Smash Bros. Melee Qualifiers
 
 + Response 400 (text/html; charset=utf-8)
 
@@ -3403,11 +3589,11 @@ Act on a single Tournament from an Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 403 (text/html; charset=utf-8)
@@ -3429,17 +3615,17 @@ Act on a single Tournament from an Event.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
     + Body
-        
+
             {
-                "name": "Defense of the Nexus Qualifiers",
-                "game": "Defense of the Nexus",
+                "name": "Super Smash Bros. Melee Qualifiers",
+                "game": "Super Smash Bros. Melee",
                 "rules": "Where we're playing we don't need rules",
-                "teams": true,
-                "start_date": "20XX-11-11 13:34:56",
-                "deadline": "20XX-11-11 12:56:56",
+                "teams": false,
+                "start_date": "2015-06-05 11:00:00",
+                "deadline": "2015-06-05 10:00:00",
                 "fee": 3.50,
                 "capacity": 25,
                 "seed_money": 322,
@@ -3470,11 +3656,11 @@ Act on a single Tournament from an Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 403 (text/html; charset=utf-8)
@@ -3492,7 +3678,7 @@ Act on a single Tournament from an Event.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 204
 
@@ -3503,16 +3689,59 @@ Act on a single Tournament from an Event.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 403 (text/html; charset=utf-8)
 
         You can't delete this tournament
+
+## Create Tournament [/matchup/events/{event}/tournaments/{tournament}/create{?date,location,station}]
+Tournaments may consist of one or two stages (a Group Stage and/or a final stage i.e., Single/Double Elimination Bracket or Round Robin).
+When the Organizer/s see fit to start a Tournament, they may ask MatchUp to create the stages.
+MatchUp wil then look for all checked-in competitors and do everything for you. Cool, huh?
+
+### Create Tournament Stages [POST]
++ Parameters
+    + event (required, string, `Event 01`) ... The name of the Event.
+    + date (required, string, `2015-03-25T09:00:00.000Z`) ... The start date of the Event.
+    + location (required, string, `miradero`) ... The location of the Event.
+    + tournament (required, string, `Super Smash Bros. Melee Qualifiers`) ... The name of the Tournament.
+
++ Request
+
+    + Headers
+
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
+
++ Response 201 (application/json; charset=utf-8)
+
+        {
+            "event": {
+                "name": "Cool Name",
+                "start_date": "20XX-11-11T12:34:56.000Z",
+                "location": "Enterprise"
+            },
+            "tournament": "Another Cool Name! Wow!"
+        }
+
++ Response 400 (text/html; charset=utf-8)
+
+        Invalid Date
+
++ Response 401 (text/html; charset=utf-8)
+
+    + Headers
+
+            WWW-Authenticate: Bearer realm=Authorization Required
+
+    + Body
+
+            Unauthorized
 
 ## Stations [/matchup/events/{event}/tournaments/{tournament}/stations{?date,location,station}]
 Act on all stations of a Tournament.
@@ -3528,7 +3757,7 @@ Act on all stations of a Tournament.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -3557,11 +3786,11 @@ Act on all stations of a Tournament.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 ### Detach Station [DELETE]
@@ -3576,7 +3805,7 @@ Act on all stations of a Tournament.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 204
 
@@ -3587,11 +3816,11 @@ Act on all stations of a Tournament.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 403 (text/html; charset=utf-8)
@@ -3615,7 +3844,7 @@ Act on all competitors of a Tournament.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (application/json; charset=utf-8)
 
@@ -3662,11 +3891,11 @@ Act on all competitors of a Tournament.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 ## One Competitor [/matchup/events/{event}/tournaments/{tournament}/competitors/{competitor}{?date,location}]
@@ -3684,10 +3913,10 @@ Act on a single competitor of a Tournament.
 
     + Headers
 
-            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QwMSIsImlhdCI6MTQyODA4OTI2OH0.5_ljyhOW2FgLhZ4x_y5XHOwJYSTYEql9dDrKugfsD-c
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
 
 + Response 200 (text/html; charset=utf-8)
-        
+
         Updated
 
 + Response 400 (text/html; charset=utf-8)
@@ -3697,13 +3926,70 @@ Act on a single competitor of a Tournament.
 + Response 401 (text/html; charset=utf-8)
 
     + Headers
-        
+
             WWW-Authenticate: Bearer realm=Authorization Required
 
     + Body
-        
+
             Unauthorized
 
 + Response 403 (text/html; charset=utf-8)
 
         You can't check-in people for this event
+
+## Score Reporting [/matchup/events/{event}/tournaments/{tournament}/rounds/{round}/matches/{match}/{set}{?date,location,round_of}]
+Submit the results of a Set.
+
+### Report Score [POST]
++ Parameters
+    + event (required, string, `Event 01`) ... The name of the Event.
+    + date (required, string, `2015-03-25T09:00:00.000Z`) ... The start date of the Event.
+    + location (required, string, `miradero`) ... The location of the Event.
+    + tournament (required, string, `Super Smash Bros. Melee Qualifiers`) ... The name of the Tournament.
+    + round_of (required, string, `Group`) ... Indicates where the round was/it to be played.
+
+        + Values
+            + `Group`
+            + `Winner`
+            + `Loser`
+            + `Round Robin`
+
++ Request
+
+    + Headers
+
+            Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6Im9sbGlkYWIiLCJpYXQiOjE0Mjg0NTY3NTF9.tvWGCFgqc7l199fWpEdq6mecsyoajU1wC-HEAB37PNY
+
+    + Body
+
+            {
+                "score": 1
+            }
+
++ Response 201 (text/html; charset=utf-8)
+
+        Score reported
+
++ Response 400 (text/html; charset=utf-8)
+
+        Invalid Date
+
++ Response 401 (text/html; charset=utf-8)
+
+    + Headers
+
+            WWW-Authenticate: Bearer realm=Authorization Required
+
+    + Body
+
+            Unauthorized
+
++ Response 403 (text/html; charset=utf-8)
+
+        You can't submit score
+
++ Response 403 (application/json; charset=utf-8)
+
+        {
+            "error": "Incomplete or invalid parameters"
+        }
