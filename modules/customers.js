@@ -46,6 +46,75 @@ var getUserProfile = function(req, res, pg, conString, log) {
 	});
 };
 
+function getDetailsForMatchup(res, pg, conString, log, client, done, matchup, index, length, myMatchups) {
+	var queryText = "";
+	if (matchup.is_team_based) {
+		queryText = "SELECT team.team_name, team.team_logo, sum(submits.score) AS score FROM team JOIN competes_for ON competes_for.team_name = team.team_name JOIN competes ON competes_for.event_name = competes.event_name AND competes_for.event_start_date = competes.event_start_date AND competes_for.event_location = competes.event_location AND competes_for.tournament_name = competes.tournament_name AND competes_for.competitor_number = competes.competitor_number LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND competes.match_number = $7 GROUP BY team.team_name, team.team_logo";
+	} else {
+		queryText = "SELECT customer.customer_tag, customer.customer_profile_pic, sum(submits.score) AS score FROM customer JOIN is_a ON is_a.customer_username = customer.customer_username JOIN competes ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND competes.match_number = $7 GROUP BY customer.customer_tag, customer.customer_profile_pic;";
+	}
+
+	var query = client.query({
+		text : queryText,
+		values : [matchup.event_name, matchup.event_start_date, matchup.event_location, matchup.tournament_name, matchup.round_number, matchup.round_of, matchup.match_number]
+	});
+	query.on("row", function(row, result) {
+		result.addRow(row);
+	});
+	query.on('error', function(error) {
+		done();
+		res.status(500).send(error);
+		log.info({
+			res : res
+		}, 'done response');
+	});
+	query.on("end", function(result) {
+		matchup.details = result.rows;
+		if (index == length) {
+			done();
+			res.status(200).send(myMatchups);
+		}
+	});
+}
+
+var getMatchups = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var queryText = "";
+		if (req.query.state === "Past") {
+			queryText = "SELECT match.event_name, match.event_start_date, match.event_location, match.tournament_name, match.round_number, match.round_of, match.match_number, tournament.is_team_based FROM match JOIN competes ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND match.round_number = competes.round_number AND match.round_of = competes.round_of AND match.match_number = competes.match_number JOIN is_a ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number JOIN tournament ON match.event_name = tournament.event_name AND match.event_start_date = tournament.event_start_date AND match.event_location = tournament.event_location AND match.tournament_name = tournament.tournament_name WHERE is_a.customer_username = $1 AND match.match_completed";
+		} else {
+			queryText = "SELECT match.event_name, match.event_start_date, match.event_location, match.tournament_name, match.round_number, match.round_of, match.match_number, tournament.is_team_based FROM match JOIN competes ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND match.round_number = competes.round_number AND match.round_of = competes.round_of AND match.match_number = competes.match_number JOIN is_a ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number JOIN tournament ON match.event_name = tournament.event_name AND match.event_start_date = tournament.event_start_date AND match.event_location = tournament.event_location AND match.tournament_name = tournament.tournament_name WHERE is_a.customer_username = $1 AND NOT match.match_completed;";
+		}
+
+		var query = client.query({
+			text : queryText,
+			values : [req.user.username]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			done();
+			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+		query.on("end", function(result) {
+			var myMatchups = result.rows;
+
+			var i = 0;
+			for ( i = 0; i < myMatchups.length; i++) {
+				getDetailsForMatchup(res, pg, conString, log, client, done, myMatchups[i], i, (myMatchups.length - 1), myMatchups);
+			}
+		});
+	});
+};
+
 var getSubscriptions = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -848,7 +917,7 @@ var createEvent = function(req, res, pg, conString, log) {
 									res : res
 								}, 'done response');
 							} else {
-								/* 
+								/*
 								 * We have to perform this part in another function.
 								 * This is because of node's asynchronous nature.
 								 * Before we add a Tournament to the Event we created, we must check if the game exists in our DB.
@@ -1001,3 +1070,4 @@ module.exports.getTeams = getTeams;
 module.exports.getOrganizations = getOrganizations;
 module.exports.getEvents = getEvents;
 module.exports.getRegisteredEvents = getRegisteredEvents;
+module.exports.getMatchups = getMatchups;

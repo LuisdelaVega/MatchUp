@@ -77,6 +77,10 @@ myApp.controller('profileSummaryController', function ($scope, $state, $http, $s
 	}
 
 
+	$scope.gotToEditProfile = function () {
+		sharedDataService.set($scope.profileData);
+		$state.go("app.editProfile");
+	}
 });
 
 //Controller used to display the Users Organizations page, manages data about the organizations a user belongs to.
@@ -160,3 +164,62 @@ function ($scope, $http, $stateParams, $window, $state) {
 
 
 }]);
+
+myApp.controller('editProfileController', ['$scope', '$http', '$state', 'sharedDataService', '$rootScope', '$window', function ($scope, $http, $state, sharedDataService, $rootScope, $window) {
+	$scope.user = sharedDataService.get();
+	// Check if data service is empty
+	if (Object.keys($scope.user).length == 0) {
+		$http.get($rootScope.baseURL + '/matchup/profile/' + $window.sessionStorage.username).success(function (data) {
+			$scope.user = data;
+		});
+	}
+
+	$scope.file_changed = function (element) {
+
+		var photofile = element.files[0];
+		var reader = new FileReader();
+		// Function fire everytime the file changes
+		reader.onload = function (e) {
+			var fd = new FormData();
+			fd.append("image", e.target.result.split(",")[1]);
+			fd.append("key", $rootScope.imgurKey);
+			var xhr = new XMLHttpRequest();
+			xhr.open("POST", "http://api.imgur.com/2/upload.json");
+			xhr.onload = function () {
+				// Apply changes to scope. Not a angular function it is needed
+				$scope.$apply(function () {
+					var link = JSON.parse(xhr.responseText).upload.links.original;					
+					//Check which image was changed
+					if (element.id == "cover") 
+						$scope.user.customer_cover_photo = link;
+					else 
+						$scope.user.customer_profile_pic = link;					
+				});
+			}
+			xhr.send(fd);
+
+		}
+		reader.readAsDataURL(photofile);
+	};
+
+	$scope.submitEditUser = function (valid) {
+		if (valid) {
+			var profile = {
+				"first_name": $scope.user.customer_first_name,
+				"last_name": $scope.user.customer_last_name,
+				"tag": $scope.user.customer_tag,
+				"profile_pic": $scope.user.customer_profile_pic,
+				"cover": $scope.user.customer_cover_photo,
+				"email": $scope.user.customer_email,
+				"country": $scope.user.customer_country,
+				"bio": $scope.user.customer_bio,
+			};
+			$http.put($rootScope.baseURL + "/matchup/profile", profile).success(function () {
+				$state.go("app.userProfile", {
+					"username": $window.sessionStorage.username
+				})
+			});
+		}
+	}
+
+	}]);

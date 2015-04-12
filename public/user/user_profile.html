@@ -21,7 +21,7 @@
 			</div>
 			<div class="row">
 				<div class="col-md-3 col-md-offset-9">
-					<a class="btn btn-primary btn-block box-margin" ui-sref="app.editProfile" ng-if="profileData.my_profile">Edit</a>
+					<a class="btn btn-primary btn-block box-margin" ng-click="gotToEditProfile()" ng-if="profileData.my_profile">Edit</a>
 				</div>
 			</div>
 			<div class="btn-group btn-group-justified box-margin" role="group" ng-if="!profileData.my_profile">
