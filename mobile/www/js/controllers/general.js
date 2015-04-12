@@ -332,7 +332,7 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
 
 }]);
 
-myApp.controller('cameraReportController', ['$scope', '$http', '$cordovaCamera', 'Camera', function ($scope, $http, $cordovaCamera) {
+myApp.controller('cameraReportController', ['$scope', '$http', '$cordovaCamera', '$ionicPlatform', function ($scope, $http, $cordovaCamera, $ionicPlatform) {
 
     //Used to determine whether camera is taken or not and display it if it is. 
     $scope.picturetaken = false;
@@ -351,11 +351,13 @@ myApp.controller('cameraReportController', ['$scope', '$http', '$cordovaCamera',
             saveToPhotoAlbum: false
         };
 
-        $cordovaCamera.getPicture(options).then(function(imageData) {
-            $scope.imageURL = imageURI;
-            $scope.picturetaken = true;
-        }, function(err) {
-            // An error occured. Show a message to the user
+        $ionicPlatform.ready(function() {
+            $cordovaCamera.getPicture(options).then(function(imageData) {
+                $scope.imageURL = imageURI;
+                $scope.picturetaken = true;
+            }, function(err) {
+                // An error occured. Show a message to the user
+            });
         });
     }
 }]);

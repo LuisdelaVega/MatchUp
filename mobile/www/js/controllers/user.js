@@ -220,7 +220,7 @@ myApp.controller('myMatchupViewController', ['$scope', '$http', '$stateParams', 
 
 }]);
 
-myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$window', '$cordovaCamera', function ($scope, $http, $stateParams, $window, $cordovaCamera) {
+myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$window', '$cordovaCamera', '$ionicPlatform', function ($scope, $http, $stateParams, $window, $cordovaCamera, $ionicPlatform) {
 
     $http.defaults.useXDomain = true;
     $http.defaults.headers.common['Authorization'] = 'Client-ID 44f5a38fc083775';
@@ -313,52 +313,55 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
             saveToPhotoAlbum: false
         };
 
-        $cordovaCamera.getPicture(options).then(function(imageData) {
-            $scope.profilePic = imageURI;
+        $ionicPlatform.ready(function() {
+            $cordovaCamera.getPicture(options).then(function(imageData) {
+                $scope.profilePic = imageURI;
 
-            var div = document.getElementById("preview"); //<img> containing image. called div to avoid calling it the same as img object
-            var c = document.getElementById("myCanvas"); //<canvas> where image will be drawn to obtain base64 encoding 
+                var div = document.getElementById("preview"); //<img> containing image. called div to avoid calling it the same as img object
+                var c = document.getElementById("myCanvas"); //<canvas> where image will be drawn to obtain base64 encoding 
 
-            var ctx = c.getContext("2d");
+                var ctx = c.getContext("2d");
 
-            var img = new Image();
+                var img = new Image();
 
-            //Avoids tainted canvas error
-            img.crossOrigin = 'Anonymous';
+                //Avoids tainted canvas error
+                img.crossOrigin = 'Anonymous';
 
-            //new img object contains the profile picture
-            img.src = $scope.profilePic;
+                //new img object contains the profile picture
+                img.src = $scope.profilePic;
 
-            //Wait until image is loaded. avoids sending blank images to the imgur api
-            img.onload = function(){
+                //Wait until image is loaded. avoids sending blank images to the imgur api
+                img.onload = function(){
 
-                //Set height and width of canvas to be equal to that of the image. This is so that the uploaded image is not cut off.
-                c.height = div.offsetHeight;
-                c.width  = div.offsetWidth;
+                    //Set height and width of canvas to be equal to that of the image. This is so that the uploaded image is not cut off.
+                    c.height = div.offsetHeight;
+                    c.width  = div.offsetWidth;
 
-                //Draw image to canvas
-                ctx.drawImage(img, 0, -50);
+                    //Draw image to canvas
+                    ctx.drawImage(img, 0, -50);
 
-                //Get base64 encoding of image. binary file containing image contents
-                var imgE64 = c.toDataURL();
+                    //Get base64 encoding of image. binary file containing image contents
+                    var imgE64 = c.toDataURL();
 
-                //Metadata -- imgur doesn't need this
-                imgE64 = imgE64.split(",")[1]
+                    //Metadata -- imgur doesn't need this
+                    imgE64 = imgE64.split(",")[1]
 
-                //Call to upload image to imgur
-                $http.post('https://api.imgur.com/3/upload', {
-                    "image": imgE64
-                }).success(function (data) {
+                    //Call to upload image to imgur
+                    $http.post('https://api.imgur.com/3/upload', {
+                        "image": imgE64
+                    }).success(function (data) {
 
-                    alert(data.data.link); //Here's the link
+                        alert(data.data.link); //Here's the link
 
-                }).
-                error(function (err){
-                    console.log("error in editProfileController");
-                });
-            }
-        })
+                    }).
+                    error(function (err){
+                        console.log("error in editProfileController");
+                    });
+                }
+            })
+        });
     }
+
 }]);
 
 
