@@ -332,26 +332,32 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
 
 }]);
 
-myApp.controller('cameraReportController', ['$scope', '$http', 'Camera', function ($scope, $http, Camera) {
+myApp.controller('cameraReportController', ['$scope', '$http', '$cordovaCamera', 'Camera', function ($scope, $http, $cordovaCamera) {
 
     //Used to determine whether camera is taken or not and display it if it is. 
     $scope.picturetaken = false;
 
     //Interacts with corresponding factory that calls on platform specific API (Android or iOS) to handle the taking of pictures
-    $scope.takePicture = function () {
-        console.log('Getting camera');
-        Camera.getPicture().then(function (imageURI) {
+    $scope.takePicture = function() {
+        var options = { 
+            quality : 75, 
+            destinationType : Camera.DestinationType.DATA_URL, 
+            sourceType : Camera.PictureSourceType.CAMERA, 
+            allowEdit : true,
+            encodingType: Camera.EncodingType.JPEG,
+            targetWidth: 300,
+            targetHeight: 300,
+            popoverOptions: CameraPopoverOptions,
+            saveToPhotoAlbum: false
+        };
+
+        $cordovaCamera.getPicture(options).then(function(imageData) {
             $scope.imageURL = imageURI;
             $scope.picturetaken = true;
-        }, function (err) {
-            console.err(err);
-        }, {
-            quality: 75,
-            targetWidth: 320,
-            targetHeight: 320,
-            saveToPhotoAlbum: false
+        }, function(err) {
+            // An error occured. Show a message to the user
         });
-    };
+    }
 }]);
 
 myApp.controller('popularGameViewController', ['$scope', '$http', '$state', 'sharedDataService', '$window', function ($scope, $http, $state, sharedDataService, $window) {

@@ -300,12 +300,22 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
 
     }
 
-    //Interacts with corresponding factory that calls on platform specific API (Android or iOS) to handle the taking of pictures
-    $scope.takePicture = function () {
-        Camera.getPicture( {sourceType : Camera.PictureSourceType.PHOTOLIBRARY} ).then(function (imageURI) {
+    $scope.takePicture = function() {
+        var options = { 
+            quality : 75, 
+            destinationType : Camera.DestinationType.DATA_URL, 
+            sourceType : Camera.PictureSourceType.PHOTOLIBRARY, 
+            allowEdit : true,
+            encodingType: Camera.EncodingType.JPEG,
+            targetWidth: 300,
+            targetHeight: 300,
+            popoverOptions: CameraPopoverOptions,
+            saveToPhotoAlbum: false
+        };
 
+        $cordovaCamera.getPicture(options).then(function(imageData) {
             $scope.profilePic = imageURI;
-            
+
             var div = document.getElementById("preview"); //<img> containing image. called div to avoid calling it the same as img object
             var c = document.getElementById("myCanvas"); //<canvas> where image will be drawn to obtain base64 encoding 
 
@@ -346,17 +356,10 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
                 error(function (err){
                     console.log("error in editProfileController");
                 });
-            }
-
-        }, function (err) {
-            console.err(err);
-        }, {
-            quality: 75,
-            targetWidth: 320,
-            targetHeight: 320,
-            saveToPhotoAlbum: false
+        }, function(err) {
+            // An error occured. Show a message to the user
         });
-    };
+    }
 
 }]);
 

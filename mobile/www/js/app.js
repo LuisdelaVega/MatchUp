@@ -1,5 +1,5 @@
 //Declare parent module. Module defines states and has within its parameters all the other js files containing the controllers.
-angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-events', 'user', 'team-organizations', 'genres', 'regular-events', 'events', 'game-profile', 'my-events', 'registered-events'])
+angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-events', 'user', 'team-organizations', 'genres', 'regular-events', 'events', 'game-profile', 'my-events', 'registered-events', 'ngCordova'])
 
     .run(function ($ionicPlatform) {
     $ionicPlatform.ready(function () {
