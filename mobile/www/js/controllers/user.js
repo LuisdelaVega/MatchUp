@@ -300,7 +300,7 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
 
                 $ionicLoading.show({
                     template: 'loading'
-                })
+                });
 
                 var config = {
                     headers: {
@@ -355,6 +355,10 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
                         'Authorization': "Bearer "+ $window.sessionStorage.token
                     }
                 };
+                
+                $ionicLoading.show({
+                    template: 'loading'
+                });
 
                 //Call to upload image to imgur
                 $http.post('https://api.imgur.com/3/upload', {
@@ -365,6 +369,7 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
 
                     $http.put('http://matchup.neptunolabs.com/matchup/profile', $scope.user, config).success(function (data) {
 
+                        $ionicLoading.hide();
                         $scope.editedCoverPhoto = true; //Displays message if succesfully updated cover photo
 
                     }).
