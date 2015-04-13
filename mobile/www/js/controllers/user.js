@@ -356,65 +356,35 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
 
         $ionicPlatform.ready(function() {
             $cordovaCamera.getPicture(options).then(function(imageData) {
-                $scope.user.cover = "data:image/jpeg;base64,"+imageData;
 
-                var div = document.getElementById("preview2"); //<img> containing image. called div to avoid calling it the same as img object
-                var c = document.getElementById("myCanvas"); //<canvas> where image will be drawn to obtain base64 encoding 
+                var config = {
+                    headers: {
+                        'Authorization': "Bearer "+ $window.sessionStorage.token
+                    }
+                };
 
-                var ctx = c.getContext("2d");
+                //Call to upload image to imgur
+                $http.post('https://api.imgur.com/3/upload', {
+                    "image": imageData
+                }).success(function (data) {
 
-                var img = new Image();
+                    $scope.user.cover = data.data.link; //Here's the link
 
-                //Avoids tainted canvas error
-                img.crossOrigin = 'Anonymous';
+                    $http.put('http://matchup.neptunolabs.com/matchup/profile', $scope.user, config).success(function (data) {
 
-                //new img object contains the profile picture
-                img.src = $scope.user.cover;
-
-                //Wait until image is loaded. avoids sending blank images to the imgur api
-                img.onload = function(){
-
-                    //Set height and width of canvas to be equal to that of the image. This is so that the uploaded image is not cut off.
-                    c.height = div.offsetHeight;
-                    c.width  = div.offsetWidth;
-
-                    //Draw image to canvas
-                    ctx.drawImage(img, 0, 0);
-
-                    //Get base64 encoding of image. binary file containing image contents
-                    var imgE64 = c.toDataURL();
-
-                    //Metadata -- imgur doesn't need this
-                    imgE64 = imgE64.split(",")[1]
-
-                    var config = {
-                        headers: {
-                            'Authorization': "Bearer "+ $window.sessionStorage.token
-                        }
-                    };
-
-                    //Call to upload image to imgur
-                    $http.post('https://api.imgur.com/3/upload', {
-                        "image": imgE64
-                    }).success(function (data) {
-
-                        $scope.user.cover = data.data.link; //Here's the link
-
-                        $http.put('http://matchup.neptunolabs.com/matchup/profile', $scope.user, config).success(function (data) {
-
-                            $scope.editedCoverPhoto = true; //Displays message if succesfully updated cover photo
-
-                        }).
-                        error(function (err){
-
-
-                        });
+                        $scope.editedCoverPhoto = true; //Displays message if succesfully updated cover photo
 
                     }).
                     error(function (err){
-                        console.log("error in editProfileController");
+
+
                     });
-                }
+
+                }).
+                error(function (err){
+                    console.log("error in editProfileController");
+                });
+
             })
         });
     }
