@@ -2,25 +2,25 @@
 	<div class="tab-pane fade in active" id="create-event-main-tab">
 		<div class="box">
 			<h2>Event</h2>
-			<form name="Form" novalidate>
+			<form name="Form">
 				<legend>General Info</legend>
 				<div class="form-group">
 					<label>Name: </label>
 					<input class="form-control" ng-model="event.name" name="name" required maxlength="127">
-					<span style="color:red" ng-show="Form.name.$dirty && Form.name.$invalid">
-<span ng-show="Form.name.$error.required">Event Name Required.</span>
-					</span>
 				</div>
 				<div class="row">
 					<div class="col-xs-12 col-md-6 col-lg-6">
 						<label>Hosted by: </label>
-						<select class="form-control" ng-model="event.host" ng-options="item.name for item in userOrganization" ng-init="event.host = userOrganization[0]">
+						<select class="form-control" ng-model="host" ng-options="item for item in userOrganization">
 						</select>
 					</div>
 					<div class="col-xs-12 col-md-6 col-lg-6">
 						<div class="form-group">
 							<label>Event Type: </label>
-							<select class="form-control" ng-model="event.type" ng-options="item.name for item in eventType" ng-init="event.type = eventType[0]">
+							<select class="form-control" ng-model="event.type" ng-init="event.type = 'Local'">
+								<option ng-value="Local">Local</option>
+								<option ng-value="Regional">Regional</option>
+								<option ng-value="National">National</option>
 							</select>
 						</div>
 					</div>
@@ -149,7 +149,7 @@
 				<div class="row box-margin">
 					<div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
 						<div class="form-group">
-							<label>Spectator Deduction Fee: </label>
+							<label>Deduction Fee: </label>
 							<div class="form-group input-group">
 								<span class="input-group-addon">%</span>
 								<input type="number" class="form-control" ng-model="event.deduction_fee" min="0" max="100">
@@ -223,7 +223,7 @@
 						<div class="form-group has-feedback">
 							<label class="control-label">Game</label>
 							<!-- 	TOOOOOOOOODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO   -->
-							<input type="text" class="form-control" placeholder="Search for Games" ng-model="tournament.game"/>
+							<input type="text" class="form-control" placeholder="Search for Games" ng-model="tournament.game" />
 							<i class="form-control-feedback glyphicon glyphicon-search"></i>
 						</div>
 					</div>
@@ -261,25 +261,20 @@
 					<textarea class="form-control" rows="4" ng-model="tournament.rules" maxlength="127"></textarea>
 				</div>
 				<div class="row">
-					<div class="col-xs-12 col-md-6 col-lg-6">
-						<label>Competitor Fee: </label>
-						<div class="form-group input-group">
-							<span class="input-group-addon">$</span>
-							<input type="text" class="form-control" ng-model="tournament.fee" valid-decimal>
+					<div ng-if="host != userOrganization[0]">
+						<div class="col-xs-12 col-md-6 col-lg-6">
+							<label>Competitor Fee: </label>
+							<div class="form-group input-group">
+								<span class="input-group-addon">$</span>
+								<input type="text" class="form-control" ng-model="tournament.fee" valid-decimal>
+							</div>
 						</div>
-					</div>
-					<div class="col-xs-12 col-md-6 col-lg-6">
-						<label>Seed Money: </label>
-						<div class="form-group input-group">
-							<span class="input-group-addon">$</span>
-							<input type="text" class="form-control" ng-model="tournament.seed_money" valid-input input-pattern="[^0-9]+">
-						</div>
-					</div>
-					<div class="col-xs-12 col-md-6 col-lg-6">
-						<label>Competitor Deduction Fee:</label>
-						<div class="form-group input-group">
-							<span class="input-group-addon">%</span>
-							<input type="text" class="form-control" ng-model="tournament.deduction_fee" valid-input input-pattern="[^0-9]+">
+						<div class="col-xs-12 col-md-6 col-lg-6">
+							<label>Seed Money: </label>
+							<div class="form-group input-group">
+								<span class="input-group-addon">$</span>
+								<input type="text" class="form-control" ng-model="tournament.seed_money" valid-input input-pattern="[^0-9]+">
+							</div>
 						</div>
 					</div>
 					<div class="col-xs-12 col-md-6 col-lg-6">
@@ -293,11 +288,11 @@
 				<label>Team based</label>
 				<div class="form-inline">
 					<div class="form-group">
-						<input type="radio" ng-model="tournament.teams" value="true" ng-init="tournament.teams='false'"> Yes
+						<input type="radio" ng-model="tournament.teams" ng-value="true" ng-init="tournament.teams=false"> Yes
 						<br>
-						<input type="radio" ng-model="tournament.teams" value="false"> No
+						<input type="radio" ng-model="tournament.teams" ng-value="false"> No
 					</div>
-					<div class="form-group" ng-show="tournament.teams == 'true'" style="margin-left:60px">
+					<div class="form-group" ng-show="tournament.teams == true" style="margin-left:60px">
 						<label>Team Size: </label>
 						<input class="form-control" type="number" ng-model="tournament.team_size" ng-init="tournament.team_size = 2">
 					</div>
@@ -306,12 +301,14 @@
 					<div class="col-xs-12 col-md-6 col-lg-6">
 						<div class="form-group">
 							<label>Tournament Type: </label>
-							<select class="form-control" ng-model="tournament.type" ng-options="item.name for item in tournamentType" ng-init="tournament.type = tournamentType[0]">
-						</select>
+							<select class="form-control" ng-model="tournament.type" ng-init="tournament.type = 'Single Stage'">
+								<option ng-value="'Single Stage'">Single Stage</option>
+								<option ng-value="'Two Stage'">Two Stage</option>
+							</select>
 						</div>
 					</div>
 				</div>
-				<div class="row" ng-show="tournament.type.name == 'Two Stage'">
+				<div class="row" ng-show="tournament.type == 'Two Stage'">
 					<div class="col-xs-12 col-md-6 col-lg-6">
 						<div class="form-group">
 							<label># of Competitors per Group: </label>
@@ -326,14 +323,19 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-xs-12 col-md-6 col-lg-6" ng-show="tournament.type.name == 'Single Stage'">
+					<div class="col-xs-12 col-md-6 col-lg-6" ng-show="tournament.type == 'Single Stage'">
 						<label>Tournament Format: </label>
-						<select class="form-control" ng-model="tournament.format" ng-options="item.name for item in tournamentFormat" ng-init="tournament.format = tournamentFormat[0]">
+						<select class="form-control" ng-model="tournament.format" ng-init="tournament.format = 'Single Elimination'">
+							<option ng-value="'Single Elimination'">Single Elimination</option>
+							<option ng-value="'Double Elimination'">Double Elimination</option>
+							<option ng-value="'Round Robin'">Round Robin</option>
 						</select>
 					</div>
-					<div class="col-xs-12 col-md-6 col-lg-6" ng-show="tournament.type.name == 'Two Stage'">
+					<div class="col-xs-12 col-md-6 col-lg-6" ng-show="tournament.type == 'Two Stage'">
 						<label>Final Stage: </label>
-						<select class="form-control" ng-model="tournament.format" ng-options="item.name for item in tournamentFormatTwo" ng-init="tournament.format = tournamentFormatTwo[0]">
+						<select class="form-control" ng-model="tournament.format" ng-init="tournament.format = 'Single Elimination'">
+							<option ng-value="'Single Elimination'">Single Elimination</option>
+							<option ng-value="'Double Elimination'">Double Elimination</option>
 						</select>
 					</div>
 				</div>
