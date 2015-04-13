@@ -1,0 +1,1108 @@
+<XMLDiagram>
+  <TDBADiagramController Locked="0">
+    <Elements>
+      <TDBADiagramObject id="1" propertiesclass="TDiagramMetaTableProperties" objectname="public.belongs_to">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="2460" top="1160" width="200" height="66"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="2" propertiesclass="TDiagramMetaTableProperties" objectname="public.capacity_for">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="1690" top="2680" width="200" height="108"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="3" propertiesclass="TDiagramMetaTableProperties" objectname="public.captain_for">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="1760" top="490" width="200" height="66"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="4" propertiesclass="TDiagramMetaTableProperties" objectname="public.competes">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="750" top="1730" width="200" height="150"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="5" propertiesclass="TDiagramMetaTableProperties" objectname="public.competes_for">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="1050" top="730" width="200" height="122"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="6" propertiesclass="TDiagramMetaTableProperties" objectname="public.competitor">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="1060" top="1020" width="200" height="209"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="7" propertiesclass="TDiagramForeignKeyProperties" objectname="public.competes.FK_competes_competitor">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="112" top="112" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="852" y="1804"/>
+                <Point x="1090" y="1160"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="8" propertiesclass="TDiagramForeignKeyProperties" objectname="public.competes_for.FK_competes_for_competitor">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="128" top="128" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1140" y="760"/>
+                <Point x="1140" y="1110"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="9" propertiesclass="TDiagramMetaTableProperties" objectname="public.competitor_goes_to">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="670" top="2740" width="200" height="192"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="10" propertiesclass="TDiagramMetaTableProperties" objectname="public.customer">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="2160" top="520" width="260" height="270"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="11" propertiesclass="TDiagramForeignKeyProperties" objectname="public.belongs_to.FK_belongs_to_customer">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="176" top="176" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="2590" y="1226"/>
+                <Point x="2360" y="710"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="12" propertiesclass="TDiagramForeignKeyProperties" objectname="public.captain_for.FK_captain_for_customer">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="192" top="192" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1880" y="510"/>
+                <Point x="2300" y="620"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="13" propertiesclass="TDiagramMetaTableProperties" objectname="public.event">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="2180" top="2310" width="270" height="280"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="14" propertiesclass="TDiagramForeignKeyProperties" objectname="public.event.FK_event_customer">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="224" top="224" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="2300" y="2450"/>
+                <Point x="2270" y="650"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="15" propertiesclass="TDiagramMetaTableProperties" objectname="public.game">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="1610" top="1780" width="200" height="69"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="16" propertiesclass="TDiagramMetaTableProperties" objectname="public.genre">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="1970" top="2150" width="200" height="69"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="21" propertiesclass="TDiagramMetaTableProperties" objectname="public.hosts">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="2520" top="1830" width="200" height="94"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="22" propertiesclass="TDiagramForeignKeyProperties" objectname="public.hosts.FK_hosts_event">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="352" top="352" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="2610" y="1880"/>
+                <Point x="2314" y="2449"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="23" propertiesclass="TDiagramMetaTableProperties" objectname="public.is_a">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="1600" top="880" width="200" height="122"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="24" propertiesclass="TDiagramForeignKeyProperties" objectname="public.is_a.FK_is_a_competitor">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="384" top="384" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1697" y="937"/>
+                <Point x="1162" y="1129"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="25" propertiesclass="TDiagramForeignKeyProperties" objectname="public.is_a.FK_is_a_customer">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="400" top="400" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1697" y="937"/>
+                <Point x="2291" y="651"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="26" propertiesclass="TDiagramMetaTableProperties" objectname="public.is_of">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="1790" top="1950" width="200" height="66"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="27" propertiesclass="TDiagramForeignKeyProperties" objectname="public.is_of.FK_is_of_game">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="432" top="432" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1892" y="1980"/>
+                <Point x="1711" y="1813"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="28" propertiesclass="TDiagramForeignKeyProperties" objectname="public.is_of.FK_is_of_genre">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="448" top="448" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1892" y="1980"/>
+                <Point x="2075" y="2183"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="29" propertiesclass="TDiagramMetaTableProperties" objectname="public.is_played_in">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="1160" top="2850" width="200" height="150"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="30" propertiesclass="TDiagramMetaTableProperties" objectname="public.match">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="660" top="2320" width="200" height="167"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="31" propertiesclass="TDiagramForeignKeyProperties" objectname="public.competes.FK_competes_match">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="496" top="496" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="852" y="1804"/>
+                <Point x="700" y="2320"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="32" propertiesclass="TDiagramForeignKeyProperties" objectname="public.competitor_goes_to.FK_competitor_goes_to_future_match">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="512" top="512" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="740" y="2820"/>
+                <Point x="730" y="2390"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="33" propertiesclass="TDiagramForeignKeyProperties" objectname="public.competitor_goes_to.FK_competitor_goes_to_past_match">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="528" top="528" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="780" y="2820"/>
+                <Point x="770" y="2420"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="35" propertiesclass="TDiagramForeignKeyProperties" objectname="public.is_played_in.FK_is_played_in_match">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="560" top="560" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1256" y="2924"/>
+                <Point x="764" y="2400"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="38" propertiesclass="TDiagramMetaTableProperties" objectname="public.news">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="2400" top="2840" width="200" height="139"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="39" propertiesclass="TDiagramForeignKeyProperties" objectname="public.news.FK_news_event">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="624" top="624" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="2505" y="2906"/>
+                <Point x="2314" y="2449"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="42" propertiesclass="TDiagramMetaTableProperties" objectname="public.organization">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="2660" top="1510" width="260" height="120"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="43" propertiesclass="TDiagramForeignKeyProperties" objectname="public.belongs_to.FK_belongs_to_organization">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="688" top="688" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="2560" y="1170"/>
+                <Point x="2750" y="1610"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="44" propertiesclass="TDiagramForeignKeyProperties" objectname="public.hosts.FK_hosts_organization">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="704" top="704" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="2590" y="1900"/>
+                <Point x="2740" y="1570"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="45" propertiesclass="TDiagramMetaTableProperties" objectname="public.owns">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="2610" top="1040" width="200" height="66"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="46" propertiesclass="TDiagramForeignKeyProperties" objectname="public.owns.FK_owns_customer">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="736" top="736" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="2700" y="1106"/>
+                <Point x="2360" y="570"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="47" propertiesclass="TDiagramForeignKeyProperties" objectname="public.owns.FK_owns_organization">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="752" top="752" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="2700" y="1106"/>
+                <Point x="2850" y="1530"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="48" propertiesclass="TDiagramMetaTableProperties" objectname="public.pays">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="3100" top="620" width="200" height="125"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="49" propertiesclass="TDiagramForeignKeyProperties" objectname="public.pays.FK_pays_customer">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="784" top="784" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="3200" y="686"/>
+                <Point x="2380" y="631"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="50" propertiesclass="TDiagramMetaTableProperties" objectname="public.plays_for">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="1760" top="640" width="200" height="66"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="51" propertiesclass="TDiagramForeignKeyProperties" objectname="public.plays_for.FK_plays_for_customer">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="816" top="816" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1858" y="671"/>
+                <Point x="2291" y="651"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="55" propertiesclass="TDiagramMetaTableProperties" objectname="public.report">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="310" top="2630" width="200" height="223"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="56" propertiesclass="TDiagramMetaTableProperties" objectname="public.request">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="2560" top="450" width="200" height="97"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="57" propertiesclass="TDiagramForeignKeyProperties" objectname="public.request.FK_request_customer">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="912" top="912" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="2659" y="497"/>
+                <Point x="2290" y="600"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="58" propertiesclass="TDiagramMetaTableProperties" objectname="public.review">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="2320" top="1550" width="200" height="167"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="59" propertiesclass="TDiagramForeignKeyProperties" objectname="public.review.FK_review_customer">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="944" top="944" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="2460" y="1670"/>
+                <Point x="2291" y="651"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="60" propertiesclass="TDiagramForeignKeyProperties" objectname="public.review.FK_review_event">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="960" top="960" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="2450" y="1630"/>
+                <Point x="2330" y="2410"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="61" propertiesclass="TDiagramMetaTableProperties" objectname="public.round">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="1130" top="2320" width="200" height="181"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="62" propertiesclass="TDiagramForeignKeyProperties" objectname="public.match.FK_match_round">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="992" top="992" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="764" y="2400"/>
+                <Point x="1235" y="2414"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="68" propertiesclass="TDiagramMetaTableProperties" objectname="public.spectator_fee">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="3100" top="2320" width="200" height="150"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="69" propertiesclass="TDiagramForeignKeyProperties" objectname="public.spectator_fee.FK_spectator_fee_event">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1104" top="1104" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="3150" y="2433"/>
+                <Point x="2310" y="2440"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="70" propertiesclass="TDiagramForeignKeyProperties" objectname="public.pays.FK_pays_spectator_fee">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1120" top="1120" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="3200" y="686"/>
+                <Point x="3197" y="2392"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="73" propertiesclass="TDiagramMetaTableProperties" objectname="public.station">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="1830" top="2940" width="200" height="111"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="74" propertiesclass="TDiagramForeignKeyProperties" objectname="public.station.FK_station_event">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1184" top="1184" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1930" y="2993"/>
+                <Point x="2314" y="2449"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="75" propertiesclass="TDiagramForeignKeyProperties" objectname="public.capacity_for.FK_capacity_for_station">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1200" top="1200" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1790" y="2738"/>
+                <Point x="1930" y="2993"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="76" propertiesclass="TDiagramForeignKeyProperties" objectname="public.is_played_in.FK_is_played_in_station">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1216" top="1216" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1256" y="2924"/>
+                <Point x="1930" y="2993"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="77" propertiesclass="TDiagramMetaTableProperties" objectname="public.stream">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="2090" top="3140" width="200" height="108"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="78" propertiesclass="TDiagramForeignKeyProperties" objectname="public.stream.FK_stream_station">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1248" top="1248" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="2190" y="3190"/>
+                <Point x="1940" y="2990"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="82" propertiesclass="TDiagramMetaTableProperties" objectname="public.subscribed_to">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="2190" top="340" width="200" height="66"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="83" propertiesclass="TDiagramForeignKeyProperties" objectname="public.subscribed_to.FK_subscribed_to_customer_interest">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1328" top="1328" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="2300" y="390"/>
+                <Point x="2300" y="640"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="84" propertiesclass="TDiagramForeignKeyProperties" objectname="public.subscribed_to.FK_subscribed_to_customer_subscriber">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1344" top="1344" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="2270" y="380"/>
+                <Point x="2270" y="650"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="85" propertiesclass="TDiagramMetaTableProperties" objectname="public.team">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="1410" top="560" width="200" height="111"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="86" propertiesclass="TDiagramForeignKeyProperties" objectname="public.captain_for.FK_captain_for_team">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1376" top="1376" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1890" y="510"/>
+                <Point x="1512" y="611"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="87" propertiesclass="TDiagramForeignKeyProperties" objectname="public.competes_for.FK_competes_for_team">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1392" top="1392" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1170" y="790"/>
+                <Point x="1520" y="620"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="88" propertiesclass="TDiagramForeignKeyProperties" objectname="public.plays_for.FK_plays_for_team_name">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1408" top="1408" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1820" y="680"/>
+                <Point x="1512" y="611"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="92" propertiesclass="TDiagramMetaTableProperties" objectname="public.tournament">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="1500" top="2280" width="200" height="279"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="93" propertiesclass="TDiagramForeignKeyProperties" objectname="public.tournament.FK_tournament_event">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1488" top="1488" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1598" y="2417"/>
+                <Point x="2310" y="2420"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="94" propertiesclass="TDiagramForeignKeyProperties" objectname="public.tournament.FK_tournament_game">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1504" top="1504" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1620" y="2320"/>
+                <Point x="1700" y="1810"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="95" propertiesclass="TDiagramForeignKeyProperties" objectname="public.capacity_for.FK_capacity_for_tournament">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1520" top="1520" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1790" y="2738"/>
+                <Point x="1598" y="2417"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="96" propertiesclass="TDiagramForeignKeyProperties" objectname="public.competitor.FK_competitor_tournament">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1536" top="1536" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1210" y="1130"/>
+                <Point x="1620" y="2380"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="97" propertiesclass="TDiagramForeignKeyProperties" objectname="public.round.FK_round_tournament">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1552" top="1552" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1235" y="2414"/>
+                <Point x="1598" y="2417"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="36" propertiesclass="TDiagramMetaTableProperties" objectname="public.meetup">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="1900" top="1190" width="200" height="167"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="37" propertiesclass="TDiagramForeignKeyProperties" objectname="public.meetup.FK_meetup_customer">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1456" top="1456" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1980" y="1270"/>
+                <Point x="2260" y="650"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="52" propertiesclass="TDiagramForeignKeyProperties" objectname="public.meetup.FK_meetup_event">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1472" top="1472" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="2000" y="1273"/>
+                <Point x="2320" y="2450"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="53" propertiesclass="TDiagramMetaTableProperties" objectname="public.to_play">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="1740" top="1490" width="200" height="122"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="54" propertiesclass="TDiagramForeignKeyProperties" objectname="public.to_play.FK_to_play_game">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1504" top="1504" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1840" y="1551"/>
+                <Point x="1710" y="1810"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="89" propertiesclass="TDiagramForeignKeyProperties" objectname="public.to_play.FK_to_play_meetup">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1520" top="1520" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1840" y="1551"/>
+                <Point x="2000" y="1270"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="66" propertiesclass="TDiagramMetaTableProperties" objectname="public.shows">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="2480" top="2230" width="200" height="94"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="67" propertiesclass="TDiagramForeignKeyProperties" objectname="public.shows.FK_shows_event">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1488" top="1488" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="2580" y="2277"/>
+                <Point x="2360" y="2500"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="71" propertiesclass="TDiagramMetaTableProperties" objectname="public.sponsors">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="2670" top="1990" width="200" height="83"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="72" propertiesclass="TDiagramForeignKeyProperties" objectname="public.shows.FK_shows_sponsor">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1520" top="1520" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="2580" y="2280"/>
+                <Point x="2770" y="2031"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="19" propertiesclass="TDiagramMetaTableProperties" objectname="public.group">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="1060" top="1800" width="200" height="108"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="34" propertiesclass="TDiagramForeignKeyProperties" objectname="public.group.FK_tournament_group">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1520" top="1520" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1160" y="1854"/>
+                <Point x="1600" y="2420"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="90" propertiesclass="TDiagramMetaTableProperties" objectname="public.is_in">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="1060" top="1470" width="200" height="122"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="91" propertiesclass="TDiagramForeignKeyProperties" objectname="public.is_in.FK_is_in_competitor">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1552" top="1552" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1150" y="1520"/>
+                <Point x="1160" y="1120"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="98" propertiesclass="TDiagramForeignKeyProperties" objectname="public.is_in.FK_is_in_group">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1568" top="1568" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1160" y="1531"/>
+                <Point x="1160" y="1850"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="17" propertiesclass="TDiagramMetaTableProperties" objectname="public.is_set">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="320" top="2060" width="200" height="167"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="18" propertiesclass="TDiagramForeignKeyProperties" objectname="public.is_set.FK_is_set_match">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1600" top="1600" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="420" y="2143"/>
+                <Point x="760" y="2400"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="20" propertiesclass="TDiagramForeignKeyProperties" objectname="public.report.FK_report_is_set">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1616" top="1616" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="410" y="2740"/>
+                <Point x="420" y="2143"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="79" propertiesclass="TDiagramMetaTableProperties" objectname="public.submits">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="570" top="1490" width="200" height="181"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="80" propertiesclass="TDiagramForeignKeyProperties" objectname="public.submits.FK_submits_competitor">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1616" top="1616" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="670" y="1580"/>
+                <Point x="1120" y="1050"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="102" propertiesclass="TDiagramForeignKeyProperties" objectname="public.submits.FK_submits_is_set">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1632" top="1632" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="670" y="1580"/>
+                <Point x="420" y="2140"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="63" propertiesclass="TDiagramMetaTableProperties" objectname="public.has_a">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="850" top="2070" width="200" height="167"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="64" propertiesclass="TDiagramForeignKeyProperties" objectname="public.has_a.FK_has_a_group">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1552" top="1552" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="950" y="2153"/>
+                <Point x="1160" y="1850"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="65" propertiesclass="TDiagramForeignKeyProperties" objectname="public.has_a.FK_has_a_match">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1568" top="1568" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="950" y="2153"/>
+                <Point x="760" y="2400"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="101" propertiesclass="TDiagramMetaTableProperties" objectname="public.request_sponsor">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="2930" top="1210" width="200" height="111"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="103" propertiesclass="TDiagramForeignKeyProperties" objectname="public.request_sponsor.FK_request_sponsor_organization">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1648" top="1648" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="3030" y="1265"/>
+                <Point x="2870" y="1580"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="81" propertiesclass="TDiagramMetaTableProperties" objectname="public.is_confirmed">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="2800" top="1770" width="200" height="83"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="99" propertiesclass="TDiagramForeignKeyProperties" objectname="public.is_confirmed.FK_comfirmed_organization">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1632" top="1632" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="2900" y="1811"/>
+                <Point x="2790" y="1570"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="100" propertiesclass="TDiagramForeignKeyProperties" objectname="public.is_confirmed.FK_comfirmed_sponsor">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1648" top="1648" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="2900" y="1811"/>
+                <Point x="2770" y="2030"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="41" propertiesclass="TDiagramMetaTableProperties" objectname="public.prize_distribution">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="1870" top="2490" width="200" height="97"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="104" propertiesclass="TDiagramForeignKeyProperties" objectname="public.tournament.FK_tournmanet_proze_distribution">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1664" top="1664" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1600" y="2420"/>
+                <Point x="1970" y="2538"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="40" propertiesclass="TDiagramMetaTableProperties" objectname="public.group_stage">
+        <TDiagramMetaTableProperties>
+          <Glyph>
+            <Geometry left="1220" top="2600" width="200" height="122"/>
+          </Glyph>
+        </TDiagramMetaTableProperties>
+      </TDBADiagramObject>
+      <TDBADiagramObject id="105" propertiesclass="TDiagramForeignKeyProperties" objectname="public.group_stage.FK_group_stage_tournament">
+        <TDiagramForeignKeyProperties>
+          <Relation>
+            <Geometry left="1680" top="1680" width="200" height="100"/>
+            <Glyph>
+              <Geometry>
+                <Point x="1320" y="2661"/>
+                <Point x="1600" y="2420"/>
+              </Geometry>
+            </Glyph>
+          </Relation>
+        </TDiagramForeignKeyProperties>
+      </TDBADiagramObject>
+    </Elements>
+    <Surface zoom="24.3200000000002" scrollx="0" scrolly="0"/>
+  </TDBADiagramController>
+</XMLDiagram>

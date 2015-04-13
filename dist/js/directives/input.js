@@ -1,4 +1,4 @@
-var myApp = angular.module('InputDirectives', [])
+var myApp = angular.module('InputDirectives', []);
 
 myApp.directive('validInput', function () {
 	return {
@@ -38,7 +38,7 @@ myApp.directive('validInput', function () {
 				}
 			});
 		}
-	}
+	};
 });
 
 myApp.directive('validDecimal', function () {
