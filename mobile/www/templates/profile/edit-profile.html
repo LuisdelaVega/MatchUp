@@ -1,6 +1,6 @@
 <ion-view view-title="Edit Profile">
     <ion-nav-buttons side="left">
-        <button class="button button-icon" ui-sref="app.profile.summary">
+        <button class="button button-icon" ui-sref="app.profile.summary({ username: user.username})">
             <i class="icon ion-ios-arrow-back"></i>
         </button>
     </ion-nav-buttons>
@@ -303,6 +303,9 @@
                     Change Profile Picture
                 </button>
             </div>
+            <div ng-if="editedProfilePic">
+                <p style="color: green">Succesfully edited profile picture</p>
+            </div>
         </div>
 
         <div class="card">
@@ -315,7 +318,7 @@
                 </button>
             </div>
             <div ng-if="editedCoverPhoto">
-                <p style="color: green">Succesfully edited profile info</p>
+                <p style="color: green">Succesfully edited cover photo</p>
             </div>
         </div>
 
