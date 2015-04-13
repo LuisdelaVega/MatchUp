@@ -342,7 +342,7 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
     }
 
     $scope.editedCoverPhoto = false;
-    
+
     $scope.changeCoverPhoto = function() {
         var options = { 
             quality : 75, 
@@ -386,6 +386,12 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
 
                     //Metadata -- imgur doesn't need this
                     imgE64 = imgE64.split(",")[1]
+
+                    var config = {
+                        headers: {
+                            'Authorization': "Bearer "+ $window.sessionStorage.token
+                        }
+                    };
 
                     //Call to upload image to imgur
                     $http.post('https://api.imgur.com/3/upload', {
