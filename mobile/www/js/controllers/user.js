@@ -315,7 +315,7 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
 
         $ionicPlatform.ready(function() {
             $cordovaCamera.getPicture(options).then(function(imageData) {
-                $scope.profilePic = imageURI;
+                $scope.profilePic = "data:image/jpeg;base64,"+imageData;
 
                 var div = document.getElementById("preview"); //<img> containing image. called div to avoid calling it the same as img object
                 var c = document.getElementById("myCanvas"); //<canvas> where image will be drawn to obtain base64 encoding 

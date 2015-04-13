@@ -348,12 +348,12 @@ myApp.controller('cameraReportController', ['$scope', '$http', '$cordovaCamera',
             targetWidth: 300,
             targetHeight: 300,
             popoverOptions: CameraPopoverOptions,
-            saveToPhotoAlbum: false
+            saveToPhotoAlbum: true
         };
 
         $ionicPlatform.ready(function() {
             $cordovaCamera.getPicture(options).then(function(imageData) {
-                $scope.imageURL = imageURI;
+                $scope.imageURL = "data:image/jpeg;base64,"+imageData;
                 $scope.picturetaken = true;
             }, function(err) {
                 // An error occured. Show a message to the user
