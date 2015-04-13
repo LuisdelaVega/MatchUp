@@ -103,9 +103,9 @@ myApp.controller("CreateEventController", function ($scope, $http, $window, $roo
 		var fee = {
 				"name": $scope.fee.name,
 				// Ticket amount
-				"available": $scope.fee.available,
+				"available": parseInt($scope.fee.available),
 				// Price
-				"amount": $scope.fee.amount,
+				"amount": parseFloat($scope.fee.amount),
 				"description": $scope.fee.description,
 			}
 			// Push fee
@@ -178,12 +178,13 @@ myApp.controller("CreateEventController", function ($scope, $http, $window, $roo
 			// Check if number of winners per group makes sense with respect
 			// to number of players per group
 			if (parseInt($scope.tournament.group_players) < parseInt($scope.tournament.group_winners)) {
-				alert("Competitors can be larger than participants per group");
+				alert("Competitors can not be larger than participants per group");
 				return;
 			}
-			if(parseInt($scope.tournament.capacity) < parseInt($scope.tournament.group_players))
+			if(parseInt($scope.tournament.capacity) < parseInt($scope.tournament.group_players)){
 				alert("Capacity can not be less than the number of players per group");
 				return;
+			}
 		} else {
 			// Init group stuff to zero if two stage is no selected
 			$scope.tournament.group_players = 0;
@@ -241,7 +242,7 @@ myApp.controller("CreateEventController", function ($scope, $http, $window, $roo
 			}
 			console.log(request);
 			$http.post($rootScope.baseURL + "/matchup/events", request).success(function (data) {
-				$scope.goToEvent($scope.event.name, $scope.event.start_date, $scope.event.location);
+				$scope.goToEvent(data.name,data.start_date,data.location);
 			}).error(function (err) {
 				console.log(err);
 			});
@@ -249,9 +250,8 @@ myApp.controller("CreateEventController", function ($scope, $http, $window, $roo
 		// Go to organizer page if an organization is hosting
 		else {
 			// Set premium tournament values
-			tournament.fee = $scope.tournament.fee;
-			tournament.deduction_fee = $scope.tournament.deduction_fee;
-			tournament.seed_money = $scope.tournament.seed_money;
+			tournament.fee = parseFloat($scope.tournament.fee);
+			tournament.seed_money = parseFloat($scope.tournament.seed_money);
 			$scope.tournaments.push(tournament);
 			$('#tab2').tab('show');
 			clearTournamentPage();
@@ -312,17 +312,24 @@ myApp.controller("CreateEventController", function ($scope, $http, $window, $roo
 			if ($scope.sponsors[i].checked)
 				selectedSponsors.push($scope.sponsors[i]);
 			// No sponsor selected, create request without sponsor
-		if (selectedSponsors.length == 0)
-			request = [$scope.event, $scope.tournaments, $scope.fees, {
-				"host": $scope.host
-			}];
+		if (selectedSponsors.length == 0){
+			request.event = $scope.event;
+			request.tournament = $scope.tournaments;
+			request.fees = $scope.fees;
+			request.host = $scope.host;
+			request.sponsors = [];
+			console.log(request);
+			$http.post($rootScope.baseURL + "/matchup/events?hosted=true", request).success(function (data) {
+				$scope.goToEvent(data.name,data.start_date,data.location);
+			}).error(function (err) {
+				console.log(err);
+			});
+		}
 		// Add sponsor to request
 		else
 			request = [$scope.event, $scope.tournaments, $scope.fees, selectedSponsors, {
 				"host": $scope.host
 			}];
-
-		console.log(request);
 	}
 
 	// Clears tournament inputs

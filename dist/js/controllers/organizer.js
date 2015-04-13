@@ -1,4 +1,4 @@
-var myApp = angular.module('organizer',[]);
+var myApp = angular.module('organizer', []);
 
 
 myApp.controller("SeedingController", function ($scope) {
@@ -34,6 +34,17 @@ myApp.controller("SeedingController", function ($scope) {
 	$scope.index = 0;
 
 	$scope.seedingCreated = false;
+	$scope.rounds = [{
+			name: 'Round 1',
+				}, {
+			name: 'Round 2',
+				},
+		{
+			name: 'Round 3',
+
+				}, {
+			name: 'Round 4'
+				}];
 
 	$scope.getSeedingInfo = function (index) {
 		if (index == 0) {

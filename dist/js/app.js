@@ -1,5 +1,5 @@
-var myApp = angular.module('MatchUp', ['ui.router', 'ngResource', 'as.sortable', 'ui.bootstrap.datetimepicker', 'Authentication', 'InputDirectives', 'home', 'premium-events', 'regular-events', 'user', 'organizer', 'organization', 'forms']);
- 
+var myApp = angular.module('MatchUp', ['ui.router', 'ngResource', 'as.sortable', 'ui.bootstrap.datetimepicker', 'Authentication', 'InputDirectives', 'home', 'premium-events', 'tournaments', 'user', 'organizer', 'organization', 'forms']);
+
 myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider) {
 	//
 	// For any unmatched url, redirect to /home
@@ -95,19 +95,24 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 		 *
 		 */
 		.state('app.eventSettings', {
-             url: "/settings/event/:eventName/:eventDate/:eventLocation",
+			url: "/settings/event/:eventName/:eventDate/:eventLocation",
 			templateUrl: "organizer/event_settings.html",
-            controller: "eventSettingsController"
-        
+			controller: "eventSettingsController"
+
 		})
 		.state('app.editEvent', {
 			url: "/editEvent",
 			templateUrl: "organizer/edit_event.html"
 		})
-        .state('app.editTournament', {
-             url: "/settings/event/:eventName/:eventDate/:eventLocation/tournament/:tournamentName",
-            templateUrl: "organizer/edit_tournament.html",
-            controller: "editTournamentController"
+		.state('app.editTournament', {
+			url: "/settings/event/:eventName/:eventDate/:eventLocation/tournament/:tournamentName",
+			templateUrl: "organizer/edit_tournament.html",
+			controller: "editTournamentController"
+		})
+		.state('app.tournamentList', {
+			url: "/tournamentList",
+			templateUrl: "organizer/tournament_list.html",
+			controller: "editTournamentController"
 		})
 		.state('app.registrations', {
 			url: "/registrations",
@@ -264,15 +269,15 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 
 
 	.state('app.search', {
-		url: "/search/:query",
-		templateUrl: "search.html",
-		controller: "searchController"
-	})
+			url: "/search/:query",
+			templateUrl: "search.html",
+			controller: "searchController"
+		})
 		.state('app.searchResults', {
-		url: "/search/:type/:query",
-		templateUrl: "searchResults.html",
-		controller: "searchResultsController"
-	});
+			url: "/search/:type/:query",
+			templateUrl: "searchResults.html",
+			controller: "searchResultsController"
+		});
 
 	$httpProvider.interceptors.push(function ($q, $timeout, $injector) {
 		var AuthenticationService, $state;
@@ -288,7 +293,7 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			request: function (config) {
 				// AutheticationService is not initiated if the browser is refreshed
 				// Hack it with sessionStorage
-				if(sessionStorage.getItem("token") && sessionStorage.getItem("username"))
+				if (sessionStorage.getItem("token") && sessionStorage.getItem("username"))
 					config.headers['Authorization'] = 'Bearer ' + sessionStorage.getItem("token");
 				return config;
 			},
@@ -305,7 +310,7 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 				else if (rejection.status == 403) {
 					alert("HTTP error: 403")
 					$state.go("app.home");
-				} else{
+				} else {
 					console.log("HTTP error: " + rejection.status);
 					$state.go("app.home");
 				}
@@ -333,9 +338,9 @@ myApp.run(function ($rootScope, $state, AuthenticationService, $window) {
 
 });
 
-   myApp.factory("MatchUpCache", function($cacheFactory) {
-       return $cacheFactory("cache");
- 
+myApp.factory("MatchUpCache", function ($cacheFactory) {
+	return $cacheFactory("cache");
+
 });
 myApp.factory('sharedDataService', function () {
 	var savedData = {}
