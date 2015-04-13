@@ -356,7 +356,7 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
 
         $ionicPlatform.ready(function() {
             $cordovaCamera.getPicture(options).then(function(imageData) {
-                $scope.user.cover_photo = "data:image/jpeg;base64,"+imageData;
+                $scope.user.cover = "data:image/jpeg;base64,"+imageData;
 
                 var div = document.getElementById("preview2"); //<img> containing image. called div to avoid calling it the same as img object
                 var c = document.getElementById("myCanvas"); //<canvas> where image will be drawn to obtain base64 encoding 
@@ -379,7 +379,7 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
                     c.width  = div.offsetWidth;
 
                     //Draw image to canvas
-                    ctx.drawImage(img, 0, -50);
+                    ctx.drawImage(img, 0, 0);
 
                     //Get base64 encoding of image. binary file containing image contents
                     var imgE64 = c.toDataURL();
