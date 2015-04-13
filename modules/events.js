@@ -210,17 +210,106 @@ var getEvent = function(req, res, pg, conString, log) {
 	});
 };
 
+function updateCompetitor(req, res, log, client, done, competitor, isWinner) {
+	var queryText = "";
+
+	if (isWinner) {
+		queryText = "UPDATE competitor SET matches_won = matches_won + 1 WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_number = $5";
+	} else {
+		queryText = "UPDATE competitor SET matches_lost = matches_lost + 1 WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_number = $5";
+	}
+
+	client.query({
+		text : queryText,
+		values : [req.params.event, req.query.date, req.query.location, req.params.tournament, competitor.competitor_number]
+	}, function(err, result) {
+		if (err) {
+			client.query("ROLLBACK");
+			done();
+			console.log(err);
+			res.status(500).send(err);
+			log.info({
+				res : res
+			}, 'done response');
+		} else {
+			// Assign each competitor to their next match
+			if (req.query.round_of != "Group" && req.query.round_of != "Round Robin") {
+				if (req.query.round_of != "Loser" || isWinner) {
+					var query = client.query({
+						text : "SELECT future_round_number, future_round_of, future_match FROM competitor_goes_to WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND past_round_number = $5 AND past_round_of = $6 AND past_match = $7 AND is_winner = $8",
+						values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, isWinner]
+					});
+					query.on("row", function(row, result) {
+						result.addRow(row);
+					});
+					query.on('error', function(error) {
+						client.query("ROLLBACK");
+						done();
+						console.log(error);
+						res.status(500).send(error);
+						log.info({
+							res : res
+						}, 'done response');
+					});
+					query.on("end", function(result) {
+						if (result.rows.length) {
+							client.query({
+								text : "INSERT INTO competes (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, competitor_number) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
+								values : [req.params.event, req.query.date, req.query.location, req.params.tournament, result.rows[0].future_round_number, result.rows[0].future_round_of, result.rows[0].future_match, competitor.competitor_number]
+							}, function(err, result) {
+								done();
+								if (err) {
+									client.query("ROLLBACK");
+									done();
+									res.status(500).send("Oh, no! Disaster!");
+									log.info({
+										res : res
+									}, 'done response');
+								}
+							});
+						}
+					});
+				}
+			}
+		}
+	});
+}
+
+function updateSetCompleted(req, res, log, client, done, index, length, busy) {
+	client.query({
+		text : "UPDATE is_set SET set_completed = true WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6 AND match_number = $7 AND set_seq = $8",
+		values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, (req.params.set + index)]
+	}, function(err, result) {
+		if (err) {
+			client.query("ROLLBACK");
+			done();
+			console.log(err);
+			res.status(500).send(err);
+			log.info({
+				res : res
+			}, 'done response');
+		} else {
+			console.log("index = " + index);
+			console.log("length = " + length);
+			console.log((req.params.set + index));
+			if (index == length) {
+				busy = false;
+			}
+		}
+	});
+}
+
 var submitScore = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var event = new Object();
+		// And so it begins
 		client.query("BEGIN");
 		var query = client.query({
-			text : "SELECT event_name, event_start_date, event_location FROM event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND event_active;",
-			values : [req.params.event, req.query.date, req.query.location]
+			text : "SELECT score_type, number_of_people_per_group, amount_of_winners_per_group, round_best_of FROM event NATURAL JOIN tournament NATURAL JOIN round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6 AND event_active",
+			values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of]
 		});
 		query.on("row", function(row, result) {
 			result.addRow(row);
@@ -236,8 +325,8 @@ var submitScore = function(req, res, pg, conString, log) {
 		});
 		query.on("end", function(result) {
 			if (result.rows.length) {
-				event = result.rows[0];
-				// Check if user 
+				var details = result.rows[0];
+				// Check if user can submit score
 				var query = client.query({
 					text : "SELECT competes.competitor_number, (submits.score IS NULL AND NOT is_set.set_completed) AS can_submit_score FROM is_set JOIN competes ON is_set.event_name = competes.event_name AND is_set.event_start_date = competes.event_start_date AND is_set.event_location = competes.event_location AND is_set.tournament_name = competes.tournament_name AND is_set.round_number = competes.round_number AND is_set.round_of = competes.round_of AND is_set.match_number = competes.match_number JOIN is_a ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number AND submits.set_seq = is_set.set_seq WHERE is_set.event_name = $1 AND is_set.event_start_date = $2 AND is_set.event_location = $3 AND is_set.tournament_name = $4 AND is_set.round_number = $5 AND is_set.round_of = $6 AND is_set.match_number = $7 AND is_set.set_seq = $8 AND is_a.customer_username = $9",
 					values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.user.username]
@@ -256,42 +345,562 @@ var submitScore = function(req, res, pg, conString, log) {
 				});
 				query.on("end", function(result) {
 					if (result.rows.length && result.rows[0].can_submit_score) {
+						details.competitor_number = result.rows[0].competitor_number;
 						if (!isNaN(req.body.score)) {
-							
+
+							// Get opponent's score
 							/*
-							 * TODO Before inserting the score, we must check to see if our opponent has submited his own score and compare it.
+							 * Before inserting the score, we must check to see if our opponent has submited his own score and compare it.
 							 * If the scores are the same (i.e., both say they won, score = 1), then send a 409 (Conflict) and explain the situation in the body
 							 */
-							client.query({
-								text : "INSERT INTO submits (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number, score) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
-								values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, result.rows[0].competitor_number, req.body.score]
-							}, function(err, result) {
-								if (err) {
-									client.query("ROLLBACK");
-									done();
-									console.log(err);
-									res.status(500).send(err);
-									log.info({
-										res : res
-									}, 'done response');
+							var query = client.query({
+								text : "SELECT competes.competitor_number, submits.score FROM is_set JOIN competes ON is_set.event_name = competes.event_name AND is_set.event_start_date = competes.event_start_date AND is_set.event_location = competes.event_location AND is_set.tournament_name = competes.tournament_name AND is_set.round_number = competes.round_number AND is_set.round_of = competes.round_of AND is_set.match_number = competes.match_number JOIN is_a ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number AND submits.set_seq = is_set.set_seq WHERE is_set.event_name = $1 AND is_set.event_start_date = $2 AND is_set.event_location = $3 AND is_set.tournament_name = $4 AND is_set.round_number = $5 AND is_set.round_of = $6 AND is_set.match_number = $7 AND is_set.set_seq = $8 AND is_a.customer_username <> $9",
+								values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.user.username]
+							});
+							query.on("row", function(row, result) {
+								result.addRow(row);
+							});
+							query.on('error', function(error) {
+								client.query("ROLLBACK");
+								done();
+								console.log(error);
+								res.status(500).send(error);
+								log.info({
+									res : res
+								}, 'done response');
+							});
+							query.on("end", function(result) {
+								if (result.rows.length) {
+									if (result.rows[0].score == req.body.score) {
+										client.query("ROLLBACK");
+										done();
+										res.status(409).send('Your opponent submitted the same score as you');
+										log.info({
+											res : res
+										}, 'done response');
+									} else {
+										// No conflicts were detected so lets go ahead and submit the score and mark the set as completed
+										client.query({
+											text : "INSERT INTO submits (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number, score) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+											values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, details.competitor_number, req.body.score]
+										}, function(err, result) {
+											if (err) {
+												client.query("ROLLBACK");
+												done();
+												console.log(err);
+												res.status(500).send(err);
+												log.info({
+													res : res
+												}, 'done response');
+											} else {
+												// Since both competitors have successfully submitted their scores, the set is now completed
+												client.query({
+													text : "UPDATE is_set SET set_completed = true WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6 AND match_number = $7 AND set_seq = $8",
+													values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set]
+												}, function(err, result) {
+													if (err) {
+														client.query("ROLLBACK");
+														done();
+														console.log(err);
+														res.status(500).send(err);
+														log.info({
+															res : res
+														}, 'done response');
+													} else {
+														/*
+														* Now that the set has been marked completed, the domino effect begins.
+														* Worst case scenario:
+														* 		Completing this Set, completes the Match, which then completes the Round,
+														* 		which in effect completes the Group Stage. The server then has to calulate
+														* 		the winners of each Group and allocate them in their respective matches in
+														* 		the Final Stage.
+														*/
+														// TODO Check if a competitor has won enough sets to win a match
+														var busy = true;
+														var query = client.query({
+															text : "SELECT competes.competitor_number, sum(submits.score) AS score FROM is_set JOIN competes ON is_set.event_name = competes.event_name AND is_set.event_start_date = competes.event_start_date AND is_set.event_location = competes.event_location AND is_set.tournament_name = competes.tournament_name AND is_set.round_number = competes.round_number AND is_set.round_of = competes.round_of AND is_set.match_number = competes.match_number JOIN is_a ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number AND submits.set_seq = is_set.set_seq WHERE is_set.event_name = $1 AND is_set.event_start_date = $2 AND is_set.event_location = $3 AND is_set.tournament_name = $4 AND is_set.round_number = $5 AND is_set.round_of = $6 AND is_set.match_number = $7 GROUP BY competes.competitor_number",
+															values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match]
+														});
+														query.on("row", function(row, result) {
+															console.log(row);
+															console.log(!isNaN(row.score), ((details.round_best_of + 1) / row.score) == row.score);
+															if (!isNaN(row.score) && ((details.round_best_of + 1) / row.score) == row.score) {
+																// Update set_completed for other the rest of the sets
+																for (var i = 0; i < (details.round_best_of - row.score); i++) {
+																	updateSetCompleted(req, res, log, client, done, (i + 1), ((details.round_best_of - row.score) - 1), busy);
+																}
+															}
+															// result.addRow(row);
+														});
+														query.on('error', function(error) {
+															client.query("ROLLBACK");
+															done();
+															console.log(error);
+															res.status(500).send(error);
+															log.info({
+																res : res
+															}, 'done response');
+														});
+														query.on("end", function(result) {
+															// if (!isNaN(result.rows[0].score) && ((details.round_best_of + 1) / result.rows[0].score) == result.rows[0].score) {
+																// //TODO Update set_completed for other the rest of the sets
+																// for (var i = 0; i < (details.round_best_of - result.rows[0].score); i++) {
+																	// updateSetCompleted(req, res, log, client, done, (i + 1), ((details.round_best_of - result.rows[0].score) - 1), busy);
+																// }
+															// } else if (!isNaN(result.rows[1].score) && ((details.round_best_of + 1) / result.rows[1].score) == result.rows[1].score) {
+																// for (var i = 0; i < (details.round_best_of - result.rows[1].score); i++) {
+																	// updateSetCompleted(req, res, log, client, done, (i + 1), ((details.round_best_of - result.rows[1].score) - 1), busy);
+																// }
+															// } else {
+																// busy = false;
+															// }
+															var query = client.query({
+															text : "SELECT every(is_set.set_completed) as match_completed FROM is_set JOIN competes ON is_set.event_name = competes.event_name AND is_set.event_start_date = competes.event_start_date AND is_set.event_location = competes.event_location AND is_set.tournament_name = competes.tournament_name AND is_set.round_number = competes.round_number AND is_set.round_of = competes.round_of AND is_set.match_number = competes.match_number JOIN is_a ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number WHERE is_set.event_name = $1 AND is_set.event_start_date = $2 AND is_set.event_location = $3 AND is_set.tournament_name = $4 AND is_set.round_number = $5 AND is_set.round_of = $6 AND is_set.match_number = $7 AND is_a.customer_username = $8",
+															values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.user.username]
+														});
+														query.on("row", function(row, result) {
+															result.addRow(row);
+														});
+														query.on('error', function(error) {
+															client.query("ROLLBACK");
+															done();
+															console.log(error);
+															res.status(500).send(error);
+															log.info({
+																res : res
+															}, 'done response');
+														});
+														query.on("end", function(result) {
+															/*
+															 * Domino #1 : There are no sets left to play in this match
+															 * Now we must:
+															 * 		#1. Calculate the outcome of this match (who won/lost) and assign the competitors to their next match if necessary
+															 * 		#2. Check and see if Domino #2 falls (this was the last match of the round)
+															 */
+															if (result.rows.length && result.rows[0].match_completed) {
+																// Get the info for the two competitors of this match
+																var query = client.query({
+																	text : "SELECT competes.competitor_number, sum(submits.score) AS score FROM competes LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND competes.match_number = $7 GROUP BY competes.competitor_number ORDER BY score DESC",
+																	values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match]
+																});
+																query.on("row", function(row, result) {
+																	result.addRow(row);
+																});
+																query.on('error', function(error) {
+																	client.query("ROLLBACK");
+																	done();
+																	console.log(error);
+																	res.status(500).send(error);
+																	log.info({
+																		res : res
+																	}, 'done response');
+																});
+																query.on("end", function(result) {
+																	// Store the data of the outcome of the match
+																	var matchOutcome = result.rows;
+
+																	// Update the matches won/lost for each competitor. Node can take care of this whoever it wants. I don't give a flying f*ck
+																	for (var i = 0; i < matchOutcome.length; i++) {
+																		updateCompetitor(req, res, log, client, done, matchOutcome[i], !i);
+																	}
+																	// Update match completed
+																	client.query({
+																		text : "UPDATE match SET match_completed = true WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6 AND match_number = $7",
+																		values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match]
+																	}, function(err, result) {
+																		if (err) {
+																			client.query("ROLLBACK");
+																			done();
+																			console.log(err);
+																			res.status(500).send(err);
+																			log.info({
+																				res : res
+																			}, 'done response');
+																		} else {
+																			// Check if round is completed
+																			var query = client.query({
+																				text : "SELECT every(match_completed) AS round_completed FROM match WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6",
+																				values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of]
+																			});
+																			query.on("row", function(row, result) {
+																				result.addRow(row);
+																			});
+																			query.on('error', function(error) {
+																				client.query("ROLLBACK");
+																				done();
+																				console.log(error);
+																				res.status(500).send(error);
+																				log.info({
+																					res : res
+																				}, 'done response');
+																			});
+																			query.on("end", function(result) {
+																				/*
+																				 * Domino #2 : There are no matches left to play in this round
+																				 * Did I mention that the dominoes become bigger?
+																				 * Now we must check to see if there are any matches left to play in this stage.
+																				 * If all rounds have been completed, we must perform different actions depending on which stage ended.
+																				 */
+																				if (result.rows.length && result.rows[0].round_completed) {
+																					client.query({
+																						text : "UPDATE round SET round_completed = true WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6",
+																						values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of]
+																					}, function(err, result) {
+																						if (err) {
+																							client.query("ROLLBACK");
+																							done();
+																							console.log(err);
+																							res.status(500).send(err);
+																							log.info({
+																								res : res
+																							}, 'done response');
+																						} else {
+																							/*
+																							 * The stage we're at is indicated by the value of the round_of parameter.
+																							 * We need to know if this round that was just completed was the last round of it's stage.
+																							 * A good thing is that the queries become shorter as we progress, but don't get too comfortable,
+																							 * there is a storm coming, especially if the stage that ended was
+																							 * either the Group Stage or the Winners bracket. Keep scrolling down to watch the next episode.
+																							 */
+																							var query = client.query({
+																								text : "SELECT every(round_completed) AS stage_completed FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_of = $5",
+																								values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of]
+																							});
+																							query.on("row", function(row, result) {
+																								result.addRow(row);
+																							});
+																							query.on('error', function(error) {
+																								client.query("ROLLBACK");
+																								done();
+																								console.log(error);
+																								res.status(500).send(error);
+																								log.info({
+																									res : res
+																								}, 'done response');
+																							});
+																							query.on("end", function(result) {
+																								/*
+																								 * Domino #3 : There are no rounds left to play in this Stage
+																								 * Yup, we're finally here, the last and heaviest domino.
+																								 * So, there are a few possible outcomes here, and it all depends on which Stage ended.
+																								 * Lets write all possible outcomes bellow:
+																								 *
+																								 * 	Loser Bracket ended: Nothing. Ez amiright?
+																								 * 		The loser finalist has already been placed in the Winers final match and no further action is needed at the moment.
+																								 *
+																								 * 	Group Stage ended: We need to calculate the standings of each player, in each group, and look for the value of ammount of winners per group. If there are player tied for 1st place in a group, we need to look for their match and whoever won takes the first place. We have to arrange the winners seeding based on the group each player was in and what was their placing in that group. After this, we use my algorithm to place the winners in their respective matches. Phew, that doesn't seem like much, does it?
+																								 *
+																								 * 	Winners Bracket ended or Round Robin Stage ended: Right, so this basically means the tournament ended. But what does it mean when we say the tournament ended? Well, we have to give players a way to brag, right? So we have to calculate their standing. Ez... is it? If only it was as simple as calculating their matches won and lost, and whatever. It's not (at least not for brackets). We have to know the size of the bracket and the last round the competitor played. I haven't yet thought this through completelly but yeah, ain't dis a bitch.
+																								 */
+																								if (result.rows.length && result.rows[0].stage_completed) {
+																									// Eziest
+																									if (req.query.round_of === "Loser") {
+																										client.query("COMMIT");
+																										done();
+																										res.status(201).send("Score submitted");
+																										log.info({
+																											res : res
+																										}, 'done response');
+																									} else if (req.query.round_of === "Group") {
+																										//TODO Change this
+																										client.query("COMMIT");
+																										done();
+																										res.status(201).send("Score submitted");
+																										log.info({
+																											res : res
+																										}, 'done response');
+																									} else if (req.query.round_of === "Winner") {
+																										//TODO Change this
+																										client.query("COMMIT");
+																										done();
+																										res.status(201).send("Score submitted");
+																										log.info({
+																											res : res
+																										}, 'done response');
+																									} else {
+																										//TODO Change this
+																										client.query("COMMIT");
+																										done();
+																										res.status(201).send("Score submitted");
+																										log.info({
+																											res : res
+																										}, 'done response');
+																									}
+																								} else {
+																									client.query("COMMIT");
+																									done();
+																									res.status(201).send("Score submitted");
+																									log.info({
+																										res : res
+																									}, 'done response');
+																								}
+																							});
+																						}
+																					});
+																				} else {
+																					client.query("COMMIT");
+																					done();
+																					res.status(201).send("Score submitted");
+																					log.info({
+																						res : res
+																					}, 'done response');
+																				}
+																			});
+																		}
+																	});
+																});
+															} else {
+																client.query("COMMIT");
+																done();
+																res.status(201).send("Score submitted");
+																log.info({
+																	res : res
+																}, 'done response');
+															}
+														});
+														});
+
+														// There is no easy way to do this. This was my last resort. I'm not proud...
+														// while (busy);
+														// Check if match is completed
+														// var query = client.query({
+															// text : "SELECT every(is_set.set_completed) as match_completed FROM is_set JOIN competes ON is_set.event_name = competes.event_name AND is_set.event_start_date = competes.event_start_date AND is_set.event_location = competes.event_location AND is_set.tournament_name = competes.tournament_name AND is_set.round_number = competes.round_number AND is_set.round_of = competes.round_of AND is_set.match_number = competes.match_number JOIN is_a ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number WHERE is_set.event_name = $1 AND is_set.event_start_date = $2 AND is_set.event_location = $3 AND is_set.tournament_name = $4 AND is_set.round_number = $5 AND is_set.round_of = $6 AND is_set.match_number = $7 AND is_a.customer_username = $8",
+															// values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.user.username]
+														// });
+														// query.on("row", function(row, result) {
+															// result.addRow(row);
+														// });
+														// query.on('error', function(error) {
+															// client.query("ROLLBACK");
+															// done();
+															// console.log(error);
+															// res.status(500).send(error);
+															// log.info({
+																// res : res
+															// }, 'done response');
+														// });
+														// query.on("end", function(result) {
+															// /*
+															 // * Domino #1 : There are no sets left to play in this match
+															 // * Now we must:
+															 // * 		#1. Calculate the outcome of this match (who won/lost) and assign the competitors to their next match if necessary
+															 // * 		#2. Check and see if Domino #2 falls (this was the last match of the round)
+															 // */
+															// if (result.rows.length && result.rows[0].match_completed) {
+																// // Get the info for the two competitors of this match
+																// var query = client.query({
+																	// text : "SELECT competes.competitor_number, sum(submits.score) AS score FROM competes LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND competes.match_number = $7 GROUP BY competes.competitor_number ORDER BY score DESC",
+																	// values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match]
+																// });
+																// query.on("row", function(row, result) {
+																	// result.addRow(row);
+																// });
+																// query.on('error', function(error) {
+																	// client.query("ROLLBACK");
+																	// done();
+																	// console.log(error);
+																	// res.status(500).send(error);
+																	// log.info({
+																		// res : res
+																	// }, 'done response');
+																// });
+																// query.on("end", function(result) {
+																	// // Store the data of the outcome of the match
+																	// var matchOutcome = result.rows;
+// 
+																	// // Update the matches won/lost for each competitor. Node can take care of this whoever it wants. I don't give a flying f*ck
+																	// for (var i = 0; i < matchOutcome.length; i++) {
+																		// updateCompetitor(req, res, log, client, done, matchOutcome[i], !i);
+																	// }
+																	// // Update match completed
+																	// client.query({
+																		// text : "UPDATE match SET match_completed = true WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6 AND match_number = $7",
+																		// values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match]
+																	// }, function(err, result) {
+																		// if (err) {
+																			// client.query("ROLLBACK");
+																			// done();
+																			// console.log(err);
+																			// res.status(500).send(err);
+																			// log.info({
+																				// res : res
+																			// }, 'done response');
+																		// } else {
+																			// // Check if round is completed
+																			// var query = client.query({
+																				// text : "SELECT every(match_completed) AS round_completed FROM match WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6",
+																				// values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of]
+																			// });
+																			// query.on("row", function(row, result) {
+																				// result.addRow(row);
+																			// });
+																			// query.on('error', function(error) {
+																				// client.query("ROLLBACK");
+																				// done();
+																				// console.log(error);
+																				// res.status(500).send(error);
+																				// log.info({
+																					// res : res
+																				// }, 'done response');
+																			// });
+																			// query.on("end", function(result) {
+																				// /*
+																				 // * Domino #2 : There are no matches left to play in this round
+																				 // * Did I mention that the dominoes become bigger?
+																				 // * Now we must check to see if there are any matches left to play in this stage.
+																				 // * If all rounds have been completed, we must perform different actions depending on which stage ended.
+																				 // */
+																				// if (result.rows.length && result.rows[0].round_completed) {
+																					// client.query({
+																						// text : "UPDATE round SET round_completed = true WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6",
+																						// values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of]
+																					// }, function(err, result) {
+																						// if (err) {
+																							// client.query("ROLLBACK");
+																							// done();
+																							// console.log(err);
+																							// res.status(500).send(err);
+																							// log.info({
+																								// res : res
+																							// }, 'done response');
+																						// } else {
+																							// /*
+																							 // * The stage we're at is indicated by the value of the round_of parameter.
+																							 // * We need to know if this round that was just completed was the last round of it's stage.
+																							 // * A good thing is that the queries become shorter as we progress, but don't get too comfortable,
+																							 // * there is a storm coming, especially if the stage that ended was
+																							 // * either the Group Stage or the Winners bracket. Keep scrolling down to watch the next episode.
+																							 // */
+																							// var query = client.query({
+																								// text : "SELECT every(round_completed) AS stage_completed FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_of = $5",
+																								// values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of]
+																							// });
+																							// query.on("row", function(row, result) {
+																								// result.addRow(row);
+																							// });
+																							// query.on('error', function(error) {
+																								// client.query("ROLLBACK");
+																								// done();
+																								// console.log(error);
+																								// res.status(500).send(error);
+																								// log.info({
+																									// res : res
+																								// }, 'done response');
+																							// });
+																							// query.on("end", function(result) {
+																								// /*
+																								 // * Domino #3 : There are no rounds left to play in this Stage
+																								 // * Yup, we're finally here, the last and heaviest domino.
+																								 // * So, there are a few possible outcomes here, and it all depends on which Stage ended.
+																								 // * Lets write all possible outcomes bellow:
+																								 // *
+																								 // * 	Loser Bracket ended: Nothing. Ez amiright?
+																								 // * 		The loser finalist has already been placed in the Winers final match and no further action is needed at the moment.
+																								 // *
+																								 // * 	Group Stage ended: We need to calculate the standings of each player, in each group, and look for the value of ammount of winners per group. If there are player tied for 1st place in a group, we need to look for their match and whoever won takes the first place. We have to arrange the winners seeding based on the group each player was in and what was their placing in that group. After this, we use my algorithm to place the winners in their respective matches. Phew, that doesn't seem like much, does it?
+																								 // *
+																								 // * 	Winners Bracket ended or Round Robin Stage ended: Right, so this basically means the tournament ended. But what does it mean when we say the tournament ended? Well, we have to give players a way to brag, right? So we have to calculate their standing. Ez... is it? If only it was as simple as calculating their matches won and lost, and whatever. It's not (at least not for brackets). We have to know the size of the bracket and the last round the competitor played. I haven't yet thought this through completelly but yeah, ain't dis a bitch.
+																								 // */
+																								// if (result.rows.length && result.rows[0].stage_completed) {
+																									// // Eziest
+																									// if (req.query.round_of === "Loser") {
+																										// client.query("COMMIT");
+																										// done();
+																										// res.status(201).send("Score submitted");
+																										// log.info({
+																											// res : res
+																										// }, 'done response');
+																									// } else if (req.query.round_of === "Group") {
+																										// //TODO Change this
+																										// client.query("COMMIT");
+																										// done();
+																										// res.status(201).send("Score submitted");
+																										// log.info({
+																											// res : res
+																										// }, 'done response');
+																									// } else if (req.query.round_of === "Winner") {
+																										// //TODO Change this
+																										// client.query("COMMIT");
+																										// done();
+																										// res.status(201).send("Score submitted");
+																										// log.info({
+																											// res : res
+																										// }, 'done response');
+																									// } else {
+																										// //TODO Change this
+																										// client.query("COMMIT");
+																										// done();
+																										// res.status(201).send("Score submitted");
+																										// log.info({
+																											// res : res
+																										// }, 'done response');
+																									// }
+																								// } else {
+																									// client.query("COMMIT");
+																									// done();
+																									// res.status(201).send("Score submitted");
+																									// log.info({
+																										// res : res
+																									// }, 'done response');
+																								// }
+																							// });
+																						// }
+																					// });
+																				// } else {
+																					// client.query("COMMIT");
+																					// done();
+																					// res.status(201).send("Score submitted");
+																					// log.info({
+																						// res : res
+																					// }, 'done response');
+																				// }
+																			// });
+																		// }
+																	// });
+																// });
+															// } else {
+																// client.query("COMMIT");
+																// done();
+																// res.status(201).send("Score submitted");
+																// log.info({
+																	// res : res
+																// }, 'done response');
+															// }
+														// });
+													}
+												});
+											}
+										});
+									}
 								} else {
-									/*
-									 * TODO There is a lot of logic that has to happen here. I need to check if the set is completed or not and do the appropriate changes.
-									 * Also, I think this will be the place to check if everything has completed, and by everything I mean, check if this match has completed, and if so
-									 * check if that completes the round, and if so check if that completes the stage we're at, and if so check if that completes the whole Tournament.
-									 */
-									client.query("COMMIT");
-									done();
-									res.status(200).send("Updated");
-									log.info({
-										res : res
-									}, 'done response');
+									// Go ahead and submit the score, Everything else will happen when the opponent tries to submit his score
+									client.query({
+										text : "INSERT INTO submits (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number, score) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+										values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, details.competitor_number, req.body.score]
+									}, function(err, result) {
+										if (err) {
+											client.query("ROLLBACK");
+											done();
+											console.log(err);
+											res.status(500).send(err);
+											log.info({
+												res : res
+											}, 'done response');
+										} else {
+											client.query("COMMIT");
+											done();
+											res.status(201).send("Score submitted");
+											log.info({
+												res : res
+											}, 'done response');
+										}
+									});
 								}
 							});
 						} else {
 							client.query("ROLLBACK");
 							done();
-							res.status(403).json({
+							res.status(400).json({
 								error : "Incomplete or invalid parameters"
 							});
 							log.info({

@@ -780,7 +780,7 @@ function addTournament(req, res, tournament, client, done, log) {
 		if (result.rows.length) {
 			client.query({
 				text : "INSERT INTO tournament (event_name, event_start_date, event_location, tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
-				values : [req.body.event.name, req.body.event.start_date, req.body.event.location, tournament.name, tournament.game, tournament.rules, tournament.teams, tournament.start_date, tournament.deadline, Math.floor(tournament.fee * 100) / 100, tournament.capacity, Math.floor(tournament.seed_money * 100) / 100, tournament.type, tournament.format, tournament.scoring, ((tournament.type === "Two-Stage") ? tournament.group_players : 0), ((tournament.type === "Two-Stage") ? tournament.group_winners : 0)]
+				values : [req.body.event.name, req.body.event.start_date, req.body.event.location, tournament.name, tournament.game, tournament.rules, tournament.teams, tournament.start_date, tournament.deadline, Math.floor(tournament.fee * 100) / 100, tournament.capacity, Math.floor(tournament.seed_money * 100) / 100, tournament.type, tournament.format, tournament.scoring, ((tournament.type === "Two Stage") ? tournament.group_players : 0), ((tournament.type === "Two Stage") ? tournament.group_winners : 0)]
 			}, function(err, result) {
 				if (err) {
 					client.query("ROLLBACK");
@@ -876,7 +876,7 @@ var createEvent = function(req, res, pg, conString, log) {
 								if (result.rows.length) {
 									client.query({
 										text : "INSERT INTO tournament (event_name, event_start_date, event_location, tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
-										values : [req.body.event.name, req.body.event.start_date, req.body.event.location, req.body.tournament[0].name, req.body.tournament[0].game, req.body.tournament[0].rules, req.body.tournament[0].teams, req.body.tournament[0].start_date, req.body.tournament[0].deadline, 0, 32, 0, req.body.tournament[0].type, req.body.tournament[0].format, req.body.tournament[0].scoring, ((req.body.tournament[0].type === "Two-Stage") ? req.body.tournament[0].group_players : 0), ((req.body.tournament[0].type === "Two-Stage") ? req.body.tournament[0].group_winners : 0)]
+										values : [req.body.event.name, req.body.event.start_date, req.body.event.location, req.body.tournament[0].name, req.body.tournament[0].game, req.body.tournament[0].rules, req.body.tournament[0].teams, req.body.tournament[0].start_date, req.body.tournament[0].deadline, 0, 32, 0, req.body.tournament[0].type, req.body.tournament[0].format, req.body.tournament[0].scoring, ((req.body.tournament[0].type === "Two Stage") ? req.body.tournament[0].group_players : 0), ((req.body.tournament[0].type === "Two Stage") ? req.body.tournament[0].group_winners : 0)]
 									}, function(err, result) {
 										if (err) {
 											client.query("ROLLBACK");
