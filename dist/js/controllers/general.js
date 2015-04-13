@@ -192,7 +192,7 @@ function ($scope, $http, $state, $window, AuthenticationService, $rootScope) {
                     console.log(err);
                 });
             }
-        }
+        };
 }]);
 
 myApp.controller('sidebarController', ['$scope', '$window', '$http', '$state', 'AuthenticationService',
@@ -202,9 +202,9 @@ function ($scope, $window, $http, $state, AuthenticationService) {
         $scope.goToTeams = function (username) {
             $state.go("app.userTeams", {
                     "username": username
-                }) //
+                }) ;
 
-        }
+        };
         $scope.goToTeamsProfile = function (teamName) {
             $state.go("app.teamProfile", {
                 "teamName": teamName
@@ -219,10 +219,10 @@ function ($scope, $window, $http, $state, AuthenticationService) {
                 if (query.length > 0) {
                     $state.go("app.search", {
                             "query": query
-                        }) //
+                        }) ;
                 }
             }
-        }
+        };
         $scope.goToSearchResults = function (type, query) {
             //need undefined in case somebody pushes the button and they havent entered any text
             if (query !== undefined) { //gpooo
@@ -230,69 +230,69 @@ function ($scope, $window, $http, $state, AuthenticationService) {
                     $state.go("app.searchResults", {
                             "type": type,
                             "query": query
-                        }) //
+                        }) ;
                 } //goooooo
             }
-        }
+        };
 
         $scope.goToMyProfile = function () {
             $state.go("app.userProfile", {
                     "username": $window.sessionStorage.username
-                }) //
-        }
+                }) ;
+        };
         $scope.goToRegisteredEvents = function () {
             $state.go("app.registeredEvents", {
                     "username": $window.sessionStorage.username
-                }) //
-        }
+                }) ;
+        };
 
         $scope.goToMyEvents = function () {
             $state.go("app.myEvents", {
                     "username": $window.sessionStorage.username
-                }) //
-        }
+                }) ;
+        };
 
         $scope.goCreateEvent = function () {
             $state.go("app.userProfile", {
                     "username": $window.sessionStorage.username
-                }) //
-        }
+                });
+        };
 
         $scope.goToMyMatchUps = function () {
             $state.go("app.userProfile", {
                     "username": $window.sessionStorage.username
-                }) //
-        }
+                }) ;
+        };
 
         $scope.goToMyTeams = function () {
             $state.go("app.userTeams", {
                     "username": $window.sessionStorage.username
-                }) //
-        }
+                });
+        };
 
         $scope.goToMyOrganizations = function () {
             $state.go("app.userOrganizations", {
                     "username": $window.sessionStorage.username
-                }) //
-        }
+                });
+        };
 
         $scope.logout = function () {
             AuthenticationService.clearCredentials();
             $state.go("login"); //
-        }
+        };
 
         $scope.goToOrganizationProfile = function (organization) {
                 $state.go("app.organizationProfile", {
                         "organizationName": organization
-                    }) //
-            }
+                    }) ;
+           };
             //go to a specific users in an event
         $scope.goToUser = function (customer_username) {
 
             $state.go("app.userProfile", {
                     "username": customer_username
-                }) //
-        }
+                }) ;
+        };
 
 
         $scope.goToGameProfile = function (gameName) {
@@ -505,7 +505,7 @@ myApp.controller('myEventsController', ['$scope', '$http', '$state', '$statePara
 }]);
 
 myApp.controller('registeredEventsController', ['$scope', '$http', '$state', '$stateParams', '$rootScope', function ($scope, $http, $state, $stateParams, $rootScope) {
-    // TODO: Theres nothing visually that says if his a spectator or competitor
+    // TODO: There's nothing visually that says if his a spectator or competitor
     // Get events where user is a competitor
     $http.get($rootScope.baseURL + '/matchup/profile/' + $stateParams.username + '/events/registered?type=competitor').success(function (data) {
         $scope.upcoming = [];
@@ -524,7 +524,8 @@ myApp.controller('registeredEventsController', ['$scope', '$http', '$state', '$s
         }
     }).then(function () {
         // Get events where user is a spectator
-        $http.get($rootScope.baseURL + '/matchup/profile/' + $stateParams.username + '/events/registered?type=spectator').success(function (data) {
+        $http.get($rootScope.baseURL + '/matchup/profile/' + $stateParams.username + '/events/registered?type=spectator')
+        .success(function (data) {
             for (var i = 0; i < data.length; i++) {
                 var start = new Date(data[i].event_start_date).getTime();
                 var end = new Date(data[i].event_end_date).getTime();
@@ -536,6 +537,6 @@ myApp.controller('registeredEventsController', ['$scope', '$http', '$state', '$s
                 else
                     $scope.history.push(data[i]);
             }
-        })
+        });
     });
 }]);
