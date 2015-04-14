@@ -1,0 +1,12 @@
+START TRANSACTION;
+INSERT INTO "group_stage"(event_name, event_start_date, event_location, tournament_name, number_of_people_per_group, amount_of_winners_per_group) Values('First Test','2015-10-19 09:00:00','miradero','Super Smash Bros. Melee Qualifiers',6,2);
+INSERT INTO "group_stage"(event_name, event_start_date, event_location, tournament_name, number_of_people_per_group, amount_of_winners_per_group) Values('Event 02','2015-05-05 09:00:00','miradero','Smash Bros. Melee Weekly',4,2);
+INSERT INTO "group_stage"(event_name, event_start_date, event_location, tournament_name, number_of_people_per_group, amount_of_winners_per_group) Values('Event 01','2015-03-25 09:00:00','miradero','Super Smash Bros. Melee Qualifiers',4,2);
+INSERT INTO "group_stage"(event_name, event_start_date, event_location, tournament_name, number_of_people_per_group, amount_of_winners_per_group) Values('Event 06','2015-10-29 09:00:00','1234 Calle Paloma, Mayaguez, PR 00681-9042','Test Tournament 01',6,2);
+INSERT INTO "group_stage"(event_name, event_start_date, event_location, tournament_name, number_of_people_per_group, amount_of_winners_per_group) Values('Event 06','2015-10-29 09:00:00','1234 Calle Paloma, Mayaguez, PR 00681-9042','Test Tournament 02',6,2);
+INSERT INTO "group_stage"(event_name, event_start_date, event_location, tournament_name, number_of_people_per_group, amount_of_winners_per_group) Values('Event 06','2015-10-29 09:00:00','1234 Calle Paloma, Mayaguez, PR 00681-9042','Test Tournament 03',6,2);
+INSERT INTO "group_stage"(event_name, event_start_date, event_location, tournament_name, number_of_people_per_group, amount_of_winners_per_group) Values('Event 07','2015-12-01 09:00:00','30 Easton Ave, New Brunswick, NJ','Test Groups 02',3,1);
+INSERT INTO "group_stage"(event_name, event_start_date, event_location, tournament_name, number_of_people_per_group, amount_of_winners_per_group) Values('Event 08','2015-11-02 09:00:00','30 Independence BLV, Warren, NJ','Test Groups 03',3,1);
+INSERT INTO "group_stage"(event_name, event_start_date, event_location, tournament_name, number_of_people_per_group, amount_of_winners_per_group) Values('Event 09','2015-11-02 09:00:00','41 Independence BLV, Warren, NJ','Test Groups 04',3,1);
+INSERT INTO "group_stage"(event_name, event_start_date, event_location, tournament_name, number_of_people_per_group, amount_of_winners_per_group) Values('Event 01','2015-03-25 09:00:00','miradero','Mortal Kombat X Qualifiers',3,3);
+COMMIT;
