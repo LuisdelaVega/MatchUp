@@ -76,14 +76,12 @@ function authenticate(req, res) {
 		log.info({
 			res : res
 		}, 'done response');
-	};
-
+	}
 	// Get the values for basic authentication in the header
 	var user = basicAuth(req);
 	if (!user || !user.name || !user.pass) {
 		return unauthorized(res);
-	};
-
+	}
 	// Query the DB to find the account
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -132,7 +130,7 @@ function authenticate(req, res) {
 			} else {
 				done();
 				return unauthorized(res);
-			};
+			}
 		});
 	});
 }
@@ -254,7 +252,6 @@ app.route('/matchup/events/:event').get(function(req, res) {
 	log.info({
 		req : req
 	}, 'start request');
-	var eventStartDate = new Date(req.query.date);
 	var eventStartDate = new Date(req.body.start_date);
 	var eventEndDate = new Date(req.body.end_date);
 	var eventRegistrationDeadline = new Date(req.body.registration_deadline);

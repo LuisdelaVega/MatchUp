@@ -619,7 +619,7 @@ function singleEliminationBracket(bracket, players, tournament) {
 	// Assign players for Winners Round 1 Matches
 	for ( i = 0; i < (bracket.numOfPlayers - bracket.byes) / 2; i++) {
 		// winnerRounds[0].matches[i].player1 = players[bracket.byes + i/* - 1*/];
-		console.log(players[bracket.byes + i/* - 1*/] instanceof String); (players[bracket.byes + i/* - 1*/] instanceof String ? 'Do nothing' : winnerRounds[0].matches[i].players.push(players[bracket.byes + i/* - 1*/]));
+        (players[bracket.byes + i/* - 1*/] instanceof String ? 'Do nothing' : winnerRounds[0].matches[i].players.push(players[bracket.byes + i/* - 1*/]));
 		// winnerRounds[0].matches[i].player2 = players[bracket.numOfPlayers - i - 1];
 		(players[bracket.numOfPlayers - i - 1] instanceof String ? 'Do nothing' : winnerRounds[0].matches[i].players.push(players[bracket.numOfPlayers - i - 1]));
 		//console.log(winnerRounds[0].name+", match: "+i+", player1: "+winnerRounds[0].matches[i].player1.seed+", player2: "+winnerRounds[0].matches[i].player2.seed);

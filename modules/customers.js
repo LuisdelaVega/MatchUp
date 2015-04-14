@@ -13,8 +13,8 @@ var getUserProfile = function(req, res, pg, conString, log) {
 	// Query the DB to find the account
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
-			return console.error('error fetching client from pool', err);
-		}
+            return console.error('error fetching client from pool', err);
+        }
 
 		// Query the database to find the user's account
 		var query = client.query({
