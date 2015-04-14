@@ -263,8 +263,9 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			templateUrl: "organization/my_organizations.html"
 		})
 		.state('app.requestOrganization', {
-			url: "/requestOrganization",
-			templateUrl: "organization/request_organization.html"
+			url: "user/request/rganization",
+			templateUrl: "organization/request_organization.html",
+			controller: "RequestOrganizationController"
 		})
 
 
@@ -316,7 +317,7 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 				}
 				return rejection;
 			}
-		}
+		};
 	});
 });
 

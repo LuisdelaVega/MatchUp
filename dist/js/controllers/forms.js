@@ -2,7 +2,6 @@
 // form inputs
 var myApp = angular.module('forms', []);
 
-
 /*
  *	Controller that handles all the input field of the create
  *	event module. It will also initiate calls to the server
@@ -10,24 +9,20 @@ var myApp = angular.module('forms', []);
  *	templateUrl: "event/create_event.html"
  *	url (POST): http://matchup.neptunolabs.com/matchup/events?hosted=bool
  */
-myApp.controller("CreateEventController", function ($scope, $http, $window, $rootScope, $state) {
-
+myApp.controller("CreateEventController", function($scope, $http, $window, $rootScope, $state) {
 
 	//Get the organization the customer belongs to
-	$http.get($rootScope.baseURL + '/matchup/profile/' + $window.sessionStorage.username + '/organizations')
-		.success(function (data) {
+	$http.get($rootScope.baseURL + '/matchup/profile/' + $window.sessionStorage.username + '/organizations').success(function(data) {
 
-
-			$scope.userOrganization = [];
-			$scope.userOrganization.push($window.sessionStorage.username);
-			for (var i = 0; i < data.length; i++) {
-				$scope.userOrganization.push(data[i].organization_name);
-			}
-			$scope.host = $scope.userOrganization[0];
-		}).error(function (data, status) {
-			console.log(status);
-		});
-
+		$scope.userOrganization = [];
+		$scope.userOrganization.push($window.sessionStorage.username);
+		for (var i = 0; i < data.length; i++) {
+			$scope.userOrganization.push(data[i].organization_name);
+		}
+		$scope.host = $scope.userOrganization[0];
+	}).error(function(data, status) {
+		console.log(status);
+	});
 
 	// Arrays to store local data before sending to the server.
 	// Only used for the organizer page
@@ -35,9 +30,9 @@ myApp.controller("CreateEventController", function ($scope, $http, $window, $roo
 	$scope.fees = [];
 
 	// Validate the input fields of the General Information form
-	// This will check for null values, valid dates, and 
+	// This will check for null values, valid dates, and
 	// correct length of the strings
-	$scope.validateEvent = function () {
+	$scope.validateEvent = function() {
 		// Check undefined values and valid stuff
 		if (!$scope.event.name) {
 			alert("Event name is required");
@@ -82,47 +77,45 @@ myApp.controller("CreateEventController", function ($scope, $http, $window, $roo
 		// Go to organizer page
 		else {
 			// Retrieve sponsors of the organization
-			$scope.sponsors = [
-				{
-					name: 'Intel Gaming',
-					img: "https://pbs.twimg.com/profile_images/378800000857186263/xyP_oi80_400x400.jpeg"
-				}, {
-					name: 'Twitch',
-					img: "https://pbs.twimg.com/profile_images/509073338191183872/fYdty6yd.png"
-				}, {
-					name: 'See Puerto Rico',
-					img: "http://www.visitusa.org.uk/memberassets/676/LGO-Estrella_SEE_blue-ing.jpg"
-				}];
+			$scope.sponsors = [{
+				name : 'Intel Gaming',
+				img : "https://pbs.twimg.com/profile_images/378800000857186263/xyP_oi80_400x400.jpeg"
+			}, {
+				name : 'Twitch',
+				img : "https://pbs.twimg.com/profile_images/509073338191183872/fYdty6yd.png"
+			}, {
+				name : 'See Puerto Rico',
+				img : "http://www.visitusa.org.uk/memberassets/676/LGO-Estrella_SEE_blue-ing.jpg"
+			}];
 			$('#tab2').tab('show');
 		}
-	}
+	};
 
 	// Creates a fee and clears input in addFeeModal
-	$scope.createFee = function () {
+	$scope.createFee = function() {
 		// Create fee object to be added to the fees array
 		var fee = {
-				"name": $scope.fee.name,
-				// Ticket amount
-				"available": parseInt($scope.fee.available),
-				// Price
-				"amount": parseFloat($scope.fee.amount),
-				"description": $scope.fee.description,
-			}
-			// Push fee
+			"name" : $scope.fee.name,
+			// Ticket amount
+			"available" : parseInt($scope.fee.available),
+			// Price
+			"amount" : parseFloat($scope.fee.amount),
+			"description" : $scope.fee.description,
+		};
+		// Push fee
 		$scope.fees.push(fee);
 		// Hide modal
 		$("#addFeeModal").modal("hide");
 		// Reset form
 		$scope.fee.name = $scope.fee.amount = $scope.fee.available = $scope.fee.description = "";
-	}
+	};
 
 	// Delete the selected fee
 	// @params
 	// index: item to be deleted from the aray
-	$scope.deleteFee = function (index) {
+	$scope.deleteFee = function(index) {
 		$scope.fees.splice(index, 1);
-	}
-
+	};
 
 	/* Validate Tournament form
 	 * If the user is creating a hosted event the function will
@@ -130,7 +123,7 @@ myApp.controller("CreateEventController", function ($scope, $http, $window, $roo
 	 * to the server to create the event for the current user
 	 * url (POST): http://matchup.neptunolabs.com/matchup/events?hosted=bool
 	 */
-	$scope.validateTournament = function () {
+	$scope.validateTournament = function() {
 
 		// Check for blank inputs
 		if ($scope.userOrganization[0] == $scope.host) {
@@ -181,7 +174,7 @@ myApp.controller("CreateEventController", function ($scope, $http, $window, $roo
 				alert("Competitors can not be larger than participants per group");
 				return;
 			}
-			if(parseInt($scope.tournament.capacity) < parseInt($scope.tournament.group_players)){
+			if (parseInt($scope.tournament.capacity) < parseInt($scope.tournament.group_players)) {
 				alert("Capacity can not be less than the number of players per group");
 				return;
 			}
@@ -213,21 +206,21 @@ myApp.controller("CreateEventController", function ($scope, $http, $window, $roo
 
 		// Tournament object
 		var tournament = {
-			"name": $scope.tournament.name,
-			"game": $scope.tournament.game,
-			"rules": $scope.tournament.rules,
-			"teams": $scope.tournament.teams,
-			"team_size": $scope.tournament.team_size,
-			"start_date": $scope.tournament.start_date,
-			"deadline": $scope.tournament.deadline,
-			"fee": 0,
-			"capacity": parseInt($scope.tournament.capacity),
-			"seed_money": 0,
-			"type": $scope.tournament.type,
-			"format": $scope.tournament.format,
-			"scoring": $scope.tournament.scoring,
-			"group_players": parseInt($scope.tournament.group_players),
-			"group_winners": parseInt($scope.tournament.group_winners),
+			"name" : $scope.tournament.name,
+			"game" : $scope.tournament.game,
+			"rules" : $scope.tournament.rules,
+			"teams" : $scope.tournament.teams,
+			"team_size" : $scope.tournament.team_size,
+			"start_date" : $scope.tournament.start_date,
+			"deadline" : $scope.tournament.deadline,
+			"fee" : 0,
+			"capacity" : parseInt($scope.tournament.capacity),
+			"seed_money" : 0,
+			"type" : $scope.tournament.type,
+			"format" : $scope.tournament.format,
+			"scoring" : $scope.tournament.scoring,
+			"group_players" : parseInt($scope.tournament.group_players),
+			"group_winners" : parseInt($scope.tournament.group_winners),
 		};
 
 		// Create Event if user is hosting the event by calling a post
@@ -237,13 +230,13 @@ myApp.controller("CreateEventController", function ($scope, $http, $window, $roo
 			var tournamentArray = [];
 			tournamentArray.push(tournament);
 			var request = {
-				"event": $scope.event,
-				"tournament": tournamentArray
-			}
+				"event" : $scope.event,
+				"tournament" : tournamentArray
+			};
 			console.log(request);
-			$http.post($rootScope.baseURL + "/matchup/events", request).success(function (data) {
-				$scope.goToEvent(data.name,data.start_date,data.location);
-			}).error(function (err) {
+			$http.post($rootScope.baseURL + "/matchup/events", request).success(function(data) {
+				$scope.goToEvent(data.name, data.start_date, data.location);
+			}).error(function(err) {
 				console.log(err);
 			});
 		}
@@ -256,11 +249,11 @@ myApp.controller("CreateEventController", function ($scope, $http, $window, $roo
 			$('#tab2').tab('show');
 			clearTournamentPage();
 		}
-	}
+	};
 
-	// Cancel Tournament, go to organizer or general info page depending 
+	// Cancel Tournament, go to organizer or general info page depending
 	// if an organization is selected
-	$scope.cancelTournament = function () {
+	$scope.cancelTournament = function() {
 		// Go to event details if user is hosting the event
 		if ($scope.userOrganization[0] == $scope.host) {
 			$('#tab1').tab('show');
@@ -271,25 +264,25 @@ myApp.controller("CreateEventController", function ($scope, $http, $window, $roo
 			$('#tab2').tab('show');
 		}
 
-	}
+	};
 
 	// Transition function
-	$scope.addTournament = function () {
+	$scope.addTournament = function() {
 		$('#tab3').tab('show');
-	}
+	};
 
 	// Splice selected tournament from the tournament array
-	$scope.deleteTournament = function (index) {
+	$scope.deleteTournament = function(index) {
 		$scope.tournaments.splice(index, 1);
-	}
+	};
 
 	// Transition function
-	$scope.backToEvent = function () {
+	$scope.backToEvent = function() {
 		$('#tab1').tab('show');
-	}
+	};
 
 	// Function to create a hosted event
-	$scope.createHostedEvent = function () {
+	$scope.createHostedEvent = function() {
 		// Proceed if theres tournaments and fees created
 		if ($scope.tournaments.length == 0 || $scope.fees.length == 0) {
 			alert("An event cant be createad without at least one tournament and one spectator fee");
@@ -305,68 +298,73 @@ myApp.controller("CreateEventController", function ($scope, $http, $window, $roo
 
 		var request = {};
 
-		// Iterate through the sponsor check box to add them to the 
+		// Iterate through the sponsor check box to add them to the
 		// selectedSponsors array
 		for (var i = 0; i < $scope.sponsors.length; i++)
 		// if checked add them to the array
 			if ($scope.sponsors[i].checked)
 				selectedSponsors.push($scope.sponsors[i]);
-			// No sponsor selected, create request without sponsor
-		if (selectedSponsors.length == 0){
+		// No sponsor selected, create request without sponsor
+		if (selectedSponsors.length == 0) {
 			request.event = $scope.event;
 			request.tournament = $scope.tournaments;
 			request.fees = $scope.fees;
 			request.host = $scope.host;
 			request.sponsors = [];
 			console.log(request);
-			$http.post($rootScope.baseURL + "/matchup/events?hosted=true", request).success(function (data) {
-				$scope.goToEvent(data.name,data.start_date,data.location);
-			}).error(function (err) {
+			$http.post($rootScope.baseURL + "/matchup/events?hosted=true", request).success(function(data) {
+				$scope.goToEvent(data.name, data.start_date, data.location);
+			}).error(function(err) {
 				console.log(err);
 			});
 		}
 		// Add sponsor to request
 		else
 			request = [$scope.event, $scope.tournaments, $scope.fees, selectedSponsors, {
-				"host": $scope.host
+				"host" : $scope.host
 			}];
-	}
+	};
 
 	// Clears tournament inputs
-	var clearTournamentPage = function () {
+	var clearTournamentPage = function() {
 		$scope.tournament.name = $scope.tournament.start_date = $scope.tournament.deadline = $scope.tournament.rules = $scope.tournament.fee = $scope.tournament.seed_money = $scope.tournament.deduction_fee = $scope.tournament.capacity = $scope.tournament.team_size = $scope.tournament.group_players = $scope.tournament.group_winners = $scope.tournament.scoring = $scope.tournament.game = "";
 
 	}
 });
-
 
 /*
  *	Handles input fields of the create team form.
  *	templateUrl: "team/create_team.html"
  *	url (POST): http://matchup.neptunolabs.com/matchup/teams
  */
-myApp.controller("CreateTeamController", function ($scope) {
+myApp.controller("CreateTeamController", function($scope) {
 
-	$scope.submitCreateTeam = function (valid) {
+	$scope.submitCreateTeam = function(valid) {
 		if (valid) {
 			console.log($scope.team)
 		}
 	}
 });
 
-
 /*
  *	Request organization controller
  *	templateUrl: "organization/request_organization.html",
  *	URL (POST): http://matchup.neptunolabs.com/matchup/organizations
  */
-myApp.controller("RequestOrganizationController", function ($scope) {
 
-	$scope.submitOrganization = function (valid) {
+myApp.controller("RequestOrganizationController", function($scope, $window, $http, $rootScope, $state) {
+
+	$scope.submitOrganization = function(valid) {
 		if (valid) {
-			console.log($scope.organization)
-		}
-	}
+			//Organization objects
+			$http.post($rootScope.baseURL + "/matchup/organizations", $scope.organization).success(function() {
+				alert("Request for an organization successful");
+				$state.go("app.userProfile", {
+					"username" : $window.sessionStorage.username
+				})
+			});
+		};
+	};
 });
 
 /*
@@ -375,7 +373,7 @@ myApp.controller("RequestOrganizationController", function ($scope) {
  *	URL (PUT): http://matchup.neptunolabs.com/matchup/teams/{{team}}
  *	URL (DELETE) http://matchup.neptunolabs.com/matchup/events/{{event}}/tournaments/{{tournament}}?date={{date}}&location={{location}}
  */
-myApp.controller("editTournamentController", function ($scope) {
+myApp.controller("editTournamentController", function($scope) {
 
 	// Miscellaneous information for static data
 	var d = new Date();
@@ -385,52 +383,49 @@ myApp.controller("editTournamentController", function ($scope) {
 	deadline.setDate(start_date.getHours() - 1);
 
 	// Init tournament type object for the dropdown
-	$scope.tournamentType = [
-		{
-			name: 'Single Stage',
-				}, {
-			name: 'Two Stage',
-				}];
+	$scope.tournamentType = [{
+		name : 'Single Stage',
+	}, {
+		name : 'Two Stage',
+	}];
 
 	// Init tournament format (Single Stage) object for the dropdown
-	$scope.tournamentFormat = [
-		{
-			name: 'Single Elimination',
-				}, {
-			name: 'Double Elimination',
-				}, {
-			name: 'Round Robin',
-				}];
+	$scope.tournamentFormat = [{
+		name : 'Single Elimination',
+	}, {
+		name : 'Double Elimination',
+	}, {
+		name : 'Round Robin',
+	}];
 
 	// Init tournament format (Two Stage) object for the dropdown
 	// As we can see, we limit the selection to Single and Dobule
 	// elimantion because round robing is not supported as a final
 	// stage
-	$scope.tournamentFormatTwo = [
-		{
-			name: 'Single Elimination',
-				}, {
-			name: 'Double Elimination',
-				}];
+	$scope.tournamentFormatTwo = [{
+		name : 'Single Elimination',
+	}, {
+		name : 'Double Elimination',
+	}];
 
 	//Get all tournaments of the selected event
 	var tournament = {
-		"name": "Tourney 1",
-		"game": "Mario",
-		"rules": "There are no rules right now",
-		"teams": false,
-		"team_size": 0,
-		"start_date": start_date,
-		"deadline": deadline,
-		"fee": 22.50,
-		"deduction_fee": 8,
-		"capacity": 50,
-		"seed_money": 100.00,
-		"type": "Two Stage",
-		"format": "Single Elimination",
-		"scoring": "Match",
-		"group_players": 4,
-		"group_winners": 2,
+		"name" : "Tourney 1",
+		"game" : "Mario",
+		"rules" : "There are no rules right now",
+		"teams" : false,
+		"team_size" : 0,
+		"start_date" : start_date,
+		"deadline" : deadline,
+		"fee" : 22.50,
+		"deduction_fee" : 8,
+		"capacity" : 50,
+		"seed_money" : 100.00,
+		"type" : "Two Stage",
+		"format" : "Single Elimination",
+		"scoring" : "Match",
+		"group_players" : 4,
+		"group_winners" : 2,
 	};
 
 	// Array for persiting tournaments
@@ -439,35 +434,30 @@ myApp.controller("editTournamentController", function ($scope) {
 	$scope.tournamentIndex = 0;
 
 	// Transition function to the tournament form
-	$scope.addTournament = function () {
+	$scope.addTournament = function() {
 		$("#edit-tab2").tab("show");
 	}
-
 	// Transition function to tournament list view
-	$scope.cancel = function () {
+	$scope.cancel = function() {
 		$("#edit-tournament-tab1").tab("show");
 	}
-
-	// 
-	$scope.createTournament = function () {
+	//
+	$scope.createTournament = function() {
 		$("#edit-tournament-tab1").tab("show");
 	}
-
 	// Save index of tournament to be deleted
 	// and show the modal
-	$scope.deleteTournament = function (index) {
+	$scope.deleteTournament = function(index) {
 		$scope.tournamentIndex = index;
 		$('#deleteModal').modal("show");
 	}
-
 	// Populate tournament edit form and transition to the page
-	$scope.editTournament = function (index) {
+	$scope.editTournament = function(index) {
 		$scope.tournament = $scope.tournaments[index];
 		$("#edit-tab2").tab("show");
 	}
-
 	// Delete tournament
-	$scope.delete = function () {
+	$scope.delete = function() {
 		$scope.tournaments.splice($scope.tournamentIndex, 1);
 		$('#deleteModal').modal("hide");
 	}
