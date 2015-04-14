@@ -140,7 +140,9 @@ SELECT sum(submits.score) AS score FROM is_set JOIN competes ON is_set.event_nam
 
 SELECT score_type, number_of_people_per_group, amount_of_winners_per_group, round_best_of FROM event NATURAL JOIN tournament NATURAL JOIN round WHERE event_name = 'Event 01' AND event_start_date = '2015-03-25 09:00:00' AND event_location = 'miradero' AND tournament_name = 'Mortal Kombat X Qualifiers' AND round_number = 1 AND round_of = 'Group' AND event_active;
 
-http://127.0.0.1:5000/matchup/events/Event 01/tournaments/Mortal Kombat X Qualifiers/rounds/1/matches/1/2?date=2015-03-25 09:00:00&location=miradero&station=1&round_of=Group
+http://127.0.0.1:5000/matchup/profile/matchups
+
+http://127.0.0.1:5000/matchup/events/Event 01/tournaments/Mortal Kombat X Qualifiers/rounds/2/matches/1/1?date=2015-03-25 09:00:00&location=miradero&station=1&round_of=Group
 
 papaluisre
 eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InBhcGFsdWlzcmUiLCJpYXQiOjE0Mjg5NTY2NzB9.vczR1Wq-jkHmq1_ckddrgyynD-vIoZ5mxj3dPSdIm7Q

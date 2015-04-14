@@ -193,4 +193,35 @@ var getSearchResults = function(req, res, pg, conString, log) {
 	});
 };
 
+var searchUsers = function(req, res, pg, conString, log) {
+    pg.connect(conString, function(err, client, done) {
+        if (err) {
+            return console.error('error fetching client from pool', err);
+        }
+
+         var query = client.query({
+             text: "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_country FROM customer WHERE customer_first_name ||' '|| customer_last_name ILIKE '%" + req.params.parameter + "%' OR customer_tag ILIKE '%" + req.params.parameter + "%' AND customer_active"
+         });
+         query.on("row", function (row, result) {
+             result.addRow(row);
+         });
+         query.on('error', function (error) {
+             client.query("ROLLBACK");
+             done();
+             res.status(500).send(error);
+             log.info({
+                 res: res
+             }, 'done response');
+         });
+         query.on("end", function (result) {
+             done();
+             res.status(200).json(result.rows);
+             log.info({
+                 res: res
+             }, 'done response');
+         });
+     });
+};
+
 module.exports.getSearchResults = getSearchResults;
+module.exports.searchUsers = searchUsers;
