@@ -351,7 +351,6 @@ myApp.controller("CreateTeamController", function($scope) {
  *	templateUrl: "organization/request_organization.html",
  *	URL (POST): http://matchup.neptunolabs.com/matchup/organizations
  */
-
 myApp.controller("RequestOrganizationController", function($scope, $window, $http, $rootScope, $state) {
 
 	$scope.submitOrganization = function(valid) {
@@ -361,9 +360,60 @@ myApp.controller("RequestOrganizationController", function($scope, $window, $htt
 				alert("Request for an organization successful");
 				$state.go("app.userProfile", {
 					"username" : $window.sessionStorage.username
-				})
+				});
 			});
 		};
+	};
+});
+
+/*
+ *
+ */
+myApp.controller("editOrganizationController", function($scope, $window, $stateParams, $http, $rootScope, $state) {
+	// Check if data service is empty
+	$http.get($rootScope.baseURL + '/matchup/organizations/' + $stateParams.organizationName).success(function(data) {
+		$scope.organization = data;
+	});
+
+	$scope.file_changed = function(element) {
+
+		var photofile = element.files[0];
+		var reader = new FileReader();
+		// Function fire everytime the file changes
+		reader.onload = function(e) {
+			var fd = new FormData();
+			fd.append("image", e.target.result.split(",")[1]);
+			fd.append("key", $rootScope.imgurKey);
+			var xhr = new XMLHttpRequest();
+			xhr.open("POST", "http://api.imgur.com/2/upload.json");
+			xhr.onload = function() {
+				// Apply changes to scope. Not a angular function it is needed
+				$scope.$apply(function() {
+					var link = JSON.parse(xhr.responseText).upload.links.original;
+					//Check which image was changed
+					if (element.id == "cover")
+						$scope.organization.organization_cover_photo = link;
+					else
+						$scope.organization.organization_logo = link;
+				});
+			};
+			xhr.send(fd);
+
+		};
+		reader.readAsDataURL(photofile);
+	};
+
+	$scope.submitEditOrganization = function(valid) {
+		var organization = {
+			"cover" : $scope.organization.organization_cover_photo,
+			"bio" : $scope.organization.organization_bio,
+			"logo" : $scope.organization.organization_logo,
+
+		};
+
+		$http.put($rootScope.baseURL + "/matchup/organizations/" + $scope.organization.organization_name, organization).success(function() {
+			alert("Edit successful");
+		});
 	};
 });
 

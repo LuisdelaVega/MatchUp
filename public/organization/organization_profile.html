@@ -14,7 +14,7 @@
 	</div>
 	<div class="row">
 		<div class="col-md-3 col-md-offset-9">
-			<a class="btn btn-primary btn-block box-margin" ui-sref="app.editOrganization" ng-if="organization.is_member">Edit</a>
+			<a class="btn btn-primary btn-block box-margin" ui-sref="app.editOrganization({organizationName: organization.organization_name})" ng-if="organization.is_member">Edit</a>
 		</div>
 	</div>
 </div>
@@ -23,9 +23,7 @@
 <div class="widget-box box-margin">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Events</h3>
-		<a class="widget-more" ui-sref="app.organizationEvents({organizationName: organization.organization_name})">
-						See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
-					</a>
+		<a class="widget-more" ui-sref="app.organizationEvents({organizationName: organization.organization_name})"> See More<i class="fa fa-arrow-circle-o-right panel-padding"></i> </a>
 	</div>
 	<!--Widget Header-->
 	<div class="widget-body">
@@ -34,20 +32,19 @@
 				<div class="row" style="padding-left: 15px">
 					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="event in events | limitTo: 4">
 						<a class="thumbnail" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_banner}}">
-							<hr class="hr-custom-padding">
-							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-										overflow: hidden;">
-								<p class="thumbnail-title">
-									{{event.event_name}}
-								</p>
-								<p class="thumbnail-paragraph">
-									{{event.event_location}}
-								</p>
-								<p class="thumbnail-paragraph">
-									{{ event.event_start_date | date: 'medium'}}
-								</p>
-							</div>
-						</a>
+						<hr class="hr-custom-padding">
+						<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+						overflow: hidden;">
+							<p class="thumbnail-title">
+								{{event.event_name}}
+							</p>
+							<p class="thumbnail-paragraph">
+								{{event.event_location}}
+							</p>
+							<p class="thumbnail-paragraph">
+								{{ event.event_start_date | date: 'medium'}}
+							</p>
+						</div> </a>
 					</div>
 				</div>
 			</div>
@@ -55,7 +52,6 @@
 	</div>
 </div>
 <!-- Organization Events widget-->
-
 
 <!-- Owners widget -->
 <div class="widget-box">

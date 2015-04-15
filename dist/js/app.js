@@ -250,8 +250,9 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			controller: "organizationProfileController"
 		})
 		.state('app.editOrganization', {
-			url: "/editOrganization",
-			templateUrl: "organization/edit_organization.html"
+			url: "/organization/:organizationName/edit",
+			templateUrl: "organization/edit_organization.html",
+			controller: "editOrganizationController"
 		})
 		.state('app.organizationEvents', {
 			url: "/organizationEvents/:organizationName",
@@ -263,7 +264,7 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			templateUrl: "organization/my_organizations.html"
 		})
 		.state('app.requestOrganization', {
-			url: "user/request/rganization",
+			url: "user/request/organization",
 			templateUrl: "organization/request_organization.html",
 			controller: "RequestOrganizationController"
 		})
