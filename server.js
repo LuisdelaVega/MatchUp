@@ -914,13 +914,24 @@ app.get('/matchup/search/:parameter', function(req, res) {
 
 /* /matchup/search/users/:parameter
  *
- * [GET] Search the system only for users
+ * [GET] Search the system for a specific user
  */
 app.get('/matchup/search/users/:parameter', function(req, res) {
     log.info({
         req : req
     }, 'start request');
     search.searchUsers(req, res, pg, conString, log);
+});
+
+/* /matchup/search/games/:parameter
+ *
+ * [GET] Search the system for a specific game
+ */
+app.get('/matchup/search/games/:parameter', function(req, res) {
+    log.info({
+        req : req
+    }, 'start request');
+    search.searchGames(req, res, pg, conString, log);
 });
 
 //*\\\\\\\\\\* TEAMS *//////////*/

@@ -223,5 +223,36 @@ var searchUsers = function(req, res, pg, conString, log) {
      });
 };
 
+var searchGames = function(req, res, pg, conString, log) {
+    pg.connect(conString, function(err, client, done) {
+        if (err) {
+            return console.error('error fetching client from pool', err);
+        }
+
+        var query = client.query({
+            text: "SELECT * FROM game WHERE game_name ILIKE '%" + req.params.parameter + "%'"
+        });
+        query.on("row", function (row, result) {
+            result.addRow(row);
+        });
+        query.on('error', function (error) {
+            client.query("ROLLBACK");
+            done();
+            res.status(500).send(error);
+            log.info({
+                res: res
+            }, 'done response');
+        });
+        query.on("end", function (result) {
+            done();
+            res.status(200).json(result.rows);
+            log.info({
+                res: res
+            }, 'done response');
+        });
+    });
+};
+
 module.exports.getSearchResults = getSearchResults;
 module.exports.searchUsers = searchUsers;
+module.exports.searchGames = searchGames;
