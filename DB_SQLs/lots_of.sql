@@ -140,10 +140,16 @@ SELECT sum(submits.score) AS score FROM is_set JOIN competes ON is_set.event_nam
 
 SELECT score_type, number_of_people_per_group, amount_of_winners_per_group, round_best_of FROM event NATURAL JOIN tournament NATURAL JOIN round WHERE event_name = 'Event 01' AND event_start_date = '2015-03-25 09:00:00' AND event_location = 'miradero' AND tournament_name = 'Mortal Kombat X Qualifiers' AND round_number = 1 AND round_of = 'Group' AND event_active;
 
-http://127.0.0.1:5000/matchup/events/Event 01/tournaments/Mortal Kombat X Qualifiers/rounds/1/matches/1/2?date=2015-03-25 09:00:00&location=miradero&station=1&round_of=Group
+http://127.0.0.1:5000/matchup/profile/matchups
+
+http://127.0.0.1:5000/matchup/events/Event 01/tournaments/Mortal Kombat X Qualifiers/rounds/2/matches/1/1?date=2015-03-25 09:00:00&location=miradero&station=1&round_of=Group
 
 papaluisre
 eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InBhcGFsdWlzcmUiLCJpYXQiOjE0Mjg5NTY2NzB9.vczR1Wq-jkHmq1_ckddrgyynD-vIoZ5mxj3dPSdIm7Q
 
 rapol
 eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InJhcG9sIiwiaWF0IjoxNDI4OTU3OTI4fQ.oG_PAGYluugXoU9LzYR2L8bvO0drgkleB6REoqL9vBs
+
+SELECT round_number, round_of, match_number FROM match WHERE (concat(round_number, round_of, match_number) NOT IN (SELECT concat(round_number, round_of, match_number) FROM is_played_in WHERE event_name = 'Event 01' AND event_start_date = '2015-03-25 09:00:00' AND event_location = 'miradero' AND tournament_name = 'Mortal Kombat X Qualifiers')) AND (concat(round_number, round_of, match_number, 2) IN (SELECT concat(round_number, round_of, match_number,count(concat(round_number, round_of, match_number))) FROM competes WHERE event_name = 'Event 01' AND event_start_date = '2015-03-25 09:00:00' AND event_location = 'miradero' AND tournament_name = 'Mortal Kombat X Qualifiers' GROUP BY round_number, round_of, match_number)) AND event_name = 'Event 01' AND event_start_date = '2015-03-25 09:00:00' AND event_location = 'miradero' AND tournament_name = 'Mortal Kombat X Qualifiers' ORDER BY round_number, CASE WHEN round_of = 'Group' THEN 1 WHEN round_of = 'Round Robin' THEN 2 WHEN round_of = 'Winner' THEN 3 WHEN round_of = 'Loser' THEN 4 END LIMIT 1;
+
+SELECT score_type, number_of_people_per_group, amount_of_winners_per_group, round_best_of, tournament_format, station_number FROM event NATURAL JOIN tournament NATURAL JOIN round NATURAL JOIN match LEFT OUTER JOIN is_played_in ON match.event_name = is_played_in.event_name AND match.event_start_date = is_played_in.event_start_date AND match.event_location = is_played_in.event_location AND match.tournament_name =is_played_in.tournament_name AND match.round_number = is_played_in.round_number AND match.round_of = is_played_in.round_of AND match.match_number = is_played_in.match_number WHERE match.event_name = 'Event 01' AND match.event_start_date = '2015-03-25 09:00:00' AND match.event_location = 'miradero' AND match.tournament_name = 'Mortal Kombat X Qualifiers' AND match.round_number = 1 AND match.round_of = 'Group' AND match.match_number = 1 AND event.event_active;

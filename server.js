@@ -912,6 +912,17 @@ app.get('/matchup/search/:parameter', function(req, res) {
 	search.getSearchResults(req, res, pg, conString, log);
 });
 
+/* /matchup/search/users/:parameter
+ *
+ * [GET] Search the system only for users
+ */
+app.get('/matchup/search/users/:parameter', function(req, res) {
+    log.info({
+        req : req
+    }, 'start request');
+    search.searchUsers(req, res, pg, conString, log);
+});
+
 //*\\\\\\\\\\* TEAMS *//////////*/
 /* /matchup/teams
  *

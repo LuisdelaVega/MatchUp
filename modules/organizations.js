@@ -61,7 +61,7 @@ var getOrganization = function(req, res, pg, conString, log) {
 	});
 };
 
-//TODO Send new Org info
+//TODO Edit API
 var editOrganization = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -85,26 +85,37 @@ var editOrganization = function(req, res, pg, conString, log) {
 		});
 		query.on("end", function(result) {
 			if (result.rows.length && result.rows[0].is_member) {
-				client.query({
-					text : "UPDATE organization SET (organization_logo, organization_bio, organization_cover_photo) = ($1, $2, $3) WHERE organization_name = $4",
-					values : [req.body.logo, req.body.bio, req.body.cover, req.params.organization]
-				}, function(err, result) {
-					if (err) {
-						client.query("ROLLBACK");
-						done();
-						res.status(500).send(err);
-						log.info({
-							res : res
-						}, 'done response');
-					} else {
-						client.query("COMMIT");
-						done();
-						res.status(200).send('Organization info udated');
-						log.info({
-							res : res
-						}, 'done response');
-					}
-				});
+                if (req.body.logo && req.body.bio && req.body.cover) {
+                    client.query({
+                        text: "UPDATE organization SET (organization_logo, organization_bio, organization_cover_photo) = ($1, $2, $3) WHERE organization_name = $4",
+                        values: [req.body.logo, req.body.bio, req.body.cover, req.params.organization]
+                    }, function (err, result) {
+                        if (err) {
+                            client.query("ROLLBACK");
+                            done();
+                            res.status(500).send(err);
+                            log.info({
+                                res: res
+                            }, 'done response');
+                        } else {
+                            client.query("COMMIT");
+                            done();
+                            res.status(200).send('Organization info udated');
+                            log.info({
+                                res: res
+                            }, 'done response');
+                        }
+                    });
+                } else {
+                    client.query("ROLLBACK");
+                    done();
+                    res.status(400).json({
+                        error : "Incomplete or invalid parameters"
+                    });
+                    log.info({
+                        res: res
+                    }, 'done response');
+                }
 			} else {
 				res.status(404).send("Coudn't find the organization: " + req.params.organization);
 			}
