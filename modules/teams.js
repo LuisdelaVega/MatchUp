@@ -180,7 +180,7 @@ var getTeamMembers = function(req, res, pg, conString, log) {
 		query.on("end", function(result) {
 			if (result.rows.length) {
 				var query = client.query({
-					text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, bool_and(customer_username IN (SELECT customer_username FROM captain_for WHERE team_name = $1)) AS is_captain FROM customer NATURAL JOIN plays_for NATURAL JOIN team WHERE team_name = $1 AND team_active GROUP BY customer_username",
+					text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, bool_and(customer_username IN (SELECT customer_username FROM captain_for WHERE team_name = $1)) AS is_captain FROM customer NATURAL JOIN plays_for NATURAL JOIN team WHERE team_name = $1 AND team_active GROUP BY customer_username ORDER BY is_captain DESC",
 					values : [req.params.team]
 				});
 				query.on("row", function(row, result) {

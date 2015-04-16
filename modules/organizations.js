@@ -164,7 +164,7 @@ var getOrganizationMembers = function(req, res, pg, conString, log) {
 		}
 
 		var query = client.query({
-			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, bool_and(customer_username IN (SELECT customer_username FROM owns WHERE organization_name = $1)) AS is_owner FROM organization NATURAL JOIN belongs_to NATURAL JOIN customer WHERE organization_name = $1 AND organization_active GROUP BY customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic",
+			text : "SELECT customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic, bool_and(customer_username IN (SELECT customer_username FROM owns WHERE organization_name = $1)) AS is_owner FROM organization NATURAL JOIN belongs_to NATURAL JOIN customer WHERE organization_name = $1 AND organization_active GROUP BY customer_username, customer_first_name, customer_last_name, customer_tag, customer_profile_pic ORDER BY is_owner DESC",
 			values : [req.params.organization]
 		});
 		query.on("row", function(row, result) {

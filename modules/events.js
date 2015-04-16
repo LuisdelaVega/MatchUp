@@ -337,6 +337,113 @@ function getNextPowerOf2(numOfPlayers) {
     return Math.ceil(Math.log(numOfPlayers) / Math.log(2));
 }
 
+function is_set(req, res, client, done, log, round_number, round_of, match_number, set_seq, station_number, index, length) {
+    client.query({
+        text : "INSERT INTO is_set (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
+        values : [req.params.event, req.query.date, req.query.location, req.params.tournament, round_number, round_of, match_number, set_seq]
+    }, function(err, result) {
+        if (err) {
+            console.log("is_set");
+            client.query("ROLLBACK");
+            done();
+            res.status(500).send(err);
+            log.info({
+                res : res
+            }, 'done response');
+        } else if (index == length) {
+            // Assign the same station to the extra match (No reason for them to move since they are playing each other again)
+            client.query({
+                text : "INSERT INTO is_played_in (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, station_number) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
+                values : [req.params.event, req.query.date, req.query.location, req.params.tournament, round_number, round_of, match_number, station_number]
+            }, function (err, result) {
+                if (err) {
+                    client.query("ROLLBACK");
+                    done();
+                    console.log(err);
+                    res.status(500).send(err);
+                    log.info({
+                        res: res
+                    }, 'done response');
+                } else {
+                    client.query("COMMIT");
+                    done();
+                    res.status(201).send("Score submitted");
+                    log.info({
+                        res : res
+                    }, 'done response');
+                }
+            });
+        }
+    });
+}
+
+function reallyUpdateStanding(req, res, client, done, log, competitor_number, standing, index, length, otherIndex, otherLength) {
+    client.query({
+        text : "UPDATE competitor SET competitor_standing = $6 WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_number = $5",
+        values : [req.params.event, req.query.date, req.query.location, req.params.tournament, competitor_number, standing]
+    }, function (err, result) {
+        if (err) {
+            client.query("ROLLBACK");
+            done();
+            console.log(err);
+            res.status(500).send(err);
+            log.info({
+                res: res
+            }, 'done response');
+        } else {
+            console.log("Set the standing for competitor #" + competitor_number + " at " + standing);
+            console.log("index "+index+" length "+length+" otherIndex "+otherIndex+" otherLength "+otherLength);
+            if (index == length && otherIndex == otherLength) {
+                console.log("BYE");
+                client.query("COMMIT");
+                done();
+                res.status(201).send("Score submitted");
+                log.info({
+                    res : res
+                }, 'done response');
+            }
+        }
+    });
+}
+
+function updateStanding(req, res, client, done, log, tournament_format, rounds, whereTheLosersAt) {
+    var standing = 3;
+    var index = 0;
+    console.log("Hello!");
+    console.log(rounds.length);
+    for (var i = 0; i < rounds.length; i++) {
+        console.log("Getting the losers from round: " + rounds[i].round_number + " of " + whereTheLosersAt);
+        var query = client.query({
+            text: "SELECT competes.competitor_number FROM competes WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND (competes.competitor_number NOT IN (SELECT competitor_number FROM competes JOIN competitor_goes_to ON competes.event_name = competitor_goes_to.event_name AND competes.event_start_date = competitor_goes_to.event_start_date AND competes.event_location = competitor_goes_to.event_location AND competes.tournament_name = competitor_goes_to.tournament_name AND competes.round_number = competitor_goes_to.future_round_number AND competes.round_of = competitor_goes_to.future_round_of AND competes.match_number = competitor_goes_to.future_match WHERE competitor_goes_to.is_winner AND competitor_goes_to.future_round_number = $7 AND competitor_goes_to.future_round_of = $8)) ORDER BY competes.round_number DESC, competes.match_number",
+            values: [req.params.event, req.query.date, req.query.location, req.params.tournament, rounds[i].round_number, whereTheLosersAt, ((tournament_format === "Double Elimination" && !i) ? req.params.round : (rounds[i].round_number+1)), ((tournament_format === "Double Elimination" && !i) ? "Winner" : whereTheLosersAt)]
+        });
+        query.on("row", function (row, result) {
+            result.addRow(row);
+        });
+        query.on('error', function (error) {
+            client.query("ROLLBACK");
+            done();
+            console.log(error);
+            res.status(500).send(error);
+            log.info({
+                res: res
+            }, 'done response');
+        });
+        query.on("end", function (result) {
+            for (var j = 0; j < result.rows.length; j++) {
+                console.log("Going to set the standing for competitor #" + result.rows[j].competitor_number + " at " + standing);
+                var competitor = result.rows[j].competitor_number;
+                reallyUpdateStanding(req, res, client, done, log, result.rows[j].competitor_number, standing, j, (result.rows.length-1), index, (rounds.length-1));
+            }
+            console.log("Going to update the value for the standing currently at " + standing);
+            standing += result.rows.length;
+            console.log("Updated the value for the standing to " + standing);
+            index++;
+        });
+        console.log("i: "+i);
+    }
+}
+
 //TODO check for compliance between the score in the body and the score_type of the Tournament
 //TODO Check for round_pause
 var submitScore = function(req, res, pg, conString, log) {
@@ -551,6 +658,7 @@ var submitScore = function(req, res, pg, conString, log) {
                                                                                 }, 'done response');
                                                                             } else {
                                                                                 // Asign the station where this match was played to another match that has no station already assigned
+                                                                                //TODO Check this
                                                                                 var query = client.query({
                                                                                     text : "SELECT round_number, round_of, match_number FROM match WHERE (concat(round_number, round_of, match_number) NOT IN (SELECT concat(round_number, round_of, match_number) FROM is_played_in WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4)) AND (concat(round_number, round_of, match_number, 2) IN (SELECT concat(round_number, round_of, match_number,count(concat(round_number, round_of, match_number))) FROM competes WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 GROUP BY round_number, round_of, match_number)) AND event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 ORDER BY round_number, CASE WHEN round_of = 'Group' THEN 1 WHEN round_of = 'Round Robin' THEN 2 WHEN round_of = 'Winner' THEN 3 WHEN round_of = 'Loser' THEN 4 END LIMIT 1",
                                                                                     values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
@@ -775,21 +883,212 @@ var submitScore = function(req, res, pg, conString, log) {
                                                                                                                 }
                                                                                                             });
                                                                                                         } else if (req.query.round_of === "Winner") {
-                                                                                                            //TODO This is where we will take care of what happens after the Round Robin stage has ended
-                                                                                                            client.query("COMMIT");
-                                                                                                            done();
-                                                                                                            res.status(201).send("Score submitted");
-                                                                                                            log.info({
-                                                                                                                res : res
-                                                                                                            }, 'done response');
+                                                                                                            // Look for the finalists of the Winners Bracket
+                                                                                                            var query = client.query({
+                                                                                                                text : "SELECT competes.competitor_number, competitor.matches_lost, sum(submits.score) AS score FROM competes JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number JOIN competitor ON competitor.event_name = competes.event_name AND competitor.event_start_date = competes.event_start_date AND competitor.event_location = competes.event_location AND competitor.tournament_name = competes.tournament_name AND competitor.competitor_number = competes.competitor_number WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_of = 'Winner' AND competes.round_number = (SELECT max(round_number) FROM round WHERE round_of = 'Winner' AND event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4) GROUP BY competes.competitor_number, competitor.matches_lost ORDER BY score DESC",
+                                                                                                                values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
+                                                                                                            });
+                                                                                                            query.on("row", function(row, result) {
+                                                                                                                result.addRow(row);
+                                                                                                            });
+                                                                                                            query.on('error', function(error) {
+                                                                                                                client.query("ROLLBACK");
+                                                                                                                done();
+                                                                                                                console.log(error);
+                                                                                                                res.status(500).send(error);
+                                                                                                                log.info({
+                                                                                                                    res : res
+                                                                                                                }, 'done response');
+                                                                                                            });
+                                                                                                            query.on("end", function(result) {
+                                                                                                                /**
+                                                                                                                 * If both players have lost the same amount of matches, that means that the undefeated player lost his first match.
+                                                                                                                 * This means that we are in a Double Elimination Bracket (In a Single Elimination Bracket, when you lose, you don't play any more matches, hence no two players of a specific match can have the same number of matches lost. We still perform the check to be consistent and buletproof).
+                                                                                                                 * In a Double Elimination Bracket, a player is eliminated after losing two matches. This also applies in the Final match.
+                                                                                                                 * We must create another round with a single match, where these two players face of again to determine the winner.
+                                                                                                                 *
+                                                                                                                 * If both players have a different of matches lost, this means that we have a winner and a loser. and can proceed to calculate the standings
+                                                                                                                 */
+                                                                                                                if (result.rows[0].matches_lost == result.rows[1].matches_lost && details.tournament_format === "Double Elimination") {
+                                                                                                                    var competitorInfo = result.rows;
+                                                                                                                    // Create the extra round
+                                                                                                                    client.query({
+                                                                                                                        text : "INSERT INTO round (event_name, event_start_date, event_location, tournament_name, round_number, round_of, round_start_date, round_pause, round_completed, round_best_of) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+                                                                                                                        values : [req.params.event, req.query.date, req.query.location, req.params.tournament, (parseInt(req.params.round)+1), "Winner", (new Date()).toUTCString(), false, false, details.round_best_of]
+                                                                                                                    }, function (err, result) {
+                                                                                                                        if (err) {
+                                                                                                                            client.query("ROLLBACK");
+                                                                                                                            done();
+                                                                                                                            console.log(err);
+                                                                                                                            res.status(500).send(err);
+                                                                                                                            log.info({
+                                                                                                                                res: res
+                                                                                                                            }, 'done response');
+                                                                                                                        } else {
+                                                                                                                            // Create the extra match
+                                                                                                                            client.query({
+                                                                                                                                text : "INSERT INTO match (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, is_favourite, match_completed) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+                                                                                                                                values : [req.params.event, req.query.date, req.query.location, req.params.tournament, (parseInt(req.params.round)+1), "Winner", 1, true, false]
+                                                                                                                            }, function (err, result) {
+                                                                                                                                if (err) {
+                                                                                                                                    client.query("ROLLBACK");
+                                                                                                                                    done();
+                                                                                                                                    console.log(err);
+                                                                                                                                    res.status(500).send(err);
+                                                                                                                                    log.info({
+                                                                                                                                        res: res
+                                                                                                                                    }, 'done response');
+                                                                                                                                } else {
+                                                                                                                                    // Assign one of the players to the extra match
+                                                                                                                                    client.query({
+                                                                                                                                        text : "INSERT INTO competes (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, competitor_number) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
+                                                                                                                                        values : [req.params.event, req.query.date, req.query.location, req.params.tournament, (parseInt(req.params.round)+1), "Winner", 1, competitorInfo[0].competitor_number]
+                                                                                                                                    }, function (err, result) {
+                                                                                                                                        if (err) {
+                                                                                                                                            client.query("ROLLBACK");
+                                                                                                                                            done();
+                                                                                                                                            console.log(err);
+                                                                                                                                            res.status(500).send(err);
+                                                                                                                                            log.info({
+                                                                                                                                                res: res
+                                                                                                                                            }, 'done response');
+                                                                                                                                        } else {
+                                                                                                                                            // Assign the other player to the extra match
+                                                                                                                                            client.query({
+                                                                                                                                                text : "INSERT INTO competes (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, competitor_number) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
+                                                                                                                                                values : [req.params.event, req.query.date, req.query.location, req.params.tournament, (parseInt(req.params.round)+1), "Winner", 1, competitorInfo[1].competitor_number]
+                                                                                                                                            }, function (err, result) {
+                                                                                                                                                if (err) {
+                                                                                                                                                    client.query("ROLLBACK");
+                                                                                                                                                    done();
+                                                                                                                                                    console.log(err);
+                                                                                                                                                    res.status(500).send(err);
+                                                                                                                                                    log.info({
+                                                                                                                                                        res: res
+                                                                                                                                                    }, 'done response');
+                                                                                                                                                } else {
+                                                                                                                                                    // Assign the sets to the extra match
+                                                                                                                                                    for (var i = 0; i < details.round_best_of; i++) {
+                                                                                                                                                        is_set(req, res, client, done, log, (parseInt(req.params.round)+1), "Winner", 1, (i+1), details.station_number, i, (parseInt(details.round_best_of) -1))
+                                                                                                                                                    }
+                                                                                                                                                }
+                                                                                                                                            });
+                                                                                                                                        }
+                                                                                                                                    });
+                                                                                                                                }
+                                                                                                                            });
+                                                                                                                        }
+                                                                                                                    });
+                                                                                                                } else {
+                                                                                                                    /**
+                                                                                                                     * Calculate the standings for each player.
+                                                                                                                     */
+                                                                                                                    var query = client.query({
+                                                                                                                        text : "SELECT competes.competitor_number, sum(submits.score) AS score FROM competes JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number JOIN competitor ON competitor.event_name = competes.event_name AND competitor.event_start_date = competes.event_start_date AND competitor.event_location = competes.event_location AND competitor.tournament_name = competes.tournament_name AND competitor.competitor_number = competes.competitor_number WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_of = 'Winner' AND competes.round_number = (SELECT max(round_number) FROM round WHERE round_of = 'Winner' AND event_name = $1 AND event_start_date = $2  AND event_location = $3 AND tournament_name = $4) GROUP BY competes.competitor_number, competitor.matches_lost ORDER BY score DESC",
+                                                                                                                        values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
+                                                                                                                    });
+                                                                                                                    query.on("row", function(row, result) {
+                                                                                                                        result.addRow(row);
+                                                                                                                    });
+                                                                                                                    query.on('error', function(error) {
+                                                                                                                        client.query("ROLLBACK");
+                                                                                                                        done();
+                                                                                                                        console.log(error);
+                                                                                                                        res.status(500).send(error);
+                                                                                                                        log.info({
+                                                                                                                            res : res
+                                                                                                                        }, 'done response');
+                                                                                                                    });
+                                                                                                                    query.on("end", function(result) {
+                                                                                                                        var winners = result.rows;
+                                                                                                                        client.query({
+                                                                                                                            text : "UPDATE competitor SET competitor_standing = $6 WHERE event_name = $1 AND event_start_date = $2  AND event_location = $3 AND tournament_name = $4 AND competitor_number = $5",
+                                                                                                                            values : [req.params.event, req.query.date, req.query.location, req.params.tournament, winners[0].competitor_number, 1]
+                                                                                                                        }, function (err, result) {
+                                                                                                                            if (err) {
+                                                                                                                                client.query("ROLLBACK");
+                                                                                                                                done();
+                                                                                                                                console.log(err);
+                                                                                                                                res.status(500).send(err);
+                                                                                                                                log.info({
+                                                                                                                                    res: res
+                                                                                                                                }, 'done response');
+                                                                                                                            } else {
+                                                                                                                                client.query({
+                                                                                                                                    text : "UPDATE competitor SET competitor_standing = $6 WHERE event_name = $1 AND event_start_date = $2  AND event_location = $3 AND tournament_name = $4 AND competitor_number = $5",
+                                                                                                                                    values : [req.params.event, req.query.date, req.query.location, req.params.tournament, winners[1].competitor_number, 2]
+                                                                                                                                }, function (err, result) {
+                                                                                                                                    if (err) {
+                                                                                                                                        client.query("ROLLBACK");
+                                                                                                                                        done();
+                                                                                                                                        console.log(err);
+                                                                                                                                        res.status(500).send(err);
+                                                                                                                                        log.info({
+                                                                                                                                            res: res
+                                                                                                                                        }, 'done response');
+                                                                                                                                    }
+                                                                                                                                });
+                                                                                                                            }
+                                                                                                                        });
+                                                                                                                    });
+
+                                                                                                                    var whereTheLosersAt = "";
+                                                                                                                    var queryText = "";
+                                                                                                                    if (details.tournament_format === "Double Elimination") {
+                                                                                                                        whereTheLosersAt = "Loser";
+                                                                                                                        queryText = "SELECT round_number FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_of = 'Loser' ORDER BY round_number DESC";
+                                                                                                                    } else {
+                                                                                                                        whereTheLosersAt = "Winner";
+                                                                                                                        queryText = "SELECT round_number FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_of = 'Winner' AND round_number <> (SELECT max(round_number) FROM round WHERE round_of = 'Winner' AND event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4) ORDER BY round_number DESC";
+                                                                                                                    }
+
+                                                                                                                    // Check for 3rd place and so on
+                                                                                                                    // First go through all rounds in descending order, starting from the
+                                                                                                                    var query = client.query({
+                                                                                                                        text : queryText,
+                                                                                                                        values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
+                                                                                                                    });
+                                                                                                                    query.on("row", function(row, result) {
+                                                                                                                        result.addRow(row);
+                                                                                                                    });
+                                                                                                                    query.on('error', function(error) {
+                                                                                                                        client.query("ROLLBACK");
+                                                                                                                        done();
+                                                                                                                        console.log(error);
+                                                                                                                        res.status(500).send(error);
+                                                                                                                        log.info({
+                                                                                                                            res : res
+                                                                                                                        }, 'done response');
+                                                                                                                    });
+                                                                                                                    query.on("end", function(result) {
+                                                                                                                        // round_number, round_of
+                                                                                                                        updateStanding(req, res, client, done, log, details.tournament_format, result.rows, whereTheLosersAt);
+                                                                                                                    });
+                                                                                                                }
+                                                                                                            });
                                                                                                         } else {
                                                                                                             // TODO This is where we will take care of what happens after the Round Robin stage has ended
-                                                                                                            client.query("COMMIT");
-                                                                                                            done();
-                                                                                                            res.status(201).send("Score submitted");
-                                                                                                            log.info({
-                                                                                                                res : res
-                                                                                                            }, 'done response');
+                                                                                                            var query = client.query({
+                                                                                                                text : "SELECT competitor_number FROM competitor NATURAL JOIN competes WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_of = 'Round Robin' ORDER BY matches_won DESC, competitor_seed ASC",
+                                                                                                                values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
+                                                                                                            });
+                                                                                                            query.on("row", function(row, result) {
+                                                                                                                result.addRow(row);
+                                                                                                            });
+                                                                                                            query.on('error', function(error) {
+                                                                                                                client.query("ROLLBACK");
+                                                                                                                done();
+                                                                                                                console.log(error);
+                                                                                                                res.status(500).send(error);
+                                                                                                                log.info({
+                                                                                                                    res : res
+                                                                                                                }, 'done response');
+                                                                                                            });
+                                                                                                            query.on("end", function(result) {
+                                                                                                                for (var i = 0 ; i < result.rows.length; i++) {
+                                                                                                                    reallyUpdateStanding(req, res, client, done, log, result.rows[i].competitor_number, (i+1), i, (result.rows.length), 0, 0);
+                                                                                                                }
+                                                                                                            });
                                                                                                         }
                                                                                                     } else {
                                                                                                         client.query("COMMIT");
