@@ -1,9 +1,7 @@
 <div class="row">
 	<div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
 		<div class="list-group">
-			<a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="tournament in tournaments track by $index" ng-click="getTournamentStation($index)">
-				<h4 class="list-group-item-heading">{{tournament.tournament_name}}</h4>
-			</a>
+			<a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="tournament in tournaments track by $index" ng-click="getTournamentStation($index)"> <h4 class="list-group-item-heading">{{tournament.tournament_name}}</h4> </a>
 		</div>
 	</div>
 	<div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
@@ -15,20 +13,24 @@
 				<div class="list-group-item clearfix cursor" ng-repeat="item in stations" ng-click="editStationModal($index)">
 					<p class="lead event-footer-title">
 						Station {{item.station_number}}
-						<p ng-if="item.stream_link">
-							Stream: {{item.stream_link}}
-						</p>
-						<!-- TODO Use ongoing variable!-->
-						<p>  Station in Use:{{item.station_in_use}}
-						</p>
+					<p ng-if="item.stream_link">
+						Stream: {{item.stream_link}}
+					</p>
+					<!-- TODO Use ongoing variable!-->
+					<p>
+						Station in Use:{{item.station_in_use}}
+					</p>
 				</div>
 			</div>
-			<button class="btn btn-success" ng-click="addStation()">Add New Station</button>
-			<button class="btn btn-default" ng-click="linkStation()">Link Station</button>
+			<button class="btn btn-success" ng-click="addStation()">
+				Add New Station
+			</button>
+			<button class="btn btn-default" ng-click="linkStation()">
+				Link Station
+			</button>
 		</div>
 	</div>
 </div>
-
 
 <div class="modal fade" id="editStationModal">
 	<div class="modal-dialog">
@@ -44,18 +46,26 @@
 					<div class="form-group">
 						<h4>Tournaments Assigned to</h4>
 						<ul>
-							<li ng-repeat="tournament in stationInUse">{{tournament.name}}</li>
+							<li ng-repeat="tournament in stationInUse">
+								{{tournament.name}}
+							</li>
 						</ul>
 					</div>
 					<div class="form-group">
 						<label>Stream: </label>
 						<input class="form-control" placeholder="Enter stream link" ng-model="newStream">
 					</div>
-					<button class="btn btn-success" ng-click="editStream()">Edit Stream</button>
+					<button class="btn btn-success" ng-click="editStream()" ng-if="stations[stationIndex].stream_link">
+						Edit Stream
+					</button>
+					<button class="btn btn-success" ng-click="addStream()" ng-if="!stations[stationIndex].stream_link">
+						Add Stream
+					</button>
+
 				</form>
 			</div>
 			<div class="modal-footer">
-				<div ng-switch on="stationInUse.length == 1">
+				<div ng-switch on="index == 0">
 					<div ng-switch-when="true">
 						<button type="button" class="btn btn-danger" ng-click="deleteStation()">
 							Delete Station
@@ -80,7 +90,6 @@
 	<!-- /.modal-dialog -->
 </div>
 <!-- /.modal -->
-
 
 <div class="modal fade" id="linkStation">
 	<div class="modal-dialog">

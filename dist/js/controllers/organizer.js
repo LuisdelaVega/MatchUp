@@ -293,23 +293,16 @@ myApp.controller("StationController", function($scope, $http, $window, $rootScop
 		console.log("Event Tournaments");
 		console.log(data);
 		$scope.tournaments = data;
+
 		$scope.tournaments.unshift({
 			"tournament_name" : "All Stations"
 		});
-		$scope.index = 0;
-		$scope.stations = $scope.allStations;
-		// $http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/'+ $scope.tournaments[$scope.index].tournament_name + '/stations?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
-		// console.log("Event Tournaments");
-		// console.log(data);
-		// $scope.stations = data;
-		//
-		//
-		// }).error(function(err) {
-		// console.log(err);
-		// });
 
 	}).error(function(err) {
 		console.log(err);
+	}).finally(function() {
+		$scope.stations = $scope.allStations;
+		$scope.index = 0;
 	});
 	// Index to show active item in list of tournament
 
@@ -409,12 +402,16 @@ myApp.controller("StationController", function($scope, $http, $window, $rootScop
 	$scope.selected = {
 		station : null
 	};
-	// Attatch station to a tournament
+	// Attach station to a tournament
 	$scope.attatch = function() {
 		if ($scope.selected.station) {
-			$scope.stations.push(angular.fromJson($scope.selected.station));
-			$('#linkStation').modal("hide");
-			$scope.selected.station = null;
+			$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&station=' + angular.fromJson($scope.selected.station).station_number).success(function(data) {
+				$scope.stations.push(angular.fromJson($scope.selected.station));
+				$('#linkStation').modal("hide");
+				$scope.selected.station = null;
+			}).error(function(err) {
+				console.log(err);
+			});
 		}
 	};
 
@@ -425,30 +422,83 @@ myApp.controller("StationController", function($scope, $http, $window, $rootScop
 			"station_in_use" : false,
 			"stream_link" : null
 		};
-		$scope.allStations.push($scope.newStation);
+
+		$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/stations?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+			$scope.allStations.push($scope.newStation);
+
+		}).error(function(err) {
+			console.log(err);
+		});
+
+		//add to current station
 		if ($scope.index > 0) {
-			$scope.stations.push($scope.newStation);
+			$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&station=' + $scope.newStation.station_number).success(function(data) {
+				$scope.stations.push($scope.newStation);
+			}).error(function(err) {
+				console.log(err);
+			});
 		}
 
 	};
 
 	$scope.editStream = function() {
 		// Get input value and overwrite station stream link
-		$scope.stations[$scope.stationIndex].stream_link = $scope.newStream;
-		$scope.newStream = "";
-		$('#editStationModal').modal('hide');
+		$http.put($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/stations/' + $scope.stations[$scope.stationIndex].station_number + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation, {
+			"stream" : $scope.newStream
+		}).success(function(data) {
+			if ($scope.index > 0)
+				$scope.stations[$scope.stationIndex].stream_link = $scope.newStream;
+			else
+				$scope.allStations[$scope.stationIndex].stream_link = $scope.newStream;
+
+			$scope.newStream = "";
+			$('#editStationModal').modal('hide');
+
+		}).error(function(err) {
+			console.log(err);
+		});
+
+	};
+
+	$scope.addStream = function() {
+		// Get input value and overwrite station stream link
+		$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/stations/' + $scope.stations[$scope.stationIndex].station_number + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation, {
+			"stream" : $scope.newStream
+		}).success(function(data) {
+			if ($scope.index > 0)
+				$scope.stations[$scope.stationIndex].stream_link = $scope.newStream;
+			else
+				$scope.allStations[$scope.stationIndex].stream_link = $scope.newStream;
+
+			$scope.newStream = "";
+			$('#editStationModal').modal('hide');
+
+		}).error(function(err) {
+			console.log(err);
+		});
+
 	};
 
 	// Remove station from tournament
 	$scope.removeStation = function() {
-		$scope.stations.splice($scope.stationIndex, 1);
-		$('#editStationModal').modal('hide');
+		$http.delete($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '/stations?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&station=' + $scope.stations[$scope.stationIndex].station_number).success(function(data) {
+			$scope.stations.splice($scope.stationIndex, 1);
+			$('#editStationModal').modal('hide');
+		}).error(function(err) {
+			console.log(err);
+		});
 	};
 
 	// Delete station from tournament
 	$scope.deleteStation = function() {
-		$scope.stations.splice($scope.stationIndex, 1);
-		$('#editStationModal').modal('hide');
+		$http.delete($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/stations?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&station=' + $scope.allStations[$scope.stationIndex].station_number).success(function(data) {
+			$scope.allStations.splice($scope.stationIndex, 1);
+			$('#editStationModal').modal('hide');
+
+		}).error(function(err) {
+			console.log(err);
+		});
+
 	};
 });
 
