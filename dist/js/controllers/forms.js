@@ -337,13 +337,213 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
  *	templateUrl: "team/create_team.html"
  *	url (POST): http://matchup.neptunolabs.com/matchup/teams
  */
-myApp.controller("CreateTeamController", function($scope) {
+myApp.controller("CreateTeamController", function($scope, $window, $rootScope, $http, $state) {
+
+	$scope.team = {}
+	$scope.validCover = true;
+	$scope.file_changed = function(element) {
+		console.log(element);
+
+		var photofile = element.files[0];
+		var reader = new FileReader();
+		// Function fire everytime the file changes
+		reader.onload = function(e) {
+			var fd = new FormData();
+			fd.append("image", e.target.result.split(",")[1]);
+			fd.append("key", $rootScope.imgurKey);
+			var xhr = new XMLHttpRequest();
+			xhr.open("POST", "http://api.imgur.com/2/upload.json");
+			xhr.onload = function() {
+				// Apply changes to scope. Not a angular function it is needed
+				$scope.$apply(function() {
+					var link = JSON.parse(xhr.responseText).upload.links.original;
+					//Check which image was changed
+					if (element.id == "logo")
+						$scope.team.logo = link;
+					else
+						$scope.team.cover = link;
+				});
+			}
+			xhr.send(fd);
+
+		}
+		reader.readAsDataURL(photofile);
+	};
 
 	$scope.submitCreateTeam = function(valid) {
-		if (valid) {
-			console.log($scope.team)
+		console.log($scope.team.cover);
+		if (angular.isUndefined($scope.team.cover)) {
+			$scope.validCover = false;
+			return;
+		} else {
+			$scope.validCover = true;
 		}
-	}
+		if (valid) {
+			console.log($scope.team);
+
+			$http.post($rootScope.baseURL + '/matchup/teams', $scope.team).success(function(data, status) {
+				alert("Team Succesfully Created");
+
+				$state.go("app.teamProfile", {
+					"teamName" : data.team_name
+				});
+
+			});
+
+			// $http.get($rootScope.baseURL + '/matchup/teams').success(function(data, status) {
+			// });
+
+		} else {
+			return;
+		}
+	};
+});
+
+/* Manage/edit team controller:
+ * Controller contains the necessary logic to manage a specific team, this includes editing general information about a team, adding/deleting members of a team,
+ * making another member the captain (if and only if you are the captain) and deleting the team.
+ */
+myApp.controller("editTeamController", function($scope, $window, $rootScope, $http, $state, $stateParams) {
+
+	$http.get($rootScope.baseURL + '/matchup/teams/' + $stateParams.teamName).success(function(data) {
+		console.log(data);
+		$scope.team = {
+			"name" : data.team_name,
+			"bio" : data.team_bio,
+			"logo" : data.team_logo,
+			"cover" : data.team_cover_photo
+		};
+		//get all users that belong to an organization
+		$http.get($rootScope.baseURL + '/matchup/teams/' + $scope.team.name + '/members').success(function(data) {
+			$scope.members = data;
+			$scope.membersList = [];
+			$http.get($rootScope.baseURL + '/matchup/profile/').success(function(data) {
+
+				$scope.currentUser = data;
+				$scope.currentUser.is_captain = false;
+				$scope.currentUser.is_member = false;
+
+				angular.forEach($scope.members, function(member) {
+					$scope.membersList.push(member.customer_username);
+					if ($scope.currentUser.customer_username == member.customer_username) {
+						$scope.currentUser.is_member = true;
+						if (member.is_captain) {
+							$scope.currentUser.is_captain = true;
+						}
+					}
+				});
+
+			});
+
+		});
+
+	});
+
+	$scope.filterArray = function(user) {
+		return ($scope.membersList.indexOf(user.customer_username) == -1);
+	};
+
+	$scope.validCover = true;
+	$scope.file_changed = function(element) {
+
+		var photofile = element.files[0];
+		var reader = new FileReader();
+		// Function fire everytime the file changes
+		reader.onload = function(e) {
+			var fd = new FormData();
+			fd.append("image", e.target.result.split(",")[1]);
+			fd.append("key", $rootScope.imgurKey);
+			var xhr = new XMLHttpRequest();
+			xhr.open("POST", "http://api.imgur.com/2/upload.json");
+			xhr.onload = function() {
+				// Apply changes to scope. Not a angular function it is needed
+				$scope.$apply(function() {
+					var link = JSON.parse(xhr.responseText).upload.links.original;
+					//Check which image was changed
+					if (element.id == "logo")
+						$scope.team.logo = link;
+					else
+						$scope.team.cover = link;
+				});
+			}
+			xhr.send(fd);
+
+		}
+		reader.readAsDataURL(photofile);
+	};
+
+	$scope.submitEditTeam = function(valid) {
+		if (angular.isUndefined($scope.team.cover)) {
+			$scope.validCover = false;
+			return;
+		} else {
+			$scope.validCover = true;
+			$http.put($rootScope.baseURL + '/matchup/teams/' + $scope.team.name, $scope.team).success(function(data, status) {
+				alert("Team Succesfully Edited");
+
+				$state.go("app.teamProfile", {
+					"teamName" : $scope.team.name
+				});
+
+			});
+		}
+
+	};
+
+	$scope.deleteTeam = function() {
+		$http.delete($rootScope.baseURL + '/matchup/teams/' + $scope.team.name).success(function(data, status) {
+			$state.go("app.home");
+
+		});
+	};
+
+	$scope.addMember = function(user) {
+
+		$http.post($rootScope.baseURL + '/matchup/teams/' + $stateParams.teamName + '/members?username=' + user.customer_username + '').success(function(data, status) {
+			$scope.lastUserAdded = user;
+			$scope.membersList.push(user.customer_username);
+			$scope.members.push(user);
+			$('#addTeammateModal').modal('hide');
+			$('#teammateAddSuccesModal').modal('show');
+
+		});
+
+	};
+
+	$scope.deleteUserPrompt = function(user) {
+		$('#deleteTeammateModal').modal('show');
+		$scope.deleteTeammate = user;
+	};
+
+	$scope.removeMember = function() {
+
+		$http.delete($rootScope.baseURL + '/matchup/teams/' + $stateParams.teamName + '/members?username=' + $scope.deleteTeammate.customer_username + '').success(function(data, status) {
+
+			$scope.membersList.splice($scope.membersList.indexOf($scope.deleteTeammate), 1);
+
+			$scope.members.splice($scope.members.indexOf($scope.deleteTeammate), 1);
+			$('#deleteTeammateModal').modal('hide');
+			$('#teammateDeleteSuccesModal').modal('show');
+
+		});
+
+	};
+
+	$scope.makeUserCaptainPrompt = function(user) {
+		$('#makeCaptainModal').modal('show');
+		$scope.captainTeammate = user;
+	};
+
+	$scope.makeMemberCaptain = function() {
+
+		$http.put($rootScope.baseURL + '/matchup/teams/' + $stateParams.teamName + '/members?username=' + $scope.captainTeammate.customer_username + '').success(function(data, status) {
+			$('#makeCaptainModal').modal('hide');
+			$('#makeCaptainSuccesModal').modal('show');
+
+		});
+
+	};
+
 });
 
 /*
@@ -423,7 +623,7 @@ myApp.controller("editOrganizationController", function($scope, $window, $stateP
  *	URL (PUT): http://matchup.neptunolabs.com/matchup/teams/{{team}}
  *	URL (DELETE) http://matchup.neptunolabs.com/matchup/events/{{event}}/tournaments/{{tournament}}?date={{date}}&location={{location}}
  */
-myApp.controller("editTournamentController", function($scope) {
+myApp.controller("editHostedTournamentController", function($scope) {
 
 	// Miscellaneous information for static data
 	var d = new Date();

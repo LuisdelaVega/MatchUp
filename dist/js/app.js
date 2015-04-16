@@ -53,27 +53,27 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 
 		})
 		.state('app.generalEvents', {
-			url: "/generalEvents",
+			url: "/general-events",
 			templateUrl: "event/general_events.html",
 			controller: "generalViewController"
 		})
 		.state('app.myEvents', {
-			url: "/myEvents/:username",
+			url: "/user/:username/my-events",
 			templateUrl: "event/my_events.html",
 			controller: "myEventsController"
 		})
 		.state('app.createEvent', {
-			url: "/createEvent",
+			url: "/create/event",
 			templateUrl: "event/create_event.html",
 			controller: "CreateEventController"
 		})
 		.state('app.registeredEvents', {
-			url: "/registeredEvents/:username",
+			url: "/user/:username/registered-events/",
 			templateUrl: "event/registered_events.html",
 			controller: "registeredEventsController"
 		})
 		.state('app.meetupList', {
-			url: "/meetupList/:eventname/:date/:location",
+			url: "/meetups/:eventname/:date/:location",
 			templateUrl: "event/meetupList.html",
 			controller: "meetupListController"
 		})
@@ -101,11 +101,12 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 
 		})
 		.state('app.editEvent', {
-			url: "/editEvent",
-			templateUrl: "organizer/edit_event.html"
+			url: "/event/:eventName/:eventDate/:eventLocation/edit",
+			templateUrl: "organizer/edit_event.html",
+			controller: "editEventController"
 		})
 		.state('app.editTournament', {
-			url: "/settings/event/:eventName/:eventDate/:eventLocation/tournament/:tournamentName",
+			url: "/event/:eventName/:eventDate/:eventLocation/tournament/:tournamentName/edit",
 			templateUrl: "organizer/edit_tournament.html",
 			controller: "editTournamentController"
 		})
@@ -120,7 +121,7 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			controller: "RegistrationController"
 		})
 		.state('app.stationAssignment', {
-			url: "/stationAssignment",
+			url: "/event/:eventName/:eventDate/:eventLocation/stations/edit",
 			templateUrl: "organizer/station_assignment.html",
 			controller: "StationController"
 		})
@@ -178,12 +179,12 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			controller: "userOrganizationsController"
 		})
 		.state('app.editProfile', {
-			url: "/editProfile",
+			url: "/user/:username/edit",
 			templateUrl: "user/edit_profile.html",
 			controller: "editProfileController"
 		})
 		.state('app.myMatchups', {
-			url: "/myMatchups",
+			url: "/user/:username/matchups",
 			templateUrl: "user/my_matchups.html"
 		})
 		.state('app.subcriptions', {
@@ -196,12 +197,12 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 		 *
 		 */
 		.state('app.gameProfile', {
-			url: "/gameProfile/:game",
+			url: "/game/:game/events",
 			templateUrl: "game/game_profile.html",
 			controller: "gameProfileController"
 		})
 		.state('app.popularGames', {
-			url: "/popularGames",
+			url: "/games/popular",
 			templateUrl: "game/popular_games.html",
 			controller: "gameViewController"
 		})
@@ -233,12 +234,14 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			templateUrl: "team/team_standings.html"
 		})
 		.state('app.editTeam', {
-			url: "/editTeam",
-			templateUrl: "team/edit_team.html"
+			url: "/team/:teamName/edit",
+			templateUrl: "team/edit_team.html",
+			controller: "editTeamController"
 		})
 		.state('app.createTeam', {
-			url: "/createTeam",
-			templateUrl: "team/create_team.html"
+			url: "/create/team",
+			templateUrl: "team/create_team.html",
+			controller: "CreateTeamController"
 		})
 		/**
 		 *	Organization Stuff

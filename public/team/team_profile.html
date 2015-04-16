@@ -16,7 +16,7 @@
 			</div>
 			<div class="row">
 				<div class="col-md-3 col-md-offset-9">
-					<a class="btn btn-primary btn-block box-margin" ui-sref="app.editTeam" ng-if="teamProfile.is_member">Edit</a>
+					<a class="btn btn-primary btn-block box-margin" ui-sref="app.editTeam({teamName: teamProfile.team_name})" ng-if="teamProfile.is_member">Edit</a>
 				</div>
 			</div>
 		</div>
@@ -83,7 +83,7 @@
 			<div class="tickets-container">
 				<ul class="tickets-list">
 					<div class="row">
-						<div class="col-lg-3 col-md-6 col-sm-12 col-xs-12" ng-repeat="member in members | limitTo: 4">
+						<div class="col-lg-3 col-md-6 col-sm-12 col-xs-12" ng-repeat="member in members">
 							<li class="ticket-item" ng-click="goToUser(member.customer_username)">
 								<div class="ticket-user">
 									<img ng-src="{{member.customer_profile_pic}}" class="user-avatar">

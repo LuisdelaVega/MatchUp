@@ -72,7 +72,9 @@ myApp.controller('profileSummaryController', function ($scope, $state, $http, $s
 
 	$scope.gotToEditProfile = function () {
 		sharedDataService.set($scope.profileData);
-		$state.go("app.editProfile");
+		$state.go("app.editProfile", {
+				"username": $scope.me
+			});
 	}
 });
 

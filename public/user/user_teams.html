@@ -1,6 +1,6 @@
 <div class="box">
 	<div class="page-header" ng-if="isUser">
-		<a class="btn btn-primary pull-right" ui-sref="app.createTeam" role="button">Create Team</a>
+		<a class="btn btn-primary pull-right" ui-sref="app.createTeam({user: customerUsername})" role="button">Create Team</a>
 		<h1>My Teams</h1>
 	</div>
 	<div class="page-header" ng-if="!isUser">

@@ -2,37 +2,68 @@
 	<div class="col-md-8">
 		<div class="box">
 			<form name="teamForm" ng-submit="submitCreateTeam(teamForm.$valid)">
-				<legend>Create Team</legend>
+				<legend>
+					Create Team
+				</legend>
 				<div class="form-group" ng-class="{ 'has-error' : teamForm.name.$invalid && !teamForm.name.$pristine }">
 					<label>Team Name: </label>
 					<input class="form-control" name="name" ng-model="team.name" required ng-minlength="3" ng-maxlength="127">
-					<p ng-show="teamForm.name.$error.minlength" class="help-block">Team name is too short.</p>
-					<p ng-show="teamForm.name.$error.maxlength" class="help-block">Team name is too long.</p>
+					<p ng-show="teamForm.name.$error.minlength" class="help-block">
+						Team name is too short.
+					</p>
+					<p ng-show="teamForm.name.$error.maxlength" class="help-block">
+						Team name is too long.
+					</p>
 				</div>
 				<div class="form-group">
 					<label>Bio:</label>
 					<textarea class="form-control" rows="4" ng-model="team.bio" maxlength="255"></textarea>
 				</div>
-				<div class="form-group">
-					<label>Upload Banner:</label>
-					<div class="input-group">
-						<span class="group-span-filestyle input-group-btn" tabindex="0"> <label  class="btn btn-default btn-file"> <span class="glyphicon glyphicon-picture">   Browse&hellip;
-                           <input type="file"> </span></span>
-						<input type="text" ng-model="team.cover" class="form-control" readonly>
+				<div class="form-group" >
+					<div class="row">
+						<label class="col-sm-2 control-label">Upload Cover</label>
+						<div class="col-sm-3" >
+							<span class="file-input btn btn-primary btn-file btn-block"> Browse&hellip;
+								<input ng-model="team.cover" onchange="angular.element(this).scope().file_changed(this)"  id="cover"  name="cover" type="file" accept="image/*">
+							</span>
+							<div ng-show="!validCover" ng-class="{ 'has-error' : !validCover}">
+								<p  class="help-block" >
+									A team cover photo is required.
+								</p>
+							</div>
+
+						</div>
+						<div class="col-sm-7">
+							<img style="width:100%" src="{{team.cover}}">
+						</div>
 					</div>
-					<span class="help-block"></span>
+
 				</div>
-				<div class="form-group">
-					<label class="">Upload Logo:</label>
-					<div class="input-group">
-						<span class="group-span-filestyle input-group-btn" tabindex="0"> <label  class="btn btn-default btn-file"> <span class="glyphicon glyphicon-picture">   Browse&hellip;
-                           <input type="file"> </span>
-						</span>
-						<input type="text" ng-model="team.logo" class="form-control" readonly>
+
+				<div class="form-group" >
+					<div class="row">
+						<label class="col-sm-2 control-label">Upload Logo</label>
+						<div class="col-sm-3" >
+							<span class="file-input btn btn-primary btn-file btn-block"> Browse&hellip;
+								<input ng-model="team.cover" onchange="angular.element(this).scope().file_changed(this)"  id="logo"  name="logo" type="file" accept="image/*">
+							</span>
+							<div ng-show="!validCover" ng-class="{ 'has-error' : !validCover}">
+								<p  class="help-block" >
+									A team logo is required.
+								</p>
+							</div>
+
+						</div>
+						<div class="col-sm-4">
+							<img style="width:100%" src="{{team.logo}}">
+						</div>
 					</div>
-					<span class="help-block"></span>
+
 				</div>
-				<button class="btn btn-success btn-block" type="submit">Create</button>
+
+				<button class="btn btn-success btn-block" type="submit">
+					Create
+				</button>
 			</form>
 		</div>
 	</div>

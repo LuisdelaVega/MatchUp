@@ -197,6 +197,18 @@ function ($scope, $http, $state, $window, AuthenticationService, $rootScope) {
 
 myApp.controller('sidebarController', ['$scope', '$window', '$http', '$state', 'AuthenticationService',
 function ($scope, $window, $http, $state, AuthenticationService) {
+	$scope.me = $window.sessionStorage.username;
+	
+	$scope.userSearch = function(query) {
+ 		$http.get('http://136.145.116.232/matchup/search/users/' + query + '').success(function(data, status, headers) {
+			$scope.users = angular.fromJson(data);
+			console.log($scope.users);
+		}).error(function(data, status, headers) {
+			console.log("error in search controller");
+		});
+
+	};
+	
 
         //function for going into a page that will display all the teams the customer belongs to
         $scope.goToTeams = function (username) {
@@ -205,6 +217,7 @@ function ($scope, $window, $http, $state, AuthenticationService) {
                 }) ;
 
         };
+      
         $scope.goToTeamsProfile = function (teamName) {
             $state.go("app.teamProfile", {
                 "teamName": teamName
@@ -223,58 +236,19 @@ function ($scope, $window, $http, $state, AuthenticationService) {
                 }
             }
         };
+        
         $scope.goToSearchResults = function (type, query) {
             //need undefined in case somebody pushes the button and they havent entered any text
-            if (query !== undefined) { //gpooo
-                if (query.length > 0) { //goooo
+            if (query !== undefined) {  
+                if (query.length > 0) {  
                     $state.go("app.searchResults", {
                             "type": type,
                             "query": query
                         }) ;
-                } //goooooo
+                } 
             }
         };
-
-        $scope.goToMyProfile = function () {
-            $state.go("app.userProfile", {
-                    "username": $window.sessionStorage.username
-                }) ;
-        };
-        $scope.goToRegisteredEvents = function () {
-            $state.go("app.registeredEvents", {
-                    "username": $window.sessionStorage.username
-                }) ;
-        };
-
-        $scope.goToMyEvents = function () {
-            $state.go("app.myEvents", {
-                    "username": $window.sessionStorage.username
-                }) ;
-        };
-
-        $scope.goCreateEvent = function () {
-            $state.go("app.userProfile", {
-                    "username": $window.sessionStorage.username
-                });
-        };
-
-        $scope.goToMyMatchUps = function () {
-            $state.go("app.userProfile", {
-                    "username": $window.sessionStorage.username
-                }) ;
-        };
-
-        $scope.goToMyTeams = function () {
-            $state.go("app.userTeams", {
-                    "username": $window.sessionStorage.username
-                });
-        };
-
-        $scope.goToMyOrganizations = function () {
-            $state.go("app.userOrganizations", {
-                    "username": $window.sessionStorage.username
-                });
-        };
+ 
 
         $scope.logout = function () {
             AuthenticationService.clearCredentials();

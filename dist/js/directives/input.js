@@ -1,12 +1,12 @@
 var myApp = angular.module('InputDirectives', []);
 
-myApp.directive('validInput', function () {
+myApp.directive('validInput', function() {
 	return {
-		require: '?ngModel',
-		scope: {
-			"inputPattern": '@'
+		require : '?ngModel',
+		scope : {
+			"inputPattern" : '@'
 		},
-		link: function (scope, element, attrs, ngModelCtrl) {
+		link : function(scope, element, attrs, ngModelCtrl) {
 
 			var regexp = null;
 
@@ -18,7 +18,7 @@ myApp.directive('validInput', function () {
 				return;
 			}
 
-			ngModelCtrl.$parsers.push(function (val) {
+			ngModelCtrl.$parsers.push(function(val) {
 				if (regexp) {
 					var clean = val.replace(regexp, '');
 					if (val !== clean) {
@@ -32,7 +32,7 @@ myApp.directive('validInput', function () {
 
 			});
 
-			element.bind('keypress', function (event) {
+			element.bind('keypress', function(event) {
 				if (event.keyCode === 32) {
 					event.preventDefault();
 				}
@@ -41,15 +41,15 @@ myApp.directive('validInput', function () {
 	};
 });
 
-myApp.directive('validDecimal', function () {
+myApp.directive('validDecimal', function() {
 	return {
-		require: '?ngModel',
-		link: function (scope, element, attrs, ngModelCtrl) {
+		require : '?ngModel',
+		link : function(scope, element, attrs, ngModelCtrl) {
 			if (!ngModelCtrl) {
 				return;
 			}
 
-			ngModelCtrl.$parsers.push(function (val) {
+			ngModelCtrl.$parsers.push(function(val) {
 				if (angular.isUndefined(val)) {
 					var val = '';
 				}
@@ -68,7 +68,7 @@ myApp.directive('validDecimal', function () {
 				return clean;
 			});
 
-			element.bind('keypress', function (event) {
+			element.bind('keypress', function(event) {
 				if (event.keyCode === 32) {
 					event.preventDefault();
 				}
@@ -76,3 +76,17 @@ myApp.directive('validDecimal', function () {
 		}
 	};
 });
+
+myApp.directive('validFile', function() {
+	return {
+		restrict : 'A',
+		require : '?ngModel',
+		link : function(scope, el, attrs, ngModel) {
+			el.bind('change', function() {
+				scope.$apply(function() {
+					ngModel.$setViewValue(el.val());
+				});
+			});
+		}
+	};
+}); 

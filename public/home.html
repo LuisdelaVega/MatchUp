@@ -109,10 +109,10 @@
         <div class="widget-main no-padding">
             <div class="tickets-container">
                 <div class="row" style="padding-left: 15px">
-                    <div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="game in popularGames | limitTo: 6">
-                        <a class="thumbnail" ui-sref="app.gameProfile">
-                            <img ng-src="{{ game.game_image }}" ng-click="goToGameProfile(game.game_name)">
-                        </a>
+                    <div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="game in popularGames | limitTo: 8">
+                        <a class="thumbnail" ui-sref="app.gameProfile({game: game.game_name})">
+                            <img ng-src="{{ game.game_image }}" >
+                         </a>
                     </div>
                 </div>
             </div>
