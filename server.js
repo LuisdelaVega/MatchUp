@@ -435,6 +435,17 @@ app.route('/matchup/events/:event/tournaments/:tournament/create').post(function
 	tournaments.createTournament(req, res, pg, conString, log);
 });
 
+/* /matchup/events/:event/tournaments/:tournament/standings
+ *
+ * TODO [GET] Get the standings of a Tournament
+ */
+app.route('/matchup/events/:event/tournaments/:tournament/standings').get(function(req, res) {
+    log.info({
+        req : req
+    }, 'start request');
+    tournaments.getStandings(req, res, pg, conString, log);
+});
+
 /* /matchup/events/:event/tournaments/:tournament/rounds/:round/matches/:match/:set?date=date&location=string&round_of=string
  * TODO Update in API
  * 	Params:

@@ -445,8 +445,49 @@ function getLosers(req, res, client, done, log, tournament_format, rounds, where
     }
 }
 
+function checkForUpdate(req, res, client, done, log, players, index, length) {
+    if ((index+1) < length && players[index].wins == players[index+1].wins) {
+        var query = client.query({
+            text : "SELECT competes.competitor_number, sum(submits.score) AS score FROM competes JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number WHERE (competes.event_name, competes.event_start_date, competes.event_location, competes.tournament_name, competes.round_number, competes.round_of, competes.match_number) = (SELECT event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number FROM match WHERE (concat(event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number) IN (SELECT concat(event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number) FROM competes WHERE competitor_number = $5) AND concat(event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number) IN (SELECT concat(event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number) FROM competes WHERE competitor_number = $6)) AND event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_of = 'Round Robin') GROUP BY competes.competitor_number ORDER BY score DESC",
+            values : [req.params.event, req.query.date, req.query.location, req.params.tournament, players[index].competitor_number, players[index+1].competitor_number]
+        });
+        query.on("row", function(row, result) {
+            result.addRow(row);
+        });
+        query.on('error', function(error) {
+            client.query("ROLLBACK");
+            done();
+            console.log(error);
+            res.status(500).send(error);
+            log.info({
+                res : res
+            }, 'done response');
+        });
+        query.on("end", function(result) {
+            if (result.rows[0].competitor_number != players[index].competitor_number) {
+                var temp = players[index].standing;
+                players[index].standing = players[index+1].standing;
+                players[index+1].standing = temp;
+                updateStandingForOneCompetitor(req, res, client, done, log, players[index].competitor_number, players[index].standing, index, length-1, false);
+            }
+        });
+    } else {
+        updateStandingForOneCompetitor(req, res, client, done, log, players[index].competitor_number, players[index].standing, index, length-1, true);
+    }
+}
+
 //TODO check for compliance between the score in the body and the score_type of the Tournament
 //TODO Check for round_pause
+/*
+ I'm a complete idiot, much of this couls have been done on different functions, each of them connecting to the database and doing what they have to do. I've been working on this for quite a while
+ today, 04/16/2015 is when I realize this. This comment will stay here for me to be ashamed.
+ I do want to note that this happened because I had recently finished working on the createTournament function and well, frankly I dind't expect anything to be as hard as that.
+
+ I let this get out of hand. I didn't realize this until I had already finished it and started working on a new function. When I started with that other function, I automatically thought: "Hey, I can do some work here, return, then let another function do
+ the rest of the work. So yeah, here I am, writting another long ass comment. I am not a smart man.
+
+ It's not that anything would really change, it's just that the code would be more distributed. Whatever
+  */
 var submitScore = function(req, res, pg, conString, log) {
     pg.connect(conString, function(err, client, done) {
         if (err) {
@@ -1072,9 +1113,9 @@ var submitScore = function(req, res, pg, conString, log) {
                                                                                                                 }
                                                                                                             });
                                                                                                         } else {
-                                                                                                            // Round Robin standings are
+                                                                                                            // Round Robin standings are calculated the same way as we do in the Group Stage
                                                                                                             var query = client.query({
-                                                                                                                text : "SELECT competitor_number FROM competitor NATURAL JOIN competes WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_of = 'Round Robin' ORDER BY matches_won DESC, competitor_seed ASC",
+                                                                                                                text : " SELECT competes.competitor_number, sum(submits.score)/((round.round_best_of/2)+1) AS wins, row_number() OVER(ORDER BY sum(submits.score)/((round.round_best_of/2)+1) DESC, competitor.competitor_seed DESC) AS standing FROM submits JOIN competes ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.round_of = competes.round_of AND submits.round_number = competes.round_number AND submits.competitor_number = competes.competitor_number JOIN round ON submits.event_name = round.event_name AND submits.event_start_date = round.event_start_date AND submits.event_location = round.event_location AND submits.tournament_name = round.tournament_name AND submits.round_of = round.round_of AND submits.round_number = round.round_number JOIN competitor ON competitor.event_name = competes.event_name AND competitor.event_start_date = competes.event_start_date AND competitor.event_location = competes.event_location AND competitor.tournament_name = competes.tournament_name AND competitor.competitor_number = competes.competitor_number WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_of = 'Round Robin' GROUP BY competes.competitor_number, round.round_best_of, competitor.competitor_seed ORDER BY wins DESC, competitor.competitor_seed DESC",
                                                                                                                 values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
                                                                                                             });
                                                                                                             query.on("row", function(row, result) {
@@ -1090,8 +1131,11 @@ var submitScore = function(req, res, pg, conString, log) {
                                                                                                                 }, 'done response');
                                                                                                             });
                                                                                                             query.on("end", function(result) {
-                                                                                                                for (var i = 0 ; i < result.rows.length; i++) {
-                                                                                                                    updateStandingForOneCompetitor(req, res, client, done, log, result.rows[i].competitor_number, (i+1), i, (result.rows.length), true);
+                                                                                                                // Check if there are ties between players and if so, look for their matchup and change their standing if necessary
+                                                                                                                var flag = false;
+                                                                                                                var competitors = result.rows;
+                                                                                                                for (var i = 0 ; i < competitors.length; i++) {
+                                                                                                                    checkForUpdate(req, res, client, done, log, competitors, index, competitors.length)
                                                                                                                 }
                                                                                                             });
                                                                                                         }
@@ -1250,7 +1294,7 @@ var getCompetitors = function(req, res, pg, conString, log) {
             return console.error('error fetching client from pool', err);
         }
         var query = client.query({
-            text : "SELECT distinct customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic, tournament.competitor_fee, competitor.competitor_check_in AS checked_in, competitor.competitor_seed, competitor.competitor_number FROM tournament JOIN is_a ON is_a.event_name = tournament.event_name AND is_a.event_start_date = tournament.event_start_date AND is_a.event_location = tournament.event_location AND is_a.tournament_name = tournament.tournament_name JOIN competitor ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN customer ON customer.customer_username = is_a.customer_username WHERE tournament.event_name = $1 AND tournament.event_start_date = $2 AND tournament.event_location = $3 AND tournament.tournament_name = $4 ORDER BY competitor.competitor_seed",
+            text : "SELECT distinct customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic, tournament.competitor_fee, competitor.competitor_check_in AS check_in, competitor.competitor_seed, competitor.competitor_number FROM tournament JOIN is_a ON is_a.event_name = tournament.event_name AND is_a.event_start_date = tournament.event_start_date AND is_a.event_location = tournament.event_location AND is_a.tournament_name = tournament.tournament_name JOIN competitor ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN customer ON customer.customer_username = is_a.customer_username WHERE tournament.event_name = $1 AND tournament.event_start_date = $2 AND tournament.event_location = $3 AND tournament.tournament_name = $4 ORDER BY competitor.competitor_seed",
             values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
         });
         query.on("row", function(row, result) {
