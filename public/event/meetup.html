@@ -1,60 +1,59 @@
-<div class="blur-cover">
-</div>
 <div class="panel-padding">
+	<!--			Meetup General Info    	 -->
 	<div class="box box-margin">
-		<p class="info-title">
-			MeetUP Name
-		</p>
+		<h2 align="middle">{{meetup.meetup_name}}</h2>
 		<div class="row">
-			<div class="col-xs-12 col-md-6 col-lg-6">
-				<h4>Details</h4>
+			<!--				Meetup Description   	  -->
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-4">
+				<h3>Description</h3>
 				<p class="info-paragraph">
-					Raw denim Truffaut proident wolf, asymmetrical mollit exercitation. Tousled est art party wayfarers. Cupidatat ullamco gluten-free Schlitz listicle. Fixie literally normcore, DIY eu jean shorts Truffaut Helvetica actually mlkshk put a bird on it cold-pressed tilde. Tempor biodiesel Shoreditch ennui assumenda skateboard. Literally fixie fanny pack commodo organic, plaid raw denim viral delectus cornhole church-key tofu master cleanse pariatur. Food truck viral anim tilde aute PBR consequat leggings, aliqua single-origin coffee salvia quinoa enim qui wayfarers.
+					{{meetup.meetup_description}}
 				</p>
 			</div>
-			<div class="col-xs-12  col-md-6 col-lg-6">
-				<h4>General Info</h4>
+			<div class="col-xs-12 col-md-12 col-lg-4">
+				<h3>General Info</h3>
 				<dl class="info-paragraph">
-					<dt>
-										Start Date
-									</dt>
-					<dd>
-						Jan 9, 2015 8:00PM
-					</dd>
-					<dt>
-										End Date
-									</dt>
-					<dd>
-						Jan 19, 2015 11:00PM
-					</dd>
-					<dt>
-										Location
-									</dt>
-					<dd>
-						Hilton hotel 405
-					</dd>
+					<div class="row">
+						<dt>
+							Start Date
+						</dt>
+						<dd>
+							{{ meetup.meetup_start_date | date: 'medium'}}
+						</dd>
+						<dt>
+							End Date
+						</dt>
+						<dd>
+							{{ meetup.meetup_end_date | date: 'medium'}}
+						</dd>
+						<dt>
+							Location
+						</dt>
+						<dd>
+							{{ meetup.meetup_location }}
+						</dd>
+					</div>
 				</dl>
 			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-offset-6 col-xs-12 col-md-4 col-lg-6">
-				<h4>Hosted By</h4>
-				<div class="event-creator"></div>
-				<p class="info-paragraph">
-					Edwin Badillo
-				</p>
+			<!--					Hosted by/ Creator-->
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-4">
+				<h2 class="info-title">Hosted By</h2>
+				<h3 style="margin-top:0px;padding-top:0px">{{meetup.customer_tag}}</h3>
+				<a class="thumbnail" ng-click="goToUser(meetup.customer_username)"><img class="profile-picture cursor" ng-src="{{meetup.customer_profile_pic}}"> </a>
 			</div>
 		</div>
-	</div>
-	<div class="box box-margin">
-		<p class="info-title">
-			Games
-		</p>
-		<div class="row">
-			<div class="col-lg-3 col-md-4 col-xs-6">
-				<a class="thumbnail"> <img src="http://static-cdn.jtvnw.net/ttv-boxart/League%20of%20Legends-140x196.jpg">
-					<h4 align="center">League of Legends</h4> </a>
+		<div class="btn-group btn-group-justified box-margin" role="group" ng-if="meetup.is_organizer">
+			<div class="btn-group" role="group">
+				<button type="button" class="btn btn-primary" ui-sref="app.editMeetup({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location })">
+					Edit Meetup
+				</button>
+			</div>
+			<div class="btn-group" role="group">
+				<button type="button" class="btn btn-danger">
+					Delete
+				</button>
 			</div>
 		</div>
+
 	</div>
 </div>

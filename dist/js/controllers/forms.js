@@ -328,11 +328,12 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 	// Clears tournament inputs
 	var clearTournamentPage = function() {
 		$scope.tournament.name = $scope.tournament.start_date = $scope.tournament.deadline = $scope.tournament.rules = $scope.tournament.fee = $scope.tournament.seed_money = $scope.tournament.deduction_fee = $scope.tournament.capacity = $scope.tournament.team_size = $scope.tournament.group_players = $scope.tournament.group_winners = $scope.tournament.scoring = $scope.tournament.game = "";
-	};
+
+	}
 });
 
 /*
- * Controller that handles all the input field of the create a meetup module
+ * Create Meet Up Controller
  * templateUrl: "event/create_meetup.html",
  * url: "/meetup/:eventName/:eventDate/:eventLocation/create",
  * POST http://matchup.neptunolabs.com/matchup/events/event/meetups?date=2015-03-25T09:00:00.000Z&location=miradero
@@ -353,13 +354,17 @@ myApp.controller("createMeetUpController", function($scope, $http, $window, $roo
 			$scope.eventName = $stateParams.eventName;
 			$scope.eventDate = $stateParams.eventDate;
 			$scope.eventLocation = $stateParams.eventLocation;
-
+			
 			$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/meetups?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation, meetUp).success(function(data) {
 				alert("Creation of a MeetUp successful");
-				$state.go("app.meetupList", {
-					"eventname" : $scope.eventName,
-					"location" : $scope.eventLocation,
-					"date" : $scope.eventDate,
+				$state.go("app.meetup", {
+					"eventName" : data.event.name,
+					"eventLocation" : data.event.location,
+					"eventDate" : data.event.date,
+                    "meetupDate": data.meetup.start_date,
+                    "meetupLocation": data.meetup.location,
+                    "customerUsername" : data.meetup.creator
+
 				});
 			});
 		};

@@ -12,10 +12,10 @@
 				<div class="tickets-container">
 					<div class="row" style="padding-left: 15px">
 						<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat = "meetup in meetupsInfo">
-							<a class="thumbnail" ng-click="goToMeetup(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location, meetup.meetup_start_date, meetup.meetup_location)">
+							<a class="thumbnail" ng-click="goToMeetup(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location, meetup.meetup_start_date, meetup.meetup_location, meetup.customer_username)">
 								<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 											overflow: hidden;">
-									<p class="thumbnail-title" ui-sref="app.meetup">
+									<p class="thumbnail-title">
                                         {{noMeetup}}
                                         {{meetup.meetup_name}}
 									</p>

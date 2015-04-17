@@ -78,7 +78,7 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			controller: "meetupListController"
 		})
 		.state('app.meetup', {
-			url: "/meetup/:eventName/:eventDate/:eventLocation/:meetupDate/:meetupLocation",
+			url: "/meetup/:eventName/:eventDate/:eventLocation/:meetupDate/:meetupLocation/:customerUsername",
 			templateUrl: "event/meetup.html",
 			controller: "meetupController"
 		})
@@ -87,6 +87,12 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			templateUrl: "event/create_meetup.html",
 			controller: "createMeetUpController"
 		})
+		.state('app.edit_meetup', {
+			url: "/meetup/:eventName/:eventDate/:eventLocation/:meetupDate/:meetupLocation/:customerUsername",
+			templateUrl: "event/edit_Meetup.html",
+			controller: "editMeetUpController"			
+		}
+		
 		.state('app.competitorSignup', {
 			url: "/competitorSignup",
 			templateUrl: "event/competitor_signup.html"
