@@ -1,26 +1,19 @@
 <div class="tab-content">
 	<div class="box">
-		<form>
+		<form name="meetUpForm" ng-submit="SubmitCreateMeetup(meetUpForm.$valid)">
 			<legend>
 				Create MeetUP
 			</legend>
 			<div class="form-group">
 				<label>Name: </label>
-				<input class="form-control" placeholder="Enter Name" id="createEventName">
+				<input class="form-control" ng-model="meetup.name" name="name" required maxlength="127">
 			</div>
 
 			<div class="row">
 				<div class="col-xs-12 col-md-6 col-lg-6">
 					<div class="form-group">
 						<label>Description:</label>
-						<textarea class="form-control" rows="4" id="createEventDescription"></textarea>
-					</div>
-				</div>
-				<div class="col-xs-12 col-md-6 col-lg-6">
-					<div class="form-group has-feedback">
-						<label class="control-label">Game</label>
-						<input type="text" class="form-control" placeholder="Search for Games" />
-						<i class="form-control-feedback glyphicon glyphicon-search"></i>
+						<textarea class="form-control" rows="4" ng-model="meetup.description"></textarea>
 					</div>
 				</div>
 			</div>
@@ -29,21 +22,29 @@
 			</legend>
 			<div class="row">
 				<div class="col-xs-12 col-md-6 col-lg-6">
-					<div class="form-group">
-						<label>Start Date: </label>
-						<div class='input-group date' id='dtpCreateEventStartDate'>
-							<input type='text' id="startDate" class="form-control" />
-							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span> </span>
-						</div>
+					<div class="dropdown">
+						<label>Start Date</label>
+						<a class="dropdown-toggle" id="dropdown1" role="button" data-toggle="dropdown">
+						<div class="input-group">
+							<input type="text" class="form-control" data-ng-model="meetup.start_date">
+							<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+						</div> </a>
+						<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+							<datetimepicker data-ng-model="meetup.start_date" data-datetimepicker-config="{ dropdownSelector: '#dropdown1' }" />
+						</ul>
 					</div>
 				</div>
 				<div class="col-xs-12 col-md-6 col-lg-6">
-					<div class="form-group">
-						<label>End Date: </label>
-						<div class='input-group date' id='dtpCreateEventEndDate'>
-							<input type='text' class="form-control" id="endDate" placeholder="Enter End Date" />
-							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span> </span>
-						</div>
+					<div class="dropdown">
+						<label>End Date</label>
+						<a class="dropdown-toggle" id="dropdown1" role="button" data-toggle="dropdown">
+						<div class="input-group">
+							<input type="text" class="form-control" data-ng-model="meetup.end_date">
+							<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+						</div> </a>
+						<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+							<datetimepicker data-ng-model="meetup.end_date" data-datetimepicker-config="{ dropdownSelector: '#dropdown2' }" />
+						</ul>
 					</div>
 				</div>
 			</div>
@@ -51,11 +52,15 @@
 				<div class="col-xs-12 col-md-6 col-lg-6">
 					<div class="form-group">
 						<label>Location: </label>
-						<input class="form-control" placeholder="Location" id="location">
+						<input class="form-control" ng-model="meetup.location" name="location" required maxlength="127">
+						<span style="color:red" ng-show="meetUpForm.location.$dirty && meetUpForm.location.$invalid"> <span ng-show="meetUpForm.location.$error.required">MeetUp Location Required.</span> </span>
 					</div>
 				</div>
 			</div>
-			<a href="meetUPpage.html" class="btn btn-primary btn-block">Create</a>
+			<button type"submit" class="btn btn-primary btn-block">
+				Create
+			</button>
 		</form>
 	</div>
 </div>
+

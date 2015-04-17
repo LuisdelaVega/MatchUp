@@ -4,7 +4,7 @@
 	<div class="widget-box">
 		<div class="widget-header bordered-bottom bordered-themesecondary">
 			<h3 class="widget-title themesecondary">MeetUps</h3>
-			<a class="widget-more" ui-sref="app.create_meetup" ng-if ="endDate"> Create MeetUp<i class="fa fa-plus panel-padding"></i> </a>
+			<a class="widget-more" ui-sref="app.create_meetup({eventName:eventInfo.event_name, eventDate:eventInfo.event_start_date, eventLocation:eventInfo.event_location})" ng-if ="endDate"> Create MeetUp<i class="fa fa-plus panel-padding"></i> </a>
 		</div>
 		<!--Widget Header-->
 		<div class="widget-body">

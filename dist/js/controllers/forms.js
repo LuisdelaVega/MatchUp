@@ -328,8 +328,42 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 	// Clears tournament inputs
 	var clearTournamentPage = function() {
 		$scope.tournament.name = $scope.tournament.start_date = $scope.tournament.deadline = $scope.tournament.rules = $scope.tournament.fee = $scope.tournament.seed_money = $scope.tournament.deduction_fee = $scope.tournament.capacity = $scope.tournament.team_size = $scope.tournament.group_players = $scope.tournament.group_winners = $scope.tournament.scoring = $scope.tournament.game = "";
+	};
+});
 
-	}
+/*
+ * Controller that handles all the input field of the create a meetup module
+ * templateUrl: "event/create_meetup.html",
+ * url: "/meetup/:eventName/:eventDate/:eventLocation/create",
+ * POST http://matchup.neptunolabs.com/matchup/events/event/meetups?date=2015-03-25T09:00:00.000Z&location=miradero
+ */
+myApp.controller("createMeetUpController", function($scope, $http, $window, $rootScope, $state, $stateParams) {
+
+	$scope.SubmitCreateMeetup = function(valid) {
+
+		var meetUp = {
+			"name" : $scope.meetup.name,
+			"location" : $scope.meetup.location,
+			"start_date" : $scope.meetup.start_date,
+			"end_date" : $scope.meetup.end_date,
+			"description" : $scope.meetup.description,
+
+		};
+		if (valid) {
+			$scope.eventName = $stateParams.eventName;
+			$scope.eventDate = $stateParams.eventDate;
+			$scope.eventLocation = $stateParams.eventLocation;
+
+			$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/meetups?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation, meetUp).success(function(data) {
+				alert("Creation of a MeetUp successful");
+				$state.go("app.meetupList", {
+					"eventname" : $scope.eventName,
+					"location" : $scope.eventLocation,
+					"date" : $scope.eventDate,
+				});
+			});
+		};
+	};
 });
 
 /*
@@ -363,10 +397,10 @@ myApp.controller("CreateTeamController", function($scope, $window, $rootScope, $
 					else
 						$scope.team.cover = link;
 				});
-			}
+			};
 			xhr.send(fd);
 
-		}
+		};
 		reader.readAsDataURL(photofile);
 	};
 
@@ -465,10 +499,10 @@ myApp.controller("editTeamController", function($scope, $window, $rootScope, $ht
 					else
 						$scope.team.cover = link;
 				});
-			}
+			};
 			xhr.send(fd);
 
-		}
+		};
 		reader.readAsDataURL(photofile);
 	};
 
@@ -567,7 +601,10 @@ myApp.controller("RequestOrganizationController", function($scope, $window, $htt
 });
 
 /*
- *
+ * edit Organization Controller
+ * url: "/organization/:organizationName/edit",
+ * templateUrl: "organization/edit_organization.html",
+ * Editing bio, logo and cover photo to an organization.
  */
 myApp.controller("editOrganizationController", function($scope, $window, $stateParams, $http, $rootScope, $state) {
 	// Check if data service is empty

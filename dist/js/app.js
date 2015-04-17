@@ -83,8 +83,9 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			controller: "meetupController"
 		})
 		.state('app.create_meetup', {
-			url: "/createMeetup",
-			templateUrl: "event/create_meetup.html"
+			url: "/meetup/:eventName/:eventDate/:eventLocation/create",
+			templateUrl: "event/create_meetup.html",
+			controller: "createMeetUpController"
 		})
 		.state('app.competitorSignup', {
 			url: "/competitorSignup",
