@@ -295,7 +295,6 @@ var createTournament = function(req, res, pg, conString, log) {
 						*/
 						// Just to be sure
 						var flag = false;
-						// Added the false statement because I don't want it to run just yet
 						if (tournament.tournament_type === "Two Stage") {
 							// Create the groups and connect the competitors with them
 							for (var i = 0; i < tournament.groupStage.groups.length; i++) {
@@ -343,6 +342,9 @@ var createTournament = function(req, res, pg, conString, log) {
 							client.query("COMMIT");
 							done();
 							res.status(201).send(tournament);
+							log.info({
+								res : res
+							}, 'done response');
 						}
 					});
 				});
@@ -1207,4 +1209,89 @@ function doubleEliminationBracket(bracket, tournament) {
 	}
 }
 
+var getStandings = function(req, res, pg, conString, log) {
+    pg.connect(conString, function(err, client, done) {
+        if (err) {
+            return console.error('error fetching client from pool', err);
+        }
+
+        var query = client.query({
+            text: "SELECT tournament_name, tournament_start_date, tournament_type, tournament_format, number_of_people_per_group, amount_of_winners_per_group FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
+            values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+        });
+        query.on("row", function (row, result) {
+            result.addRow(row);
+        });
+        query.on('error', function (error) {
+            client.query("ROLLBACK");
+            done();
+            console.log(error);
+            res.status(500).send(error);
+            log.info({
+                res: res
+            }, 'done response');
+        });
+        query.on("end", function (result) {
+            if (result.rows.length) {
+                var standings = new Object();
+                if (result.rows[0].tournament_type == "Two Stage") {
+                    var query = client.query({
+                        text: 'SELECT group_number FROM "group" WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4',
+                        values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+                    });
+                    query.on("row", function (row, result) {
+                        result.addRow(row);
+                    });
+                    query.on('error', function (error) {
+                        client.query("ROLLBACK");
+                        done();
+                        console.log(error);
+                        res.status(500).send(error);
+                        log.info({
+                            res: res
+                        }, 'done response');
+                    });
+                    query.on("end", function (result) {
+                        standings.groupstage = new Object();
+                        standings.groupstage.groups = result.rows;
+                        for (var i = 0; i < standings.groupstage.groups.length; i++) {
+                            standings.groupstage.groups[i].players = new Array();
+                        }
+                        var query = client.query({
+                            text: 'SELECT customer.customer_username, customer.customer_profile_pic, customer.customer_tag, has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) AS wins, CASE WHEN has_a.group_number = (SELECT count(*) FROM "group" WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4) THEN ((SELECT count(*) FROM is_a WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4) % tournament.number_of_people_per_group - 1) - sum(submits.score)/((round.round_best_of/2)+1) ELSE (tournament.number_of_people_per_group - 1) - sum(submits.score)/((round.round_best_of/2)+1) END AS loses, CASE WHEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC, competitor.competitor_seed) % (tournament.number_of_people_per_group) = 0 THEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group + 1) ELSE row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group) END AS standing, (CASE WHEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC, competitor.competitor_seed) % (tournament.number_of_people_per_group) = 0 THEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group + 1) ELSE row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group) END <= tournament.amount_of_winners_per_group) AS advanced FROM submits JOIN competes ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.round_of = competes.round_of AND submits.round_number = competes.round_number AND submits.competitor_number = competes.competitor_number JOIN round ON submits.event_name = round.event_name AND submits.event_start_date = round.event_start_date AND submits.event_location = round.event_location AND submits.tournament_name = round.tournament_name AND submits.round_of = round.round_of AND submits.round_number = round.round_number JOIN competitor ON competitor.event_name = competes.event_name AND competitor.event_start_date = competes.event_start_date AND competitor.event_location = competes.event_location AND competitor.tournament_name = competes.tournament_name AND competitor.competitor_number = competes.competitor_number JOIN has_a ON has_a.event_name = competes.event_name AND has_a.event_start_date = competes.event_start_date AND has_a.event_location = competes.event_location AND has_a.tournament_name = competes.tournament_name AND has_a.round_number = competes.round_number AND has_a.round_of = competes.round_of AND has_a.match_number = competes.match_number JOIN tournament ON submits.event_name = tournament.event_name AND submits.event_start_date = tournament.event_start_date AND submits.event_location = tournament.event_location AND submits.tournament_name = tournament.tournament_name JOIN is_a ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN customer ON customer.customer_username = is_a.customer_username WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_of = $5 GROUP BY customer.customer_username, customer.customer_tag, customer.customer_profile_pic, round.round_best_of, has_a.group_number, competitor.competitor_seed, tournament.number_of_people_per_group, tournament.amount_of_winners_per_group ORDER BY has_a.group_number, wins DESC, competitor.competitor_seed, standing',
+                            values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Group"]
+                        });
+                        query.on("row", function (row, result) {
+                            standings.groupstage.groups[row.group_number - 1].players.push(row);
+                        });
+                        query.on('error', function (error) {
+                            client.query("ROLLBACK");
+                            done();
+                            console.log(error);
+                            res.status(500).send(error);
+                            log.info({
+                                res: res
+                            }, 'done response');
+                        });
+                        query.on("end", function (result) {
+                            done();
+                            res.status(200).send(standings);
+                            log.info({
+                                res: res
+                            }, 'done response');
+                        });
+                    });
+                }
+            } else {
+                done();
+                res.status(404).send("Tournament not found");
+                log.info({
+                    res: res
+                }, 'done response');
+            }
+        });
+    });
+};
+
 module.exports.createTournament = createTournament;
+module.exports.getStandings = getStandings;
