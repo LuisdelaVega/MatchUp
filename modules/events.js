@@ -3300,9 +3300,7 @@ var removeTournament = function(req, res, pg, conString, log) {
         }
 
         var eventStartDate = new Date(req.query.date);
-        var startDate = new Date(req.body.start_date);
-        var checkInDeadline = new Date(req.body.deadline);
-        if (!(eventStartDate.getTime()) || !(startDate.getTime()) || !(checkInDeadline.getTime()) || checkInDeadline.getTime() > startDate.getTime() || eventStartDate.getTime() > startDate.getTime()) {
+        if (!(eventStartDate.getTime())) {
             done();
             res.status(400).send('Invalid date');
             log.info({
