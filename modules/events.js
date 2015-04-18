@@ -3343,14 +3343,14 @@ var removeTournament = function(req, res, pg, conString, log) {
             return console.error('error fetching client from pool', err);
         }
 
-        var eventStartDate = new Date(req.query.date);
-        if (!(eventStartDate.getTime())) {
-            done();
-            res.status(400).send('Invalid date');
-            log.info({
-                res : res
-            }, 'done response');
-        } else {
+        //var eventStartDate = new Date(req.query.date);
+        //if (!(eventStartDate.getTime())) {
+        //    done();
+        //    res.status(400).send('Invalid date');
+        //    log.info({
+        //        res : res
+        //    }, 'done response');
+        //} else {
             client.query("BEGIN");
             // Check if the user is registered for this event
             var query = client.query({
@@ -3396,7 +3396,7 @@ var removeTournament = function(req, res, pg, conString, log) {
                     }, 'done response');
                 }
             });
-        }
+        //}
     });
 };
 
