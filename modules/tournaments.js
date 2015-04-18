@@ -1433,7 +1433,7 @@ var getRounds = function(req, res, pg, conString, log) {
 							customer_tag : row.customer_tag,
 							customer_profile_pic : row.customer_profile_pic,
 							score : row.score
-						})
+						});
 					} else if (row.round_of === "Loser") {
 						if (!tournament.finalStage.loserRounds[row.round_number-1]) {
 							tournament.finalStage.loserRounds[row.round_number-1] = new Object();
@@ -1451,7 +1451,7 @@ var getRounds = function(req, res, pg, conString, log) {
 							customer_tag : row.customer_tag,
 							customer_profile_pic : row.customer_profile_pic,
 							score : row.score
-						})
+						});
 					} else {
 						if (!tournament.finalStage.roundRobinRounds[row.round_number-1]) {
 							tournament.finalStage.roundRobinRounds[row.round_number-1] = new Object();
@@ -1469,7 +1469,7 @@ var getRounds = function(req, res, pg, conString, log) {
 							customer_tag : row.customer_tag,
 							customer_profile_pic : row.customer_profile_pic,
 							score : row.score
-						})
+						});
 					}
 				});
 				query.on('error', function (error) {
@@ -1595,7 +1595,181 @@ var getMatch = function(req, res, pg, conString, log) {
 	});
 };
 
+var getPrizeDistributions = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var query = client.query({
+			text : "SELECT * FROM prize_distribution"
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			done();
+			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+		query.on("end", function(result) {
+			done();
+			res.status(200).json(result.rows);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+	});
+};
+
+function customerIsACompetitor(req, res, client, done, log, customer_username, competitor_number, index, length) {
+	client.query({
+		text: "INSERT INTO is_a (event_name, event_start_date, event_location, tournament_name, competitor_number, customer_username) VALUES($1, $2, $3, $4, $5, $6)",
+		values: [req.params.event, req.query.date, req.query.location, req.params.tournament, competitor_number, customer_username]
+	}, function (err, result) {
+		if (err) {
+			client.query("ROLLBACK");
+			done();
+			console.log(err);
+			res.status(500).send(err);
+			log.info({
+				res: res
+			}, 'done response');
+		} else if (index == length) {
+			client.query("COMMIT");
+			done();
+			res.status(201).send('Registered');
+			log.info({
+				res : res
+			}, 'done response');
+		}
+	});
+}
+
+//TODO Integrate with payment service
+var registerForTournament = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		client.query("BEGIN");
+		var query = client.query({
+			text : "SELECT competitor_fee, team_size, tournament_max_capacity AS max_capacity, ($5 IN (SELECT customer_username FROM is_a WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4)) AS is_competitor, (SELECT count(*) FROM is_a WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4) AS registered_competitors FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
+			values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.user.username]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			client.query("ROLLBACK");
+			done();
+			console.log(error);
+			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+		query.on("end", function(result) {
+			if (result.rows.length && !result.rows[0].is_competitor && result.rows[0].max_capacity > result.rows[0].registered_competitors) {
+				var tournament = result.rows[0];
+				//if (tournament.competitor_fee) {
+					/**
+					 * Payment service happens here.
+					 * The payment service code is probably going to be handled async, so I have to handle that but for now lets just do whatever
+					 */
+
+				//} else {
+					var query = client.query({
+						text : "SELECT max(competitor_number)+1 AS next_competitor FROM competitor WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4",
+						values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
+					});
+					query.on("row", function(row, result) {
+						result.addRow(row);
+					});
+					query.on('error', function(error) {
+						client.query("ROLLBACK");
+						done();
+						console.log(error);
+						res.status(500).send(error);
+						log.info({
+							res : res
+						}, 'done response');
+					});
+					query.on("end", function(result) {
+						var nextCompetitor = (!(result.rows[0].next_competitor) ? 1 : result.rows[0].next_competitor);
+						client.query({
+							text: "INSERT INTO competitor (event_name, event_start_date, event_location, tournament_name, competitor_number, competitor_standing, competitor_seed, matches_won, matches_lost, competitor_has_forfeited, competitor_check_in, competitor_paid) VALUES($1, $2, $3, $4, $5, 0, 0, 0, 0, false, false, true)",
+							values: [req.params.event, req.query.date, req.query.location, req.params.tournament, nextCompetitor]
+						}, function (err, result) {
+							if (err) {
+								client.query("ROLLBACK");
+								done();
+								console.log(err);
+								res.status(500).send(err);
+								log.info({
+									res : res
+								}, 'done response');
+							} else {
+								if (tournament.team_size > 1) {
+									if (!req.body.team || !req.body.players || req.body.players != tournament.team_size) {
+										client.query("ROLLBACK");
+										done();
+										res.status(403).json({
+											missing_team_name : !req.body.team,
+											missing_players_array : !req.body.players,
+											invalid_amount_of_players : req.body.players != tournament.team_size
+										});
+										log.info({
+											res : res
+										}, 'done response');
+									} else {
+										client.query({
+											text: "INSERT INTO competes_for (event_name, event_start_date, event_location, tournament_name, competitor_number, team_name) VALUES($1, $2, $3, $4, $5, $6)",
+											values: [req.params.event, req.query.date, req.query.location, req.params.tournament, nextCompetitor, req.body.team]
+										}, function (err, result) {
+											if (err) {
+												client.query("ROLLBACK");
+												done();
+												console.log(err);
+												res.status(500).send(err);
+												log.info({
+													res: res
+												}, 'done response');
+											} else {
+												for (var i = 0, index = 0; i < tournament.team_size; i++) {
+													customerIsACompetitor(req, res, client, done, log, req.body.players[i], nextCompetitor, index++, tournament.team_size-1);
+												}
+											}
+										});
+									}
+								} else {
+									customerIsACompetitor(req, res, client, done, log, req.user.username, nextCompetitor, 0, 0);
+								}
+							}
+						});
+					});
+				//}
+			} else {
+				client.query("ROLLBACK");
+				done();
+				res.status(403).json({
+					already_registered : result.rows[0].is_competitor,
+					at_max_capacity : result.rows[0].max_capacity <= result.rows[0].registered_competitors
+				});
+				log.info({
+					res : res
+				}, 'done response');
+			}
+		});
+	});
+};
+
 module.exports.createTournament = createTournament;
 module.exports.getStandings = getStandings;
 module.exports.getRounds = getRounds;
 module.exports.getMatch = getMatch;
+module.exports.getPrizeDistributions = getPrizeDistributions;
+module.exports.registerForTournament = registerForTournament;

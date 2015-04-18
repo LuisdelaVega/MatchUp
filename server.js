@@ -369,7 +369,7 @@ app.route('/matchup/events/:event/stations/:station').get(function(req, res) {
 });
 
 /* /matchup/events/:event/tournaments?date=date&location=string
- *
+ *TODO update API
  * [GET] Get all Tournaments from a specific Event
  */
 app.route('/matchup/events/:event/tournaments').get(function(req, res) {
@@ -423,7 +423,7 @@ app.route('/matchup/events/:event/tournaments/:tournament').get(function(req, re
 	events.removeTournament(req, res, pg, conString, log);
 });
 
-/* /matchup/events/:event/tournaments/:tournament/create
+/* /matchup/events/:event/tournaments/:tournament/create?date=date&location=string
  * TODO Allow only event organizers to do this
  * 
  * [POST] Create the stages of a Tournament
@@ -435,7 +435,26 @@ app.route('/matchup/events/:event/tournaments/:tournament/create').post(function
 	tournaments.createTournament(req, res, pg, conString, log);
 });
 
-/* /matchup/events/:event/tournaments/:tournament/standings
+/* /matchup/events/:event/tournaments/:tournament/register?date=date&location=string
+ * TODO Update API
+ *
+ * 	params:
+ * 		+ Body [If the team_size > 1]
+ * 			{
+ * 				"team": "Name of team",
+ * 				"players": ["Usernames of players"]
+ * 			}
+ *
+ * [POST] Register to play in a Tournament
+ */
+app.route('/matchup/events/:event/tournaments/:tournament/register').post(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	tournaments.registerForTournament(req, res, pg, conString, log);
+});
+
+/* /matchup/events/:event/tournaments/:tournament/standings?date=date&location=string
  * TODO Update API
  * [GET] Get the standings of a Tournament
  */
@@ -446,7 +465,7 @@ app.route('/matchup/events/:event/tournaments/:tournament/standings').get(functi
     tournaments.getStandings(req, res, pg, conString, log);
 });
 
-/* /matchup/events/:event/tournaments/:tournament/rounds
+/* /matchup/events/:event/tournaments/:tournament/rounds?date=date&location=string
  * TODO Update API
  * [GET] Get the rounds of a Tournament
  */
@@ -1094,6 +1113,17 @@ app.route('/matchup/teams/:team/standings').get(function(req, res) {
 		req : req
 	}, 'start request');
 	teams.getStandings(req, res, pg, conString, log);
+});
+
+/* /matchup/teams/:team/standings
+ *
+ * [GET] Get the subscriptions of a specific Customer
+ */
+app.route('/matchup/distributions').get(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	tournaments.getPrizeDistributions(req, res, pg, conString, log);
 });
 
 ///////////////////////////////////////////////// SERVER LISTEN

@@ -1011,7 +1011,7 @@ var submitScore = function(req, res, pg, conString, log) {
                                                                                                                                                 } else {
                                                                                                                                                     // Assign the sets to the extra match
                                                                                                                                                     for (var i = 0; i < details.round_best_of; i++) {
-                                                                                                                                                        is_set(req, res, client, done, log, (parseInt(req.params.round)+1), "Winner", 1, (i+1), details.station_number, i, (parseInt(details.round_best_of) -1))
+                                                                                                                                                        is_set(req, res, client, done, log, (parseInt(req.params.round)+1), "Winner", 1, (i+1), details.station_number, i, (parseInt(details.round_best_of) -1));
                                                                                                                                                     }
                                                                                                                                                 }
                                                                                                                                             });
@@ -1930,7 +1930,7 @@ var getTournaments = function(req, res, pg, conString, log) {
         }
 
         var query = client.query({
-            text : "SELECT tournament_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group, game.* FROM tournament NATURAL JOIN game NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND event_active AND tournament_active",
+            text : "SELECT tournament_name, tournament_rules, team_size, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group, game.*, prize_distribution.* FROM tournament NATURAL JOIN game NATURAL JOIN event NATURAL JOIN prize_distribution WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND event_active AND tournament_active",
             values : [req.params.event, req.query.date, req.query.location]
         });
         query.on("row", function(row, result) {
@@ -1960,14 +1960,15 @@ var getTournament = function(req, res, pg, conString, log) {
         }
 
         var query = client.query({
-            text : "SELECT tournament_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group, game.* FROM tournament NATURAL JOIN game NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND tournament_active AND event_active",
-            values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
+            text : "SELECT tournament_name, tournament_rules, team_size, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group, game.*, prize_distribution.*, ($5 IN (SELECT customer_username FROM is_a WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4)) AS is_competitor FROM tournament NATURAL JOIN game NATURAL JOIN event NATURAL JOIN prize_distribution WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND tournament_active AND event.event_active",
+            values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.user.username]
         });
         query.on("row", function(row, result) {
             result.addRow(row);
         });
         query.on('error', function(error) {
             done();
+            console.log(error);
             res.status(500).send(error);
             log.info({
                 res : res
@@ -3289,8 +3290,8 @@ var addTournament = function(req, res, pg, conString, log) {
                 query.on("end", function(result) {
                     if (result.rows.length) {
                         client.query({
-                            text : "INSERT INTO tournament (event_name, event_start_date, event_location, tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
-                            values : [req.params.event, req.query.date, req.query.location, req.body.name, req.body.game, req.body.rules, req.body.teams, req.body.start_date, req.body.deadline, Math.floor(req.body.fee * 100) / 100, req.body.capacity, Math.floor(req.body.seed_money * 100) / 100, req.body.type, req.body.format, req.body.scoring, ((req.body.type === "Two Stage") ? req.body.group_players : 0), ((req.body.type === "Two Stage") ? req.body.group_winners : 0)]
+                            text : "INSERT INTO tournament (event_name, event_start_date, event_location, tournament_name, game_name, tournament_rules, team_size, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group, prize_distribution_name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)",
+                            values : [req.params.event, req.query.date, req.query.location, req.body.name, req.body.game, req.body.rules, req.body.teams, req.body.start_date, req.body.deadline, Math.floor(req.body.fee * 100) / 100, req.body.capacity, Math.floor(req.body.seed_money * 100) / 100, req.body.type, req.body.format, req.body.scoring, ((req.body.type === "Two Stage") ? req.body.group_players : 0), ((req.body.type === "Two Stage") ? req.body.group_winners : 0), req.body.prize_distribution]
                         }, function(err, result) {
                             if (err) {
                                 clent.query("ROLLBACK");
@@ -3547,8 +3548,8 @@ var editTournament = function(req, res, pg, conString, log) {
         query.on("end", function(result) {
             if (result.rows.length) {
                 client.query({
-                    text : "UPDATE tournament SET (tournament_name, game_name, tournament_rules, is_team_based, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group) = ($5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4",
-                    values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.body.name, req.body.game, req.body.rules, req.body.teams, req.body.start_date, req.body.deadline, Math.floor(req.body.fee * 100) / 100, req.body.capacity, Math.floor(req.body.seed_money * 100) / 100, req.body.type, req.body.format, req.body.scoring, ((req.body.type === "Two Stage") ? req.body.group_players : 0), ((req.body.type === "Two Stage") ? req.body.group_winners : 0)]
+                    text : "UPDATE tournament SET (tournament_name, game_name, tournament_rules, team_size, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group, prize_distribution_name) = ($5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19) WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4",
+                    values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.body.name, req.body.game, req.body.rules, req.body.teams, req.body.start_date, req.body.deadline, Math.floor(req.body.fee * 100) / 100, req.body.capacity, Math.floor(req.body.seed_money * 100) / 100, req.body.type, req.body.format, req.body.scoring, ((req.body.type === "Two Stage") ? req.body.group_players : 0), ((req.body.type === "Two Stage") ? req.body.group_winners : 0), req.body.prize_distribution]
                 }, function(err, result) {
                     if (err) {
                         client.query("ROLLBACK");
