@@ -436,8 +436,8 @@ app.route('/matchup/events/:event/tournaments/:tournament/create').post(function
 });
 
 /* /matchup/events/:event/tournaments/:tournament/standings
- *
- * TODO [GET] Get the standings of a Tournament
+ * TODO Update API
+ * [GET] Get the standings of a Tournament
  */
 app.route('/matchup/events/:event/tournaments/:tournament/standings').get(function(req, res) {
     log.info({
@@ -446,11 +446,34 @@ app.route('/matchup/events/:event/tournaments/:tournament/standings').get(functi
     tournaments.getStandings(req, res, pg, conString, log);
 });
 
+/* /matchup/events/:event/tournaments/:tournament/rounds
+ * TODO Update API
+ * [GET] Get the rounds of a Tournament
+ */
+app.route('/matchup/events/:event/tournaments/:tournament/rounds').get(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	tournaments.getRounds(req, res, pg, conString, log);
+});
+
+
+/* /matchup/events/:event/tournaments/:tournament/rounds/:rounds/matches/:match
+ * TODO Update API
+ * [GET] Get a specific match
+ */
+app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round/matches/:match').get(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	tournaments.getMatch(req, res, pg, conString, log);
+});
+
 /* /matchup/events/:event/tournaments/:tournament/rounds/:round/matches/:match/:set?date=date&location=string&round_of=string
  * TODO Update in API
  * 	Params:
  * 		round_of = Indicates where the round was/it to be played. Posible values: [Group, Winner, Loser, Round Robin]
- * 
+ *
  * [POST] Submit the results of a Set
  * TODO [PUT] Update the results of a Set TODO Can be used by Organizers
  */
@@ -857,6 +880,17 @@ app.route('/matchup/profile/:username/subscriptions').get(function(req, res) {
 	customers.getSubscriptions(req, res, pg, conString, log);
 });
 
+/* /matchup/profile/:username/standings
+ *
+ * [GET] Get the subscriptions of a specific Customer
+ */
+app.route('/matchup/profile/:username/standings').get(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	customers.getStandings(req, res, pg, conString, log);
+});
+
 /* /matchup/profile/:username/teams
  *
  * [GET] Get the Teams for which a specific Customer competes
@@ -1049,6 +1083,17 @@ app.route('/matchup/teams/:team/members').get(function(req, res) {
 	// } else {
 	teams.removeTeamMember(req, res, pg, conString, log);
 	// }
+});
+
+/* /matchup/teams/:team/standings
+ *
+ * [GET] Get the subscriptions of a specific Customer
+ */
+app.route('/matchup/teams/:team/standings').get(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	teams.getStandings(req, res, pg, conString, log);
 });
 
 ///////////////////////////////////////////////// SERVER LISTEN

@@ -174,6 +174,61 @@ var getSubscriptions = function(req, res, pg, conString, log) {
 	});
 };
 
+var getStandings = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		// Query the database to find the user's account
+		var query = client.query({
+			text : "SELECT customer_username FROM customer WHERE customer_username = $1 AND customer_active",
+			values : [req.params.username]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			done();
+			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+		query.on("end", function(result) {
+			if (result.rows.length) {
+				var query = client.query({
+					text : "SELECT event_name, event_start_date, event_location, tournament_name, competitor_standing AS standing FROM competitor NATURAL JOIN is_a WHERE customer_username = $1 AND competitor_standing > 0",
+					values : [req.params.username]
+				});
+				query.on("row", function(row, result) {
+					result.addRow(row);
+				});
+				query.on('error', function(error) {
+					done();
+					res.status(500).send(error);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+				query.on("end", function(result) {
+					done();
+					res.status(200).send(result.rows);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+			} else {
+				done();
+				res.status(404).send("User: " + req.params.username + " was not not found");
+				log.info({
+					res : res
+				}, 'done response');
+			}
+		});
+	});
+};
+
 var getTeams = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -1098,3 +1153,4 @@ module.exports.getOrganizations = getOrganizations;
 module.exports.getEvents = getEvents;
 module.exports.getRegisteredEvents = getRegisteredEvents;
 module.exports.getMatchups = getMatchups;
+module.exports.getStandings = getStandings;

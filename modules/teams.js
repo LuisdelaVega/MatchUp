@@ -211,6 +211,61 @@ var getTeamMembers = function(req, res, pg, conString, log) {
 	});
 };
 
+var getStandings = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		// Query the database to find the user's account
+		var query = client.query({
+			text : "SELECT team_name FROM team WHERE team_name = $1 AND team_active",
+			values : [req.params.team]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			done();
+			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+		query.on("end", function(result) {
+			if (result.rows.length) {
+				var query = client.query({
+					text : "SELECT event_name, event_start_date, event_location, tournament_name, competitor_standing AS standing FROM competitor NATURAL JOIN competes_for WHERE team_name = $1 AND competitor_standing > 0",
+					values : [req.params.team]
+				});
+				query.on("row", function(row, result) {
+					result.addRow(row);
+				});
+				query.on('error', function(error) {
+					done();
+					res.status(500).send(error);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+				query.on("end", function(result) {
+					done();
+					res.status(200).send(result.rows);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+			} else {
+				done();
+				res.status(404).send("Team: " + req.params.team + " was not not found");
+				log.info({
+					res : res
+				}, 'done response');
+			}
+		});
+	});
+};
+
 var addTeamMember = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -486,3 +541,4 @@ module.exports.getTeamMembers = getTeamMembers;
 module.exports.addTeamMember = addTeamMember;
 module.exports.removeTeamMember = removeTeamMember;
 module.exports.makeCaptain = makeCaptain;
+module.exports.getStandings = getStandings;

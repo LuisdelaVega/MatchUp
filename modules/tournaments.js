@@ -290,9 +290,9 @@ var createTournament = function(req, res, pg, conString, log) {
 
 						// Now we have everything needed to create the stages of a tournament in the database
 						/*
-						* Perform the same check as before to handle node being an asynchronous a-hole.
-						* Since we need to perform various functions that also involve more than one query we need to be carefull and do things in order.
-						*/
+						 * Perform the same check as before to handle node being an asynchronous a-hole.
+						 * Since we need to perform various functions that also involve more than one query we need to be carefull and do things in order.
+						 */
 						// Just to be sure
 						var flag = false;
 						if (tournament.tournament_type === "Two Stage") {
@@ -621,7 +621,7 @@ function singleEliminationBracket(bracket, players, tournament) {
 	// Assign players for Winners Round 1 Matches
 	for ( i = 0; i < (bracket.numOfPlayers - bracket.byes) / 2; i++) {
 		// winnerRounds[0].matches[i].player1 = players[bracket.byes + i/* - 1*/];
-        (players[bracket.byes + i/* - 1*/] instanceof String ? 'Do nothing' : winnerRounds[0].matches[i].players.push(players[bracket.byes + i/* - 1*/]));
+		(players[bracket.byes + i/* - 1*/] instanceof String ? 'Do nothing' : winnerRounds[0].matches[i].players.push(players[bracket.byes + i/* - 1*/]));
 		// winnerRounds[0].matches[i].player2 = players[bracket.numOfPlayers - i - 1];
 		(players[bracket.numOfPlayers - i - 1] instanceof String ? 'Do nothing' : winnerRounds[0].matches[i].players.push(players[bracket.numOfPlayers - i - 1]));
 		//console.log(winnerRounds[0].name+", match: "+i+", player1: "+winnerRounds[0].matches[i].player1.seed+", player2: "+winnerRounds[0].matches[i].player2.seed);
@@ -1209,89 +1209,393 @@ function doubleEliminationBracket(bracket, tournament) {
 	}
 }
 
-var getStandings = function(req, res, pg, conString, log) {
-    pg.connect(conString, function(err, client, done) {
-        if (err) {
-            return console.error('error fetching client from pool', err);
-        }
+function getStandingsForFinalStage(req, res, client, done, log, standings) {
+	var query = client.query({
+		text: 'SELECT max(competitor.competitor_standing) AS standings FROM competitor JOIN is_a ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN tournament ON competitor.event_name = tournament.event_name AND competitor.event_start_date = tournament.event_start_date AND competitor.event_location = tournament.event_location AND competitor.tournament_name = tournament.tournament_name JOIN customer ON customer.customer_username = is_a.customer_username WHERE is_a.event_name = $1 AND is_a.event_start_date = $2 AND is_a.event_location = $3 AND is_a.tournament_name = $4 AND competitor.competitor_standing > 0',
+		values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+	});
+	query.on("row", function (row, result) {
+		result.addRow(row);
+	});
+	query.on('error', function (error) {
+		client.query("ROLLBACK");
+		done();
+		console.log(error);
+		res.status(500).send(error);
+		log.info({
+			res: res
+		}, 'done response');
+	});
+	query.on("end", function (result) {
+		if (result.rows.length) {
+			standings.finalStage = new Object();
+			standings.finalStage.standings = new Array();
+			console.log(result.rows[0].standings);
+			for (var i = 0; i < result.rows[0].standings; i++) {
+				console.log("Hello!");
+				standings.finalStage.standings[i] = new Array();
+			}
+			var query = client.query({
+				text: 'SELECT customer.customer_username, customer.customer_profile_pic, customer.customer_tag, competitor.competitor_standing AS standing FROM competitor JOIN is_a ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN tournament ON competitor.event_name = tournament.event_name AND competitor.event_start_date = tournament.event_start_date AND competitor.event_location = tournament.event_location AND competitor.tournament_name = tournament.tournament_name JOIN customer ON customer.customer_username = is_a.customer_username WHERE is_a.event_name = $1 AND is_a.event_start_date = $2 AND is_a.event_location = $3 AND is_a.tournament_name = $4 AND competitor.competitor_standing > 0 ORDER BY standing',
+				values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+			});
+			query.on("row", function (row, result) {
+				standings.finalStage.standings[row.standing - 1].push(row);
+			});
+			query.on('error', function (error) {
+				client.query("ROLLBACK");
+				done();
+				console.log(error);
+				res.status(500).send(error);
+				log.info({
+					res: res
+				}, 'done response');
+			});
+			query.on("end", function (result) {
+				done();
+				res.status(200).send(standings);
+				log.info({
+					res: res
+				}, 'done response');
+			});
+		} else {
+			done();
+			res.status(204).send('');
+			log.info({
+				res: res
+			}, 'done response');
+		}
+	});
+}
 
-        var query = client.query({
-            text: "SELECT tournament_name, tournament_start_date, tournament_type, tournament_format, number_of_people_per_group, amount_of_winners_per_group FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
-            values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
-        });
-        query.on("row", function (row, result) {
-            result.addRow(row);
-        });
-        query.on('error', function (error) {
-            client.query("ROLLBACK");
-            done();
-            console.log(error);
-            res.status(500).send(error);
-            log.info({
-                res: res
-            }, 'done response');
-        });
-        query.on("end", function (result) {
-            if (result.rows.length) {
-                var standings = new Object();
-                if (result.rows[0].tournament_type == "Two Stage") {
-                    var query = client.query({
-                        text: 'SELECT group_number FROM "group" WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4',
-                        values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
-                    });
-                    query.on("row", function (row, result) {
-                        result.addRow(row);
-                    });
-                    query.on('error', function (error) {
-                        client.query("ROLLBACK");
-                        done();
-                        console.log(error);
-                        res.status(500).send(error);
-                        log.info({
-                            res: res
-                        }, 'done response');
-                    });
-                    query.on("end", function (result) {
-                        standings.groupstage = new Object();
-                        standings.groupstage.groups = result.rows;
-                        for (var i = 0; i < standings.groupstage.groups.length; i++) {
-                            standings.groupstage.groups[i].players = new Array();
-                        }
-                        var query = client.query({
-                            text: 'SELECT customer.customer_username, customer.customer_profile_pic, customer.customer_tag, has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) AS wins, CASE WHEN has_a.group_number = (SELECT count(*) FROM "group" WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4) THEN ((SELECT count(*) FROM is_a WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4) % tournament.number_of_people_per_group - 1) - sum(submits.score)/((round.round_best_of/2)+1) ELSE (tournament.number_of_people_per_group - 1) - sum(submits.score)/((round.round_best_of/2)+1) END AS loses, CASE WHEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC, competitor.competitor_seed) % (tournament.number_of_people_per_group) = 0 THEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group + 1) ELSE row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group) END AS standing, (CASE WHEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC, competitor.competitor_seed) % (tournament.number_of_people_per_group) = 0 THEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group + 1) ELSE row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group) END <= tournament.amount_of_winners_per_group) AS advanced FROM submits JOIN competes ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.round_of = competes.round_of AND submits.round_number = competes.round_number AND submits.competitor_number = competes.competitor_number JOIN round ON submits.event_name = round.event_name AND submits.event_start_date = round.event_start_date AND submits.event_location = round.event_location AND submits.tournament_name = round.tournament_name AND submits.round_of = round.round_of AND submits.round_number = round.round_number JOIN competitor ON competitor.event_name = competes.event_name AND competitor.event_start_date = competes.event_start_date AND competitor.event_location = competes.event_location AND competitor.tournament_name = competes.tournament_name AND competitor.competitor_number = competes.competitor_number JOIN has_a ON has_a.event_name = competes.event_name AND has_a.event_start_date = competes.event_start_date AND has_a.event_location = competes.event_location AND has_a.tournament_name = competes.tournament_name AND has_a.round_number = competes.round_number AND has_a.round_of = competes.round_of AND has_a.match_number = competes.match_number JOIN tournament ON submits.event_name = tournament.event_name AND submits.event_start_date = tournament.event_start_date AND submits.event_location = tournament.event_location AND submits.tournament_name = tournament.tournament_name JOIN is_a ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN customer ON customer.customer_username = is_a.customer_username WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_of = $5 GROUP BY customer.customer_username, customer.customer_tag, customer.customer_profile_pic, round.round_best_of, has_a.group_number, competitor.competitor_seed, tournament.number_of_people_per_group, tournament.amount_of_winners_per_group ORDER BY has_a.group_number, wins DESC, competitor.competitor_seed, standing',
-                            values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Group"]
-                        });
-                        query.on("row", function (row, result) {
-                            standings.groupstage.groups[row.group_number - 1].players.push(row);
-                        });
-                        query.on('error', function (error) {
-                            client.query("ROLLBACK");
-                            done();
-                            console.log(error);
-                            res.status(500).send(error);
-                            log.info({
-                                res: res
-                            }, 'done response');
-                        });
-                        query.on("end", function (result) {
-                            done();
-                            res.status(200).send(standings);
-                            log.info({
-                                res: res
-                            }, 'done response');
-                        });
-                    });
-                }
-            } else {
-                done();
-                res.status(404).send("Tournament not found");
-                log.info({
-                    res: res
-                }, 'done response');
-            }
-        });
-    });
+var getStandings = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var query = client.query({
+			text: "SELECT tournament_type FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
+			values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+		});
+		query.on("row", function (row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function (error) {
+			client.query("ROLLBACK");
+			done();
+			console.log(error);
+			res.status(500).send(error);
+			log.info({
+				res: res
+			}, 'done response');
+		});
+		query.on("end", function (result) {
+			if (result.rows.length) {
+				var standings = new Object();
+				if (result.rows[0].tournament_type == "Two Stage") {
+					var query = client.query({
+						text: 'SELECT group_number FROM "group" WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4',
+						values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+					});
+					query.on("row", function (row, result) {
+						result.addRow(row);
+					});
+					query.on('error', function (error) {
+						client.query("ROLLBACK");
+						done();
+						console.log(error);
+						res.status(500).send(error);
+						log.info({
+							res: res
+						}, 'done response');
+					});
+					query.on("end", function (result) {
+						standings.groupStage = new Object();
+						standings.groupStage.groups = new Array();
+						for (var i = 0; i < result.rows.length; i++) {
+							standings.groupStage.groups[i] = new Array();
+						}
+						var query = client.query({
+							text: 'SELECT customer.customer_username, customer.customer_profile_pic, customer.customer_tag, has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) AS wins, CASE WHEN has_a.group_number = (SELECT count(*) FROM "group" WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4) THEN ((SELECT count(*) FROM is_a WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4) % tournament.number_of_people_per_group - 1) - sum(submits.score)/((round.round_best_of/2)+1) ELSE (tournament.number_of_people_per_group - 1) - sum(submits.score)/((round.round_best_of/2)+1) END AS loses, CASE WHEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC, competitor.competitor_seed) % (tournament.number_of_people_per_group) = 0 THEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group + 1) ELSE row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group) END AS standing, (CASE WHEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC, competitor.competitor_seed) % (tournament.number_of_people_per_group) = 0 THEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group + 1) ELSE row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group) END <= tournament.amount_of_winners_per_group) AS advanced FROM submits JOIN competes ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.round_of = competes.round_of AND submits.round_number = competes.round_number AND submits.competitor_number = competes.competitor_number JOIN round ON submits.event_name = round.event_name AND submits.event_start_date = round.event_start_date AND submits.event_location = round.event_location AND submits.tournament_name = round.tournament_name AND submits.round_of = round.round_of AND submits.round_number = round.round_number JOIN competitor ON competitor.event_name = competes.event_name AND competitor.event_start_date = competes.event_start_date AND competitor.event_location = competes.event_location AND competitor.tournament_name = competes.tournament_name AND competitor.competitor_number = competes.competitor_number JOIN has_a ON has_a.event_name = competes.event_name AND has_a.event_start_date = competes.event_start_date AND has_a.event_location = competes.event_location AND has_a.tournament_name = competes.tournament_name AND has_a.round_number = competes.round_number AND has_a.round_of = competes.round_of AND has_a.match_number = competes.match_number JOIN tournament ON submits.event_name = tournament.event_name AND submits.event_start_date = tournament.event_start_date AND submits.event_location = tournament.event_location AND submits.tournament_name = tournament.tournament_name JOIN is_a ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN customer ON customer.customer_username = is_a.customer_username WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_of = $5 GROUP BY customer.customer_username, customer.customer_tag, customer.customer_profile_pic, round.round_best_of, has_a.group_number, competitor.competitor_seed, tournament.number_of_people_per_group, tournament.amount_of_winners_per_group ORDER BY has_a.group_number, wins DESC, competitor.competitor_seed, standing',
+							values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Group"]
+						});
+						query.on("row", function (row, result) {
+							standings.groupStage.groups[row.group_number - 1].push(row);
+						});
+						query.on('error', function (error) {
+							client.query("ROLLBACK");
+							done();
+							console.log(error);
+							res.status(500).send(error);
+							log.info({
+								res: res
+							}, 'done response');
+						});
+						query.on("end", function (result) {
+							getStandingsForFinalStage(req, res, client, done, log, standings);
+						});
+					});
+				} else {
+					getStandingsForFinalStage(req, res, client, done, log, standings);
+				}
+			} else {
+				done();
+				res.status(404).send("Tournament not found");
+				log.info({
+					res: res
+				}, 'done response');
+			}
+		});
+	});
+};
+
+var getRounds = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var query = client.query({
+			text: "SELECT tournament_type, tournament_format FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
+			values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+		});
+		query.on("row", function (row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function (error) {
+			client.query("ROLLBACK");
+			done();
+			console.log(error);
+			res.status(500).send(error);
+			log.info({
+				res: res
+			}, 'done response');
+		});
+		query.on("end", function (result) {
+			if (result.rows.length) {
+				var tournament = new Object();
+				tournament.finalStage = new Object();
+				if (result.rows[0].tournament_type == "Two Stage") {
+					tournament.groupStage = new Object();
+					tournament.groupStage.groups = new Array();
+				}
+				if (result.rows[0].tournament_format == "Single Elimination") {
+					tournament.finalStage.winnerRounds = new Array();
+				} else if (result.rows[0].tournament_format == "Double Elimination") {
+					tournament.finalStage.winnerRounds = new Array();
+					tournament.finalStage.loserRounds = new Array();
+				} else {
+					tournament.finalStage.roundRobinRounds = new Array();
+				}
+				var query = client.query({
+					text: 'SELECT match.round_number, match.round_of, match.match_number, match.match_completed, customer.customer_username,customer.customer_tag, customer.customer_profile_pic, sum(submits.score) AS score, has_a.group_number FROM match LEFT OUTER JOIN competes ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND competes.round_number = match.round_number AND competes.round_of = match.round_of AND competes.match_number = match.match_number LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number LEFT OUTER JOIN is_a ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND competes.competitor_number = is_a.competitor_number LEFT OUTER JOIN customer ON is_a.customer_username = customer.customer_username LEFT OUTER JOIN competitor ON competitor.event_name = competes.event_name AND competitor.event_start_date = competes.event_start_date AND competitor.event_location = competes.event_location AND competitor.tournament_name = competes.tournament_name AND competitor.competitor_number = competes.competitor_number LEFT OUTER JOIN has_a ON match.event_name = has_a.event_name AND match.event_start_date = has_a.event_start_date AND match.event_location = has_a.event_location AND match.tournament_name = has_a.tournament_name AND has_a.round_number = match.round_number AND has_a.round_of = match.round_of AND has_a.match_number = match.match_number WHERE match.event_name = $1 AND match.event_start_date = $2 AND match.event_location = $3 AND match.tournament_name = $4 GROUP BY match.round_number, match.round_of, match.match_number, match.match_completed, customer.customer_tag, customer.customer_profile_pic, customer.customer_username, competitor.competitor_seed, has_a.group_number ORDER BY CASE WHEN match.round_of = $5 THEN 1 WHEN match.round_of = $6 THEN 2 WHEN match.round_of = $7 THEN 3 WHEN match.round_of = $8 THEN 4 END, match.round_number, match.match_number, competitor.competitor_seed',
+					values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Group", "Round Robin", "Winner", "Loser"]
+				});
+				query.on("row", function (row, result) {
+					if (row.group_number) {
+						if (!tournament.groupStage.groups[row.group_number-1]) {
+							tournament.groupStage.groups[row.group_number-1] = new Object();
+							tournament.groupStage.groups[row.group_number-1].group_number = row.group_number;
+							tournament.groupStage.groups[row.group_number-1].rounds = new Array();
+						}
+						if (!tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1]) {
+							tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1] = new Object();
+							tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].round_number = row.round_number;
+							tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches = new Array();
+						}
+						if (!tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number]) {
+							tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number] = new Object();
+							tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number].match_number = row.match_number;
+							tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number].match_completed = row.match_completed;
+							tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number].players = new Array();
+						}
+						tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number].players.push({
+							customer_username : row.customer_username,
+							customer_tag : row.customer_tag,
+							customer_profile_pic : row.customer_profile_pic,
+							score : row.score
+						});
+					} else if (row.round_of === "Winner") {
+						if (!tournament.finalStage.winnerRounds[row.round_number-1]) {
+							tournament.finalStage.winnerRounds[row.round_number-1] = new Object();
+							tournament.finalStage.winnerRounds[row.round_number-1].round_number = row.round_number;
+							tournament.finalStage.winnerRounds[row.round_number-1].matches = new Array();
+						}
+						if (!tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1]) {
+							tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1] = new Object();
+							tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1].match_number = row.match_number;
+							tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1].match_completed = row.match_completed;
+							tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1].players = new Array();
+						}
+						tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1].players.push({
+							customer_username : row.customer_username,
+							customer_tag : row.customer_tag,
+							customer_profile_pic : row.customer_profile_pic,
+							score : row.score
+						})
+					} else if (row.round_of === "Loser") {
+						if (!tournament.finalStage.loserRounds[row.round_number-1]) {
+							tournament.finalStage.loserRounds[row.round_number-1] = new Object();
+							tournament.finalStage.loserRounds[row.round_number-1].round_number = row.round_number;
+							tournament.finalStage.loserRounds[row.round_number-1].matches = new Array();
+						}
+						if (!tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1]) {
+							tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1] = new Object();
+							tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1].match_number = row.match_number;
+							tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1].match_completed = row.match_completed;
+							tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1].players = new Array();
+						}
+						tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1].players.push({
+							customer_username : row.customer_username,
+							customer_tag : row.customer_tag,
+							customer_profile_pic : row.customer_profile_pic,
+							score : row.score
+						})
+					} else {
+						if (!tournament.finalStage.roundRobinRounds[row.round_number-1]) {
+							tournament.finalStage.roundRobinRounds[row.round_number-1] = new Object();
+							tournament.finalStage.roundRobinRounds[row.round_number-1].round_number = row.round_number;
+							tournament.finalStage.roundRobinRounds[row.round_number-1].matches = new Array();
+						}
+						if (!tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1]) {
+							tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1] = new Object();
+							tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1].match_number = row.match_number;
+							tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1].match_completed = row.match_completed;
+							tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1].players = new Array();
+						}
+						tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1].players.push({
+							customer_username : row.customer_username,
+							customer_tag : row.customer_tag,
+							customer_profile_pic : row.customer_profile_pic,
+							score : row.score
+						})
+					}
+				});
+				query.on('error', function (error) {
+					client.query("ROLLBACK");
+					done();
+					console.log(error);
+					res.status(500).send(error);
+					log.info({
+						res: res
+					}, 'done response');
+				});
+				query.on("end", function (result) {
+					done();
+					res.status(200).send(tournament);
+					log.info({
+						res: res
+					}, 'done response');
+				});
+			} else {
+				done();
+				res.status(404).send("Tournament not found");
+				log.info({
+					res: res
+				}, 'done response');
+			}
+		});
+	});
+};
+
+var getMatch = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var query = client.query({
+			text: "SELECT tournament_type, tournament_format FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
+			values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+		});
+		query.on("row", function (row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function (error) {
+			client.query("ROLLBACK");
+			done();
+			console.log(error);
+			res.status(500).send(error);
+			log.info({
+				res: res
+			}, 'done response');
+		});
+		query.on("end", function (result) {
+			if (result.rows.length) {
+				var matchDetails = new Object();
+				matchDetails.players = new Array();
+				console.log(req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match);
+				var query = client.query({
+					text: 'SELECT customer.customer_username, customer.customer_tag, customer.customer_profile_pic, match.match_completed, sum(submits.score) AS score FROM customer JOIN is_a ON is_a.customer_username = customer.customer_username LEFT OUTER JOIN competes ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number LEFT OUTER JOIN match ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND match.round_number = competes.round_number AND match.round_of = competes.round_of AND match.match_number = competes.match_number WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND competes.match_number = $7 GROUP BY customer.customer_username, customer.customer_tag, customer.customer_profile_pic, match.match_completed',
+					values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match]
+				});
+				query.on("row", function (row, result) {
+					console.log(row);
+					matchDetails.players.push({
+						customer_username : row.customer_username,
+						customer_tag : row.customer_tag,
+						customer_profile_pic : row.customer_profile_pic,
+						score : row.score
+					});
+					matchDetails.match_completed = row.match_completed;
+				});
+				query.on('error', function (error) {
+					client.query("ROLLBACK");
+					done();
+					console.log(error);
+					res.status(500).send(error);
+					log.info({
+						res: res
+					}, 'done response');
+				});
+				query.on("end", function (result) {
+					matchDetails.sets = new Array();
+					var query = client.query({
+						text: 'SELECT customer.customer_username, is_set.set_seq, is_set.set_completed, submits.score AS score FROM is_set JOIN match ON is_set.event_name = match.event_name AND is_set.event_start_date = match.event_start_date AND is_set.event_location = match.event_location AND is_set.tournament_name = match.tournament_name AND is_set.round_number = match.round_number AND is_set.round_of = match.round_of AND is_set.match_number = match.match_number LEFT OUTER JOIN submits ON submits.event_name = is_set.event_name AND submits.event_start_date = is_set.event_start_date AND submits.event_location = is_set.event_location AND submits.tournament_name = is_set.tournament_name AND submits.round_number = is_set.round_number AND submits.round_of = is_set.round_of AND submits.match_number = is_set.match_number AND submits.set_seq = is_set.set_seq LEFT OUTER JOIN competes ON is_set.event_name = competes.event_name AND is_set.event_start_date = competes.event_start_date AND is_set.event_location = competes.event_location AND is_set.tournament_name = competes.tournament_name AND competes.round_number = is_set.round_number AND competes.round_of = is_set.round_of AND competes.match_number = is_set.match_number AND submits.competitor_number = competes.competitor_number LEFT OUTER JOIN is_a ON is_a.competitor_number = competes.competitor_number AND is_a.event_name = is_set.event_name AND is_a.event_start_date = is_set.event_start_date AND is_a.event_location = is_set.event_location AND is_a.tournament_name = is_set.tournament_name LEFT OUTER JOIN customer ON customer.customer_username = is_a.customer_username WHERE is_set.event_name = $1 AND is_set.event_start_date = $2 AND is_set.event_location = $3 AND is_set.tournament_name = $4 AND is_set.round_number = $5 AND is_set.round_of = $6 AND is_set.match_number = $7',
+						values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match]
+					});
+					query.on("row", function (row, result) {
+						if (!matchDetails.sets[row.set_seq-1]) {
+							matchDetails.sets[row.set_seq-1] = new Object();
+							matchDetails.sets[row.set_seq-1].set_seq = row.set_seq;
+							matchDetails.sets[row.set_seq-1].set_completed = row.set_completed;
+							matchDetails.sets[row.set_seq-1].scores = new Array();
+						}
+						matchDetails.sets[row.set_seq-1].scores.push({
+							customer_username : row.customer_username,
+							score : row.score
+						});
+					});
+					query.on('error', function (error) {
+						client.query("ROLLBACK");
+						done();
+						console.log(error);
+						res.status(500).send(error);
+						log.info({
+							res: res
+						}, 'done response');
+					});
+					query.on("end", function (result) {
+						done();
+						res.status(200).send(matchDetails);
+						log.info({
+							res: res
+						}, 'done response');
+					});
+				});
+			} else {
+				done();
+				res.status(404).send("Tournament not found");
+				log.info({
+					res: res
+				}, 'done response');
+			}
+		});
+	});
 };
 
 module.exports.createTournament = createTournament;
 module.exports.getStandings = getStandings;
+module.exports.getRounds = getRounds;
+module.exports.getMatch = getMatch;
