@@ -1,4 +1,4 @@
-var myApp = angular.module('MatchUp', ['ui.router', 'ngResource', 'as.sortable', 'ui.bootstrap.datetimepicker', 'Authentication', 'InputDirectives', 'home', 'premium-events', 'tournaments', 'user', 'organizer', 'organization', 'forms']);
+var myApp = angular.module('MatchUp', ['ui.router', 'ngResource', 'as.sortable', 'ui.bootstrap.datetimepicker', 'panhandler', 'Authentication', 'InputDirectives', 'bracketDirective', 'home', 'premium-events', 'tournaments', 'user', 'organizer', 'organization', 'forms']);
 
 myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider) {
 	//
@@ -90,10 +90,10 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 		.state('app.edit_meetup', {
 			url: "/meetup/:eventName/:eventDate/:eventLocation/:meetupDate/:meetupLocation/:customerUsername",
 			templateUrl: "event/edit_Meetup.html",
-			controller: "editMeetUpController"			
-		}
-		
-		.state('app.competitorSignup', {
+			controller: "editMeetUpController"
+		})
+
+	.state('app.competitorSignup', {
 			url: "/competitorSignup",
 			templateUrl: "event/competitor_signup.html"
 		})
@@ -289,6 +289,11 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			url: "/search/:type/:query",
 			templateUrl: "searchResults.html",
 			controller: "searchResultsController"
+		})
+		.state('app.bracket', {
+			url: "/bracket",
+			templateUrl: "tournament/bracket.html",
+			controller: "bracketController"
 		});
 
 	$httpProvider.interceptors.push(function ($q, $timeout, $injector) {

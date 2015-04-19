@@ -1,0 +1,39 @@
+<link rel="stylesheet" href="../../dist/css/bracket.css">
+
+
+
+<div class="box">
+	<h3 ng-if="format == 'Double Elimination'" class="page-header">Winners Bracket</h3>
+	<div class="overflow-container" ng-style="bracketHeight">
+		<div class="overflow"  panhandler>
+			<div class="tournament">
+				<h4 ng-repeat="round in rounds" style="width:200px" align="middle">Round {{$index + 1}}</h4>
+			</div>
+			<div class="tournament format">
+				<ul class="round" ng-repeat="round in rounds">
+					<li class="spacer" ng-repeat-start="item in round" ng-if="$first">&nbsp;</li>
+					<match player1={{item.players[0].customer_tag}} score1={{item.players[0].score}} position1={{item.players[0].position}} player2={{item.players[1].customer_tag}} score2={{item.players[1].score}} position1={{item.players[1].position}} bye='{{item.bye}}' match="{{item.match_number}}" completed="{{item.match_completed}}" loser-bye="{{item.isLoser}}" extra="{{item.extra}}"></match>
+					<li class="spacer" ng-repeat-end>&nbsp;</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="box box-margin" ng-if="format == 'Double Elimination'">
+	<h3  class="page-header">Loser Bracket</h3>
+	<div class="overflow-container" ng-style="loserBracketHeight">
+		<div class="overflow"  panhandler>
+			<div class="tournament">
+				<h4 ng-repeat="round in loserRounds" style="width:200px" align="middle">Round {{$index + 1}}</h4>
+			</div>
+			<div class="tournament format">
+				<ul class="round" ng-repeat="round in loserRounds">
+					<li class="spacer" ng-repeat-start="item in round" ng-if="$first">&nbsp;</li>
+					<match player1={{item.players[0].customer_tag}} score1={{item.players[0].score}} position1={{item.players[0].position}} player2={{item.players[1].customer_tag}} score2={{item.players[1].score}} position1={{item.players[1].position}} bye='{{item.bye}}' match="{{item.match_number}}" completed="{{item.match_completed}}" loser-bye="{{round.isLoser}}" extra="{{item.extra}}"></match>
+					<li class="spacer" ng-repeat-end>&nbsp;</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>

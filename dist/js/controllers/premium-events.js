@@ -122,19 +122,6 @@ myApp.controller('eventPremiumSummaryController', function($scope, $state, $http
 		console.log("Oh oh");
 	});
 
-        // Get sponsors
-        $scope.sponsors = results[1].data;
-        // Get News
-        $scope.news = results[2].data;
-        // Get Participants
-        $scope.participants = results[3].data;
-        // Get Tournaments
-        $scope.tournamentsInfo = results[4].data;
-    }, function (err) {
-        console.log(err);
-        console.log("Oh oh");
-    });
-
     //Go to a list of meetups for this event
     $scope.goToMeetupList = function (eventName, eventDate, eventLocation) {
             //heyyeah

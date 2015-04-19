@@ -1,0 +1,113 @@
+/*
+ *  Flex Layout Specifics
+*/
+
+.overflow-container{
+	width: 100%;
+	position: relative;
+	overflow-x:hidden;
+}
+
+.overflow{
+	padding-right: 50px;
+	position: absolute;
+}
+
+.tournament {
+	display: flex;
+	flex-direction: row;
+}
+
+.format {
+	font-family: sans-serif;
+	font-size: small;
+	line-height: 1.4em;
+}
+
+.round {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	width: 200px;
+	list-style: none;
+	padding: 0;
+}
+
+.round .spacer {
+	flex-grow: 1;
+}
+
+.round .spacer:first-child,
+.round .spacer:last-child {
+	flex-grow: .5;
+}
+
+.round .game-spacer {
+	flex-grow: 1;
+}
+/*
+ *  General Styles
+*/
+/*
+.overscroll {
+	height: 500px;
+	width: 500px;
+	overflow: scroll;
+	line-height: 1.4em;
+}
+*/
+/* Each participant element has a padding */
+
+.game {
+	padding-left: 20px;
+}
+/* Class for the winner of the match*/
+
+.winner {
+	font-weight: bold;
+}
+/* Points of the match*/
+
+.game span {
+	float: right;
+	margin-right: 5px;
+}
+/*Participant in the top*/
+
+.game-top {
+	border-bottom: 1px solid #aaa;
+	min-height: 19px;
+}
+/*Space between the two participants*/
+
+.game-spacer {
+	border-right: 1px solid #aaa;
+	min-height: 40px;
+}
+/* Blank space for byes*/
+
+.bye-spacer {
+	border-right: 0px solid #aaa;
+	min-height: 78px;
+}
+
+/*Used for loser bracket*/
+.bye-player {
+	margin-left: 60px;
+	border-bottom: 1px solid #aaa;
+	white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; 
+}
+
+.bye-player span {
+	float: right;
+	margin-right: 5px;
+}
+
+/*Participant in the bottom*/
+
+.game-bottom {
+	border-top: 1px solid #aaa;
+	min-height: 19px;
+}
