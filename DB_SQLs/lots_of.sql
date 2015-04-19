@@ -229,9 +229,11 @@ SELECT customer.customer_username, is_set.set_seq, is_set.set_completed, submits
 SELECT competitor_fee, team_size, tournament_max_capacity AS max_capacity, ('test02' IN (SELECT customer_username FROM is_a WHERE event_name = 'Event 01' AND event_start_date = '2015-03-25 09:00:00' AND event_location = 'miradero' AND tournament_name = 'Mortal Kombat X Qualifiers')) AS is_competitor, (SELECT count(*) FROM is_a WHERE event_name = 'Event 01' AND event_start_date = '2015-03-25 09:00:00' AND event_location = 'miradero' AND tournament_name = 'Mortal Kombat X Qualifiers') AS registered_competitors FROM tournament NATURAL JOIN event WHERE event_name = 'Event 01' AND event_start_date = '2015-03-25 09:00:00' AND event_location = 'miradero' AND tournament_name = 'Mortal Kombat X Qualifiers' AND event_active AND tournament_active
 -- The rest are simple inserts
 
+-- Get checked in competitors
+SELECT customer_username, customer_tag, customer_profile_pic, competitor_number FROM customer NATURAL JOIN is_a NATURAL JOIN competitor WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_check_in
 
-
-
+-- Count all checked in competitors
+SELECT count(*) FROM tournament NATURAL JOIN event NATURAL JOIN competitor WHERE event_name = 'Event 01' AND event_start_date = '2015-03-25 09:00:00' AND event_location = 'miradero' AND tournament_name = 'Super Smash Bros. Melee Qualifiers' AND event_active AND tournament_active AND competitor_check_in
 
 
 

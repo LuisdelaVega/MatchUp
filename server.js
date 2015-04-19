@@ -531,6 +531,30 @@ app.route('/matchup/events/:event/tournaments/:tournament/competitors').get(func
 	events.getCompetitors(req, res, pg, conString, log);
 });
 
+/* /matchup/events/:event/tournaments/:tournament/competitors/checked?date=date&location=string
+ * TODO Update API
+ *
+ * 	params:
+ * 		+ Body
+ * 			{
+ * 				"players": [{"competitor_number": int, "seed": int}]
+ * 			}
+ *
+ * [GET] Get the details for all Competitors for a specific Tournament
+ * [PUT] Arrange the seeds for the competitors of a Tournament
+ */
+app.route('/matchup/events/:event/tournaments/:tournament/competitors/checked').get(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	tournaments.getCheckedInCompetitors(req, res, pg, conString, log);
+}).put(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	tournaments.arrangeSeeds(req, res, pg, conString, log);
+});
+
 /* /matchup/events/:event/tournaments/:tournament/competitors/:competitor?date=date&location=string
  *
  * params:

@@ -1767,9 +1767,169 @@ var registerForTournament = function(req, res, pg, conString, log) {
 	});
 };
 
+var getCheckedInCompetitors = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var query = client.query({
+			text : "SELECT team_size FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
+			values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+		query.on("end", function(result) {
+			if (result.rows.length) {
+				if (result.rows[0].team_size > 1) {
+					var query = client.query({
+						text: "SELECT team_name, team_logo, competitor_number, competitor_seed FROM team NATURAL JOIN competes_for NATURAL JOIN competitor WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_check_in ORDER BY competitor_seed",
+						values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+					});
+					query.on("row", function (row, result) {
+						result.addRow(row);
+					});
+					query.on('error', function (error) {
+						done();
+						console.log(error);
+						res.status(500).send(error);
+						log.info({
+							res: res
+						}, 'done response');
+					});
+					query.on("end", function (result) {
+						done();
+						res.status(200).json(result.rows);
+						log.info({
+							res: res
+						}, 'done response');
+					});
+				} else {
+					var query = client.query({
+						text: "SELECT customer_username, customer_tag, customer_profile_pic, competitor_number, competitor_seed FROM customer NATURAL JOIN is_a NATURAL JOIN competitor WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_check_in ORDER BY competitor_seed",
+						values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+					});
+					query.on("row", function (row, result) {
+						result.addRow(row);
+					});
+					query.on('error', function (error) {
+						done();
+						console.log(error);
+						res.status(500).send(error);
+						log.info({
+							res: res
+						}, 'done response');
+					});
+					query.on("end", function (result) {
+						done();
+						res.status(200).json(result.rows);
+						log.info({
+							res: res
+						}, 'done response');
+					});
+				}
+			} else {
+				done();
+				res.status(404).send('Tournament not found');
+				log.info({
+					res : res
+				}, 'done response');
+			}
+		});
+	});
+};
+
+function changeSeedValue(req, res, client, done, log, competitor_number, seed, index, length) {
+	client.query({
+		text: "UPDATE competitor SET competitor_seed = $6 WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_number = $5",
+		values: [req.params.event, req.query.date, req.query.location, req.params.tournament, competitor_number, seed]
+	}, function (err, result) {
+		if (err) {
+			client.query("ROLLBACK");
+			done();
+			console.log(err);
+			res.status(500).send(err);
+			log.info({
+				res: res
+			}, 'done response');
+		} else if (index == length) {
+			client.query("COMMIT");
+			done();
+			res.status(201).send('Seeds updated');
+			log.info({
+				res: res
+			}, 'done response');
+		}
+	});
+}
+
+var arrangeSeeds = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		client.query("BEGIN");
+		var query = client.query({
+			text : "SELECT count(*) AS players FROM tournament NATURAL JOIN event NATURAL JOIN competitor WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active AND competitor_check_in",
+			values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			client.query("ROLLBACK");
+			done();
+			console.log(error);
+			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+		query.on("end", function(result) {
+			if (result.rows.length) {
+				if (req.body.players && req.body.players.length == parseInt(result.rows[0].players) && req.body.players.length > 1) {
+					for (var i = 0, index = 0; i < result.rows[0].players; i++) {
+						changeSeedValue(req, res, client, done, log, req.body.players[i].competitor_number, req.body.players[i].seed, index++, req.body.players.length-1);
+					}
+				} else {
+					client.query("ROLLBACK");
+					done();
+					res.status(403).json({
+						missing_players_array : !req.body.players,
+						invalid_amount_of_players : req.body.players.length != result.rows[0].players,
+						not_enough_players_for_a_tournament : req.body.players.length <= 1
+					});
+					log.info({
+						res : res
+					}, 'done response');
+				}
+			} else {
+				client.query("ROLLBACK");
+				done();
+				res.status(404).send('Tournament not found');
+				log.info({
+					res : res
+				}, 'done response');
+			}
+		});
+	});
+};
+
 module.exports.createTournament = createTournament;
 module.exports.getStandings = getStandings;
 module.exports.getRounds = getRounds;
 module.exports.getMatch = getMatch;
 module.exports.getPrizeDistributions = getPrizeDistributions;
 module.exports.registerForTournament = registerForTournament;
+module.exports.getCheckedInCompetitors = getCheckedInCompetitors;
+module.exports.arrangeSeeds = arrangeSeeds;
