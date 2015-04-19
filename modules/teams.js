@@ -81,52 +81,50 @@ var editTeam = function(req, res, pg, conString, log) {
 			log.info({
 				res : res
 			}, 'done response');
-		}
-
-		client.query("BEGIN");
-
-		var query = client.query({
-			text : "SELECT team_name, team_logo, team_bio, team_cover_photo, bool_and(team_name IN (SELECT team_name FROM plays_for WHERE customer_username = $2)) AS is_member FROM team WHERE team_active AND team_name = $1 GROUP BY team_name, team_logo, team_bio, team_cover_photo",
-			values : [req.params.team, req.user.username]
-		});
-		query.on("row", function(row, result) {
-			result.addRow(row);
-		});
-		query.on('error', function(error) {
-			done();
-			res.status(500).send(error);
-			log.info({
-				res : res
-			}, 'done response');
-		});
-		query.on("end", function(result) {
-			if (result.rows.length && result.rows[0].is_member) {
-				client.query({
-					text : "UPDATE team SET (team_logo, team_bio, team_cover_photo) = ($1, $2, $3) WHERE team_name = $4",
-					values : [req.body.logo, req.body.bio, req.body.cover, req.params.team]
-				}, function(err, result) {
-					if (err) {
-						client.query("ROLLBACK");
-						done();
-						res.status(500).send(err);
-					} else {
-						client.query("COMMIT");
-						done();
-						res.status(200).send("Team info updated");
-					}
-					log.info({
-						res : res
-					}, 'done response');
-				});
-			} else {
+		} else {
+			client.query("BEGIN");
+			var query = client.query({
+				text: "SELECT team_name, team_logo, team_bio, team_cover_photo, bool_and(team_name IN (SELECT team_name FROM plays_for WHERE customer_username = $2)) AS is_member FROM team WHERE team_active AND team_name = $1 GROUP BY team_name, team_logo, team_bio, team_cover_photo",
+				values: [req.params.team, req.user.username]
+			});
+			query.on("row", function (row, result) {
+				result.addRow(row);
+			});
+			query.on('error', function (error) {
 				done();
-				res.status(404).send("Couldn't find team: " + req.params.team);
+				res.status(500).send(error);
 				log.info({
-					res : res
+					res: res
 				}, 'done response');
-			};
-		});
-
+			});
+			query.on("end", function (result) {
+				if (result.rows.length && result.rows[0].is_member) {
+					client.query({
+						text: "UPDATE team SET (team_logo, team_bio, team_cover_photo) = ($1, $2, $3) WHERE team_name = $4",
+						values: [req.body.logo, req.body.bio, req.body.cover, req.params.team]
+					}, function (err, result) {
+						if (err) {
+							client.query("ROLLBACK");
+							done();
+							res.status(500).send(err);
+						} else {
+							client.query("COMMIT");
+							done();
+							res.status(200).send("Team info updated");
+						}
+						log.info({
+							res: res
+						}, 'done response');
+					});
+				} else {
+					done();
+					res.status(404).send("Couldn't find team: " + req.params.team);
+					log.info({
+						res: res
+					}, 'done response');
+				}
+			});
+		}
 	});
 };
 

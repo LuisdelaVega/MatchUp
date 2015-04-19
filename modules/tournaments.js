@@ -1525,10 +1525,11 @@ var getMatch = function(req, res, pg, conString, log) {
 			if (result.rows.length) {
 				var matchDetails = new Object();
 				matchDetails.players = new Array();
+				matchDetails.is_competitor = false;
 				console.log(req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match);
 				var query = client.query({
-					text: 'SELECT customer.customer_username, customer.customer_tag, customer.customer_profile_pic, match.match_completed, sum(submits.score) AS score FROM customer JOIN is_a ON is_a.customer_username = customer.customer_username LEFT OUTER JOIN competes ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number LEFT OUTER JOIN match ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND match.round_number = competes.round_number AND match.round_of = competes.round_of AND match.match_number = competes.match_number WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND competes.match_number = $7 GROUP BY customer.customer_username, customer.customer_tag, customer.customer_profile_pic, match.match_completed',
-					values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match]
+					text: 'SELECT customer.customer_username, (customer.customer_username = $8) AS is_competitor, customer.customer_tag, customer.customer_profile_pic, match.match_completed, sum(submits.score) AS score FROM customer JOIN is_a ON is_a.customer_username = customer.customer_username LEFT OUTER JOIN competes ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number LEFT OUTER JOIN match ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND match.round_number = competes.round_number AND match.round_of = competes.round_of AND match.match_number = competes.match_number WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND competes.match_number = $7 GROUP BY customer.customer_username, customer.customer_tag, customer.customer_profile_pic, match.match_completed',
+					values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.user.username]
 				});
 				query.on("row", function (row, result) {
 					console.log(row);
@@ -1539,6 +1540,9 @@ var getMatch = function(req, res, pg, conString, log) {
 						score : row.score
 					});
 					matchDetails.match_completed = row.match_completed;
+					if (!matchDetails.is_competitor) {
+						matchDetails.is_competitor = row.is_competitor;
+					}
 				});
 				query.on('error', function (error) {
 					client.query("ROLLBACK");
@@ -1925,6 +1929,107 @@ var arrangeSeeds = function(req, res, pg, conString, log) {
 	});
 };
 
+var createReport = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		client.query("BEGIN");
+		var query = client.query({
+			text : "SELECT tournament_name, ($8 IN (SELECT customer.customer_username FROM customer JOIN is_a ON is_a.customer_username = customer.customer_username LEFT OUTER JOIN competes ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number LEFT OUTER JOIN match ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND match.round_number = competes.round_number AND match.round_of = competes.round_of AND match.match_number = competes.match_number WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND competes.match_number = $7 GROUP BY customer.customer_username)) AS is_competitor FROM event NATURAL JOIN tournament NATURAL JOIN round NATURAL JOIN match WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6 AND match_number = $7 AND event_active AND tournament_active",
+			values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.user.username]
+		});
+		query.on("row", function(row, result) {
+			console.log(row);
+			console.log(req.user.username);
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			client.query("ROLLBACK");
+			done();
+			console.log(error);
+			console.log("HELLO!");
+			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+		query.on("end", function(result) {
+			if (result.rows.length) {
+				if (result.rows[0].is_competitor) {
+					var query = client.query({
+						text : "SELECT max(report_number)+1 AS next_report FROM report WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6 AND match_number = $7",
+						values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match]
+					});
+					query.on("row", function(row, result) {
+						result.addRow(row);
+					});
+					query.on('error', function(error) {
+						client.query("ROLLBACK");
+						done();
+						console.log(error);
+						res.status(500).send(error);
+						log.info({
+							res : res
+						}, 'done response');
+					});
+					query.on("end", function(result) {
+						var nextReport = (!(result.rows[0].next_report) ? 1 : result.rows[0].next_report);
+						if (req.body.description && req.body.type) {
+							client.query({
+								text: "INSERT INTO report (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, report_number, report_description, report_image, report_date, report_type) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+								values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, nextReport, req.body.description, (!req.body.image ? 'null' : req.body.image), (new Date()).toUTCString(), req.body.type]
+							}, function (err, result) {
+								if (err) {
+									client.query("ROLLBACK");
+									done();
+									console.log(err);
+									res.status(500).send(err);
+									log.info({
+										res: res
+									}, 'done response');
+								} else {
+									client.query("COMMIT");
+									done();
+									res.status(201).send('Sumbitted');
+									log.info({
+										res: res
+									}, 'done response');
+								}
+							});
+						} else {
+							client.query("ROLLBACK");
+							done();
+							res.status(403).json({
+								missing_description : !req.body.description,
+								missing_type : !req.body.type
+							});
+							log.info({
+								res : res
+							}, 'done response');
+						}
+					});
+				} else {
+					client.query("ROLLBACK");
+					done();
+					res.status(403).send("You can't submit a report for this match");
+					log.info({
+						res : res
+					}, 'done response');
+				}
+			} else {
+				client.query("ROLLBACK");
+				done();
+				res.status(404).send('Something was not found. (event, tournament, round, or match)');
+				log.info({
+					res : res
+				}, 'done response');
+			}
+		});
+	});
+};
+
 module.exports.createTournament = createTournament;
 module.exports.getStandings = getStandings;
 module.exports.getRounds = getRounds;
@@ -1933,3 +2038,4 @@ module.exports.getPrizeDistributions = getPrizeDistributions;
 module.exports.registerForTournament = registerForTournament;
 module.exports.getCheckedInCompetitors = getCheckedInCompetitors;
 module.exports.arrangeSeeds = arrangeSeeds;
+module.exports.createReport = createReport;

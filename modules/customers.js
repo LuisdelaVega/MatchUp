@@ -282,6 +282,62 @@ var getTeams = function(req, res, pg, conString, log) {
 	});
 };
 
+var getRequests = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		// Query the database to find the user's account
+		var query = client.query({
+			text : "SELECT customer_username FROM customer WHERE customer_username = $1 AND customer_active",
+			values : [req.params.username]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			done();
+			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+		query.on("end", function(result) {
+			if (result.rows.length) {
+				var query = client.query({
+					text : "SELECT request.* FROM request NATURAL JOIN customer WHERE customer_username = $1",
+					values : [req.params.username]
+				});
+				query.on("row", function(row, result) {
+					result.addRow(row);
+				});
+				query.on('error', function(error) {
+					done();
+					console.log(error);
+					res.status(500).send(error);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+				query.on("end", function(result) {
+					done();
+					res.status(200).send(result.rows);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+			} else {
+				done();
+				res.status(404).send("User: " + req.params.username + " was not not found");
+				log.info({
+					res : res
+				}, 'done response');
+			}
+		});
+	});
+};
+
 var getOrganizations = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -1153,3 +1209,4 @@ module.exports.getEvents = getEvents;
 module.exports.getRegisteredEvents = getRegisteredEvents;
 module.exports.getMatchups = getMatchups;
 module.exports.getStandings = getStandings;
+module.exports.getRequests = getRequests;

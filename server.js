@@ -379,6 +379,17 @@ app.route('/matchup/events/:event/tournaments').get(function(req, res) {
 	events.getTournaments(req, res, pg, conString, log);
 });
 
+/* /matchup/events/:event/specfees?date=date&location=string
+ *TODO update API
+ * [GET] Get all Spectator fees for a specific Event
+ */
+app.route('/matchup/events/:event/specfees').get(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	events.getSpecFees(req, res, pg, conString, log);
+});
+
 /* /matchup/events/:event/tournaments/:tournament?date=date&location=string&station=int
  *
  * params:
@@ -493,14 +504,20 @@ app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round/matches/
  * 	Params:
  * 		round_of = Indicates where the round was/it to be played. Posible values: [Group, Winner, Loser, Round Robin]
  *
- * [POST] Submit the results of a Set
- * TODO [PUT] Update the results of a Set TODO Can be used by Organizers
+ * [PUT] Submit the results of a Set
+ * [POST] Submit a report for the match
+ * TODO [PUT] Update the results of a Set TODO Can be used by Organizers do in another route
  */
-app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round/matches/:match/:set').post(function(req, res) {
+app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round/matches/:match/:set').put(function(req, res) {
 	log.info({
 		req : req
 	}, 'start request');
 	events.submitScore(req, res, pg, conString, log);
+}).post(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	tournaments.createReport(req, res, pg, conString, log);
 });
 
 /* /matchup/events/:event/tournaments/:tournament/stations?date=date&location=string&station=int
@@ -689,6 +706,17 @@ app.route('/matchup/events/:event/meetups/:username').get(function(req, res) {
 	events.deleteMeetup(req, res, pg, conString, log);
 });
 
+/* /matchup/events/:event/reports?date=date&location=string
+ * TODO Update API
+ * [GET] Get all Reports posted on a specific Event
+ */
+app.route('/matchup/events/:event/reports').get(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	events.getReports(req, res, pg, conString, log);
+});
+
 /* /matchup/events/:event/sponsors?date=date&location=string&sponsor=string
  *
  * params:
@@ -802,6 +830,17 @@ app.route('/matchup/organizations/:organization/events').get(function(req, res) 
 		req : req
 	}, 'start request');
 	organizations.getOrganizationEvents(req, res, pg, conString, log);
+});
+
+/* /matchup/organizations/:organization/requests
+ * TODO Update API
+ * [GET] Get all Sponsor requests by a specific Organization
+ */
+app.route('/matchup/organizations/:organization/requests').get(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	organizations.getSponsorRequests(req, res, pg, conString, log);
 });
 
 /* /matchup/organizations/:organization/sponsors?sponsor=string
@@ -943,6 +982,17 @@ app.route('/matchup/profile/:username/teams').get(function(req, res) {
 		req : req
 	}, 'start request');
 	customers.getTeams(req, res, pg, conString, log);
+});
+
+/* /matchup/profile/:username/requests
+ * TODO Update API
+ * [GET] Get all requests to create an organization that a specific Customer has sumbitted
+ */
+app.route('/matchup/profile/:username/requests').get(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	customers.getRequests(req, res, pg, conString, log);
 });
 
 /* /matchup/profile/:username/organizations

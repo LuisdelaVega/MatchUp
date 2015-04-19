@@ -61,7 +61,6 @@ var getOrganization = function(req, res, pg, conString, log) {
 	});
 };
 
-//TODO Edit API
 var editOrganization = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -77,7 +76,9 @@ var editOrganization = function(req, res, pg, conString, log) {
 			result.addRow(row);
 		});
 		query.on('error', function(error) {
+			client.query("ROLLBACK");
 			done();
+			console.log(error);
 			res.status(500).send(error);
 			log.info({
 				res : res
@@ -117,11 +118,13 @@ var editOrganization = function(req, res, pg, conString, log) {
                     }, 'done response');
                 }
 			} else {
+				client.query("ROLLBACK");
+				done();
 				res.status(404).send("Coudn't find the organization: " + req.params.organization);
+				log.info({
+					res : res
+				}, 'done response');
 			}
-			log.info({
-				res : res
-			}, 'done response');
 		});
 	});
 };
@@ -222,6 +225,61 @@ var getOrganizationEvents = function(req, res, pg, conString, log) {
 				});
 				query.on('error', function(error) {
 					done();
+					res.status(500).send(error);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+				query.on("end", function(result) {
+					done();
+					res.status(200).json(result.rows);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+			} else {
+				done();
+				res.status(404).send("Coudn't find the organization: " + req.params.organization);
+				log.info({
+					res : res
+				}, 'done response');
+			}
+		});
+	});
+};
+
+var getSponsorRequests = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var query = client.query({
+			text : "SELECT organization_name, organization_logo, organization_bio, organization_cover_photo, bool_and(customer_username = $1) AS is_member FROM organization NATURAL JOIN belongs_to NATURAL JOIN customer WHERE organization_active AND customer_active AND organization_name = $2 GROUP BY organization_name",
+			values : [req.user.username, req.params.organization]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			done();
+			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+		query.on("end", function(result) {
+			if (result.rows.length) {
+				var query = client.query({
+					text : "SELECT request_sponsor.* FROM request_sponsor NATURAL JOIN organization WHERE organization_name = $1",
+					values : [req.params.organization]
+				});
+				query.on("row", function(row, result) {
+					result.addRow(row);
+				});
+				query.on('error', function(error) {
+					done();
+					console.log(error);
 					res.status(500).send(error);
 					log.info({
 						res : res
@@ -742,3 +800,4 @@ module.exports.removeOrganizationMember = removeOrganizationMember;
 module.exports.getSponsors = getSponsors;
 module.exports.requestSponsor = requestSponsor;
 module.exports.removeSponsor = removeSponsor;
+module.exports.getSponsorRequests = getSponsorRequests;
