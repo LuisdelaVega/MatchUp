@@ -1548,7 +1548,7 @@ var getMatch = function(req, res, pg, conString, log) {
 				matchDetails.is_competitor = false;
 				console.log(req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match);
 				var query = client.query({
-					text: 'SELECT customer.customer_username, (customer.customer_username = $8) AS is_competitor, customer.customer_tag, customer.customer_profile_pic, match.match_completed, sum(submits.score) AS score FROM customer JOIN is_a ON is_a.customer_username = customer.customer_username LEFT OUTER JOIN competes ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number LEFT OUTER JOIN match ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND match.round_number = competes.round_number AND match.round_of = competes.round_of AND match.match_number = competes.match_number WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND competes.match_number = $7 GROUP BY customer.customer_username, customer.customer_tag, customer.customer_profile_pic, match.match_completed',
+					text: 'SELECT customer.customer_username, (customer.customer_username = $8) AS is_competitor, customer.customer_tag, customer.customer_profile_pic, match.match_completed, match.is_favourite, sum(submits.score) AS score FROM customer JOIN is_a ON is_a.customer_username = customer.customer_username LEFT OUTER JOIN competes ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number LEFT OUTER JOIN match ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND match.round_number = competes.round_number AND match.round_of = competes.round_of AND match.match_number = competes.match_number WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND competes.match_number = $7 GROUP BY customer.customer_username, customer.customer_tag, customer.customer_profile_pic, match.match_completed, match.is_favourite',
 					values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.user.username]
 				});
 				query.on("row", function (row, result) {
@@ -1560,6 +1560,7 @@ var getMatch = function(req, res, pg, conString, log) {
 						score : row.score
 					});
 					matchDetails.match_completed = row.match_completed;
+					matchDetails.is_favourite = row.is_favourite;
 					if (!matchDetails.is_competitor) {
 						matchDetails.is_competitor = row.is_competitor;
 					}
@@ -1609,6 +1610,300 @@ var getMatch = function(req, res, pg, conString, log) {
 					});
 				});
 			} else {
+				done();
+				res.status(404).send("Tournament not found");
+				log.info({
+					res: res
+				}, 'done response');
+			}
+		});
+	});
+};
+
+var markAsFavourite = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		client.query("BEGIN");
+		var query = client.query({
+			text : "SELECT tournament_name FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
+			values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			client.query("ROLLBACK");
+			done();
+			console.log(error);
+			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+		query.on("end", function(result) {
+			if (result.rows.length) {
+				client.query({
+					text: "UPDATE match SET is_favourite = NOT is_favourite WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6 AND match_number = $7",
+					values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match]
+				}, function (err, result) {
+					if (err) {
+						client.query("ROLLBACK");
+						done();
+						console.log(err);
+						res.status(500).send(err);
+						log.info({
+							res: res
+						}, 'done response');
+					} else {
+						client.query("COMMIT");
+						done();
+						res.status(200).send("Updated");
+						log.info({
+							res: res
+						}, 'done response');
+					}
+				});
+			} else {
+				client.query("ROLLBACK");
+				done();
+				res.status(404).send("Tournament not found");
+				log.info({
+					res: res
+				}, 'done response');
+			}
+		});
+	});
+};
+
+var unPauseRound = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		client.query("BEGIN");
+		var query = client.query({
+			text : "SELECT tournament_name FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
+			values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			client.query("ROLLBACK");
+			done();
+			console.log(error);
+			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+		query.on("end", function(result) {
+			if (result.rows.length) {
+				client.query({
+					text: "UPDATE round SET round_pause = false WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6",
+					values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of]
+				}, function (err, result) {
+					if (err) {
+						client.query("ROLLBACK");
+						done();
+						console.log(err);
+						res.status(500).send(err);
+						log.info({
+							res: res
+						}, 'done response');
+					} else {
+						client.query("COMMIT");
+						done();
+						res.status(200).send("Un-paused");
+						log.info({
+							res: res
+						}, 'done response');
+					}
+				});
+			} else {
+				client.query("ROLLBACK");
+				done();
+				res.status(404).send("Tournament not found");
+				log.info({
+					res: res
+				}, 'done response');
+			}
+		});
+	});
+};
+
+function addSet(req, res, client, done, log, match_number, next_set, index, length, canEnd) {
+	client.query({
+		text: "INSERT INTO is_set (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
+		values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, match_number, next_set]
+	}, function (err, result) {
+		if (err) {
+			client.query("ROLLBACK");
+			done();
+			console.log("Here2222");
+			console.log(err);
+			res.status(500).send(err);
+			log.info({
+				res: res
+			}, 'done response');
+		} else if (index == length && canEnd) {
+			client.query("COMMIT");
+			done();
+			res.status(201).send("Sets added");
+			log.info({
+				res: res
+			}, 'done response');
+		}
+	});
+}
+
+function removeSet(req, res, client, done, log, match_number, next_set, index, length, canEnd) {
+	var query = client.query({
+		text : "SELECT max(set_seq) AS next_set FROM is_set WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6 AND match_number = $7",
+		values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, match_number]
+	});
+	query.on("row", function(row, result) {
+		result.addRow(row);
+	});
+	query.on('error', function(error) {
+		client.query("ROLLBACK");
+		done();
+		console.log(error);
+		res.status(500).send(error);
+		log.info({
+			res : res
+		}, 'done response');
+	});
+	query.on("end", function(result) {
+		client.query({
+			text: "DELETE FROM is_set WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq) = ($1, $2, $3, $4, $5, $6, $7, $8)",
+			values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, match_number, next_set]
+		}, function (err, result) {
+			if (err) {
+				client.query("ROLLBACK");
+				done();
+				console.log(err);
+				res.status(500).send(err);
+				log.info({
+					res: res
+				}, 'done response');
+			} else if (index == length && canEnd) {
+				client.query("COMMIT");
+				done();
+				res.status(204).send("");
+				log.info({
+					res: res
+				}, 'done response');
+			}
+		});
+	});
+}
+
+function addSets(req, res, client, done, log, match_number, next_set, sets_to_add, index, length) {
+	for (var i = 0; i < sets_to_add; i++) {
+		addSet(req, res, client, done, log, match_number, next_set+i+1, i, sets_to_add-1, index == length);
+	}
+}
+
+function removeSets(req, res, client, done, log, match_number, next_set, sets_to_remove, index, length) {
+	for (var i = 0; i < sets_to_remove; i++) {
+		removeSet(req, res, client, done, log, match_number, next_set-i, i, sets_to_remove-1, index == length);
+	}
+}
+
+var editBestOf = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		client.query("BEGIN");
+		var query = client.query({
+			text : "SELECT round_best_of, (SELECT count(*) FROM match WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6) AS matches FROM tournament NATURAL JOIN event NATURAL JOIN round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6 AND event_active AND tournament_active",
+			values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			client.query("ROLLBACK");
+			done();
+			console.log(error);
+			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+		query.on("end", function(result) {
+			if (result.rows.length) {
+				var round = {};
+				round.best_of = parseInt(result.rows[0].round_best_of);
+				round.matches = parseInt(result.rows[0].matches);
+				if (isNaN(req.body.best_of) || req.body.best_of <= 0) {
+					client.query("ROLLBACK");
+					done();
+					res.status(400).send("Invalid payload");
+					log.info({
+						res: res
+					}, 'done response');
+				} else {
+					client.query({
+						text: "UPDATE round SET round_best_of = $7 WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of) = ($1, $2, $3, $4, $5, $6)",
+						values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.body.best_of]
+					}, function (err, result) {
+						if (err) {
+							client.query("ROLLBACK");
+							done();
+							console.log(err);
+							res.status(500).send(err);
+							log.info({
+								res: res
+							}, 'done response');
+						} else {
+							var query = client.query({
+								text : "SELECT max(set_seq) AS next_set FROM is_set WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6 AND match_number = 1",
+								values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of]
+							});
+							query.on("row", function(row, result) {
+								result.addRow(row);
+							});
+							query.on('error', function(error) {
+								client.query("ROLLBACK");
+								done();
+								console.log(error);
+								res.status(500).send(error);
+								log.info({
+									res : res
+								}, 'done response');
+							});
+							query.on("end", function(result) {
+								var next_set = parseInt(result.rows[0].next_set);
+								if (round.best_of < req.body.best_of) {
+									for (var i = 0; i < round.matches; i++) {
+										addSets(req, res, client, done, log, i + 1, next_set, req.body.best_of - round.best_of, i, round.matches - 1);
+									}
+								} else if (round.best_of > req.body.best_of) {
+									for (var i = 0; i < round.matches; i++) {
+										removeSets(req, res, client, done, log, i + 1, next_set, round.best_of - req.body.best_of, i, round.matches - 1);
+									}
+								} else {
+									client.query("COMMIT");
+									done();
+									res.status(204).send("");
+									log.info({
+										res: res
+									}, 'done response');
+								}
+							});
+						}
+					});
+				}
+			} else {
+				client.query("ROLLBACK");
 				done();
 				res.status(404).send("Tournament not found");
 				log.info({
@@ -1700,81 +1995,81 @@ var registerForTournament = function(req, res, pg, conString, log) {
 			if (result.rows.length && !result.rows[0].is_competitor && result.rows[0].max_capacity > result.rows[0].registered_competitors) {
 				var tournament = result.rows[0];
 				//if (tournament.competitor_fee) {
-					/**
-					 * Payment service happens here.
-					 * The payment service code is probably going to be handled async, so I have to handle that but for now lets just do whatever
-					 */
+				/**
+				 * Payment service happens here.
+				 * The payment service code is probably going to be handled async, so I have to handle that but for now lets just do whatever
+				 */
 
 				//} else {
-					var query = client.query({
-						text : "SELECT max(competitor_number)+1 AS next_competitor FROM competitor WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4",
-						values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
-					});
-					query.on("row", function(row, result) {
-						result.addRow(row);
-					});
-					query.on('error', function(error) {
-						client.query("ROLLBACK");
-						done();
-						console.log(error);
-						res.status(500).send(error);
-						log.info({
-							res : res
-						}, 'done response');
-					});
-					query.on("end", function(result) {
-						var nextCompetitor = (!(result.rows[0].next_competitor) ? 1 : result.rows[0].next_competitor);
-						client.query({
-							text: "INSERT INTO competitor (event_name, event_start_date, event_location, tournament_name, competitor_number, competitor_standing, competitor_seed, matches_won, matches_lost, competitor_has_forfeited, competitor_check_in, competitor_paid) VALUES($1, $2, $3, $4, $5, 0, 0, 0, 0, false, false, true)",
-							values: [req.params.event, req.query.date, req.query.location, req.params.tournament, nextCompetitor]
-						}, function (err, result) {
-							if (err) {
-								client.query("ROLLBACK");
-								done();
-								console.log(err);
-								res.status(500).send(err);
-								log.info({
-									res : res
-								}, 'done response');
-							} else {
-								if (tournament.team_size > 1) {
-									if (!req.body.team || !req.body.players || req.body.players != tournament.team_size) {
-										client.query("ROLLBACK");
-										done();
-										res.status(403).json({
-											missing_team_name : !req.body.team,
-											missing_players_array : !req.body.players,
-											invalid_amount_of_players : req.body.players != tournament.team_size
-										});
-										log.info({
-											res : res
-										}, 'done response');
-									} else {
-										client.query({
-											text: "INSERT INTO competes_for (event_name, event_start_date, event_location, tournament_name, competitor_number, team_name) VALUES($1, $2, $3, $4, $5, $6)",
-											values: [req.params.event, req.query.date, req.query.location, req.params.tournament, nextCompetitor, req.body.team]
-										}, function (err, result) {
-											if (err) {
-												client.query("ROLLBACK");
-												done();
-												console.log(err);
-												res.status(500).send(err);
-												log.info({
-													res: res
-												}, 'done response');
-											} else {
-												for (var i = 0, index = 0; i < tournament.team_size; i++) {
-													customerIsACompetitor(req, res, client, done, log, req.body.players[i], nextCompetitor, index++, tournament.team_size-1);
-												}
-											}
-										});
-									}
+				var query = client.query({
+					text : "SELECT max(competitor_number)+1 AS next_competitor FROM competitor WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4",
+					values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
+				});
+				query.on("row", function(row, result) {
+					result.addRow(row);
+				});
+				query.on('error', function(error) {
+					client.query("ROLLBACK");
+					done();
+					console.log(error);
+					res.status(500).send(error);
+					log.info({
+						res : res
+					}, 'done response');
+				});
+				query.on("end", function(result) {
+					var nextCompetitor = (!(result.rows[0].next_competitor) ? 1 : result.rows[0].next_competitor);
+					client.query({
+						text: "INSERT INTO competitor (event_name, event_start_date, event_location, tournament_name, competitor_number, competitor_standing, competitor_seed, matches_won, matches_lost, competitor_has_forfeited, competitor_check_in, competitor_paid) VALUES($1, $2, $3, $4, $5, 0, 0, 0, 0, false, false, true)",
+						values: [req.params.event, req.query.date, req.query.location, req.params.tournament, nextCompetitor]
+					}, function (err, result) {
+						if (err) {
+							client.query("ROLLBACK");
+							done();
+							console.log(err);
+							res.status(500).send(err);
+							log.info({
+								res : res
+							}, 'done response');
+						} else {
+							if (tournament.team_size > 1) {
+								if (!req.body.team || !req.body.players || req.body.players != tournament.team_size) {
+									client.query("ROLLBACK");
+									done();
+									res.status(403).json({
+										missing_team_name : !req.body.team,
+										missing_players_array : !req.body.players,
+										invalid_amount_of_players : req.body.players != tournament.team_size
+									});
+									log.info({
+										res : res
+									}, 'done response');
 								} else {
-									customerIsACompetitor(req, res, client, done, log, req.user.username, nextCompetitor, 0, 0);
+									client.query({
+										text: "INSERT INTO competes_for (event_name, event_start_date, event_location, tournament_name, competitor_number, team_name) VALUES($1, $2, $3, $4, $5, $6)",
+										values: [req.params.event, req.query.date, req.query.location, req.params.tournament, nextCompetitor, req.body.team]
+									}, function (err, result) {
+										if (err) {
+											client.query("ROLLBACK");
+											done();
+											console.log(err);
+											res.status(500).send(err);
+											log.info({
+												res: res
+											}, 'done response');
+										} else {
+											for (var i = 0, index = 0; i < tournament.team_size; i++) {
+												customerIsACompetitor(req, res, client, done, log, req.body.players[i], nextCompetitor, index++, tournament.team_size-1);
+											}
+										}
+									});
 								}
+							} else {
+								customerIsACompetitor(req, res, client, done, log, req.user.username, nextCompetitor, 0, 0);
 							}
-						});
+						}
 					});
+				});
 				//}
 			} else {
 				client.query("ROLLBACK");
@@ -2059,3 +2354,6 @@ module.exports.registerForTournament = registerForTournament;
 module.exports.getCheckedInCompetitors = getCheckedInCompetitors;
 module.exports.arrangeSeeds = arrangeSeeds;
 module.exports.createReport = createReport;
+module.exports.markAsFavourite = markAsFavourite;
+module.exports.unPauseRound = unPauseRound;
+module.exports.editBestOf = editBestOf;

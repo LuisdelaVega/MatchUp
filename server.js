@@ -514,16 +514,39 @@ app.route('/matchup/events/:event/tournaments/:tournament/rounds').get(function(
 	tournaments.getRounds(req, res, pg, conString, log);
 });
 
+/* /matchup/events/:event/tournaments/:tournament/rounds?date=date&location=string?round_of=string
+ * TODO Update API
+ *
+ * [POST] Edit the amount of sets for the matches in a round
+ * [PUT] Un-pause a round
+ */
+app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round').post(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	tournaments.editBestOf(req, res, pg, conString, log);
+}).put(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	tournaments.unPauseRound(req, res, pg, conString, log);
+});
 
-/* /matchup/events/:event/tournaments/:tournament/rounds/:rounds/matches/:match
+/* /matchup/events/:event/tournaments/:tournament/rounds/:rounds/matches/:match?round_of=string
  * TODO Update API
  * [GET] Get a specific match
+ * [PUT] Mark a match as favourite
  */
 app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round/matches/:match').get(function(req, res) {
 	log.info({
 		req : req
 	}, 'start request');
 	tournaments.getMatch(req, res, pg, conString, log);
+}).put(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	tournaments.markAsFavourite(req, res, pg, conString, log);
 });
 
 /* /matchup/events/:event/tournaments/:tournament/rounds/:round/matches/:match/:set?date=date&location=string&round_of=string
