@@ -382,16 +382,43 @@ app.route('/matchup/events/:event/tournaments').get(function(req, res) {
 /* /matchup/events/:event/specfees?date=date&location=string
  *TODO update API
  * [GET] Get all Spectator fees for a specific Event
+ * [POST] Add a new Spectator fee to an Event
  */
 app.route('/matchup/events/:event/specfees').get(function(req, res) {
 	log.info({
 		req : req
 	}, 'start request');
 	events.getSpecFees(req, res, pg, conString, log);
+}).post(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	events.addSpecFee(req, res, pg, conString, log);
+});
+
+/* /matchup/events/:event/specfees/:spec_fee?date=date&location=string
+ *TODO update API
+ *
+ * 	params:
+ * 		spec_fee = The name of the spectator fee
+ *
+ * [POST] Register in an Event as a Spectator
+ * [DELETE] Remove a Spectator fee for an Event
+ */
+app.route('/matchup/events/:event/specfees/:spec_fee').post(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	customers.registerAsSpectator(req, res, pg, conString, log);
+}).delete(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	events.removeSpecFee(req, res, pg, conString, log);
 });
 
 /* /matchup/events/:event/tournaments/:tournament?date=date&location=string&station=int
- *
+ * TODO Update API
  * params:
  * 	tournament = The name of the Tournament
  *
@@ -506,7 +533,7 @@ app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round/matches/
  *
  * [PUT] Submit the results of a Set
  * [POST] Submit a report for the match
- * TODO [PUT] Update the results of a Set TODO Can be used by Organizers do in another route
+ * TODO [PUT] Update the results of a Set TODO Do in another route
  */
 app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round/matches/:match/:set').put(function(req, res) {
 	log.info({
@@ -518,6 +545,20 @@ app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round/matches/
 		req : req
 	}, 'start request');
 	tournaments.createReport(req, res, pg, conString, log);
+});
+
+/* /matchup/events/:event/tournaments/:tournament/rounds/:round/matches/:match/:set?date=date&location=string&round_of=string
+ * TODO Update in API
+ * 	Params:
+ * 		round_of = Indicates where the round was/it to be played. Posible values: [Group, Winner, Loser, Round Robin]
+ *
+ * [PUT] Mark a resport as Resolved
+ */
+app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round/matches/:match/:set/:report').put(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	events.resolveReport(req, res, pg, conString, log);
 });
 
 /* /matchup/events/:event/tournaments/:tournament/stations?date=date&location=string&station=int
@@ -960,6 +1001,17 @@ app.route('/matchup/profile/:username/subscriptions').get(function(req, res) {
 		req : req
 	}, 'start request');
 	customers.getSubscriptions(req, res, pg, conString, log);
+});
+
+/* /matchup/profile/:username/subscriptions
+ * TODO Update API
+ * [GET] Get the Spectator fees a specific Customer has paid
+ */
+app.route('/matchup/profile/:username/specfees').get(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	customers.getSpecFees(req, res, pg, conString, log);
 });
 
 /* /matchup/profile/:username/standings

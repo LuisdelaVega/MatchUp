@@ -1,8 +1,8 @@
 //TODO Calculate the matches won/lost for the profile pages
 var getMyProfile = function(req, res, pg, conString, log) {
-	var username = new Object();
-	username.params = new Object();
-	username.user = new Object();
+	var username = {};
+	username.params = {};
+	username.user = {};
 	username.params.username = req.user.username;
 	username.user.username = req.user.username;
 
@@ -13,8 +13,8 @@ var getUserProfile = function(req, res, pg, conString, log) {
 	// Query the DB to find the account
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
-            return console.error('error fetching client from pool', err);
-        }
+			return console.error('error fetching client from pool', err);
+		}
 
 		// Query the database to find the user's account
 		var query = client.query({
@@ -105,14 +105,14 @@ var getMatchups = function(req, res, pg, conString, log) {
 			}, 'done response');
 		});
 		query.on("end", function(result) {
-            if (result.rows.length) {
-                var myMatchups = result.rows;
-                for (var i = 0; i < myMatchups.length; i++) {
-                    getDetailsForMatchup(res, pg, conString, log, client, done, myMatchups[i], i, (myMatchups.length - 1), myMatchups);
-                }
-            } else {
-                res.status(200).send([]);
-            }
+			if (result.rows.length) {
+				var myMatchups = result.rows;
+				for (var i = 0; i < myMatchups.length; i++) {
+					getDetailsForMatchup(res, pg, conString, log, client, done, myMatchups[i], i, (myMatchups.length - 1), myMatchups);
+				}
+			} else {
+				res.status(200).send([]);
+			}
 		});
 	});
 };
@@ -551,7 +551,7 @@ var subscribe = function(req, res, pg, conString, log) {
 				res : res
 			}, 'done response');
 		} else {
-			var profile = new Object();
+			var profile = {};
 			client.query("BEGIN");
 			// Query the database to find the user's account
 			var query = client.query({
@@ -727,12 +727,12 @@ var createAccount = function(req, res, pg, conString, jwt, secret, crypto, log) 
 			client.query({
 				text : "INSERT INTO customer (customer_username, customer_first_name, customer_last_name, customer_tag, customer_password, customer_salt, customer_email, customer_active) VALUES ($1, $2, $3, $4, $5, $6, $7, TRUE)",
 				values : [req.body.username, // customer_username
-				req.body.first_name, // customer_first_name
-				req.body.last_name, // customer_last_name
-				req.body.tag, // customer_tag
-				key.toString('hex'), // customer_password
-				salt, // customer_salt
-				req.body.email] // customer_email
+					req.body.first_name, // customer_first_name
+					req.body.last_name, // customer_last_name
+					req.body.tag, // customer_tag
+					key.toString('hex'), // customer_password
+					salt, // customer_salt
+					req.body.email] // customer_email
 			}, function(err, result) {
 				if (err) {
 					client.query("ROLLBACK");
@@ -785,9 +785,9 @@ var createTeam = function(req, res, pg, conString, log) {
 				client.query({
 					text : "INSERT INTO team (team_name, team_logo, team_bio, team_cover_photo, team_active) VALUES ($1, $2, $3, $4, TRUE)",
 					values : [req.body.name, // team_name
-					req.body.logo, // team_logo
-					req.body.bio, // team_bio
-					req.body.cover // team_cover_photo
+						req.body.logo, // team_logo
+						req.body.bio, // team_bio
+						req.body.cover // team_cover_photo
 					]
 				}, function(err, result) {
 					if (err) {
@@ -1192,6 +1192,114 @@ var createEvent = function(req, res, pg, conString, log) {
 	});
 };
 
+var registerAsSpectator = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		client.query("BEGIN");
+		var query = client.query({
+			text : "SELECT spec_fee_amount, spec_fee_amount_available AS amount_available, ($5 IN (SELECT customer_username FROM pays WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND spec_fee_name = $4)) AS already_purchased, (SELECT count(*) FROM pays WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND spec_fee_name = $4) AS sold FROM spectator_fee NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND spec_fee_name = $4 AND event_active",
+			values : [req.params.event, req.query.date, req.query.location, req.params.spec_fee, req.user.username]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			client.query("ROLLBACK");
+			done();
+			console.log(error);
+			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+		query.on("end", function(result) {
+			if (result.rows.length) {
+				if (result.rows[0].already_purchased || result.rows[0].sold >= result.rows[0].amount_available) {
+					client.query("ROLLBACK");
+					done();
+					res.status(403).json({
+						already_purchased : result.rows[0].already_purchased,
+						sold_out : result.rows[0].sold >= result.rows[0].amount_available
+					});
+					log.info({
+						res : res
+					}, 'done response');
+				} else {
+					//if (result.rows[0].spec_fee_amount > 0) {
+						/*
+						 Here we would handle the payment.
+						 After getting some sort of confirmation that the process was completed, we would insert into the pays table.
+						 This could most likelly be done using webhooks, only concern is managing the parameter data over at the webhook.
+						 If I can specify some req of query parameters over at the webhook we wont have any problems. And I believe I can cause that's the whole point of webhooks.
+						 I'll just redirect to a uri that contains all the needed parameters, or better yet, if I can set the payload for the webhook this will be really simple
+						 */
+					//} else {
+						client.query({
+							text: "INSERT INTO pays (event_name, event_start_date, event_location, spec_fee_name, customer_username, check_in) VALUES ($1, $2, $3, $4, $5, $6)",
+							values: [req.params.event, req.query.date, req.query.location, req.params.spec_fee, req.user.username, false]
+						}, function (err, result) {
+							if (err) {
+								client.query("ROLLBACK");
+								done();
+								console.log(err);
+								res.status(500).send(err);
+							} else {
+								client.query("COMMIT");
+								done();
+								res.status(201).send("Spec fee added");
+							}
+							log.info({
+								res: res
+							}, 'done response');
+						});
+					//}
+				}
+			} else {
+				client.query("ROLLBACK");
+				done();
+				res.status(404).send("Something was not found");
+				log.info({
+					res : res
+				}, 'done response');
+			}
+		});
+	});
+};
+
+var getSpecFees = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var query = client.query({
+			text : "SELECT pays.event_name, pays.event_start_date, pays.event_location, pays.spec_fee_name, event.event_active FROM pays JOIN event ON pays.event_name = event.event_name AND pays.event_start_date = event.event_start_date AND pays.event_location = event.event_location WHERE pays.customer_username = $1 ORDER BY pays.event_start_date DESC",
+			values : [req.params.username]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+		query.on("end", function(result) {
+			done();
+			res.status(200).json(result.rows);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+	});
+};
+
 module.exports.getMyProfile = getMyProfile;
 module.exports.getUserProfile = getUserProfile;
 module.exports.editAccount = editAccount;
@@ -1210,3 +1318,5 @@ module.exports.getRegisteredEvents = getRegisteredEvents;
 module.exports.getMatchups = getMatchups;
 module.exports.getStandings = getStandings;
 module.exports.getRequests = getRequests;
+module.exports.registerAsSpectator = registerAsSpectator;
+module.exports.getSpecFees = getSpecFees;

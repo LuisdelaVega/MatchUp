@@ -4,7 +4,7 @@ var getSearchResults = function(req, res, pg, conString, log) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		var searchresults = new Object();
+		var searchresults = {};
 		// Query the database to find the accounts
 		client.query("BEGIN");
 		var query = client.query({
@@ -40,7 +40,7 @@ var getSearchResults = function(req, res, pg, conString, log) {
 				}, 'done response');
 			});
 			query.on("end", function(result) {
-				searchresults.events = new Object();
+				searchresults.events = {};
 				searchresults.events.live = result.rows;
 
 				// Look for all the Events that have already ended

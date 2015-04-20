@@ -152,7 +152,7 @@ var getEvent = function(req, res, pg, conString, log) {
             return console.error('error fetching client from pool', err);
         }
 
-        var event = new Object();
+        var event = {};
         client.query("BEGIN");
         var query = client.query({
             text : "SELECT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_venue, event.event_banner, event.event_logo, event.event_registration_deadline, event.event_rules, event.event_description, event.event_deduction_fee, event.event_is_online, event.event_type, event.customer_username AS creator, hosts.organization_name AS host FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND event.event_active",
@@ -209,7 +209,7 @@ var getEvent = function(req, res, pg, conString, log) {
     });
 };
 
-function updateCompetitor(req, res, log, client, done, competitor, isWinner) {
+function updateCompetitor(req, res, log, client, done, competitor, isWinner, details) {
     var queryText = "";
 
     if (isWinner) {
@@ -256,7 +256,6 @@ function updateCompetitor(req, res, log, client, done, competitor, isWinner) {
                                 text : "INSERT INTO competes (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, competitor_number) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
                                 values : [req.params.event, req.query.date, req.query.location, req.params.tournament, result.rows[0].future_round_number, result.rows[0].future_round_of, result.rows[0].future_match, competitor.competitor_number]
                             }, function(err, result) {
-                                done();
                                 if (err) {
                                     client.query("ROLLBACK");
                                     done();
@@ -264,6 +263,43 @@ function updateCompetitor(req, res, log, client, done, competitor, isWinner) {
                                     log.info({
                                         res : res
                                     }, 'done response');
+                                } else if (isWinner) {
+                                    // Asign the station where this match was played to another match that has no station already assigned
+                                    //TODO Check this
+                                    var query = client.query({
+                                        text : "SELECT round_number, round_of, match_number FROM match WHERE (concat(round_number, round_of, match_number) NOT IN (SELECT concat(round_number, round_of, match_number) FROM is_played_in WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4)) AND (concat(round_number, round_of, match_number, 2) IN (SELECT concat(round_number, round_of, match_number, count(concat(round_number, round_of, match_number))) FROM competes WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 GROUP BY round_number, round_of, match_number)) AND event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 ORDER BY round_number, CASE WHEN round_of = 'Group' THEN 1 WHEN round_of = 'Round Robin' THEN 2 WHEN round_of = 'Loser' THEN 3 WHEN round_of = 'Winner' THEN 4 END, CASE WHEN $5 THEN is_favourite ELSE NOT is_favourite END LIMIT 1",
+                                        values : [req.params.event, req.query.date, req.query.location, req.params.tournament, !details.stream_link]
+                                    });
+                                    query.on("row", function(row, result) {
+                                        result.addRow(row);
+                                    });
+                                    query.on('error', function(error) {
+                                        client.query("ROLLBACK");
+                                        done();
+                                        console.log(error);
+                                        res.status(500).send(error);
+                                        log.info({
+                                            res : res
+                                        }, 'done response');
+                                    });
+                                    query.on("end", function(result) {
+                                        if (result.rows.length && details.station_number) {
+                                            client.query({
+                                                text : "INSERT INTO is_played_in (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, station_number) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
+                                                values : [req.params.event, req.query.date, req.query.location, req.params.tournament, result.rows[0].round_number, result.rows[0].round_of, result.rows[0].match_number, details.station_number]
+                                            }, function (err, result) {
+                                                if (err) {
+                                                    client.query("ROLLBACK");
+                                                    done();
+                                                    console.log(err);
+                                                    res.status(500).send(err);
+                                                    log.info({
+                                                        res: res
+                                                    }, 'done response');
+                                                }
+                                            });
+                                        }
+                                    });
                                 }
                             });
                         }
@@ -478,16 +514,6 @@ function checkForUpdate(req, res, client, done, log, players, index, length) {
 
 //TODO check for compliance between the score in the body and the score_type of the Tournament
 //TODO Check for round_pause
-/*
- I'm a complete idiot, much of this couls have been done on different functions, each of them connecting to the database and doing what they have to do. I've been working on this for quite a while
- today, 04/16/2015 is when I realize this. This comment will stay here for me to be ashamed.
- I do want to note that this happened because I had recently finished working on the createTournament function and well, frankly I dind't expect anything to be as hard as that.
-
- I let this get out of hand. I didn't realize this until I had already finished it and started working on a new function. When I started with that other function, I automatically thought: "Hey, I can do some work here, return, then let another function do
- the rest of the work. So yeah, here I am, writting another long ass comment. I am not a smart man.
-
- It's not that anything would really change, it's just that the code would be more distributed. Whatever
-  */
 var submitScore = function(req, res, pg, conString, log) {
     pg.connect(conString, function(err, client, done) {
         if (err) {
@@ -503,7 +529,7 @@ var submitScore = function(req, res, pg, conString, log) {
          * Else, it will return some useful details about the tournament that will be used later in the function
          */
         var query = client.query({
-            text : "SELECT score_type, number_of_people_per_group, amount_of_winners_per_group, round_best_of, tournament_format, station_number FROM event NATURAL JOIN tournament NATURAL JOIN round NATURAL JOIN match LEFT OUTER JOIN is_played_in ON match.event_name = is_played_in.event_name AND match.event_start_date = is_played_in.event_start_date AND match.event_location = is_played_in.event_location AND match.tournament_name = is_played_in.tournament_name AND match.round_number = is_played_in.round_number AND match.round_of = is_played_in.round_of AND match.match_number = is_played_in.match_number WHERE match.event_name = $1 AND match.event_start_date = $2 AND match.event_location = $3 AND match.tournament_name = $4 AND match.round_number = $5 AND match.round_of = $6 AND match.match_number = $7 AND event.event_active",
+            text : "SELECT tournament.score_type, tournament.number_of_people_per_group, tournament.amount_of_winners_per_group, round.round_best_of, tournament.tournament_format, is_played_instation_number, stream.stream_link FROM event NATURAL JOIN tournament NATURAL JOIN round NATURAL JOIN match LEFT OUTER JOIN is_played_in ON match.event_name = is_played_in.event_name AND match.event_start_date = is_played_in.event_start_date AND match.event_location = is_played_in.event_location AND match.tournament_name = is_played_in.tournament_name AND match.round_number = is_played_in.round_number AND match.round_of = is_played_in.round_of AND match.match_number = is_played_in.match_number LEFT OUTER JOIN stream ON stream.event_name = is_played_in.event_name AND stream.event_start_date = is_played_in.event_start_date AND stream.event_location = is_played_in.event_location AND stream.station_number = is_played_in.station_number WHERE match.event_name = $1 AND match.event_start_date = $2 AND match.event_location = $3 AND match.tournament_name = $4 AND match.round_number = $5 AND match.round_of = $6 AND match.match_number = $7 AND event.event_active",
             values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match]
         });
         query.on("row", function(row, result) {
@@ -662,7 +688,7 @@ var submitScore = function(req, res, pg, conString, log) {
                                                                 if (result.rows.length && result.rows[0].match_completed) {
                                                                     // Get the info for the two competitors of this match
                                                                     var query = client.query({
-                                                                        text : "SELECT competes.competitor_number, sum(submits.score) AS score FROM competes LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND competes.match_number = $7 GROUP BY competes.competitor_number ORDER BY score DESC",
+                                                                        text : "SELECT competes.competitor_number, sum(submits.score) AS score FROM competes LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND competes.match_number = $7 GROUP BY competes.competitor_number ORDER BY score",
                                                                         values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match]
                                                                     });
                                                                     query.on("row", function(row, result) {
@@ -683,7 +709,7 @@ var submitScore = function(req, res, pg, conString, log) {
 
                                                                         // Update the matches won/lost for each competitor
                                                                         for (var i = 0; i < matchOutcome.length; i++) {
-                                                                            updateCompetitor(req, res, log, client, done, matchOutcome[i], !i);
+                                                                            updateCompetitor(req, res, log, client, done, matchOutcome[i], i > 0, details);
                                                                         }
                                                                         // Update match completed
                                                                         client.query({
@@ -699,42 +725,6 @@ var submitScore = function(req, res, pg, conString, log) {
                                                                                     res : res
                                                                                 }, 'done response');
                                                                             } else {
-                                                                                // Asign the station where this match was played to another match that has no station already assigned
-                                                                                //TODO Check this
-                                                                                var query = client.query({
-                                                                                    text : "SELECT round_number, round_of, match_number FROM match WHERE (concat(round_number, round_of, match_number) NOT IN (SELECT concat(round_number, round_of, match_number) FROM is_played_in WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4)) AND (concat(round_number, round_of, match_number, 2) IN (SELECT concat(round_number, round_of, match_number,count(concat(round_number, round_of, match_number))) FROM competes WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 GROUP BY round_number, round_of, match_number)) AND event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 ORDER BY round_number, CASE WHEN round_of = 'Group' THEN 1 WHEN round_of = 'Round Robin' THEN 2 WHEN round_of = 'Winner' THEN 3 WHEN round_of = 'Loser' THEN 4 END LIMIT 1",
-                                                                                    values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
-                                                                                });
-                                                                                query.on("row", function(row, result) {
-                                                                                    result.addRow(row);
-                                                                                });
-                                                                                query.on('error', function(error) {
-                                                                                    client.query("ROLLBACK");
-                                                                                    done();
-                                                                                    console.log(error);
-                                                                                    res.status(500).send(error);
-                                                                                    log.info({
-                                                                                        res : res
-                                                                                    }, 'done response');
-                                                                                });
-                                                                                query.on("end", function(result) {
-                                                                                    if (result.rows.length && details.station_number) {
-                                                                                        client.query({
-                                                                                            text : "INSERT INTO is_played_in (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, station_number) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
-                                                                                            values : [req.params.event, req.query.date, req.query.location, req.params.tournament, result.rows[0].round_number, result.rows[0].round_of, result.rows[0].match_number, details.station_number]
-                                                                                        }, function (err, result) {
-                                                                                            if (err) {
-                                                                                                client.query("ROLLBACK");
-                                                                                                done();
-                                                                                                console.log(err);
-                                                                                                res.status(500).send(err);
-                                                                                                log.info({
-                                                                                                    res: res
-                                                                                                }, 'done response');
-                                                                                            }
-                                                                                        });
-                                                                                    }
-                                                                                });
                                                                                 // Check if round is completed
                                                                                 var query = client.query({
                                                                                     text : "SELECT every(match_completed) AS round_completed FROM match WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6",
@@ -821,7 +811,7 @@ var submitScore = function(req, res, pg, conString, log) {
                                                                                                             }, 'done response');
                                                                                                         } else if (req.query.round_of === "Group") {
                                                                                                             // Prepare an array to store the winners of each Group
-                                                                                                            var winners = new Array();
+                                                                                                            var winners = [];
                                                                                                             var query = client.query({
                                                                                                                 text : 'SELECT group_number FROM "group" WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 ORDER BY group_number',
                                                                                                                 values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
@@ -896,7 +886,6 @@ var submitScore = function(req, res, pg, conString, log) {
                                                                                                                                 // Assign the winners to their respective matches in the Round Robin Final Stage
                                                                                                                                 var numOfRounds = (!(winners.length % 2)) ? (winners.length - 1) : winners.length;
                                                                                                                                 var numOfMatchesPerRound = Math.floor(winners.length / 2);
-                                                                                                                                var l = 0;
                                                                                                                                 for (var j = 0; j < numOfRounds; j++) {
                                                                                                                                     if (!(winnerslength % 2)) {
                                                                                                                                         var count = 0;
@@ -1355,7 +1344,7 @@ var getStationsForEvent = function(req, res, pg, conString, log) {
             return console.error('error fetching client from pool', err);
         }
 
-        var event = new Object();
+        var event = {};
         var query = client.query({
             text : "SELECT station.station_number, station.station_in_use, stream.stream_link FROM station LEFT OUTER JOIN stream ON station.event_name = stream.event_name AND station.event_start_date = stream.event_start_date AND station.event_location = stream.event_location AND station.station_number = stream.station_number WHERE station.event_name = $1 AND station.event_start_date = $2 AND station.event_location = $3",
             values : [req.params.event, req.query.date, req.query.location]
@@ -1573,8 +1562,8 @@ var addStation = function(req, res, pg, conString, log) {
                             } else {
                                 client.query("COMMIT");
                                 done();
-                                var station = new Object();
-                                station.event = new Object();
+                                var station = {};
+                                station.event = {};
                                 station.event.name = req.params.event;
                                 station.event.date = req.query.date;
                                 station.event.location = req.query.location;
@@ -1659,7 +1648,7 @@ var getStation = function(req, res, pg, conString, log) {
         }
 
         client.query("BEGIN");
-        var station = new Object();
+        var station = {};
         var query = client.query({
             text : "SELECT station.station_number, station.station_in_use, stream.stream_link FROM station LEFT OUTER JOIN stream ON station.event_name = stream.event_name AND station.event_start_date = stream.event_start_date AND station.event_location = stream.event_location AND station.station_number = stream.station_number WHERE station.event_name = $1 AND station.event_start_date = $2 AND station.event_location = $3 AND station.station_number = $4",
             values : [req.params.event, req.query.date, req.query.location, req.params.station]
@@ -1678,7 +1667,7 @@ var getStation = function(req, res, pg, conString, log) {
         query.on("end", function(result) {
             if (result.rows.length) {
                 station = result.rows[0];
-                station.tournaments = new Array();
+                station.tournaments = [];
                 var query = client.query({
                     text : "SELECT tournament_name FROM capacity_for WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND station_number = $4",
                     values : [req.params.event, req.query.date, req.query.location, req.params.station]
@@ -1771,8 +1760,8 @@ var addStream = function(req, res, pg, conString, log) {
                             } else {
                                 client.query("COMMIT");
                                 done();
-                                var station = new Object();
-                                station.event = new Object();
+                                var station = {};
+                                station.event = {};
                                 station.event.name = req.params.event;
                                 station.event.date = req.query.date;
                                 station.event.location = req.query.location;
@@ -1843,8 +1832,8 @@ var editStation = function(req, res, pg, conString, log) {
                     } else {
                         client.query("COMMIT");
                         done();
-                        var station = new Object();
-                        station.event = new Object();
+                        var station = {};
+                        station.event = {};
                         station.event.name = req.params.event;
                         station.event.date = req.query.date;
                         station.event.location = req.query.location;
@@ -1960,7 +1949,7 @@ var getTournament = function(req, res, pg, conString, log) {
         }
 
         var query = client.query({
-            text : "SELECT tournament_name, tournament_rules, team_size, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group, game.*, prize_distribution.*, ($5 IN (SELECT customer_username FROM is_a WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4)) AS is_competitor FROM tournament NATURAL JOIN game NATURAL JOIN event NATURAL JOIN prize_distribution WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND tournament_active AND event.event_active",
+            text : "SELECT tournament_name, tournament_rules, team_size, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group, game.*, prize_distribution.*, ($5 IN (SELECT customer_username FROM is_a WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4)) AS is_competitor, (tournament_max_capacity < (SELECT count(*) FROM competitor WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4)) AS sold_out FROM tournament NATURAL JOIN game NATURAL JOIN event NATURAL JOIN prize_distribution WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND tournament_active AND event.event_active",
             values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.user.username]
         });
         query.on("row", function(row, result) {
@@ -2553,8 +2542,8 @@ var createNews = function(req, res, pg, conString, log) {
                             } else {
                                 client.query("COMMIT");
                                 done();
-                                var news = new Object();
-                                news.event = new Object();
+                                var news = {};
+                                news.event = {};
                                 news.event.name = req.params.event;
                                 news.event.date = req.query.date;
                                 news.event.location = req.query.location;
@@ -2623,8 +2612,8 @@ var updateNews = function(req, res, pg, conString, log) {
                         } else {
                             client.query("COMMIT");
                             done();
-                            var news = new Object();
-                            news.event = new Object();
+                            var news = {};
+                            news.event = {};
                             news.event.name = req.params.event;
                             news.event.date = req.query.date;
                             news.event.location = req.query.location;
@@ -2843,8 +2832,8 @@ var createReview = function(req, res, pg, conString, log) {
                             } else {
                                 client.query("COMMIT");
                                 done();
-                                var review = new Object();
-                                review.event = new Object();
+                                var review = {};
+                                review.event = {};
                                 review.event.name = req.params.event;
                                 review.event.date = req.query.date;
                                 review.event.location = req.query.location;
@@ -2913,8 +2902,8 @@ var updateReview = function(req, res, pg, conString, log) {
                         } else {
                             client.query("COMMIT");
                             done();
-                            var review = new Object();
-                            review.event = new Object();
+                            var review = {};
+                            review.event = {};
                             review.event.name = req.params.event;
                             review.event.date = req.query.date;
                             review.event.location = req.query.location;
@@ -3141,12 +3130,12 @@ var createMeetup = function(req, res, pg, conString, log) {
                             } else {
                                 client.query("COMMIT");
                                 done();
-                                var meetup = new Object();
-                                meetup.event = new Object();
+                                var meetup = {};
+                                meetup.event = {};
                                 meetup.event.name = req.params.event;
                                 meetup.event.date = req.query.date;
                                 meetup.event.location = req.query.location;
-                                meetup.meetup = new Object();
+                                meetup.meetup = {};
                                 meetup.meetup.name = req.body.name;
                                 meetup.meetup.location = req.body.location;
                                 meetup.meetup.start_date = req.body.start_date;
@@ -3300,8 +3289,8 @@ var addTournament = function(req, res, pg, conString, log) {
                             } else {
                                 client.query("COMMIT");
                                 done();
-                                var result = new Object();
-                                result.event = new Object();
+                                var result = {};
+                                result.event = {};
                                 result.event.name = req.params.event;
                                 result.event.start_date = req.query.date;
                                 result.event.location = req.query.location;
@@ -3501,7 +3490,7 @@ var editEvent = function(req, res, pg, conString, log) {
                     } else {
                         client.query("COMMIT");
                         done();
-                        var result = new Object();
+                        var result = {};
                         result.name = req.body.name;
                         result.start_date = req.body.start_date;
                         result.location = req.body.location;
@@ -3541,6 +3530,7 @@ var editTournament = function(req, res, pg, conString, log) {
         query.on('error', function(error) {
             client.query("ROLLBACK");
             done();
+            console.log(error);
             res.status(500).send(error);
             log.info({
                 res : res
@@ -3555,12 +3545,13 @@ var editTournament = function(req, res, pg, conString, log) {
                     if (err) {
                         client.query("ROLLBACK");
                         done();
+                        console.log(err);
                         res.status(500).send("Oh, no! Disaster!");
                     } else {
                         client.query("COMMIT");
                         done();
-                        var result = new Object();
-                        result.event = new Object();
+                        var result = {};
+                        result.event = {};
                         result.event.name = req.params.event;
                         result.event.start_date = req.query.date;
                         result.event.location = req.query.location;
@@ -3622,6 +3613,61 @@ var getReports = function(req, res, pg, conString, log) {
     });
 };
 
+var resolveReport = function(req, res, pg, conString, log) {
+    pg.connect(conString, function(err, client, done) {
+        if (err) {
+            return console.error('error fetching client from pool', err);
+        }
+
+        client.query("BEGIN");
+        var query = client.query({
+            text : "SELECT report.* FROM report NATURAL JOIN event NATURAL JOIN tournament WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6 AND match_number = $7 AND report_number = $8 AND tournament_active AND event_active",
+            values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.report]
+        });
+        query.on("row", function(row, result) {
+            result.addRow(row);
+        });
+        query.on('error', function(error) {
+            client.query("ROLLBACK");
+            done();
+            console.log(error);
+            res.status(500).send(error);
+            log.info({
+                res : res
+            }, 'done response');
+        });
+        query.on("end", function(result) {
+            if (result.rows.length) {
+                client.query({
+                    text : "UPDATE report SET report_status = $9 WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6 AND match_number = $7 AND report_number = $8",
+                    values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.report, "Resolved"]
+                }, function(err, result) {
+                    if (err) {
+                        client.query("ROLLBACK");
+                        done();
+                        console.log(err);
+                        res.status(500).send(err);
+                    } else {
+                        client.query("COMMIT");
+                        done();
+                        res.status(200).send('Resolved');
+                    }
+                    log.info({
+                        res : res
+                    }, 'done response');
+                });
+            } else {
+                client.query("ROLLBACK");
+                done();
+                res.status(404).send('Something was not found');
+                log.info({
+                    res : res
+                }, 'done response');
+            }
+        });
+    });
+};
+
 var getSpecFees = function(req, res, pg, conString, log) {
     pg.connect(conString, function(err, client, done) {
         if (err) {
@@ -3629,7 +3675,7 @@ var getSpecFees = function(req, res, pg, conString, log) {
         }
 
         var query = client.query({
-            text : "SELECT spectator_fee.* FROM spectator_fee NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND event_active",
+            text : "SELECT spectator_fee.*, (SELECT count(*) FROM pays WHERE pays.spec_fee_name = spectator_fee.spec_fee_name AND event_name = $1 AND event_start_date = $2 AND event_location = $3) AS sold FROM spectator_fee NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND event_active ORDER BY spec_fee_amount",
             values : [req.params.event, req.query.date, req.query.location]
         });
         query.on("row", function(row, result) {
@@ -3644,18 +3690,155 @@ var getSpecFees = function(req, res, pg, conString, log) {
             }, 'done response');
         });
         query.on("end", function(result) {
+            done();
             if (result.rows.length) {
-                done();
                 res.status(200).json(result.rows);
-                log.info({
-                    res : res
-                }, 'done response');
             } else {
-                done();
                 res.status(404).send('Event not found');
+            }
+            log.info({
+                res : res
+            }, 'done response');
+        });
+    });
+};
+
+var addSpecFee = function(req, res, pg, conString, log) {
+    pg.connect(conString, function(err, client, done) {
+        if (err) {
+            return console.error('error fetching client from pool', err);
+        }
+
+        client.query("BEGIN");
+        var spec_fee_names = [];
+        var query = client.query({
+            text : "SELECT event.event_name, spectator_fee.spec_fee_name FROM event NATURAL JOIN hosts LEFT OUTER JOIN spectator_fee ON spectator_fee.event_name = event.event_name AND spectator_fee.event_start_date = event.event_start_date AND spectator_fee.event_location = event.event_location WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND event.event_active",
+            values : [req.params.event, req.query.date, req.query.location]
+        });
+        query.on("row", function(row, result) {
+            spec_fee_names.push(row.spec_fee_name);
+            result.addRow(row);
+        });
+        query.on('error', function(error) {
+            client.query("ROLLBACK");
+            done();
+            console.log(error);
+            res.status(500).send(error);
+            log.info({
+                res : res
+            }, 'done response');
+        });
+        query.on("end", function(result) {
+            if (result.rows.length) {
+                if (!req.body.name || isNaN(req.body.fee) || req.body.fee < 0 || isNaN(req.body.available) || req.body.available < 0 || !req.body.description || spec_fee_names.indexOf(req.body.name) >= 0) {
+                    client.query("ROLLBACK");
+                    done();
+                    res.status(400).json({
+                        missing_name : !req.body.name,
+                        invalid_fee : isNaN(req.body.fee) || req.body.fee < 0,
+                        invalid_available : isNaN(req.body.available) || req.body.available < 0,
+                        missing_description : !req.body.description,
+                        repeated_name : spec_fee_names.indexOf(req.body.name) >= 0
+                    });
+                    log.info({
+                        res : res
+                    }, 'done response');
+                } else {
+                    client.query({
+                        text : "INSERT INTO spectator_fee (event_name, event_start_date, event_location, spec_fee_name, spec_fee_amount, spec_fee_description, spec_fee_amount_available) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+                        values : [req.params.event, req.query.date, req.query.location, req.body.name, req.body.fee, req.body.description, req.body.available]
+                    }, function(err, result) {
+                        if (err) {
+                            client.query("ROLLBACK");
+                            done();
+                            console.log(err);
+                            res.status(500).send(err);
+                        } else {
+                            client.query("COMMIT");
+                            done();
+                            res.status(201).send("Spec fee added");
+                        }
+                        log.info({
+                            res : res
+                        }, 'done response');
+                    });
+                }
+            } else {
+                client.query("ROLLBACK");
+                done();
+                res.status(403).send("Can't add spectator fees to this event");
                 log.info({
                     res : res
                 }, 'done response');
+            }
+        });
+    });
+};
+
+var removeSpecFee = function(req, res, pg, conString, log) {
+    pg.connect(conString, function(err, client, done) {
+        if (err) {
+            return console.error('error fetching client from pool', err);
+        }
+
+        client.query("BEGIN");
+        var query = client.query({
+            text : "SELECT count(pays.*) AS sold FROM event JOIN pays ON event.event_name = pays.event_name AND pays.event_start_date = event.event_start_date AND pays.event_location = event.event_location WHERE pays.event_name = $1 AND pays.event_start_date = $2 AND pays.event_location = $3 AND pays.spec_fee_name = $4 AND event.event_active",
+            values : [req.params.event, req.query.date, req.query.location, req.params.spec_fee]
+        });
+        query.on("row", function(row, result) {
+            result.addRow(row);
+        });
+        query.on('error', function(error) {
+            client.query("ROLLBACK");
+            done();
+            console.log(error);
+            res.status(500).send(error);
+            log.info({
+                res : res
+            }, 'done response');
+        });
+        query.on("end", function(result) {
+            console.log(result.rows[0].sold);
+            console.log(parseInt(result.rows[0].sold));
+            if (!parseInt(result.rows[0].sold)) {
+                client.query({
+                    text : "DELETE FROM spectator_fee WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND spec_fee_name = $4",
+                    values : [req.params.event, req.query.date, req.query.location, req.params.spec_fee]
+                }, function(err, result) {
+                    if (err) {
+                        client.query("ROLLBACK");
+                        done();
+                        console.log(err);
+                        res.status(500).send(err);
+                    } else {
+                        client.query("COMMIT");
+                        done();
+                        res.status(204).send("");
+                    }
+                    log.info({
+                        res : res
+                    }, 'done response');
+                });
+            } else {
+                client.query({
+                    text : "UPDATE spectator_fee SET spec_fee_amount_available = 0 WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND spec_fee_name = $4",
+                    values : [req.params.event, req.query.date, req.query.location, req.params.spec_fee]
+                }, function(err, result) {
+                    if (err) {
+                        client.query("ROLLBACK");
+                        done();
+                        console.log(err);
+                        res.status(500).send(err);
+                    } else {
+                        client.query("COMMIT");
+                        done();
+                        res.status(204).send("");
+                    }
+                    log.info({
+                        res : res
+                    }, 'done response');
+                });
             }
         });
     });
@@ -3704,7 +3887,10 @@ module.exports.checkInSpectator = checkInSpectator;
 module.exports.checkInCompetitor = checkInCompetitor;
 module.exports.submitScore = submitScore;
 module.exports.getReports = getReports;
+module.exports.resolveReport = resolveReport;
 module.exports.getSpecFees = getSpecFees;
+module.exports.addSpecFee = addSpecFee;
+module.exports.removeSpecFee = removeSpecFee;
 
 // DEPRECIATED
 module.exports.getParticipants = getParticipants;
