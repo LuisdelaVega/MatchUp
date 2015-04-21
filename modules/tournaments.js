@@ -1374,11 +1374,38 @@ var getStandings = function(req, res, pg, conString, log) {
 							standings.groupStage.groups[i] = [];
 						}
 						var query = client.query({
-							text: 'SELECT customer.customer_username, customer.customer_profile_pic, customer.customer_tag, has_a.group_number, competitor.competitor_number, sum(submits.score)/((round.round_best_of/2)+1) AS wins, CASE WHEN has_a.group_number = (SELECT count(*) FROM "group" WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4) THEN ((SELECT count(*) FROM is_a WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4) % tournament.number_of_people_per_group - 1) - sum(submits.score)/((round.round_best_of/2)+1) ELSE (tournament.number_of_people_per_group - 1) - sum(submits.score)/((round.round_best_of/2)+1) END AS loses, CASE WHEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC, competitor.competitor_seed) % (tournament.number_of_people_per_group) = 0 THEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group + 1) ELSE row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group) END AS standing, (CASE WHEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC, competitor.competitor_seed) % (tournament.number_of_people_per_group) = 0 THEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group + 1) ELSE row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group) END <= tournament.amount_of_winners_per_group) AS advanced FROM submits JOIN competes ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.round_of = competes.round_of AND submits.round_number = competes.round_number AND submits.competitor_number = competes.competitor_number JOIN round ON submits.event_name = round.event_name AND submits.event_start_date = round.event_start_date AND submits.event_location = round.event_location AND submits.tournament_name = round.tournament_name AND submits.round_of = round.round_of AND submits.round_number = round.round_number JOIN competitor ON competitor.event_name = competes.event_name AND competitor.event_start_date = competes.event_start_date AND competitor.event_location = competes.event_location AND competitor.tournament_name = competes.tournament_name AND competitor.competitor_number = competes.competitor_number JOIN has_a ON has_a.event_name = competes.event_name AND has_a.event_start_date = competes.event_start_date AND has_a.event_location = competes.event_location AND has_a.tournament_name = competes.tournament_name AND has_a.round_number = competes.round_number AND has_a.round_of = competes.round_of AND has_a.match_number = competes.match_number JOIN tournament ON submits.event_name = tournament.event_name AND submits.event_start_date = tournament.event_start_date AND submits.event_location = tournament.event_location AND submits.tournament_name = tournament.tournament_name JOIN is_a ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN customer ON customer.customer_username = is_a.customer_username WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_of = $5 GROUP BY customer.customer_username, customer.customer_tag, customer.customer_profile_pic, round.round_best_of, has_a.group_number, competitor.competitor_seed, tournament.number_of_people_per_group, tournament.amount_of_winners_per_group, competitor.competitor_number ORDER BY has_a.group_number, wins DESC, competitor.competitor_seed, standing',
-							values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Group"]
+							text: 'SELECT CASE WHEN tournament.team_size > 1 THEN team.team_name || $6 || team.team_logo ELSE customer.customer_username || $6 || customer.customer_profile_pic || $6 || customer.customer_tag END AS info, has_a.group_number, competitor.competitor_number, sum(submits.score)/((round.round_best_of/2)+1) AS wins, CASE WHEN has_a.group_number = (SELECT count(*) FROM "group" WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4) THEN ((SELECT count(*) FROM is_a WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4) % tournament.number_of_people_per_group - 1) - sum(submits.score)/((round.round_best_of/2)+1) ELSE (tournament.number_of_people_per_group - 1) - sum(submits.score)/((round.round_best_of/2)+1) END AS loses, CASE WHEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC, competitor.competitor_seed) % (tournament.number_of_people_per_group) = 0 THEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group + 1) ELSE row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group) END AS standing, (CASE WHEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC, competitor.competitor_seed) % (tournament.number_of_people_per_group) = 0 THEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group + 1) ELSE row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group) END <= tournament.amount_of_winners_per_group) AS advanced FROM submits JOIN competes ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.round_of = competes.round_of AND submits.round_number = competes.round_number AND submits.competitor_number = competes.competitor_number JOIN round ON submits.event_name = round.event_name AND submits.event_start_date = round.event_start_date AND submits.event_location = round.event_location AND submits.tournament_name = round.tournament_name AND submits.round_of = round.round_of AND submits.round_number = round.round_number JOIN competitor ON competitor.event_name = competes.event_name AND competitor.event_start_date = competes.event_start_date AND competitor.event_location = competes.event_location AND competitor.tournament_name = competes.tournament_name AND competitor.competitor_number = competes.competitor_number JOIN has_a ON has_a.event_name = competes.event_name AND has_a.event_start_date = competes.event_start_date AND has_a.event_location = competes.event_location AND has_a.tournament_name = competes.tournament_name AND has_a.round_number = competes.round_number AND has_a.round_of = competes.round_of AND has_a.match_number = competes.match_number JOIN tournament ON submits.event_name = tournament.event_name AND submits.event_start_date = tournament.event_start_date AND submits.event_location = tournament.event_location AND submits.tournament_name = tournament.tournament_name JOIN is_a ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN customer ON customer.customer_username = is_a.customer_username LEFT OUTER JOIN competes_for ON competes_for.event_name = competitor.event_name AND competes_for.event_start_date = competitor.event_start_date AND competes_for.event_location = competitor.event_location AND competes_for.tournament_name = competitor.tournament_name AND competes_for.competitor_number = competitor.competitor_number LEFT OUTER JOIN team ON team.team_name = competes_for.team_name WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_of = $5 GROUP BY customer.customer_username, customer.customer_tag, customer.customer_profile_pic, round.round_best_of, has_a.group_number, competitor.competitor_seed, tournament.number_of_people_per_group, tournament.amount_of_winners_per_group, competitor.competitor_number, team.team_name, team.team_logo, tournament.team_size, team.team_name, team.team_logo ORDER BY has_a.group_number, wins DESC, competitor.competitor_seed, standing',
+							values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Group", ",;!;,"]
 						});
 						query.on("row", function (row, result) {
-							standings.groupStage.groups[row.group_number - 1].push(row);
+							var info_string = row.info;
+							var info_array = info_string.split(",;!;,");
+							var temp = {};
+							if (info_array.length == 2) {
+								temp = {
+									team_name : info_array[0],
+									team_logo : info_array[1],
+									group_number : row.group_number,
+									competitor_number : row.competitor_number,
+									wins : row.wins,
+									loses : row.loses,
+									standing : row.standing,
+									advanced : row.advanced
+								};
+							} else {
+								temp = {
+									customer_username : info_array[0],
+									customer_profile_pic : info_array[1],
+									customer_tag : info_array[2],
+									group_number : row.group_number,
+									competitor_number : row.competitor_number,
+									wins : row.wins,
+									loses : row.loses,
+									standing : row.standing,
+									advanced : row.advanced
+								};
+							}
+							standings.groupStage.groups[row.group_number - 1].push(temp);
 						});
 						query.on('error', function (error) {
 							done();
@@ -1422,7 +1449,6 @@ var getRounds = function(req, res, pg, conString, log) {
 			result.addRow(row);
 		});
 		query.on('error', function (error) {
-			client.query("ROLLBACK");
 			done();
 			console.log(error);
 			res.status(500).send(error);
@@ -1447,10 +1473,13 @@ var getRounds = function(req, res, pg, conString, log) {
 					tournament.finalStage.roundRobinRounds = [];
 				}
 				var query = client.query({
-					text: 'SELECT match.round_number, match.round_of, match.match_number, match.match_completed, round.round_start_date, round.round_pause, round.round_completed, round.round_best_of, customer.customer_username,customer.customer_tag, customer.customer_profile_pic, sum(submits.score) AS score, has_a.group_number, is_played_in.station_number FROM match LEFT OUTER JOIN competes ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND competes.round_number = match.round_number AND competes.round_of = match.round_of AND competes.match_number = match.match_number LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number LEFT OUTER JOIN is_a ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND competes.competitor_number = is_a.competitor_number LEFT OUTER JOIN customer ON is_a.customer_username = customer.customer_username LEFT OUTER JOIN competitor ON competitor.event_name = competes.event_name AND competitor.event_start_date = competes.event_start_date AND competitor.event_location = competes.event_location AND competitor.tournament_name = competes.tournament_name AND competitor.competitor_number = competes.competitor_number LEFT OUTER JOIN has_a ON match.event_name = has_a.event_name AND match.event_start_date = has_a.event_start_date AND match.event_location = has_a.event_location AND match.tournament_name = has_a.tournament_name AND has_a.round_number = match.round_number AND has_a.round_of = match.round_of AND has_a.match_number = match.match_number LEFT OUTER JOIN is_played_in ON match.event_name = is_played_in.event_name AND match.event_start_date = is_played_in.event_start_date AND match.event_location = is_played_in.event_location AND match.tournament_name = is_played_in.tournament_name AND is_played_in.round_number = match.round_number AND is_played_in.round_of = match.round_of AND is_played_in.match_number = match.match_number JOIN round ON match.event_name = round.event_name AND match.event_start_date = round.event_start_date AND match.event_location = round.event_location AND match.tournament_name = round.tournament_name AND round.round_number = match.round_number AND round.round_of = match.round_of WHERE match.event_name = $1 AND match.event_start_date = $2 AND match.event_location = $3 AND match.tournament_name = $4 GROUP BY match.round_number, match.round_of, match.match_number, match.match_completed, customer.customer_tag, customer.customer_profile_pic, customer.customer_username, competitor.competitor_seed, has_a.group_number, is_played_in.station_number, round.round_start_date, round.round_pause, round.round_completed, round.round_best_of ORDER BY CASE WHEN match.round_of = $5 THEN 1 WHEN match.round_of = $6 THEN 2 WHEN match.round_of = $7 THEN 3 WHEN match.round_of = $8 THEN 4 END, match.round_number, match.match_number, competitor.competitor_seed',
-					values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Group", "Round Robin", "Winner", "Loser"]
+					text: 'SELECT match.round_number, match.round_of, match.match_number, match.match_completed, round.round_start_date, round.round_pause, round.round_completed, round.round_best_of, CASE WHEN tournament.team_size > 1 THEN team.team_name || $9 || team.team_logo ELSE customer.customer_username || $9 || customer.customer_profile_pic || $9 || customer.customer_tag END AS info, competes.competitor_number, sum(submits.score) AS score, has_a.group_number, is_played_in.station_number FROM match NATURAL JOIN tournament LEFT OUTER JOIN competes ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND competes.round_number = match.round_number AND competes.round_of = match.round_of AND competes.match_number = match.match_number LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number LEFT OUTER JOIN is_a ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND competes.competitor_number = is_a.competitor_number LEFT OUTER JOIN customer ON is_a.customer_username = customer.customer_username LEFT OUTER JOIN competitor ON competitor.event_name = competes.event_name AND competitor.event_start_date = competes.event_start_date AND competitor.event_location = competes.event_location AND competitor.tournament_name = competes.tournament_name AND competitor.competitor_number = competes.competitor_number LEFT OUTER JOIN competes_for ON competes_for.event_name = competitor.event_name AND competes_for.event_start_date = competitor.event_start_date AND competes_for.event_location = competitor.event_location AND competes_for.tournament_name = competitor.tournament_name AND competes_for.competitor_number = competitor.competitor_number LEFT OUTER JOIN team ON team.team_name = competes_for.team_name LEFT OUTER JOIN has_a ON match.event_name = has_a.event_name AND match.event_start_date = has_a.event_start_date AND match.event_location = has_a.event_location AND match.tournament_name = has_a.tournament_name AND has_a.round_number = match.round_number AND has_a.round_of = match.round_of AND has_a.match_number = match.match_number LEFT OUTER JOIN is_played_in ON match.event_name = is_played_in.event_name AND match.event_start_date = is_played_in.event_start_date AND match.event_location = is_played_in.event_location AND match.tournament_name = is_played_in.tournament_name AND is_played_in.round_number = match.round_number AND is_played_in.round_of = match.round_of AND is_played_in.match_number = match.match_number JOIN round ON match.event_name = round.event_name AND match.event_start_date = round.event_start_date AND match.event_location = round.event_location AND match.tournament_name = round.tournament_name AND round.round_number = match.round_number AND round.round_of = match.round_of WHERE match.event_name = $1 AND match.event_start_date = $2 AND match.event_location = $3 AND match.tournament_name = $4 GROUP BY match.round_number, match.round_of, match.match_number, match.match_completed, customer.customer_tag, customer.customer_profile_pic, customer.customer_username, competes.competitor_number, competitor.competitor_seed, has_a.group_number, is_played_in.station_number, round.round_start_date, round.round_pause, round.round_completed, round.round_best_of, tournament.team_size, team.team_name, team.team_logo ORDER BY CASE WHEN match.round_of = $5 THEN 1 WHEN match.round_of = $6 THEN 2 WHEN match.round_of = $7 THEN 3 WHEN match.round_of = $8 THEN 4 END, match.round_number, match.match_number, competitor.competitor_seed',
+					values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Group", "Round Robin", "Winner", "Loser", ",;!;,"]
 				});
 				query.on("row", function (row, result) {
+					var info_string = row.info;
+					var info_array = info_string.split(",;!;,");
+					var temp = {};
 					if (row.group_number) {
 						if (!tournament.groupStage.groups[row.group_number-1]) {
 							tournament.groupStage.groups[row.group_number-1] = {};
@@ -1473,12 +1502,24 @@ var getRounds = function(req, res, pg, conString, log) {
 							tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number].station_number = row.station_number;
 							tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number].players = [];
 						}
-						tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number].players.push({
-							customer_username : row.customer_username,
-							customer_tag : row.customer_tag,
-							customer_profile_pic : row.customer_profile_pic,
-							score : row.score
-						});
+
+						if (info_array.length == 2) {
+							temp = {
+								team_name : info_array[0],
+								team_logo : info_array[1],
+								competitor_number : row.competitor_number,
+								score : row.score
+							};
+						} else {
+							temp = {
+								customer_username : info_array[0],
+								customer_profile_pic : info_array[1],
+								customer_tag : info_array[2],
+								competitor_number : row.competitor_number,
+								score : row.score
+							};
+						}
+						tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number].players.push(temp);
 					} else if (row.round_of === "Winner") {
 						if (!tournament.finalStage.winnerRounds[row.round_number-1]) {
 							tournament.finalStage.winnerRounds[row.round_number-1] = {};
@@ -1496,12 +1537,24 @@ var getRounds = function(req, res, pg, conString, log) {
 							tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1].station_number = row.station_number;
 							tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1].players = [];
 						}
-						tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1].players.push({
-							customer_username : row.customer_username,
-							customer_tag : row.customer_tag,
-							customer_profile_pic : row.customer_profile_pic,
-							score : row.score
-						});
+
+						if (info_array.length == 2) {
+							temp = {
+								team_name : info_array[0],
+								team_logo : info_array[1],
+								competitor_number : row.competitor_number,
+								score : row.score
+							};
+						} else {
+							temp = {
+								customer_username : info_array[0],
+								customer_profile_pic : info_array[1],
+								customer_tag : info_array[2],
+								competitor_number : row.competitor_number,
+								score : row.score
+							};
+						}
+						tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1].players.push(temp);
 					} else if (row.round_of === "Loser") {
 						if (!tournament.finalStage.loserRounds[row.round_number-1]) {
 							tournament.finalStage.loserRounds[row.round_number-1] = {};
@@ -1519,12 +1572,24 @@ var getRounds = function(req, res, pg, conString, log) {
 							tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1].station_number = row.station_number;
 							tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1].players = [];
 						}
-						tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1].players.push({
-							customer_username : row.customer_username,
-							customer_tag : row.customer_tag,
-							customer_profile_pic : row.customer_profile_pic,
-							score : row.score
-						});
+
+						if (info_array.length == 2) {
+							temp = {
+								team_name : info_array[0],
+								team_logo : info_array[1],
+								competitor_number : row.competitor_number,
+								score : row.score
+							};
+						} else {
+							temp = {
+								customer_username : info_array[0],
+								customer_profile_pic : info_array[1],
+								customer_tag : info_array[2],
+								competitor_number : row.competitor_number,
+								score : row.score
+							};
+						}
+						tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1].players.push(temp);
 					} else {
 						if (!tournament.finalStage.roundRobinRounds[row.round_number-1]) {
 							tournament.finalStage.roundRobinRounds[row.round_number-1] = {};
@@ -1542,16 +1607,27 @@ var getRounds = function(req, res, pg, conString, log) {
 							tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1].station_number = row.station_number;
 							tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1].players = [];
 						}
-						tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1].players.push({
-							customer_username : row.customer_username,
-							customer_tag : row.customer_tag,
-							customer_profile_pic : row.customer_profile_pic,
-							score : row.score
-						});
+
+						if (info_array.length == 2) {
+							temp = {
+								team_name : info_array[0],
+								team_logo : info_array[1],
+								competitor_number : row.competitor_number,
+								score : row.score
+							};
+						} else {
+							temp = {
+								customer_username : info_array[0],
+								customer_profile_pic : info_array[1],
+								customer_tag : info_array[2],
+								competitor_number : row.competitor_number,
+								score : row.score
+							};
+						}
+						tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1].players.push(temp);
 					}
 				});
 				query.on('error', function (error) {
-					client.query("ROLLBACK");
 					done();
 					console.log(error);
 					res.status(500).send(error);
@@ -1606,17 +1682,31 @@ var getMatch = function(req, res, pg, conString, log) {
 				matchDetails.is_competitor = false;
 				console.log(req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match);
 				var query = client.query({
-					text: 'SELECT customer.customer_username, (customer.customer_username = $8) AS is_competitor, customer.customer_tag, customer.customer_profile_pic, match.match_completed, match.is_favourite, sum(submits.score) AS score FROM customer JOIN is_a ON is_a.customer_username = customer.customer_username LEFT OUTER JOIN competes ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number LEFT OUTER JOIN match ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND match.round_number = competes.round_number AND match.round_of = competes.round_of AND match.match_number = competes.match_number WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND competes.match_number = $7 GROUP BY customer.customer_username, customer.customer_tag, customer.customer_profile_pic, match.match_completed, match.is_favourite',
-					values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.user.username]
+					text: 'SELECT CASE WHEN tournament.team_size > 1 THEN team.team_name || $9 || team.team_logo ELSE customer.customer_username || $9 || customer.customer_profile_pic || $9 || customer.customer_tag END AS info, competes.competitor_number, (customer.customer_username = $8) AS is_competitor, match.match_completed, match.is_favourite, sum(submits.score) AS score FROM customer NATURAL JOIN is_a NATURAL JOIN tournament LEFT OUTER JOIN competes ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number LEFT OUTER JOIN competes_for ON competes_for.event_name = competes.event_name AND competes_for.event_start_date = competes.event_start_date AND competes_for.event_location = competes.event_location AND competes_for.tournament_name = competes.tournament_name AND competes_for.competitor_number = competes.competitor_number LEFT OUTER JOIN team ON team.team_name = competes_for.team_name LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number LEFT OUTER JOIN match ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND match.round_number = competes.round_number AND match.round_of = competes.round_of AND match.match_number = competes.match_number WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND competes.match_number = $7 GROUP BY customer.customer_username, customer.customer_tag, customer.customer_profile_pic, match.match_completed, match.is_favourite, competes.competitor_number, tournament.team_size, team.team_name, team.team_logo',
+					values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.user.username, ",;!;,"]
 				});
 				query.on("row", function (row, result) {
-					console.log(row);
-					matchDetails.players.push({
-						customer_username : row.customer_username,
-						customer_tag : row.customer_tag,
-						customer_profile_pic : row.customer_profile_pic,
-						score : row.score
-					});
+					var info_string = row.info;
+					var info_array = info_string.split(",;!;,");
+					var temp = {};
+					if (info_array.length == 2) {
+						temp = {
+							team_name : info_array[0],
+							team_logo : info_array[1],
+							competitor_number: row.competitor_number,
+							score : row.score
+						};
+					} else {
+						temp = {
+							customer_username : info_array[0],
+							customer_profile_pic : info_array[1],
+							customer_tag : info_array[2],
+							competitor_number: row.competitor_number,
+							score : row.score
+						};
+					}
+
+					matchDetails.players.push(temp);
 					matchDetails.match_completed = row.match_completed;
 					matchDetails.is_favourite = row.is_favourite;
 					if (!matchDetails.is_competitor) {
@@ -1634,8 +1724,9 @@ var getMatch = function(req, res, pg, conString, log) {
 				});
 				query.on("end", function (result) {
 					matchDetails.sets = [];
+					// Get the details for the sets
 					var query = client.query({
-						text: 'SELECT customer.customer_username, is_set.set_seq, is_set.set_completed, submits.score AS score FROM is_set JOIN match ON is_set.event_name = match.event_name AND is_set.event_start_date = match.event_start_date AND is_set.event_location = match.event_location AND is_set.tournament_name = match.tournament_name AND is_set.round_number = match.round_number AND is_set.round_of = match.round_of AND is_set.match_number = match.match_number LEFT OUTER JOIN submits ON submits.event_name = is_set.event_name AND submits.event_start_date = is_set.event_start_date AND submits.event_location = is_set.event_location AND submits.tournament_name = is_set.tournament_name AND submits.round_number = is_set.round_number AND submits.round_of = is_set.round_of AND submits.match_number = is_set.match_number AND submits.set_seq = is_set.set_seq LEFT OUTER JOIN competes ON is_set.event_name = competes.event_name AND is_set.event_start_date = competes.event_start_date AND is_set.event_location = competes.event_location AND is_set.tournament_name = competes.tournament_name AND competes.round_number = is_set.round_number AND competes.round_of = is_set.round_of AND competes.match_number = is_set.match_number AND submits.competitor_number = competes.competitor_number LEFT OUTER JOIN is_a ON is_a.competitor_number = competes.competitor_number AND is_a.event_name = is_set.event_name AND is_a.event_start_date = is_set.event_start_date AND is_a.event_location = is_set.event_location AND is_a.tournament_name = is_set.tournament_name LEFT OUTER JOIN customer ON customer.customer_username = is_a.customer_username WHERE is_set.event_name = $1 AND is_set.event_start_date = $2 AND is_set.event_location = $3 AND is_set.tournament_name = $4 AND is_set.round_number = $5 AND is_set.round_of = $6 AND is_set.match_number = $7',
+						text: 'SELECT CASE WHEN tournament.team_size > 1 THEN team.team_name ELSE customer.customer_username END AS info, submits.competitor_number, is_set.set_seq, is_set.set_completed, submits.score AS score FROM is_set JOIN match NATURAL JOIN tournament ON is_set.event_name = match.event_name AND is_set.event_start_date = match.event_start_date AND is_set.event_location = match.event_location AND is_set.tournament_name = match.tournament_name AND is_set.round_number = match.round_number AND is_set.round_of = match.round_of AND is_set.match_number = match.match_number LEFT OUTER JOIN submits ON submits.event_name = is_set.event_name AND submits.event_start_date = is_set.event_start_date AND submits.event_location = is_set.event_location AND submits.tournament_name = is_set.tournament_name AND submits.round_number = is_set.round_number AND submits.round_of = is_set.round_of AND submits.match_number = is_set.match_number AND submits.set_seq = is_set.set_seq LEFT OUTER JOIN competes ON is_set.event_name = competes.event_name AND is_set.event_start_date = competes.event_start_date AND is_set.event_location = competes.event_location AND is_set.tournament_name = competes.tournament_name AND competes.round_number = is_set.round_number AND competes.round_of = is_set.round_of AND competes.match_number = is_set.match_number AND submits.competitor_number = competes.competitor_number LEFT OUTER JOIN is_a ON is_a.competitor_number = competes.competitor_number AND is_a.event_name = is_set.event_name AND is_a.event_start_date = is_set.event_start_date AND is_a.event_location = is_set.event_location AND is_a.tournament_name = is_set.tournament_name LEFT OUTER JOIN customer ON customer.customer_username = is_a.customer_username LEFT OUTER JOIN competes_for ON competes_for.event_name = submits.event_name AND competes_for.event_start_date = submits.event_start_date AND competes_for.event_location = submits.event_location AND competes_for.tournament_name = submits.tournament_name AND competes_for.competitor_number = submits.competitor_number LEFT OUTER JOIN team ON team.team_name = competes_for.team_name WHERE is_set.event_name = $1 AND is_set.event_start_date = $2 AND is_set.event_location = $3 AND is_set.tournament_name = $4 AND is_set.round_number = $5 AND is_set.round_of = $6 AND is_set.match_number = $7',
 						values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match]
 					});
 					query.on("row", function (row, result) {
@@ -1646,7 +1737,8 @@ var getMatch = function(req, res, pg, conString, log) {
 							matchDetails.sets[row.set_seq-1].scores = [];
 						}
 						matchDetails.sets[row.set_seq-1].scores.push({
-							customer_username : row.customer_username,
+							name : row.info,
+							competitor_number: row.competitor_number,
 							score : row.score
 						});
 					});

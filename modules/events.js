@@ -530,7 +530,7 @@ var submitScore = function(req, res, pg, conString, log) {
          * Else, it will return some useful details about the tournament that will be used later in the function
          */
         var query = client.query({
-            text : "SELECT tournament.score_type, tournament.number_of_people_per_group, tournament.amount_of_winners_per_group, round.round_best_of, tournament.tournament_format, is_played_instation_number, stream.stream_link FROM event NATURAL JOIN tournament NATURAL JOIN round NATURAL JOIN match LEFT OUTER JOIN is_played_in ON match.event_name = is_played_in.event_name AND match.event_start_date = is_played_in.event_start_date AND match.event_location = is_played_in.event_location AND match.tournament_name = is_played_in.tournament_name AND match.round_number = is_played_in.round_number AND match.round_of = is_played_in.round_of AND match.match_number = is_played_in.match_number LEFT OUTER JOIN stream ON stream.event_name = is_played_in.event_name AND stream.event_start_date = is_played_in.event_start_date AND stream.event_location = is_played_in.event_location AND stream.station_number = is_played_in.station_number WHERE match.event_name = $1 AND match.event_start_date = $2 AND match.event_location = $3 AND match.tournament_name = $4 AND match.round_number = $5 AND match.round_of = $6 AND match.match_number = $7 AND event.event_active",
+            text : "SELECT tournament.score_type, tournament.number_of_people_per_group, tournament.amount_of_winners_per_group, round.round_best_of, tournament.tournament_format, is_played_in.station_number, stream.stream_link FROM event NATURAL JOIN tournament NATURAL JOIN round NATURAL JOIN match LEFT OUTER JOIN is_played_in ON match.event_name = is_played_in.event_name AND match.event_start_date = is_played_in.event_start_date AND match.event_location = is_played_in.event_location AND match.tournament_name = is_played_in.tournament_name AND match.round_number = is_played_in.round_number AND match.round_of = is_played_in.round_of AND match.match_number = is_played_in.match_number LEFT OUTER JOIN stream ON stream.event_name = is_played_in.event_name AND stream.event_start_date = is_played_in.event_start_date AND stream.event_location = is_played_in.event_location AND stream.station_number = is_played_in.station_number WHERE match.event_name = $1 AND match.event_start_date = $2 AND match.event_location = $3 AND match.tournament_name = $4 AND match.round_number = $5 AND match.round_of = $6 AND match.match_number = $7 AND event.event_active",
             values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match]
         });
         query.on("row", function(row, result) {
@@ -1211,6 +1211,51 @@ var submitScore = function(req, res, pg, conString, log) {
                         }, 'done response');
                     }
                 });
+            } else {
+                client.query("ROLLBACK");
+                done();
+                res.status(404).send("Couldn't find the event: " + req.params.event + " starting on: " + req.query.date + " located at: " + req.query.location);
+                log.info({
+                    res : res
+                }, 'done response');
+            }
+        });
+    });
+};
+
+var changeScore = function(req, res, pg, conString, log) {
+    pg.connect(conString, function(err, client, done) {
+        if (err) {
+            return console.error('error fetching client from pool', err);
+        }
+
+        client.query("BEGIN");
+        //console.log(req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of);
+        /**
+         * This is a multiple purpose query.
+         * If it returns an empty array, it means the event was not found.
+         * Else, it will return some useful details about the tournament that will be used later in the function
+         */
+        var query = client.query({
+            text : "SELECT tournament.score_type, tournament.number_of_people_per_group, tournament.amount_of_winners_per_group, round.round_best_of, tournament.tournament_format, is_played_in.station_number, stream.stream_link FROM event NATURAL JOIN tournament NATURAL JOIN round NATURAL JOIN match LEFT OUTER JOIN is_played_in ON match.event_name = is_played_in.event_name AND match.event_start_date = is_played_in.event_start_date AND match.event_location = is_played_in.event_location AND match.tournament_name = is_played_in.tournament_name AND match.round_number = is_played_in.round_number AND match.round_of = is_played_in.round_of AND match.match_number = is_played_in.match_number LEFT OUTER JOIN stream ON stream.event_name = is_played_in.event_name AND stream.event_start_date = is_played_in.event_start_date AND stream.event_location = is_played_in.event_location AND stream.station_number = is_played_in.station_number WHERE match.event_name = $1 AND match.event_start_date = $2 AND match.event_location = $3 AND match.tournament_name = $4 AND match.round_number = $5 AND match.round_of = $6 AND match.match_number = $7 AND event.event_active",
+            values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match]
+        });
+        query.on("row", function(row, result) {
+            result.addRow(row);
+        });
+        query.on('error', function(error) {
+            client.query("ROLLBACK");
+            done();
+            console.log(error);
+            res.status(500).send(error);
+            log.info({
+                res : res
+            }, 'done response');
+        });
+        query.on("end", function(result) {
+            if (result.rows.length) {
+                var delatils = result.rows[0];
+
             } else {
                 client.query("ROLLBACK");
                 done();
