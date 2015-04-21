@@ -7,43 +7,44 @@
     <ion-content>
         <div class="card">
             <div class="item item-text-wrap">
-                <h2>Round 1 Match 2</h2>
-                <p>Station 1</p>
+                <h2>Round {{matchupInfo.round_number}} Match {{matchupInfo.match_number}}</h2>
+                <p ng-if="matchupInfo.station_number == null">Station {{matchupInfo.station_number}}</p>
             </div>
             <div class="row">
                 <div class="col .col-33 absolute-center">
-                    <div class="img-circular large player-1"></div>
+                    <img class="img-circular large player-1" ng-src="{{players[0].customer_profile_pic}}">
                 </div>
                 <div class="col .col-33 absolute-center">
                     <div class="full-width">
-                        <h2 class="center-text">2-1</h2>
+                        <h2 class="center-text">{{players[0].score}}-{{players[1].score}}</h2>
                     </div>
                 </div>
                 <div class="col .col-33 absolute-center">
-                    <div class="img-circular large player-2"></div>
+                    <img class="img-circular large player-2" ng-src="{{players[1].customer_profile_pic}}">
                 </div>
             </div>
             <div class="row">
                 <div class="col col-33 absolute-center">
                     <div class="full-width">
-                        <p class="center-text">Player 1</p>
+                        <p class="center-text">{{ players[0].customer_tag }}</p>
                     </div>
                 </div>
                 <div class="col col-33 absolute-center">
                     <div class="full-width">
-                        <p class="center-text">Best of 3</p>
+                        <p class="center-text">Best of {{ matchInfo.sets.length }}</p>
                     </div>
                 </div>
                 <div class="col col-33 absolute-center">
                     <div class="full-width">
-                        <p class="center-text">Player 2</p>
+                        <p class="center-text">{{ players[1].customer_tag }}</p>
                     </div>
                 </div>
             </div>
             <div class="center-text padding-bottom">
-                    <div class="set-circular player-1"></div>
-                    <div class="set-circular player-2"></div>
-                    <div class="set-circular player-1"></div>
+                <span ng-repeat="set in sets">
+                    <div class="set-circular player-1" ng-if="set.scores[0].score > set.scores[1].score"></div>
+                    <div class="set-circular player-2" ng-if="set.scores[0].score < set.scores[1].score"></div>
+                </span>
             </div>
         </div>
     </ion-content>

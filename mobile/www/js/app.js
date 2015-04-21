@@ -142,7 +142,9 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     //================================================================================
         .state('app.mymatchups', {
         url: "/mymatchups",
-        templateUrl: "templates/myStuff/my-matchups.html"
+        templateUrl: "templates/myStuff/my-matchups.html",
+        controller: "myMatchupController"
+        
     })
     //================================================================================
     // My Events
@@ -248,16 +250,17 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     // Organization Profile
     //================================================================================
         .state('app.organizationprofile', {
-        url: "/organizationprofile?:organizationname",
+        url: "/organizationprofile/:organizationname",
         templateUrl: "templates/organizationprofile/organization-profile.html",
         controller: "organizationController"
     })
         .state('app.organizationprofileevents', {
-        url: "/organizationprofileevents",
-        templateUrl: "templates/organizationprofile/organization-profile-events.html"
+        url: "/organizationprofileevents/:organizationname",
+        templateUrl: "templates/organizationprofile/organization-profile-events.html",
+        controller: "organizationEventsController"
     })
         .state('app.organizationprofilemembers', {
-        url: "/organizationprofilemembers",
+        url: "/organizationprofilemembers/:organizationname",
         templateUrl: "templates/organizationprofile/organization-profile-members.html",
         controller: "removeOrganizationMemberController"
     })
@@ -267,12 +270,12 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
         templateUrl: "templates/organizationprofile/request.html"
     })
         .state('app.addorganizationmember', {
-        url: "/addorganizationmember",
+        url: "/addorganizationmember/:organizationname",
         templateUrl: "templates/organizationprofile/add-member.html",
         controller: "addOrganizationMemberController"
     })
         .state('app.editorganization', {
-        url: "/editorganization",
+        url: "/editorganization/:organizationname",
         templateUrl: "templates/organizationprofile/edit.html",
     })
 
@@ -306,6 +309,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
         .state('app.editteam', {
         url: "/editteam/:teamname",
         templateUrl: "templates/teamprofile/edit.html",
+        controller: "editTeamController"
     })
 
     //================================================================================
@@ -379,7 +383,8 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     //================================================================================
         .state('app.notifications', {
         url: "/notifications",
-        templateUrl: "templates/notifications.html"
+        templateUrl: "templates/notifications.html",
+        controller: "notificationsController"
     })
     //================================================================================
     // Matchup
@@ -387,7 +392,8 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
 
         .state('app.matchupmatch', {
         url: "/matchupmatch",
-        templateUrl: "templates/matchup/matchup-match.html"
+        templateUrl: "templates/matchup/matchup-match.html",
+        controller: "matchupMatchController"
     })
         .state('app.matchuppoints', {
         url: "/matchuppoints",
@@ -395,7 +401,8 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     })
         .state('app.matchupoingoing', {
         url: "/matchupoingoing",
-        templateUrl: "templates/matchup/matchup-ongoing.html"
+        templateUrl: "templates/matchup/matchup-ongoing.html",
+        controller: "matchupOngoingController"
     })
         .state('app.report', {
         url: "/report",

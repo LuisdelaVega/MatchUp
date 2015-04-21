@@ -1,6 +1,6 @@
 <ion-view view-title="Edit Team">
     <ion-nav-buttons side="left">
-        <button class="button button-icon" ui-sref="app.teamprofile">
+        <button class="button button-icon" ng-click="returnToTeamProfile()">
             <i class="icon ion-ios-arrow-back"></i>
         </button>
     </ion-nav-buttons>
@@ -8,31 +8,31 @@
         <div class="list list-inset">
             <label class="item item-input item-stacked-label">
                 <span class="input-label">Bio</span>
-                <textarea rows="5"></textarea>
+                <textarea rows="5" ng-model="teamProfile.bio"></textarea>
             </label>
         </div>
         <div class="card">
             <div class="item item-body">
-                <p>Image Preview</p>
+                <img class="full-image" ng-src="{{ teamProfile.logo }}" id="preview">
             </div>
             <div class="item">
-                <button class="button button-block button-positive">
-                    Add Cover
+                <button class="button button-block button-positive" ng-click="changeCoverPhoto()">
+                    Change Cover
                 </button>
             </div>
         </div>
         <div class="card">
             <div class="item item-body">
-                <p>Image Preview</p>
+                <img class="full-image" ng-src="{{ teamProfile.cover }}" id="preview2">
             </div>
             <div class="item">
-                <button class="button button-block button-positive">
-                    Add Logo
+                <button class="button button-block button-positive" ng-click="changeLogo()">
+                    Change Logo
                 </button>
             </div>
         </div>
         <div class="padding">
-            <button class="button button-block button-balanced">
+            <button class="button button-block button-balanced" ng-click="submitChanges()">
                 Submit
             </button>
         </div>

@@ -1,11 +1,11 @@
 <ion-view title="Team Members">
     <ion-nav-buttons side="left">
-        <button class="button button-icon" onclick="location.href='#/app/teamprofile'">
+        <button class="button button-icon" ng-click="returnToTeamProfile()">
             <i class="icon ion-ios-arrow-back"></i>
         </button>
     </ion-nav-buttons>
     <ion-nav-buttons side="right">
-        <button class="button button-icon" ui-sref="app.addteammember">
+        <button class="button button-icon" ng-click="goToAddTeamMember()">
             <i class="ion-plus"></i>
         </button>
         <button class="button button-icon ion-android-alert">

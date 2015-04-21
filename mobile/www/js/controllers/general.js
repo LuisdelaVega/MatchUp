@@ -429,6 +429,7 @@ myApp.controller('loginController', ['$scope', '$http', '$state', 'sharedDataSer
         //Server verifies credential. Credentials are passed through the header. If successful, server returns token
         $http.post('http://136.145.116.232/login', {}, config).success(function (data) {
             var tokenObj = angular.fromJson(data);
+            console.log(tokenObj);
             // save token in session
             $window.sessionStorage.token = tokenObj.token;
             $window.sessionStorage.username = $scope.credentials.userEmail;
@@ -490,6 +491,18 @@ myApp.controller('sidebarController', ['$scope', '$http', '$state', 'sharedDataS
             console.log(err);
 
         });
+
+        $http.get('http://136.145.116.232/matchup/profile/matchups?state=Upcoming', config).success(function (data) {
+
+            $scope.notifications = angular.fromJson(data).length;
+
+        }).error(function (err) {
+            console.log(err);
+
+        });
+
+
+
     });
     $scope.goToMyEvents = function (customer_username) {
 
@@ -518,5 +531,281 @@ myApp.controller('sidebarController', ['$scope', '$http', '$state', 'sharedDataS
         $state.go('app.profile.summary', { "username":  customer_username});
 
     };
+
+}]);
+
+myApp.controller('myMatchupController', ['$scope', '$http', '$state', 'sharedDataService', '$window', function ($scope, $http, $state, sharedDataService, $window) {
+
+    $scope.$on('$ionicView.enter', function () {
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+        $http.get('http://136.145.116.232/matchup/profile', config).success(function (data) {
+
+
+            var tag = data.customer_tag;
+
+            $http.get('http://matchup.neptunolabs.com/matchup/profile/matchups?state=Past', config).success(function (data) {
+
+                $scope.matchups = angular.fromJson(data);
+
+                $scope.loggedInUser = [ ];
+                $scope.otherUser = [ ];
+
+                angular.forEach($scope.matchups, function(matchup){
+
+                    if(matchup.details[0].customer_tag == tag){
+                        $scope.loggedInUser.push(matchup.details[0]);
+                        $scope.otherUser.push(matchup.details[1]);
+                    }
+                    else{
+                        $scope.loggedInUser.push(matchup.details[1]);
+                        $scope.otherUser.push(matchup.details[0]);
+                    }
+                });
+
+            }).error(function (err) {
+                console.log(err);
+
+            });
+
+        }).error(function (err) {
+            console.log(err);
+
+        });
+
+    });
+
+    $scope.goToPastMatchup = function (matchup) {
+
+        sharedDataService.set(matchup);
+        $state.go('app.matchupmatch');
+
+    };
+
+}]);
+
+myApp.controller('matchupMatchController', ['$scope', '$http', '$state', 'sharedDataService', '$window', function ($scope, $http, $state, sharedDataService, $window) {
+
+    $scope.$on('$ionicView.enter', function () {
+
+        $scope.matchupInfo = sharedDataService.get();
+        console.log($scope.matchupInfo);
+
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+        $http.get('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'', config).success(function (data) {
+
+            $scope.players = data.players;
+            $scope.matchInfo = data;
+            var sets = data.sets;
+
+            $scope.sets = [ ];
+
+            var posZero = $scope.players[0].customer_username
+
+            angular.forEach(sets, function(set){
+
+                if(set.scores.length != 1){
+                    if(posZero == set.scores[0].customer_username)
+                        $scope.sets.push(set);
+                    else{
+                        var temp = set.scores[0];
+                        set.scores[0] = set.scores[1];
+                        set.scores[1] = temp;
+                        $scope.sets.push(set);
+                    }
+                }
+            });
+
+            console.log($scope.sets);
+
+        }).error(function (err) {
+            console.log(err);
+
+        });
+
+
+
+    });
+
+
+}]);
+
+
+myApp.controller('notificationsController', ['$scope', '$http', '$state', 'sharedDataService', '$window', function ($scope, $http, $state, sharedDataService, $window) {
+
+    //Load profile information of currently logged in user. The token is used by the server to obtain user credentials.
+    $scope.$on('$ionicView.enter', function () {
+
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+
+        $http.get('http://136.145.116.232/matchup/profile/matchups?state=Upcoming', config).success(function (data) {
+
+            $scope.matchups = angular.fromJson(data);
+
+        }).error(function (err) {
+            console.log(err);
+
+        });
+
+    });
+
+    $scope.goToMatchupOngoing = function (matchupData) {
+
+//        var matchupData = {
+//            "event_name": "Event 01",
+//            "event_start_date": "2015-03-25T09:00:00.000Z",
+//            "event_location": "miradero",
+//            "tournament_name": "Mortal Kombat X Qualifiers",
+//            "round_number": 3,
+//            "round_of": "Loser",
+//            "match_number": 1,
+//            "team_size": 1,
+//            "station_number": null,
+//            "details":
+//            [
+//                {
+//                    "customer_tag": "samdlt",
+//                    "customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+//                    "score": "0"
+//                },
+//                {
+//                    "customer_tag": "jems9102",
+//                    "customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+//                    "score": "0"
+//                }
+//            ]
+//        };
+
+        sharedDataService.set(matchupData);
+        $state.go('app.matchupoingoing');
+
+    };
+
+}]);
+
+myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'sharedDataService', '$window', '$timeout', function ($scope, $http, $state, sharedDataService, $window, $timeout) {
+
+    $scope.$on('$ionicView.enter', function () {
+        $scope.matchupInfo = sharedDataService.get();
+
+        $scope.scoreInput = [ ];
+        
+        $scope.scoreInput.score = 'Win';
+
+        $scope.matchCompleted = false;
+
+        $scope.currentSet = 1;
+
+        $scope.pollServer();
+    });
+
+    $scope.pollServer = function() {
+
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };        
+
+        $http.get('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'', config).success(function (data) {
+
+            $scope.players = data.players;
+            $scope.matchInfo = data;
+
+            var sets = data.sets;
+
+            $scope.sets = [ ];
+
+            var posZero = $scope.players[0].customer_username
+
+            angular.forEach(sets, function(set){
+                if(set.scores.length != 1){
+                    if(posZero == set.scores[0].customer_username)
+                        $scope.sets.push(set);
+                    else{
+                        var temp = set.scores[0];
+                        set.scores[0] = set.scores[1];
+                        set.scores[1] = temp;
+                        $scope.sets.push(set);
+                    }
+                }
+            });
+
+            angular.forEach($scope.sets, function(set){
+                var foundSet = false;
+                if(set.set_completed == false && !foundSet){
+                    $scope.currentSet = set.set_seq;
+                    foundSet = true;
+                }
+            });
+
+            if($scope.sets[$scope.sets.length - 1].set_completed == true){
+                $scope.matchCompleted = true;              
+            }
+            else{
+                $timeout( function(){ $scope.pollServer(); }, 3000);
+            }
+
+        }).error(function (err) {
+            console.log(err);
+            $timeout( function(){ $scope.pollServer(); }, 3000);
+        });
+    }
+
+    $scope.submitScore = function() {
+
+
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        }; 
+
+        console.log($scope.scoreInput.score);
+        
+        if($scope.scoreInput.score == 'Win'){        
+
+            $http.post('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'/'+$scope.currentSet+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'', {
+                "score": 1
+
+            }, config).success(function (data) {   
+
+
+                console.log("submitted score");
+
+            }).error(function (err) {
+                console.log(err);
+            });
+        }
+        
+        else{
+            $http.post('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'/'+$scope.currentSet+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'', {
+                "score": 0
+
+            }, config).success(function (data) {   
+
+
+                console.log("submitted score");
+
+            }).error(function (err) {
+                console.log(err);
+            });
+
+        }
+    }
 
 }]);

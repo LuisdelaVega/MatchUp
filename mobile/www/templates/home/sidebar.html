@@ -7,7 +7,8 @@
             </ion-nav-buttons>
             <ion-nav-buttons side="right">
                 <button class="button button-icon ion-android-alert" ui-sref="app.notifications">
-                </button>
+                
+                <span ng-if="notifications > 0" class="badge badge-assertive icon-badge header-badge">{{notifications}}</span></button>
             </ion-nav-buttons>
         </ion-nav-bar>
         <ion-nav-view></ion-nav-view>

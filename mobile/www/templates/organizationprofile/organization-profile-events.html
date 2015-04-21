@@ -1,6 +1,6 @@
 <ion-view title="Events">
     <ion-nav-buttons side="left">
-        <button class="button button-icon" onclick="location.href='#/app/organizationprofile'">
+        <button class="button button-icon" ng-click="returnToOrganizationProfile()">
             <i class="icon ion-ios-arrow-back"></i>
         </button>
     </ion-nav-buttons>
@@ -10,15 +10,10 @@
     </ion-nav-buttons>
     <ion-content>
         <div class="list list-inset">
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/apex2015.png">
-                <h2>Pretty Hate Machine</h2>
-                <p>Nine Inch Nails</p>
-            </a>
-            <a class="item item-thumbnail-left" href="#">
-                <img src="img/evo.png">
-                <h2>Pretty Hate Machine</h2>
-                <p>Nine Inch Nails</p>
+            <a class="item item-thumbnail-left" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="event in events">
+                <img ng-src="{{event.event_logo}}">
+                <h2>{{event.event_name}}</h2>
+                <p>{{event.event_location}}</p>
             </a>
         </div>
     </ion-content>

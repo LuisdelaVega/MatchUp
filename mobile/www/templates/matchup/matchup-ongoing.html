@@ -1,53 +1,56 @@
 <ion-view view-title="">
     <ion-nav-buttons side="left">
-        <button class="button button-icon" onclick="location.href='#/app/mymatchups'">
+        <button class="button button-icon" ui-sref="app.notifications">
             <i class="icon ion-ios-arrow-back"></i>
         </button>
     </ion-nav-buttons>
     <ion-content>
         <div class="card">
             <div class="item item-text-wrap">
-                <h2>Round 1 Match 2</h2>
-                <p>Station 1</p>
+                <h2>Round {{ matchupInfo.round_number }} Match {{ matchupInfo.match_number }}</h2>
+                <p ng-if="matchup.station_number != null">Station {{ matchupInfo.station_number }}</p>
             </div>
             <div class="row">
                 <div class="col .col-33 absolute-center">
-                    <div class="img-circular large player-1"></div>
+                    <img class="img-circular large player-1" ng-src="{{players[0].customer_profile_pic}}">
                 </div>
                 <div class="col .col-33 absolute-center">
-                    <h2>1-0</h2>
+                    <h2>{{players[0].score}}-{{players[1].score}}</h2>
                 </div>
                 <div class="col .col-33 absolute-center">
-                    <div class="img-circular large player-2"></div>
+                    <img class="img-circular large player-2" ng-src="{{players[1].customer_profile_pic}}">
                 </div>
             </div>
             <div class="row">
-                <div class="col col-33 absolute-center">Player 1</div>
+                <div class="col col-33 absolute-center">{{ players[0].customer_tag }}</div>
                 <div class="col col-33 absolute-center">
-                    <p>Best of 3</p>
+                    <p>Best of {{ matchInfo.sets.length }}</p>
                 </div>
-                <div class="col col-33 absolute-center">Player 2</div>
+                <div class="col col-33 absolute-center">{{ players[1].customer_tag }}</div>
             </div>
             <div class="center-text padding-bottom">
-                    <div class="set-circular player-1"></div>
+                <span ng-repeat="set in sets">
+                    <div class="set-circular player-1" ng-if="set.scores[0].score > set.scores[1].score"></div>
+                    <div class="set-circular player-2" ng-if="set.scores[0].score < set.scores[1].score"></div>
+                </span>
             </div>
         </div>
-        <div class="card">
+        <div class="card" ng-if="!matchCompleted">
             <div class="item">
-                <p>Set 2</p>
+                <p>Set {{parseInt(matchup.details[0].score) + parseInt(matchup.details[0].score) + 1}}</p>
                 <div class="list list-inset">
                     <div class="item item-divider">
                         Report Score
                     </div>
                     <label class="item item-radio">
-                        <input type="radio" name="group">
+                        <input type="radio" name="group" ng-model="scoreInput.score" value="Win">
                         <div class="item-content">
                             Win
                         </div>
                         <i class="radio-icon ion-checkmark"></i>
                     </label>
                     <label class="item item-radio">
-                        <input type="radio" name="group">
+                        <input type="radio" name="group" ng-model="scoreInput.score" value="Lose">
                         <div class="item-content">
                             Lose
                         </div>
@@ -56,12 +59,17 @@
                 </div>
                 <div class="row">
                     <div class="col">
-                        <button class="button button-block button-positive">Submit</button>
+                        <button class="button button-block button-positive" ng-click="submitScore()">Submit</button>
                     </div>
                     <div class="col">
-                        <button class="button button-block button-assertive" ui-sref="app.report">Report</button>
+                        <button class="button button-block button-assertive">Report</button>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="card" ng-if="matchCompleted">
+            <div class="item item-text-wrap">
+                Match has concluded.
             </div>
         </div>
     </ion-content>

@@ -2,27 +2,20 @@
     <ion-content>
 
         <div class="list">
-            <a class="item item-avatar" href="#">
-                <img src="img/ron.jpg">
-                <h2>Scheduled to play against Ron Paul in station 2.</h2>
-                <p>Date of publication</p>
+
+<!--
+            <a class="item item-avatar" ng-click="goToMatchupOngoing()">
+                <img ng-src="{{ matchup.details[0].customer_profile_pic }}">
+                <h2>TEST CLICK HERE</h2>
+                <p>STATIC DATA TEST SCORE REPORTING</p>
             </a>
-            <a class="item item-avatar" href="#">
-                <img src="img/Capcom-Pro-Tour.jpg">
-                <h2>Final Round XII has updated their news section.</h2>
-                <p>Date of publication</p>
-            </a>
-            <a class="item item-avatar" href="#">
-                <img src="img/evo.png">
-                <h2>You have been invited to participate in EVO.</h2>
-                <p>Date of publication</p>
-            </a>
-            <a class="item item-avatar" href="#">
-                <img src="img/ron.jpg">
-                <h2>Ron Paul entered EVO.</h2>
-                <p>Date of publication</p>
-            </a>
+-->
             
+            <a class="item item-avatar" ng-repeat="matchup in matchups" ng-click="goToMatchupOngoing(matchup)">
+                <img ng-src="{{ matchup.details[0].customer_profile_pic }}">
+                <h2>Scheduled to play against {{matchup.details[0].customer_tag}}</h2>
+                <p ng-if="matchup.station_number != null">Station: {{ matchup.station_number }}</p>
+            </a>          
         </div>
 
     </ion-content>

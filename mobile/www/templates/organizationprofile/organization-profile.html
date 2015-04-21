@@ -36,7 +36,7 @@
                     <p>{{event.event_location}}</p>
                 </a>
             </div>
-            <a class="item item-icon-left dark" href="#/app/organizationprofileevents">
+            <a class="item item-icon-left dark" ng-click="goToOrganizationEvents()">
                 <i class="icon ion-android-arrow-forward"></i> See More
             </a>
         </div>
@@ -50,10 +50,13 @@
                 <h2>{{member.customer_tag}}</h2>
                 <p>{{member.customer_first_name}} {{member.customer_last_name}}</p>
                 <div class="buttons">
-                    <button class="button button-clear" ng-if="{{member.is_owner}}">
+                    <button class="button button-clear" ng-if="member.is_owner">
                         <i class="icon ion-briefcase"></i>
                     </button>
                 </div>
+            </a>
+            <a class="item item-icon-left dark" ng-click="goToOrganizationMembers()">
+                <i class="icon ion-android-arrow-forward"></i> See More
             </a>
         </div>
     </ion-content>

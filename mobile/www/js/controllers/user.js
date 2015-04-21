@@ -32,22 +32,29 @@ myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$st
         }
     };
 
-    //Synchronously fetch profile info from server
-    //Get profile information of specified user such as: tag, profile picture and cover photo. 
-    $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'', config).success(function (data) {
+    //Make server calls everytime upon entering profile. ENsures changes are visual when changing back to user profile.
+    $scope.$on('$ionicView.enter', function () {
 
-        $scope.profileData = angular.fromJson(data);
-        $scope.myProfile = $scope.profileData.my_profile;
+        //Synchronously fetch profile info from server
+        //Get profile information of specified user such as: tag, profile picture and cover photo. 
+        $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'', config).success(function (data) {
 
-        //Get teams the user belongs to
-        $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/teams', config).success(function (data) {
+            $scope.profileData = angular.fromJson(data);
+            $scope.myProfile = $scope.profileData.my_profile;
 
-            $scope.teams = angular.fromJson(data);
+            //Get teams the user belongs to
+            $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/teams', config).success(function (data) {
 
-            //Get organizations the user belongs to
-            $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/organizations', config).success(function (data) {
+                $scope.teams = angular.fromJson(data);
 
-                $scope.organizations = angular.fromJson(data);
+                //Get organizations the user belongs to
+                $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/organizations', config).success(function (data) {
+
+                    $scope.organizations = angular.fromJson(data);
+
+                }).error(function (err) {
+                    console.log(err);
+                });
 
             }).error(function (err) {
                 console.log(err);
@@ -56,9 +63,6 @@ myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$st
         }).error(function (err) {
             console.log(err);
         });
-
-    }).error(function (err) {
-        console.log(err);
     });
 
     $scope.subscribeToUser = function(username){
@@ -213,13 +217,6 @@ myApp.controller('profileEventsController', ['$scope', '$http', '$stateParams', 
 
 }]);
 
-
-myApp.controller('myMatchupViewController', ['$scope', '$http', '$stateParams', function ($scope, $http, $stateParams) {
-
-    $scope.competitors = ['img/ron.jpg', 'img/ronpaul.gif'];
-
-}]);
-
 myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$window', '$cordovaCamera', '$ionicPlatform', '$state', '$ionicLoading', function ($scope, $http, $stateParams, $window, $cordovaCamera, $ionicPlatform, $state, $ionicLoading) {
 
     $http.defaults.useXDomain = true;
@@ -315,17 +312,6 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
 
                     $scope.user.profile_pic = data.data.link; //Here's the link
 
-                    $http.put('http://matchup.neptunolabs.com/matchup/profile', $scope.user, config).success(function (data) {
-
-                        $ionicLoading.hide();
-                        $scope.editedProfilePic = true; //Displays message if succesfully updated cover photo
-
-                    }).
-                    error(function (err){
-
-
-                    });
-
                 }).
                 error(function (err){
                     console.log("error in editProfileController");
@@ -355,7 +341,7 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
                         'Authorization': "Bearer "+ $window.sessionStorage.token
                     }
                 };
-                
+
                 $ionicLoading.show({
                     template: 'loading'
                 });
