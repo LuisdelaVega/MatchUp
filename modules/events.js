@@ -155,8 +155,8 @@ var getEvent = function(req, res, pg, conString, log) {
         var event = {};
         client.query("BEGIN");
         var query = client.query({
-            text : "SELECT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_venue, event.event_banner, event.event_logo, event.event_registration_deadline, event.event_rules, event.event_description, event.event_deduction_fee, event.event_is_online, event.event_type, event.customer_username AS creator, hosts.organization_name AS host FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND event.event_active",
-            values : [req.params.event, req.query.date, req.query.location]
+            text : "SELECT event.event_name, event.event_start_date, event.event_end_date, event.event_location, event.event_venue, event.event_banner, event.event_logo, event.event_registration_deadline, event.event_rules, event.event_description, event.event_deduction_fee, event.event_is_online, event.event_type, event.customer_username AS creator, hosts.organization_name AS host, ($4 IN (SELECT customer_username FROM pays WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3)) AS is_spectator FROM event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location WHERE event.event_name = $1 AND event.event_start_date = $2 AND event.event_location = $3 AND event.event_active",
+            values : [req.params.event, req.query.date, req.query.location, req.user.username]
         });
         query.on("row", function(row, result) {
             result.addRow(row);
@@ -164,6 +164,7 @@ var getEvent = function(req, res, pg, conString, log) {
         query.on('error', function(error) {
             client.query("ROLLBACK");
             done();
+            console.log(error)
             res.status(500).send(error);
             log.info({
                 res : res
