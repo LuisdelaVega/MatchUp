@@ -558,16 +558,30 @@ app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round/matches/
  * [POST] Submit a report for the match
  * TODO [PUT] Update the results of a Set TODO Do in another route
  */
-app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round/matches/:match/:set').put(function(req, res) {
-	log.info({
-		req : req
-	}, 'start request');
-	events.submitScore(req, res, pg, conString, log);
-}).post(function(req, res) {
+app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round/matches/:match/:set').post(function(req, res) {
 	log.info({
 		req : req
 	}, 'start request');
 	tournaments.createReport(req, res, pg, conString, log);
+}).put(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	events.submitScore(req, res, pg, conString, log);
+});
+
+/* /matchup/events/:event/tournaments/:tournament/rounds/:round/matches/:match/:set/change?date=date&location=string&round_of=string
+ * TODO Update in API
+ * 	Params:
+ * 		round_of = Indicates where the round was/it to be played. Posible values: [Group, Winner, Loser, Round Robin]
+ *
+ * TODO [PUT] Update the results of a Set TODO Do in another route
+ */
+app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round/matches/:match/:set/change').put(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	events.changeScore(req, res, pg, conString, log);
 });
 
 /* /matchup/events/:event/tournaments/:tournament/rounds/:round/matches/:match/:set?date=date&location=string&round_of=string

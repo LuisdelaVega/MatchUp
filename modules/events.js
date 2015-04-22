@@ -1237,7 +1237,7 @@ var changeScore = function(req, res, pg, conString, log) {
          * Else, it will return some useful details about the tournament that will be used later in the function
          */
         var query = client.query({
-            text : "SELECT tournament.score_type, tournament.number_of_people_per_group, tournament.amount_of_winners_per_group, round.round_best_of, tournament.tournament_format, is_played_in.station_number, stream.stream_link FROM event NATURAL JOIN tournament NATURAL JOIN round NATURAL JOIN match LEFT OUTER JOIN is_played_in ON match.event_name = is_played_in.event_name AND match.event_start_date = is_played_in.event_start_date AND match.event_location = is_played_in.event_location AND match.tournament_name = is_played_in.tournament_name AND match.round_number = is_played_in.round_number AND match.round_of = is_played_in.round_of AND match.match_number = is_played_in.match_number LEFT OUTER JOIN stream ON stream.event_name = is_played_in.event_name AND stream.event_start_date = is_played_in.event_start_date AND stream.event_location = is_played_in.event_location AND stream.station_number = is_played_in.station_number WHERE match.event_name = $1 AND match.event_start_date = $2 AND match.event_location = $3 AND match.tournament_name = $4 AND match.round_number = $5 AND match.round_of = $6 AND match.match_number = $7 AND event.event_active",
+            text : "SELECT match_completed, score_type, round_best_of, tournament_format FROM event NATURAL JOIN tournament NATURAL JOIN round NATURAL JOIN match WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6 AND match_number = $7 AND event_active AND tournament_active",
             values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match]
         });
         query.on("row", function(row, result) {
@@ -1255,7 +1255,71 @@ var changeScore = function(req, res, pg, conString, log) {
         query.on("end", function(result) {
             if (result.rows.length) {
                 var delatils = result.rows[0];
-
+                if (!req.body.players || !req.body.players[0] || !req.body.players[1] || !req.body.players[0].competitor_number || !req.body.players[1].competitor_number || !req.body.players[0].score || !req.body.players[1].score) {
+                    client.query("ROLLBACK");
+                    done();
+                    res.status(400).json({
+                        missing_players_array : !req.body.players,
+                        missing_players : !req.body.players[0] || !req.body.players[1],
+                        missing_competitor_numbers : !req.body.players[0].competitor_number || !req.body.players[1].competitor_number,
+                        missing_scores : !req.body.players[0].score || !req.body.players[1].score
+                    });
+                    log.info({
+                        res : res
+                    }, 'done response');
+                } else {
+                    /**
+                     * Ah, domino effects again. Yes!
+                     * So, quick break down:
+                     *      If the match as not yet completed we can go ahead and change the score for the set since it doesn't affect any future matches/rounds.
+                     *      Else, this means that, if the tournament format is Double Elimination (worst case scenario), one player passed to a match in the next round of winners and the other player was scheduled to play in the Losers bracket
+                     *
+                     * In the worst case scenario we must do the following:
+                     *      Calculate the new winner and loser by getting their other scores (the ones from the other sets) and adding to them the new score for the set that is to be changed.
+                     *      If the winner changed (worst case) we must switch them and then go through every round, every match (using competitor_goes_to) and removing the players from subsequent matches
+                     *          This must be done for winners and loser brackets
+                     */
+                    if (!details.match_completed) {
+                        // Just update the score value for each player in the specified set and respond
+                        client.query({
+                            text : "UPDATE submits SET score = $10 WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+                            values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.body.players[0].competitor_number, req.body.players[0].score]
+                        }, function(err, result) {
+                            if (err) {
+                                client.query("ROLLBACK");
+                                done();
+                                res.status(500).send(err);
+                                log.info({
+                                    res : res
+                                }, 'done response');
+                            } else {
+                                client.query({
+                                    text : "UPDATE submits SET score = $10 WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+                                    values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.body.players[1].competitor_number, req.body.players[1].score]
+                                }, function(err, result) {
+                                    if (err) {
+                                        client.query("ROLLBACK");
+                                        done();
+                                        console.log(err);
+                                        res.status(500).send(err);
+                                        log.info({
+                                            res : res
+                                        }, 'done response');
+                                    } else {
+                                        client.query("COMMIT");
+                                        done();
+                                        res.status(200).send("Updated");
+                                        log.info({
+                                            res : res
+                                        }, 'done response');
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        // Get the sum of the scores for all other sets. NOTE: If best of 1, the sum will be 0, but the fact that the sum = 0 doesn't tell us the round was a best of 1, that is why this parameter is stored in the details variable ;-)
+                    }
+                }
             } else {
                 client.query("ROLLBACK");
                 done();
@@ -3937,6 +4001,7 @@ module.exports.resolveReport = resolveReport;
 module.exports.getSpecFees = getSpecFees;
 module.exports.addSpecFee = addSpecFee;
 module.exports.removeSpecFee = removeSpecFee;
+module.exports.changeScore = changeScore;
 
 // DEPRECIATED
 module.exports.getParticipants = getParticipants;
