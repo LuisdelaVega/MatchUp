@@ -1442,7 +1442,7 @@ var getRounds = function(req, res, pg, conString, log) {
 		}
 
 		var query = client.query({
-			text: "SELECT tournament_type, tournament_format FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
+			text: "SELECT team_size, tournament_type, tournament_format FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
 			values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
 		});
 		query.on("row", function (row, result) {
@@ -1458,6 +1458,7 @@ var getRounds = function(req, res, pg, conString, log) {
 		});
 		query.on("end", function (result) {
 			if (result.rows.length) {
+				var details = result.rows[0];
 				var tournament = {};
 				tournament.finalStage = {};
 				if (result.rows[0].tournament_type == "Two Stage") {
@@ -1477,8 +1478,9 @@ var getRounds = function(req, res, pg, conString, log) {
 					values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Group", "Round Robin", "Winner", "Loser", ",;!;,"]
 				});
 				query.on("row", function (row, result) {
+					console.log(row);
 					var info_string = row.info;
-					var info_array = info_string.split(",;!;,");
+					var info_array = (!info_string ? new Array((details.team_size > 1 ? 2 : 3)) : info_string.split(",;!;,"));
 					var temp = {};
 					if (row.group_number) {
 						if (!tournament.groupStage.groups[row.group_number-1]) {
@@ -1660,7 +1662,7 @@ var getMatch = function(req, res, pg, conString, log) {
 		}
 
 		var query = client.query({
-			text: "SELECT tournament_type, tournament_format FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
+			text: "SELECT team_size, tournament_type, tournament_format FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
 			values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
 		});
 		query.on("row", function (row, result) {
@@ -1677,6 +1679,7 @@ var getMatch = function(req, res, pg, conString, log) {
 		});
 		query.on("end", function (result) {
 			if (result.rows.length) {
+				var details = result.rows[0];
 				var matchDetails = {};
 				matchDetails.players = [];
 				matchDetails.is_competitor = false;
@@ -1687,7 +1690,8 @@ var getMatch = function(req, res, pg, conString, log) {
 				});
 				query.on("row", function (row, result) {
 					var info_string = row.info;
-					var info_array = info_string.split(",;!;,");
+					//var info_array = info_string.split(",;!;,");
+					var info_array = (!info_string ? new Array((details.team_size > 1 ? 2 : 3)) : info_string.split(",;!;,"));
 					var temp = {};
 					if (info_array.length == 2) {
 						temp = {

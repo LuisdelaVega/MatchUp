@@ -1318,6 +1318,7 @@ var changeScore = function(req, res, pg, conString, log) {
                         });
                     } else {
                         // Get the sum of the scores for all other sets. NOTE: If best of 1, the sum will be 0, but the fact that the sum = 0 doesn't tell us the round was a best of 1, that is why this parameter is stored in the details variable ;-)
+
                     }
                 }
             } else {
