@@ -73,6 +73,9 @@ function getDetailsForMatchup(res, pg, conString, log, client, done, matchup, in
 		if (index == length) {
 			done();
 			res.status(200).send(myMatchups);
+			log.info({
+				res : res
+			}, 'done response');
 		}
 	});
 }
@@ -111,7 +114,11 @@ var getMatchups = function(req, res, pg, conString, log) {
 					getDetailsForMatchup(res, pg, conString, log, client, done, myMatchups[i], i, (myMatchups.length - 1), myMatchups);
 				}
 			} else {
+				done();
 				res.status(200).send([]);
+				log.info({
+					res : res
+				}, 'done response');
 			}
 		});
 	});
