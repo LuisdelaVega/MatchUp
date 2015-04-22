@@ -1685,8 +1685,8 @@ var getMatch = function(req, res, pg, conString, log) {
 				matchDetails.is_competitor = false;
 				console.log(req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match);
 				var query = client.query({
-					text: 'SELECT CASE WHEN tournament.team_size > 1 THEN team.team_name || $9 || team.team_logo ELSE customer.customer_username || $9 || customer.customer_profile_pic || $9 || customer.customer_tag END AS info, competes.competitor_number, (customer.customer_username = $8) AS is_competitor, match.match_completed, match.is_favourite, sum(submits.score) AS score FROM customer NATURAL JOIN is_a NATURAL JOIN tournament LEFT OUTER JOIN competes ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number LEFT OUTER JOIN competes_for ON competes_for.event_name = competes.event_name AND competes_for.event_start_date = competes.event_start_date AND competes_for.event_location = competes.event_location AND competes_for.tournament_name = competes.tournament_name AND competes_for.competitor_number = competes.competitor_number LEFT OUTER JOIN team ON team.team_name = competes_for.team_name LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number LEFT OUTER JOIN match ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND match.round_number = competes.round_number AND match.round_of = competes.round_of AND match.match_number = competes.match_number WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND competes.match_number = $7 GROUP BY customer.customer_username, customer.customer_tag, customer.customer_profile_pic, match.match_completed, match.is_favourite, competes.competitor_number, tournament.team_size, team.team_name, team.team_logo',
-					values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.user.username, ",;!;,"]
+					text: 'SELECT CASE WHEN tournament.team_size > 1 THEN team.team_name || $9 || team.team_logo ELSE customer.customer_username || $9 || customer.customer_profile_pic || $9 || customer.customer_tag END AS info, competes.competitor_number, (customer.customer_username = $8) AS is_competitor, match.match_completed, match.is_favourite, sum(submits.score) AS score, (SELECT every(round_completed) FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND CASE WHEN $6 = $10 THEN round_of = $11 ELSE round_of = $6 END) AS stage_completed FROM customer NATURAL JOIN is_a NATURAL JOIN tournament LEFT OUTER JOIN competes ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number LEFT OUTER JOIN competes_for ON competes_for.event_name = competes.event_name AND competes_for.event_start_date = competes.event_start_date AND competes_for.event_location = competes.event_location AND competes_for.tournament_name = competes.tournament_name AND competes_for.competitor_number = competes.competitor_number LEFT OUTER JOIN team ON team.team_name = competes_for.team_name LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number LEFT OUTER JOIN match ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND match.round_number = competes.round_number AND match.round_of = competes.round_of AND match.match_number = competes.match_number WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND competes.match_number = $7 GROUP BY customer.customer_username, customer.customer_tag, customer.customer_profile_pic, match.match_completed, match.is_favourite, competes.competitor_number, tournament.team_size, team.team_name, team.team_logo',
+					values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.user.username, ",;!;,", "Loser", "Winner"]
 				});
 				query.on("row", function (row, result) {
 					var info_string = row.info;
@@ -1712,6 +1712,7 @@ var getMatch = function(req, res, pg, conString, log) {
 
 					matchDetails.players.push(temp);
 					matchDetails.match_completed = row.match_completed;
+					matchDetails.stage_completed = row.stage_completed;
 					matchDetails.is_favourite = row.is_favourite;
 					if (!matchDetails.is_competitor) {
 						matchDetails.is_competitor = row.is_competitor;
@@ -2247,7 +2248,7 @@ var getCheckedInCompetitors = function(req, res, pg, conString, log) {
 		}
 
 		var query = client.query({
-			text : "SELECT team_size FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
+			text : "SELECT team_size, (SELECT count(*) > 0 FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4) AS stages_created FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
 			values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
 		});
 		query.on("row", function(row, result) {
@@ -2263,6 +2264,7 @@ var getCheckedInCompetitors = function(req, res, pg, conString, log) {
 		});
 		query.on("end", function(result) {
 			if (result.rows.length) {
+				var details = result.rows[0];
 				if (result.rows[0].team_size > 1) {
 					var query = client.query({
 						text: "SELECT team_name, team_logo, competitor_number, competitor_seed FROM team NATURAL JOIN competes_for NATURAL JOIN competitor WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_check_in ORDER BY competitor_seed",
@@ -2280,8 +2282,9 @@ var getCheckedInCompetitors = function(req, res, pg, conString, log) {
 						}, 'done response');
 					});
 					query.on("end", function (result) {
+						details.competitors = result.rows;
 						done();
-						res.status(200).json(result.rows);
+						res.status(200).json(details);
 						log.info({
 							res: res
 						}, 'done response');
@@ -2303,8 +2306,9 @@ var getCheckedInCompetitors = function(req, res, pg, conString, log) {
 						}, 'done response');
 					});
 					query.on("end", function (result) {
+						details.competitors = result.rows;
 						done();
-						res.status(200).json(result.rows);
+						res.status(200).json(details);
 						log.info({
 							res: res
 						}, 'done response');
