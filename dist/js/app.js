@@ -88,12 +88,12 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			controller: "createMeetUpController"
 		})
 		.state('app.edit_meetup', {
-			url: "/meetup/:eventName/:eventDate/:eventLocation/:meetupDate/:meetupLocation/:customerUsername",
-			templateUrl: "event/edit_Meetup.html",
-			controller: "editMeetUpController"
+			url: "/meetup/:eventName/:eventDate/:eventLocation/:meetupDate/:meetupLocation/:customerUsername/edit",
+			templateUrl: "event/edit_meetup.html",
+			controller: "editMeetUpController"			
 		})
-
-	.state('app.competitorSignup', {
+		
+		.state('app.competitorSignup', {
 			url: "/competitorSignup",
 			templateUrl: "event/competitor_signup.html"
 		})

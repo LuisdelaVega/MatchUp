@@ -354,16 +354,16 @@ myApp.controller("createMeetUpController", function($scope, $http, $window, $roo
 			$scope.eventName = $stateParams.eventName;
 			$scope.eventDate = $stateParams.eventDate;
 			$scope.eventLocation = $stateParams.eventLocation;
-			
+
 			$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/meetups?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation, meetUp).success(function(data) {
 				alert("Creation of a MeetUp successful");
 				$state.go("app.meetup", {
 					"eventName" : data.event.name,
 					"eventLocation" : data.event.location,
 					"eventDate" : data.event.date,
-                    "meetupDate": data.meetup.start_date,
-                    "meetupLocation": data.meetup.location,
-                    "customerUsername" : data.meetup.creator
+					"meetupDate" : data.meetup.start_date,
+					"meetupLocation" : data.meetup.location,
+					"customerUsername" : data.meetup.creator
 
 				});
 			});
@@ -728,29 +728,79 @@ myApp.controller("editHostedTournamentController", function($scope) {
 	// Transition function to the tournament form
 	$scope.addTournament = function() {
 		$("#edit-tab2").tab("show");
-	}
+	};
 	// Transition function to tournament list view
 	$scope.cancel = function() {
 		$("#edit-tournament-tab1").tab("show");
-	}
+	};
 	//
 	$scope.createTournament = function() {
 		$("#edit-tournament-tab1").tab("show");
-	}
+	};
 	// Save index of tournament to be deleted
 	// and show the modal
 	$scope.deleteTournament = function(index) {
 		$scope.tournamentIndex = index;
 		$('#deleteModal').modal("show");
-	}
+	};
 	// Populate tournament edit form and transition to the page
 	$scope.editTournament = function(index) {
 		$scope.tournament = $scope.tournaments[index];
 		$("#edit-tab2").tab("show");
-	}
+	};
 	// Delete tournament
 	$scope.delete = function() {
 		$scope.tournaments.splice($scope.tournamentIndex, 1);
 		$('#deleteModal').modal("hide");
-	}
+	};
+});
+
+/*
+ * edit Meetup Controller
+ * url: "/organization/:organizationName/edit",
+ * templateUrl: "organization/edit_organization.html",
+ * Editing bio, logo and cover photo to an organization.
+ */
+myApp.controller("editMeetUpController", function($scope, $window, $stateParams, $http, $rootScope, $state) {
+	
+		$scope.meetup =[];
+		
+		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/meetups/' + $stateParams.customerUsername + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&meetup_date=' + $stateParams.meetupDate + '&meetup_location=' + $stateParams.meetupLocation).success(function(data, status, headers) {
+			$scope.meetup = data; 
+		}).error(function(data, status) {
+		if (status == 404 || status == 401 || status == 400)
+			$state.go("" + status);
+			console.log("error in getMeetUp");
+		});
+	
+		$scope.submitEditmeetup = function(valid) {
+
+		var meetUp = {
+			"name" : $scope.meetup.meetup_name,
+			"location" : $scope.meetup.meetup_location,
+			"start_date" : $scope.meetup.meetup_start_date,
+			"end_date" : $scope.meetup.meetup_end_date,
+			"description" : $scope.meetup.meetup_description,
+
+		};
+
+		$http.put($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/meetups/' + $stateParams.customerUsername + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&meetup_date=' + $stateParams.meetupDate + '&meetup_location=' + $stateParams.meetupLocation,{
+			"location": meetUp.location,
+			"name": meetUp.name,
+			"start_date": meetUp.start_date,
+			"end_date": meetUp.end_date,
+			"description": meetUp.description
+			
+		}).success(function(data, status, headers) {
+			alert("Editing of a MeetUp successful");
+			$state.go("app.meetup", {
+				"eventName" : $stateParams.eventName,
+				"eventDate" : $stateParams.eventDate,
+				"eventLocation" : $stateParams.eventLocation,
+				"meetupDate" : meetUp.start_date,
+				"meetupLocation" : meetUp.location, 
+				"customerUsername" : $stateParams.customerUsername, 
+			});
+		});
+	};
 });

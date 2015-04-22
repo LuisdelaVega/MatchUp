@@ -44,7 +44,7 @@
 		</div>
 		<div class="btn-group btn-group-justified box-margin" role="group" ng-if="meetup.is_organizer">
 			<div class="btn-group" role="group">
-				<button type="button" class="btn btn-primary" ui-sref="app.editMeetup({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location })">
+				<button type="button" class="btn btn-primary" ng-click="goToEditMeetup(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location, meetup.meetup_start_date, meetup.meetup_location, meetup.customer_username)">
 					Edit Meetup
 				</button>
 			</div>

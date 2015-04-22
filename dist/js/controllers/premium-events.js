@@ -190,27 +190,59 @@ function($scope, $http, $state, $stateParams, $window) {
 		console.log("error in eventPremiumSummaryController");
 	});
 
-        //Go to a specific meetup for this event
-        $scope.goToMeetup = function (eventName, eventDate, eventLocation, meetupDate, meetupLocation, customerUsername) {
-            $state.go("app.meetup", {
-                    "eventName": eventName,
-                    "eventDate": eventDate,
-                    "eventLocation": eventLocation,
-                    "meetupDate": meetupDate,
-                    "meetupLocation": meetupLocation,
-                    "customerUsername" : customerUsername
-                }); //
-        };
+	//Go to a specific meetup for this event
+	$scope.goToMeetup = function(eventName, eventDate, eventLocation, meetupDate, meetupLocation, customerUsername) {
+		$state.go("app.meetup", {
+			"eventName" : eventName,
+			"eventDate" : eventDate,
+			"eventLocation" : eventLocation,
+			"meetupDate" : meetupDate,
+			"meetupLocation" : meetupLocation,
+			"customerUsername" : customerUsername
+		});
+		//
+	};
 }]);
 
 //Meetup  controller, shows the details of a specific meetup
-myApp.controller('meetupController', ['$scope', '$http', '$state', '$stateParams', '$window',
-function ($scope, $http, $state, $stateParams, $window) {
+myApp.controller('meetupController', ['$scope', '$http', '$state', '$stateParams', '$window', '$rootScope',
+function($scope, $http, $state, $stateParams, $window, $rootScope) {
 
-        $http.get('http://136.145.116.232/matchup/events/' + $stateParams.eventName + '/meetups/' + $stateParams.customerUsername + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&meetup_date=' + $stateParams.meetupDate + '&meetup_location=' + $stateParams.meetupLocation).success(function (data, status, headers) {
-            $scope.meetup = data;
-         });
-           
+	$scope.eventInfo= {
+		event_name:"",
+		event_start_date:"",
+		event_location:""
+	};
+	
+	 $scope.meetup={
+		customer_username:"",
+		meetup_start_date:"",
+		meetup_location:""
+	};
+	
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/meetups/' + $stateParams.customerUsername + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&meetup_date=' + $stateParams.meetupDate + '&meetup_location=' + $stateParams.meetupLocation).success(function(data, status, headers) {
+		$scope.meetup = data;
+		$scope.eventInfo.event_name= $stateParams.eventName;
+		$scope.meetup.customer_username= $stateParams.customerUsername;
+		$scope.eventInfo.event_start_date =$stateParams.eventDate;
+		$scope.eventInfo.event_location=$stateParams.eventLocation;
+		$scope.meetup.meetup_start_date=$stateParams.meetupDate;
+		$scope.meetup.meetup_location=$stateParams.meetupLocation;
+		
+	});
+	
+	//Go to edit the meetUp selected
+	$scope.goToEditMeetup = function(eventName, eventDate, eventLocation, meetupDate, meetupLocation, customerUsername) {
+		$state.go("app.edit_meetup", {
+			"eventName" : eventName,
+			"eventDate" : eventDate,
+			"eventLocation" : eventLocation,
+			"meetupDate" : meetupDate,
+			"meetupLocation" : meetupLocation,
+			"customerUsername" : customerUsername
+		});
+		
+	};
 }]);
 
 myApp.controller('eventSettingsController', function($scope, $state, $http, $stateParams, sharedDataService, $q, $rootScope) {

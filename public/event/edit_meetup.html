@@ -1,0 +1,66 @@
+<div class="tab-content">
+	<div class="box">
+		<form name="editMeetUpForm" ng-submit="submitEditmeetup(editMeetUpForm.$valid)">
+			<legend>
+				Edit MeetUP
+			</legend>
+			<div class="form-group">
+				<label>Name: </label>
+				<input class="form-control" ng-model="meetup.meetup_name" name="name" required maxlength="127">
+			</div>
+
+			<div class="row">
+				<div class="col-xs-12 col-md-6 col-lg-6">
+					<div class="form-group">
+						<label>Description:</label>
+						<textarea class="form-control" rows="4" ng-model="meetup.meetup_description"></textarea>
+					</div>
+				</div>
+			</div>
+			<legend>
+				Location and Time
+			</legend>
+			<div class="row">
+				<div class="col-xs-12 col-md-6 col-lg-6">
+					<div class="dropdown">
+						<label>Start Date</label>
+						<a class="dropdown-toggle" id="dropdown1" role="button" data-toggle="dropdown">
+						<div class="input-group">
+							<input type="text" class="form-control" data-ng-model="meetup.meetup_start_date">
+							<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+						</div> </a>
+						<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+							<datetimepicker data-ng-model="meetup.meetup_start_date" data-datetimepicker-config="{ dropdownSelector: '#dropdown1' }" />
+						</ul>
+					</div>
+				</div>
+				<div class="col-xs-12 col-md-6 col-lg-6">
+					<div class="dropdown">
+						<label>End Date</label>
+						<a class="dropdown-toggle" id="dropdown2" role="button" data-toggle="dropdown">
+						<div class="input-group">
+							<input type="text" class="form-control" data-ng-model="meetup.meetup_end_date">
+							<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+						</div> </a>
+						<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+							<datetimepicker data-ng-model="meetup.meetup_end_date" data-datetimepicker-config="{ dropdownSelector: '#dropdown2' }" />
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12 col-md-6 col-lg-6">
+					<div class="form-group">
+						<label>Location: </label>
+						<input class="form-control" ng-model="meetup.meetup_location" name="location" required maxlength="127">
+						<span style="color:red" ng-show="editMeetUpForm.location.$dirty && editMeetUpForm.location.$invalid"> <span ng-show="editMeetUpForm.location.$error.required">MeetUp Location Required.</span> </span>
+					</div>
+				</div>
+			</div>
+			<button type"submit" class="btn btn-primary btn-block">
+				Save
+			</button>
+		</form>
+	</div>
+</div>
+
