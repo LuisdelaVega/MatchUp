@@ -2,21 +2,25 @@
 	<div class="tab-pane fade in active" id="tournaments-tab">
 		<div class="box">
 			<form>
-				<legend>Tournaments</legend>
+				<legend>
+					Tournaments
+				</legend>
 				<div class="list-group">
 					<div class="list-group-item clearfix" ng-repeat="item in tournaments">
-						<span class="pull-right"><a class="btn btn-sm btn-danger" ng-click="deleteTournament($index)"><span class="fa fa-times"></span>
-						</a>
-						</span>
-						<span class="pull-right"><a class="btn btn-sm btn-primary second-button-ticket" ng-click="editTournament($index)"><span class="fa fa-gear"></span>
-						</a>
-						</span>
-						<p class="lead event-footer-title">{{item.name}}</p>
-						Game: {{item.game}}
-						<br>Type: {{item.type}}
-						<br>Format:{{item.format}}
-						<br>Price {{item.price}}
-						<br>Capacity {{item.capacity}}
+						<span class="pull-right"><a class="btn btn-sm btn-danger" ng-click="deleteTournament($index)"><span class="fa fa-times"></span> </a> </span>
+						<span class="pull-right"><a class="btn btn-sm btn-primary second-button-ticket" ui-sref="app.editTournament({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location, tournamentName: item.tournament_name})"><span class="fa fa-gear"></span> </a> </span>
+						<p class="lead event-footer-title">
+							{{item.tournament_name}}
+						</p>
+						Game: {{item.game_name}}
+						<br>
+						Type: {{item.tournament_type}}
+						<br>
+						Format:{{item.tournament_format}}
+						<br>
+						Price {{item.competitor_fee}}
+						<br>
+						Capacity {{item.tournament_max_capacity}}
 					</div>
 				</div>
 				<a class="btn btn-success" ng-click="addTournament()">Add Tournament</a>
@@ -27,19 +31,21 @@
 		<div class="box">
 			<h2>Tournament</h2>
 			<form>
-				<legend>General Info</legend>
+				<legend>
+					General Info
+				</legend>
 				<div class="row">
 					<div class="col-xs-12 col-md-6 col-lg-6">
 						<div class="form-group">
 							<label>Tournament Name: </label>
-							<input class="form-control" ng-model="tournament.name" maxlength="127">
+							<input class="form-control" ng-model="newTournament.tournament_name" maxlength="127">
 						</div>
 					</div>
 					<div class="col-xs-12 col-md-6 col-lg-6">
 						<div class="form-group has-feedback">
 							<label class="control-label">Game</label>
 							<!-- 	TOOOOOOOOODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO   -->
-							<input type="text" class="form-control" placeholder="Search for Games" ng-model="tournament.game" />
+							<input type="text" class="form-control" placeholder="Search for Games" ng-model="newTournament.game_name" />
 							<i class="form-control-feedback glyphicon glyphicon-search"></i>
 						</div>
 					</div>
@@ -47,71 +53,84 @@
 				<div class="row">
 					<div class="col-xs-12 col-md-6 col-lg-6">
 						<div class="dropdown">
-							<lable>Start Date</lable>
+							<lable>
+								Start Date
+							</lable>
 							<a class="dropdown-toggle" id="dropdown4" role="button" data-toggle="dropdown">
-								<div class="input-group">
-									<input type="text" class="form-control" data-ng-model="tournament.start_date"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-								</div>
-							</a>
+							<div class="input-group">
+								<input type="text" class="form-control" data-ng-model="newTournament.start_date">
+								<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+							</div> </a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-								<datetimepicker data-ng-model="tournament.start_date" data-datetimepicker-config="{ dropdownSelector: '#dropdown4' }" />
+								<datetimepicker data-ng-model="newTournament.start_date" data-datetimepicker-config="{ dropdownSelector: '#dropdown4' }" />
 							</ul>
 						</div>
 					</div>
 					<div class="col-xs-12 col-md-6 col-lg-6">
 						<div class="dropdown">
-							<lable>Check In Deadline</lable>
+							<lable>
+								Check In Deadline
+							</lable>
 							<a class="dropdown-toggle" id="dropdown5" role="button" data-toggle="dropdown">
-								<div class="input-group">
-									<input type="text" class="form-control" data-ng-model="tournament.deadline"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-								</div>
-							</a>
+							<div class="input-group">
+								<input type="text" class="form-control" data-ng-model="newTournament.deadline">
+								<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+							</div> </a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-								<datetimepicker data-ng-model="tournament.deadline" data-datetimepicker-config="{ dropdownSelector: '#dropdown5' }" />
+								<datetimepicker data-ng-model="newTournament.deadline" data-datetimepicker-config="{ dropdownSelector: '#dropdown5' }" />
 							</ul>
 						</div>
 					</div>
 				</div>
 				<div class="form-group">
 					<label>Rules:</label>
-					<textarea class="form-control" rows="4" ng-model="tournament.rules" maxlength="127"></textarea>
+					<textarea class="form-control" rows="4" ng-model="newTournament.rules" maxlength="127"></textarea>
 				</div>
 				<div class="row">
 					<div class="col-xs-12 col-md-6 col-lg-6">
 						<label>Competitor Fee: </label>
 						<div class="form-group input-group">
 							<span class="input-group-addon">$</span>
-							<input type="text" class="form-control" ng-model="tournament.fee" valid-decimal>
+							<input type="text" class="form-control" ng-model="newTournament.competitor_fee" valid-decimal>
 						</div>
 					</div>
 					<div class="col-xs-12 col-md-6 col-lg-6">
 						<label>Seed Money: </label>
 						<div class="form-group input-group">
 							<span class="input-group-addon">$</span>
-							<input type="text" class="form-control" ng-model="tournament.seed_money" valid-input input-pattern="[^0-9]+">
+							<input type="text" class="form-control" ng-model="newTournament.seed_money" valid-input input-pattern="[^0-9]+">
 						</div>
 					</div>
-					<div class="col-xs-12 col-md-6 col-lg-6">
-						<label>Competitor Deduction Fee:</label>
-						<div class="form-group input-group">
-							<span class="input-group-addon">%</span>
-							<input type="text" class="form-control" ng-model="tournament.deduction_fee" valid-input input-pattern="[^0-9]+">
-						</div>
-					</div>
+
 					<div class="col-xs-12 col-md-6 col-lg-6">
 						<div class="form-group">
 							<label>Capacity: </label>
-							<input type="text" class="form-control" ng-model="tournament.capacity" valid-input input-pattern="[^0-9]+">
+							<input type="text" class="form-control" ng-model="newTournament.tournament_max_capacity" valid-input input-pattern="[^0-9]+">
 						</div>
 					</div>
 				</div>
-				<legend>Format</legend>
+				<legend>
+					Format
+				</legend>
+				<label>Team based</label>
+				<div class="form-inline">
+					<div class="form-group">
+						<input type="radio" ng-model="newTournament.teams" ng-value="true" >
+						Yes
+						<br>
+						<input type="radio" ng-model="newTournament.teams" ng-value="false" ng-init="newTournament.teams = false">
+						No
+					</div>
+					<div class="form-group" ng-show="newTournament.teams" style="margin-left:60px">
+						<label>Team Size: </label>
+						<input class="form-control" type="number" ng-model="newTournament.team_size">
+					</div>
+				</div>
 				<div class="row">
 					<div class="col-xs-12 col-md-6 col-lg-6">
 						<div class="form-group">
 							<label>Tournament Type: </label>
-							<select class="form-control" ng-model="tournament.type" ng-options="item.name for item in tournamentType" ng-init="tournament.type = tournamentType[0]">
-							</select>
+							<select class="form-control" ng-model="newTournament.tournament_type" ng-options="item for item  in tournamentType" ng-init="newTournament.tournament_type = tournamentType[0]"></select>
 						</div>
 					</div>
 				</div>
@@ -119,26 +138,24 @@
 					<div class="col-xs-12 col-md-6 col-lg-6">
 						<div class="form-group">
 							<label># of Competitors per Group: </label>
-							<input class="form-control" type="text" ng-model="tournament.group_players" valid-input input-pattern="[^0-9]+">
+							<input class="form-control" type="text" ng-model="newTournament.group_players" valid-input input-pattern="[^0-9]+">
 						</div>
 					</div>
 					<div class="col-xs-12 col-md-6 col-lg-6">
 						<div class="form-group">
 							<label># of Competitors advancing: </label>
-							<input class="form-control" type="text" ng-model="tournament.group_winners" valid-input input-pattern="[^0-9]+">
+							<input class="form-control" type="text" ng-model="newTournament.group_winners" valid-input input-pattern="[^0-9]+">
 						</div>
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-xs-12 col-md-6 col-lg-6" ng-show="tournament.type.name == 'Single Stage'">
+					<div class="col-xs-12 col-md-6 col-lg-6" ng-show="newTournament.type == 'Single Stage'">
 						<label>Tournament Format: </label>
-						<select class="form-control" ng-model="tournament.format" ng-options="item.name for item in tournamentFormat" ng-init="tournament.format = tournamentFormat[0]">
-						</select>
+						<select class="form-control" ng-model="newTournament.tournament_format" ng-options="item for item  in tournamentFormat" ng-init="newTournament.tournament_format = tournamentFormat[0]"></select>
 					</div>
-					<div class="col-xs-12 col-md-6 col-lg-6" ng-show="tournament.type.name == 'Two Stage'">
+					<div class="col-xs-12 col-md-6 col-lg-6" ng-show="tournament.type == 'Two Stage'">
 						<label>Final Stage: </label>
-						<select class="form-control" ng-model="tournament.format" ng-options="item.name for item in tournamentFormatTwo" ng-init="tournament.format = tournamentFormatTwo[0]">
-						</select>
+						<select class="form-control" ng-model="newTournament.tournament_format" ng-options="item for item  in tournamentFormatTwo" ng-init="newTournament.tournament_format = tournamentFormatTwo[0]"></select>
 					</div>
 				</div>
 				<div class="row custom-padding">
@@ -146,8 +163,8 @@
 						<div class="form-group">
 							<div class="checkbox">
 								<label>
-									<input type="checkbox" data-ng-model="tournament.scoring"> Allow set points
-								</label>
+									<input type="checkbox" data-ng-model="newTournament.scoring">
+									Allow set points </label>
 							</div>
 						</div>
 					</div>
@@ -166,27 +183,35 @@
 </div>
 
 <ul class="nav nav-tabs" style="visibility: hidden;">
-	<li class="active"><a data-target="#tournaments-tab" id="edit-tournament-tab1" data-toggle="tab">Ace</a>
+	<li class="active">
+		<a data-target="#tournaments-tab" id="edit-tournament-tab1" data-toggle="tab">Ace</a>
 	</li>
-	<li><a data-target="#tournament-tab" id="edit-tab2" data-toggle="tab">Deep</a>
+	<li>
+		<a data-target="#tournament-tab" id="edit-tab2" data-toggle="tab">Deep</a>
 	</li>
 </ul>
-
 
 <div class="modal fade" id="deleteModal">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
 				</button>
 				<h4 class="modal-title">Delete</h4>
 			</div>
 			<div class="modal-body">
-				<p>Are you sure you want to delete {{tournaments[tournamentIndex].name}} from the event?</p>
+				<p>
+					Are you sure you want to delete {{tournaments[tournamentIndex].name}} from the event?
+				</p>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				<button type="button" class="btn btn-primary" ng-click="delete()">Delete</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="delete()">
+					Delete
+				</button>
 			</div>
 		</div>
 		<!-- /.modal-content -->

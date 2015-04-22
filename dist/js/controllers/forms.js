@@ -665,7 +665,7 @@ myApp.controller("editOrganizationController", function($scope, $window, $stateP
  *	URL (PUT): http://matchup.neptunolabs.com/matchup/teams/{{team}}
  *	URL (DELETE) http://matchup.neptunolabs.com/matchup/events/{{event}}/tournaments/{{tournament}}?date={{date}}&location={{location}}
  */
-myApp.controller("editHostedTournamentController", function($scope) {
+myApp.controller("editHostedTournamentListController", function($scope, $http, $window, $rootScope, $state, $stateParams) {
 
 	// Miscellaneous information for static data
 	var d = new Date();
@@ -675,102 +675,170 @@ myApp.controller("editHostedTournamentController", function($scope) {
 	deadline.setDate(start_date.getHours() - 1);
 
 	// Init tournament type object for the dropdown
-	$scope.tournamentType = [{
-		name : 'Single Stage',
-	}, {
-		name : 'Two Stage',
-	}];
+	$scope.tournamentType = ["Single Stage", "Two Stage"];
 
 	// Init tournament format (Single Stage) object for the dropdown
-	$scope.tournamentFormat = [{
-		name : 'Single Elimination',
-	}, {
-		name : 'Double Elimination',
-	}, {
-		name : 'Round Robin',
-	}];
+	$scope.tournamentFormat = ["Single Elimination", "Double Elimination", "Round Robin"];
 
 	// Init tournament format (Two Stage) object for the dropdown
 	// As we can see, we limit the selection to Single and Dobule
 	// elimantion because round robing is not supported as a final
 	// stage
-	$scope.tournamentFormatTwo = [{
-		name : 'Single Elimination',
-	}, {
-		name : 'Double Elimination',
-	}];
+	$scope.tournamentFormatTwo = ["Single Elimination", "Double Elimination"];
 
-	//Get all tournaments of the selected event
-	var tournament = {
-		"name" : "Tourney 1",
-		"game" : "Mario",
-		"rules" : "There are no rules right now",
-		"teams" : false,
-		"team_size" : 0,
-		"start_date" : start_date,
-		"deadline" : deadline,
-		"fee" : 22.50,
-		"deduction_fee" : 8,
-		"capacity" : 50,
-		"seed_money" : 100.00,
-		"type" : "Two Stage",
-		"format" : "Single Elimination",
-		"scoring" : "Match",
-		"group_players" : 4,
-		"group_winners" : 2,
-	};
+	//get event
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data, status) {
+		$scope.eventInfo = data;
+
+	});
+
+	//get all tournaments for this event
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+		console.log("Event Tournaments");
+		console.log(data);
+		$scope.tournaments = data;
+
+	}).error(function(err) {
+		console.log(err);
+	});
 
 	// Array for persiting tournaments
-	$scope.tournaments = [];
-	$scope.tournaments.push(tournament);
+
 	$scope.tournamentIndex = 0;
+	$scope.newTournament = {}
 
 	// Transition function to the tournament form
 	$scope.addTournament = function() {
 		$("#edit-tab2").tab("show");
-	};
+	}
 	// Transition function to tournament list view
 	$scope.cancel = function() {
 		$("#edit-tournament-tab1").tab("show");
 	};
 	//
 	$scope.createTournament = function() {
-		$("#edit-tournament-tab1").tab("show");
+
+		// Check for blank inputs
+
+		if (!$scope.newTournament.tournament_name | !$scope.newTournament.deadline | !$scope.newTournament.rules | !$scope.newTournament.start_date | !$scope.newTournament.competitor_fee | !$scope.newTournament.seed_money | !$scope.newTournament.tournament_max_capacity) {
+			alert("Please fill out the general info section");
+			console.log(!$scope.newTournament.tournament_name, !$scope.newTournament.deadline, !$scope.newTournament.rules, !$scope.newTournament.start_date, !$scope.newTournament.competitor_fee, !$scope.newTournament.seed_money, !$scope.newTournament.tournament_max_capacity);
+
+			return;
+		}
+
+		//	Validate start date with respect to event dates
+		if ($scope.newTournament.start_date < $scope.eventInfo.start_date | $scope.newTournament.start_date > $scope.eventInfo.end_date) {
+			alert("Tournament start date cant be after or before the event");
+			return;
+		}
+
+		// Validate deadline with respect to tournament start date and event end date
+		if ($scope.newTournament.start_date <= $scope.newTournament.deadline | $scope.newTournament.deadline > $scope.eventInfo.end_date | $scope.newTournament.deadline <= $scope.eventInfo.start_date) {
+			alert("Tournament check in deadline cant be after the event end date or before the tournament start date or end date");
+			return;
+		}
+
+		if ($scope.newTournament.teams) {
+			// Illegal team size
+			if ($scope.newTournament.team_size <= 1) {
+				alert("Theres no I or 0 or negativity in team");
+				return;
+			}
+		} else {
+			// If team is false init to 0
+			$scope.newTournament.team_size = 0;
+		}
+
+		// Validate Tournament Type
+		if ($scope.newTournament.tournament_type == 'Two Stage') {
+			// Validate group stuff
+			if (!$scope.newTournament.group_players || !$scope.newTournament.group_winners) {
+				alert("Specify competitors per group and competitors advancing");
+				return;
+			}
+			// Check if number of winners per group makes sense with respect
+			// to number of players per group
+			if (parseInt($scope.newTournament.group_players) < parseInt($scope.newTournament.group_winners)) {
+				alert("Competitors can not be larger than participants per group");
+				return;
+			}
+			if (parseInt($scope.newTournament.capacity) < parseInt($scope.newTournament.group_players)) {
+				alert("Capacity can not be less than the number of players per group");
+				return;
+			}
+		} else {
+			// Init group stuff to zero if two stage is no selected
+			$scope.newTournament.group_players = 0;
+			$scope.newTournament.group_winners = 0;
+		}
+
+		// Validate tournament format
+		if (!$scope.newTournament.tournament_format) {
+			alert("Please select tournament format");
+			return;
+		}
+
+		// Initialize scoring to a readable format for the server
+		if ($scope.newTournament.scoring)
+			$scope.newTournament.scoring = "Points";
+		else
+			$scope.newTournament.scoring = "Match";
+
+		// Tournament object
+		var tournament = {
+			"name" : $scope.newTournament.tournament_name,
+			"game" : $scope.newTournament.game_name,
+			"rules" : $scope.newTournament.rules,
+			"teams" : $scope.newTournament.teams,
+			"team_size" : $scope.newTournament.team_size,
+			"start_date" : $scope.newTournament.start_date,
+			"deadline" : $scope.newTournament.deadline,
+			"fee" : parseFloat($scope.newTournament.competitor_fee),
+			"capacity" : parseInt($scope.newTournament.tournament_max_capacity),
+			"seed_money" : parseFloat($scope.newTournament.seed_money),
+			"type" : $scope.newTournament.tournament_type,
+			"format" : $scope.newTournament.tournament_format,
+			"scoring" : $scope.newTournament.scoring,
+			"group_players" : parseInt($scope.newTournament.group_players),
+			"group_winners" : parseInt($scope.newTournament.group_winners),
+		};
+
+		//ON SUCCES PUSH TO THE ARRAY THAT IS SHOWING THE TOURNAMEBTS
+		$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation, tournament).success(function(data) {
+			//TODO for some reason when I push it's not showing upcorrectly in the list. I need to check if i'm sending the parameters incorrectly or something.
+			$scope.tournaments.push($scope.newTournament);
+			console.log($scope.newTournament);
+
+		}).error(function(err) {
+			console.log(err);
+		}).finally(function() {
+
+			clearTournamentPage();
+			$("#edit-tournament-tab1").tab("show");
+		});
+
+	}
+	// Clears tournament inputs
+	var clearTournamentPage = function() {
+		$scope.newTournament.tournament_name = $scope.newTournament.start_date = $scope.newTournament.deadline = $scope.newTournament.rules = $scope.newTournament.competitor_fee = $scope.newTournament.seed_money = $scope.newTournament.deduction_fee = $scope.newTournament.tournament_max_capacity = $scope.newTournament.team_size = $scope.newTournament.group_players = $scope.newTournament.group_winners = $scope.newTournament.scoring = $scope.newTournament.game_name = "";
+
 	};
 	// Save index of tournament to be deleted
 	// and show the modal
 	$scope.deleteTournament = function(index) {
 		$scope.tournamentIndex = index;
+
 		$('#deleteModal').modal("show");
-	};
-	// Populate tournament edit form and transition to the page
-	$scope.editTournament = function(index) {
-		$scope.tournament = $scope.tournaments[index];
-		$("#edit-tab2").tab("show");
-	};
+	}
+ 
 	// Delete tournament
 	$scope.delete = function() {
-		$scope.tournaments.splice($scope.tournamentIndex, 1);
-		$('#deleteModal').modal("hide");
-	};
-});
-
-/*
- * edit Meetup Controller
- * url: "/organization/:organizationName/edit",
- * templateUrl: "organization/edit_organization.html",
- * Editing bio, logo and cover photo to an organization.
- */
-myApp.controller("editMeetUpController", function($scope, $window, $stateParams, $http, $rootScope, $state) {
-	
-		$scope.meetup =[];
-		
-		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/meetups/' + $stateParams.customerUsername + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&meetup_date=' + $stateParams.meetupDate + '&meetup_location=' + $stateParams.meetupLocation).success(function(data, status, headers) {
-			$scope.meetup = data; 
-		}).error(function(data, status) {
-		if (status == 404 || status == 401 || status == 400)
-			$state.go("" + status);
-			console.log("error in getMeetUp");
+//TODO Check
+ 		$http.delete($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.tournamentIndex].tournament_name +'?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+			$scope.tournaments.splice($scope.tournamentIndex, 1);
+		}).error(function(err) {
+			console.log(err);
 		});
 	
 		$scope.submitEditmeetup = function(valid) {

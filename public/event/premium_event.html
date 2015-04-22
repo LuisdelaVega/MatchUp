@@ -4,11 +4,15 @@
 	<li class="active">
 		<a data-target="#main" data-toggle="tab">Main</a>
 	</li>
+ 
 	<li>
 		<a data-target="#news" data-toggle="tab">News</a>
 	</li>
 	<li>
 		<a data-target="#registeredUsers" data-toggle="tab">Spectators</a>
+	</li>
+	<li>
+		<a data-target="#reviews" data-toggle="tab">Reviews</a>
 	</li>
 </ul>
 
@@ -30,7 +34,7 @@
 									{{eventInfo.event_description}}
 								</p>
 								<dt>
-								Created by
+									Created by
 								</dt>
 								<dd>
 									{{ eventInfo.creator}}
@@ -44,40 +48,40 @@
 							<div class="row">
 								<div class="col-xs-12 col-md-6 col-lg-6">
 									<dt>
-								Start Date
-							</dt>
+										Start Date
+									</dt>
 									<dd>
 										{{ eventInfo.event_start_date | date: 'medium'}}
 									</dd>
 									<dt>
-								End Date
-							</dt>
+										End Date
+									</dt>
 									<dd>
 										{{ eventInfo.event_end_date | date: 'medium'}}
 									</dd>
 									<dt>
-								Registration Deadline
-							</dt>
+										Registration Deadline
+									</dt>
 									<dd>
 										{{ eventInfo.event_registration_deadline | date: 'medium'}}
 									</dd>
 								</div>
 								<div class="col-xs-12 col-md-6 col-lg-6">
 									<dt>
-								Location
-							</dt>
+										Location
+									</dt>
 									<dd>
 										{{ eventInfo.event_location }}
 									</dd>
 									<dt ng-if="!eventInfo.event_is_online">
-								Venue
-							</dt>
+										Venue
+									</dt>
 									<dd ng-if="!eventInfo.event_is_online">
 										{{ eventInfo.event_venue }}
 									</dd>
 									<dt>
-								Event Type
-							</dt>
+										Event Type
+									</dt>
 									<dd>
 										{{ eventInfo.event_type }}
 									</dd>
@@ -90,12 +94,11 @@
 						<p class="info-paragraph">
 							{{ eventInfo.event_rules }}
 						</p>
-					</div>					
+					</div>
 					<div class="col-xs-12 col-md-12 col-lg-6">
 						<h3>Hosted by</h3>
 						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
-							<a class="thumbnail" ng-click="goToOrganizationProfile(hostInfo.organization_name)"><img class="profile-picture cursor" ng-src="{{hostInfo.organization_cover_photo}}">
-							</a>
+							<a class="thumbnail" ng-click="goToOrganizationProfile(hostInfo.organization_name)"><img class="profile-picture cursor" ng-src="{{hostInfo.organization_cover_photo}}"> </a>
 						</div>
 						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
 							<h3 style="margin-top:0px;padding-top:0px">{{hostInfo.organization_name}}</h3>
@@ -103,7 +106,7 @@
 								{{hostInfo.organization_bio}}
 							</p>
 						</div>
-					</div>					
+					</div>
 				</div>
 				<div class="btn-group btn-group-justified box-margin" role="group">
 					<div class="btn-group" role="group">
@@ -119,7 +122,7 @@
 					<div class="btn-group" role="group" ng-if="eventInfo.is_organizer && !finished">
 						<button type="button" class="btn btn-primary" ui-sref="app.eventSettings({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location })">
 							Settings
-                            
+
 						</button>
 					</div>
 				</div>
@@ -145,8 +148,7 @@
 					<div ng-repeat="tourn in tournamentsInfo">
 						<div class="col-lg-3 col-md-4 col-xs-6">
 
-							<a class="thumbnail" ng-click="goToTournament(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location, tourn.tournament_name)"> <img ng-src="{{tourn.game_image}}">
-								<h4 align="center">{{tourn.tournament_name}}</h4> </a>
+							<a class="thumbnail" ng-click="goToTournament(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location, tourn.tournament_name)"> <img ng-src="{{tourn.game_image}}"> <h4 align="center">{{tourn.tournament_name}}</h4> </a>
 						</div>
 					</div>
 				</div>
@@ -159,9 +161,11 @@
 				<div class="col-lg-6 col-md-6 col-xs-12" ng-repeat="news in news | limitTo: 8">
 					<div class="box box-margin">
 						<div class="page-header">
-							<button class="btn btn-danger pull-right" data-target="#deleteNewsModal" data-toggle="modal" ng-if="eventInfo.is_organizer"><i class="fa fa-trash-o"></i>
+							<button class="btn btn-danger pull-right"  ng-click="deleteNewsPrompt(news)" ng-if="eventInfo.is_organizer">
+								<i class="fa fa-trash-o"></i>
 							</button>
-							<button class="btn btn-info pull-right" style="margin-right:5px" data-target="#editNewsModal" data-toggle="modal" ng-if="eventInfo.is_organizer"><i class="fa fa-pencil-square-o"></i>
+							<button class="btn btn-info pull-right" style="margin-right:5px"  ng-click="editNewsPrompt(news)" ng-if="eventInfo.is_organizer">
+								<i class="fa fa-pencil-square-o"></i>
 							</button>
 							<h3>{{news.news_title}} <small>{{news.news_date_posted  | date: 'medium'}}</small></h3>
 						</div>
@@ -172,7 +176,52 @@
 				</div>
 			</div>
 			<div class="col-md-4 col-md-offset-4">
-				<button class="btn btn-primary btn-block box-margin" data-target="#postNewsModal" data-toggle="modal" ng-if="eventInfo.is_organizer">Post News</button>
+				<button class="btn btn-primary btn-block box-margin" data-target="#postNewsModal" data-toggle="modal" ng-if="eventInfo.is_organizer">
+					Post News
+				</button>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade" id="reviews">
+		<div class="panel-padding">
+			<div class="row">
+				<!-- TODO: put fancy -->
+
+				<div class="col-lg-6 col-md-6 col-xs-12" ng-repeat="review in reviews | limitTo: 8">
+
+					<div class="box box-margin">
+						<div class="page-header">
+							<div class="review user-avatar">
+								<img ng-src="{{ review.customer_profile_pic }}" class="user-pic" >
+								<h3 > &nbsp{{review.review_title}}&nbsp <small>{{review.review_date_created  | date: 'medium'}}</small>
+								<button class="btn btn-danger pull-right" ng-click="deleteReviewPrompt(review, $index)" ng-if="review.is_writer">
+									<i class="fa fa-trash-o"></i>
+								</button>
+								<button class="btn btn-info pull-right" style="margin-right:5px" ng-click="editReviewPrompt(review)" ng-if="review.is_writer">
+									<i class="fa fa-pencil-square-o"></i>
+								</button></h3>
+
+								<p>
+									<span>&nbsp&nbsp</span>
+									<span class="glyphicon glyphicon-star" ng-repeat="i in getNumber(review.star_rating) track by $index" ></span>
+									<span class="glyphicon glyphicon-star-empty" ng-repeat="i in getNumber(5-review.star_rating) track by $index" ></span>
+								</p>
+
+								<span class="user-name">&nbsp{{review.customer_tag}}</span>
+
+							</div>
+
+						</div>
+						<p>
+							{{review.review_content}}
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4 col-md-offset-4">
+				<button class="btn btn-primary btn-block box-margin" data-target="#postReviewModal" data-toggle="modal" >
+					Post Review
+				</button>
 			</div>
 		</div>
 	</div>
@@ -205,7 +254,8 @@
 			</div>
 		</div>
 	</div>
-	<!--	registered users -->
+
+ 
 </div>
 <!--	tab content -->
 
@@ -280,13 +330,13 @@
 					<div class="form-group">
 						<label class="col-sm-2 control-label">News Title</label>
 						<div class="col-sm-10">
-							<input type="text" class="form-control">
+							<input type="text" class="form-control" ng-model="newNews.title">
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="feeDescription" class="col-sm-2 control-label">News Content</label>
 						<div class="col-sm-10">
-							<textarea class="form-control" rows="4" maxlength="255"></textarea>
+							<textarea class="form-control" rows="4" maxlength="255" ng-model="newNews.content"></textarea>
 						</div>
 					</div>
 				</form>
@@ -295,7 +345,7 @@
 				<button type="button" class="btn btn-default" data-dismiss="modal">
 					Cancel
 				</button>
-				<button type="button" class="btn btn-primary" data-dismiss="modal">
+				<button type="button" class="btn btn-primary" ng-click="postNews()">
 					Post News
 				</button>
 			</div>
@@ -317,13 +367,13 @@
 					<div class="form-group">
 						<label class="col-sm-2 control-label">News Title</label>
 						<div class="col-sm-10">
-							<input type="text" class="form-control">
+							<input type="text" class="form-control" ng-model="newNews.news_title">
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="feeDescription" class="col-sm-2 control-label">News Content</label>
 						<div class="col-sm-10">
-							<textarea class="form-control" rows="4" maxlength="255"></textarea>
+							<textarea class="form-control" rows="4" maxlength="255" ng-model="newNews.content"></textarea>
 						</div>
 					</div>
 				</form>
@@ -332,7 +382,7 @@
 				<button type="button" class="btn btn-default" data-dismiss="modal">
 					Cancel
 				</button>
-				<button type="button" class="btn btn-primary" data-dismiss="modal">
+				<button type="button" class="btn btn-primary" ng-click="editNews()">
 					Edit News
 				</button>
 			</div>
@@ -346,16 +396,137 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
 				</button>
 				<h4 class="modal-title">Delete News</h4>
 			</div>
 			<div class="modal-body">
-				<p>Are you sure you want to delete this news?</p>
+				<p>
+					Are you sure you want to delete this news?
+				</p>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				<button type="button" class="btn btn-primary">Delete</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="deleteNews()">
+					Delete
+				</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade" id="postReviewModal" tabindex="-1" role="dialog" aria-labelledby="postReviewModal" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Create Review</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal">
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Review Title</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" ng-model="newReview.title">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Review Rating</label>
+						<div class="col-sm-10">
+							<input type="number" class="form-control" ng-model="newReview.rating">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="feeDescription" class="col-sm-2 control-label">Review Content</label>
+						<div class="col-sm-10">
+							<textarea class="form-control" rows="4" maxlength="255" ng-model="newReview.content"></textarea>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Cancel
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="postReview()">
+					Post Review
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="editReviewModal" tabindex="-1" role="dialog" aria-labelledby="editNewsModal" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Edit Review</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal">
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Review Title</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" ng-model="newReview.review_title">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Review Rating</label>
+						<div class="col-sm-10">
+							<input type="number" class="form-control" ng-model="newReview.star_rating">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="feeDescription" class="col-sm-2 control-label">Review Content</label>
+						<div class="col-sm-10">
+							<textarea class="form-control" rows="4" maxlength="255" ng-model="newReview.review_content"></textarea>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Cancel
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="editReview()">
+					Edit Review
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="deleteReviewModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Delete Review</h4>
+			</div>
+			<div class="modal-body">
+				<p>
+					Are you sure you want to delete this review?
+				</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-primary"  ng-click="deleteReview()">
+					Delete
+				</button>
 			</div>
 		</div>
 		<!-- /.modal-content -->

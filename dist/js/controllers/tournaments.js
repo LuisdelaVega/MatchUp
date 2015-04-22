@@ -50,6 +50,7 @@ function($scope, $http, $stateParams, sharedDataService, $q, $state, $rootScope)
 				// Get sponsors
 				$scope.sponsors = results[2].data;
 				initStuff();
+				getRounds();
 			}, function(err) {
 				console.log(err);
 				console.log("Oh oh");
@@ -77,6 +78,7 @@ function($scope, $http, $stateParams, sharedDataService, $q, $state, $rootScope)
 				$scope.competitors = results[1].data;
 
 				initStuff();
+				getRounds();
 			}, function(err) {
 				console.log(err);
 				console.log("Oh oh");
@@ -98,8 +100,62 @@ function($scope, $http, $stateParams, sharedDataService, $q, $state, $rootScope)
 
 		// Check registration deadline with current time
 		$scope.canRegister = (new Date($scope.eventInfo.event_registration_deadline)).getTime() > now_utc.getTime();
+
+		$scope.bracketTypes = ['Winners', 'Losers'];
+		$scope.bracket = 'Winners';
 	};
 
+	var getRounds = function() {
+		//http://matchup.neptunolabs.com/matchup/events/Event 01/tournaments/Ultra Street Fighter IV Qualifiers/rounds/1/matches/1?date=2015-03-25 09:00:00&location=miradero
+		//http://matchup.neptunolabs.com/matchup/events/Event 01/tournaments/Ultra Street Fighter IV Qualifiers/rounds?date=2015-03-25T09:00:00.000Z&location=miradero
+		//http://matchup.neptunolabs.com/matchup/events/Event 01/tournaments/Ultra Street Fighter IV Qualifiers/rounds?date=2015-03-25 09:00:00&location=miradero
+		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/rounds?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function(data, status) {
+			$scope.tournamentInfo = data;
+
+			//console.log(data);
+		}).then(function() {
+			$scope.bracketType = $scope.tournamentInfo.finalStage.winnerRounds
+			$scope.selectedRound = $scope.bracketType[0];
+			if ($scope.tournamentInfo.groupStage) {
+
+				$scope.selectedGroup = $scope.tournamentInfo.groupStage.groups[0];
+				$scope.selectedGroupRound = $scope.selectedGroup.rounds[0];
+			}
+			//console.log($scope.selectedGroupRound);
+			$scope.getMatch(1, 1);
+
+		});
+	};
+	$scope.resetGroup = function() {
+		$scope.selectedGroupRound = $scope.selectedGroup.rounds[0];
+	};
+	$scope.bracketChange = function(bracket) {
+		//testing.....
+		// console.log('enter');
+ 		console.log("Winners");
+		if (bracket == 'Winners') {
+			$scope.bracketType = $scope.tournamentInfo.finalStage.winnerRounds;
+			$scope.selectedRound = $scope.tournamentInfo.finalStage.winnerRounds[0];
+
+		} else {
+			console.log("Losers");
+			$scope.bracketType = $scope.tournamentInfo.finalStage.loserRounds;
+			$scope.selectedRound = $scope.tournamentInfo.finalStage.loserRounds[0];
+
+		}
+	};
+	//not sure if needed, waiting on new DB dump
+	$scope.getMatch = function(round, match) {
+		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/rounds/' + round + '/matches/' + match + '?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function(data, status) {
+			$scope.matchInfo = data;
+
+			console.log(data);
+		}).then(function() {
+			console.log($scope.matchInfo);
+
+		});
+
+	};
 }]);
 
 myApp.controller('editTournamentController', ['$scope', '$http', '$stateParams', 'sharedDataService', '$q', '$state', '$rootScope', '$filter',

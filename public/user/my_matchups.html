@@ -1,85 +1,105 @@
-<h1>My Matchups</h1>
+<h1 class="page-header">My Matchups</h1>
 <div class="row">
-	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding">
-		<div class="box cursor" data-toggle="modal" data-target="#matchupModal">
-			<div class="media">
-				<div class="media-left">
-					<a href="#">
-						<img class="media-object match-avatar" src="http://neptunolabs.com/images/badillo.jpg">
-					</a>
-				</div>
-				<div class="media-body">
-					<div class="row">
-						<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-							<h4>Apex 2015</h4>
-							<p>Round 3
-								<br>Opponent odillab</p>
-						</div>
-						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
-							<h1 style="text-align:center">2-3</h1>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding">
-		<div class="box cursor" data-toggle="modal" data-target="#matchupSetModal">
-			<div class="media">
-				<div class="media-left">
-					<a href="#">
-						<img class="media-object match-avatar" src="http://neptunolabs.com/images/badillo.jpg">
-					</a>
-				</div>
-				<div class="media-body">
-					<div class="row">
-						<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-							<h4>Apex 2015</h4>
-							<p>Round 3
-								<br>Opponent odillab</p>
-						</div>
-						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
-							<h1 style="text-align:center">2-3</h1>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding">
-		<div class="box cursor" data-toggle="modal" data-target="#matchupSetModal">
-			<div class="media">
-				<div class="media-left">
-					<a href="#">
-						<img class="media-object match-avatar" src="http://neptunolabs.com/images/badillo.jpg">
-					</a>
-				</div>
-				<div class="media-body">
-					<div class="row">
-						<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-							<h4>Apex 2015</h4>
-							<p>Round 3
-								<br>Opponent odillab</p>
-						</div>
-						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
-							<h1 style="text-align:center">2-3</h1>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
+	<div class="row">
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-10 col-md-offset-1">
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6" ng-repeat="match in pastMatchups">
+				<div class="box cursor box-margin" data-toggle="modal" data-target="#matchupModal">
 
+					<h4 class="modal-title" align="center">{{match.event_name}} - {{match.tournament_name}}</h4>
+					<p>
+						{{match.round_of}} &nbsp; Round {{match.round_number}} &nbsp; Match {{match.match_number}}
+						<br/>
+						Station {{match.station_number}}
+						<br>
+					</p>
+					<div class="row" align="center">
+						<!-- {{tournamentInfo.finalStage.winnerRounds[1].matches[1].players[1].customer_username}} -->
+
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<!-- <div class="img-circular player-1 large center-block"></div> -->
+							<img class="img-circular player-1 large center-block" ng-src="{{match.details[0].customer_profile_pic}}" />
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<h1 style="text-align:center">
+							<br>
+							{{match.details[0].score}}-{{match.details[1].score}}</h1>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<!-- <div class="img-circular player-2 large center-block"></div> -->
+							<img class="img-circular player-2 large center-block" ng-src="{{match.details[1].customer_profile_pic}}" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<h3 style="text-align:center">{{match.details[0].customer_tag}}</h3>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<h4 style="text-align:center"></h4>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<h3 style="text-align:center">{{match.details[1].customer_tag}}</h3>
+						</div>
+					</div><!-- <div style="text-align: center">
+					<div class="set-circular player-1"></div>
+					<div class="set-circular player-1 set-margin"></div>
+					<div class="set-circular player-2 set-margin"></div>
+					<div class="set-circular player-1"></div>
+					</div> -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- <div class="row" >
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6"  ng-repeat="match in selectedGroup.rounds[selectedGroupRound.round_number-1].matches  | filter:groupRoundQuery">
+	<div class="row">
+	<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-md-offset-1 col-lg-offset-1">
+	<div class="box box-margin cursor">
+	<h4 class="modal-title" align="center"> Round {{selectedRound.round_number}} Match {{match.match_number}}</h4>
+	<br>
+	<div class="row" align="center">
+
+	<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+	<img class="img-circular player-1 large center-block" ng-src="{{match.players[0].customer_profile_pic}}" />
+	</div>
+	<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+	<h1 style="text-align:center">
+	<br>
+	{{match.players[0].score}}-{{match.players[1].score}}</h1>
+	</div>
+	<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+	<img class="img-circular player-2 large center-block" ng-src="{{match.players[1].customer_profile_pic}}" />
+	</div>
+	</div>
+	<div class="row">
+	<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+	<h3 style="text-align:center">{{match.players[0].customer_tag}}</h3>
+	</div>
+	<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+	<h4 style="text-align:center"></h4>
+	</div>
+	<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+	<h3 style="text-align:center">{{match.players[1].customer_tag}}</h3>
+	</div>
+	</div>
+	</div>
+	</div>
+	</div>
+	</div>
+	</div> -->
+
+</div>
 
 <!-- modal matchup-->
 <div class="modal fade" id="matchupModal">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 class="modal-title">Round 1 Match 2<br><small>Station 2</small></h4>
+				<h4 class="modal-title">Round 1 Match 2
+				<br>
+				<small>Station 2</small></h4>
 			</div>
 			<div class="modal-body">
 				<div class="row">
@@ -122,9 +142,12 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 class="modal-title">Round 1 Match 2<br><small>Station 2</small></h4>
+				<h4 class="modal-title">Round 1 Match 2
+				<br>
+				<small>Station 2</small></h4>
 			</div>
 			<div class="modal-body">
 				<div class="row">
@@ -155,7 +178,9 @@
 					<div class="set-circular player-1"></div>
 				</div>
 				<div class=" box-margin">
-					<p>Set 1</p>
+					<p>
+						Set 1
+					</p>
 					<div class="row">
 						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 							<div class="img-circular player-1 mini center-block"></div>
@@ -168,7 +193,9 @@
 						</div>
 					</div>
 					<hr>
-					<p>Set 2</p>
+					<p>
+						Set 2
+					</p>
 					<div class="row">
 						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 							<div class="img-circular player-1 mini center-block"></div>
@@ -181,7 +208,9 @@
 						</div>
 					</div>
 					<hr>
-					<p>Set 3</p>
+					<p>
+						Set 3
+					</p>
 					<div class="row">
 						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 							<div class="img-circular player-1 mini center-block"></div>

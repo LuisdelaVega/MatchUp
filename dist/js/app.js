@@ -118,12 +118,12 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			controller: "editTournamentController"
 		})
 		.state('app.tournamentList', {
-			url: "/tournamentList",
-			templateUrl: "organizer/tournament_list.html",
-			controller: "editTournamentController"
+ 			url: "/settings/event/:eventName/:eventDate/:eventLocation/tournaments",
+ 			templateUrl: "organizer/tournament_list.html",
+			controller: "editHostedTournamentListController"
 		})
 		.state('app.registrations', {
-			url: "/registrations",
+			url: "/event/:eventName/:eventDate/:eventLocation/registrations",
 			templateUrl: "organizer/registrations.html",
 			controller: "RegistrationController"
 		})
@@ -192,7 +192,8 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 		})
 		.state('app.myMatchups', {
 			url: "/user/:username/matchups",
-			templateUrl: "user/my_matchups.html"
+			templateUrl: "user/my_matchups.html",
+			controller: "matchupsController"
 		})
 		.state('app.subcriptions', {
 			url: "/subcriptions",

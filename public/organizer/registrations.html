@@ -2,7 +2,7 @@
 	<div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
 		<div class="list-group">
 			<a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="tournament in tournaments" ng-click="getRegistrationInfo($index)">
-				<h4 class="list-group-item-heading">{{tournament.name}}</h4>
+				<h4 class="list-group-item-heading">{{tournament.tournament_name}}</h4>
 			</a>
 		</div>
 	</div>
@@ -17,7 +17,7 @@
 						<div class="row">
 							<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
 								<img class="checkin-avatar" ng-src="{{item.customer_profile_pic}}">
-								<h4 style="display:inline">{{item.customer_tag}}<small style="margin-left:10px">({{item.customer_first_name}} {{item.customer_last_name}})</small><small style="margin-left:10px" ng-if="index==0">{{item.spec_fee_name}}</small></h4>
+								<h4 style="display:inline">{{item.customer_username}}<small style="margin-left:10px">({{item.customer_first_name}} {{item.customer_last_name}})</small><small style="margin-left:10px" ng-if="index==0">{{item.spec_fee_name}}</small></h4>
 							</div>
 							<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
 								<button class="btn btn-default pull-right" ng-class="{ 'btn-success' : item.check_in}" ng-click="checkIn(item)">Check In</button>

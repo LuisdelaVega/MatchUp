@@ -99,7 +99,7 @@ myApp.controller('eventPremiumSummaryController', function($scope, $state, $http
 			$scope.finished = true;
 		else {
 			$scope.finished = false;
-			$scope.isOngoing = (startDate.getTime() > now_utc.getTime());
+			$scope.isOngoing = (startDate.getTime() < now_utc.getTime());
 			$scope.registrationEnded = (registration.getTime() < now_utc.getTime());
 		}
 
@@ -122,30 +122,243 @@ myApp.controller('eventPremiumSummaryController', function($scope, $state, $http
 		console.log("Oh oh");
 	});
 
-    //Go to a list of meetups for this event
-    $scope.goToMeetupList = function (eventName, eventDate, eventLocation) {
-            //heyyeah
-            //eventName = eventName.replace(" ", "%20");
-            // var params = [eventName, eventDate, eventLocation];
-            // sharedDataService.set(params);
-            $state.go("app.meetupList", {
-                    "eventname": eventName,
-                    "date": eventDate,
-                    "location": eventLocation
-                }) //
-        }
-        //go to posted reviews for this event
-    $scope.goToReview = function (eventName, eventDate, eventLocation, selectedTournament) {
+	//Go to a list of meetups for this event
+	$scope.goToMeetupList = function(eventName, eventDate, eventLocation) {
+		//heyyeah
+		//eventName = eventName.replace(" ", "%20");
+		// var params = [eventName, eventDate, eventLocation];
+		// sharedDataService.set(params);
+		$state.go("app.meetupList", {
+			"eventname" : eventName,
+			"date" : eventDate,
+			"location" : eventLocation
+		}) //
+	};
+
+	//go to posted reviews for this event
+	$scope.goToReview = function(eventName, eventDate, eventLocation, selectedTournament) {
 
 		eventName = eventName.replace(" ", "%20");
 		sharedDataService.set(selectedTournament);
 		$state.go("app.writereview")
+	};
+
+	$scope.newNews = {};
+
+	$scope.postNews = function() {
+		//
+		if (!$scope.newNews.title || !$scope.newNews.content) {
+			alert("Please fill all fields!");
+			return;
+		} else {
+			$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/news?date=' + $stateParams.date + '&location=' + $stateParams.location, $scope.newNews).success(function(data) {
+				//$scope.tournaments.push($scope.newTournament);
+				//console.log($scope.newTournament);
+				var now = new Date;
+				$scope.news.unshift({
+					"news_number" : $scope.news.length + 1,
+					"news_title" : $scope.newNews.title,
+					"news_content" : $scope.newNews.content,
+					"news_date_posted" : now
+
+				});
+				$('#postNewsModal').modal("hide");
+				$scope.newNews = {};
+
+			}).error(function(err) {
+				console.log(err);
+			});
+		}
+
+	};
+
+	$scope.editNewsPrompt = function(news) {
+		//get news Index
+		//show modal
+		$scope.newNews = news;
+		$('#editNewsModal').modal("show");
+
+		//load information
+
+	};
+
+	$scope.editNews = function() {
+		//REST PUT REQUEST
+		if (!$scope.newNews.news_title || !$scope.newNews.news_content) {
+			alert("Please fill all fields!");
+			return;
+		} else {
+			$http.put($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/news/' + $scope.newNews.news_number + '?date=' + $stateParams.date + '&location=' + $stateParams.location, {
+				"title" : $scope.newNews.news_title,
+				"content" : $scope.newNews.news_content
+			}).success(function(data) {
+				$('#editNewsModal').modal("hide");
+				$scope.newNews = {};
+
+			}).error(function(err) {
+				console.log(err);
+			});
+		}
+
+	};
+
+	$scope.deleteNewsPrompt = function(news) {
+		//get news Index
+		//show modal
+		$scope.newNews = news;
+		$('#deleteNewsModal').modal("show");
+
+	};
+
+	$scope.deleteNews = function() {
+		//REST DELETE REQUEST
+		$http.delete($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/news/' + $scope.newNews.news_number + '?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function(data) {
+			$('#deleteNewsModal').modal("hide");
+			$scope.newNews = {};
+
+		}).error(function(err) {
+			console.log(err);
+			alert("News was not deleted, error ocurred");
+		});
+
+	};
+
+	$scope.getNumber = function(num) {
+		return new Array(num);
 	}
+	//getr all reviews
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/reviews?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function(data) {
+		$scope.reviews = data;
+
+	}).error(function(err) {
+		console.log(err);
+	});
+
+	$scope.postReview = function() {
+		//
+		if ($scope.newReview.rating < 1 || $scope.newReview.rating > 5 || isNaN($scope.newReview.rating)) {
+			alert("Please choose a rating between 1 and 5!");
+			return;
+		}
+		if (!$scope.newReview.title || !$scope.newReview.content || !$scope.newReview.rating) {
+			alert("Please fill all fields!");
+			return;
+		} else {
+
+			$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/reviews?date=' + $stateParams.date + '&location=' + $stateParams.location, $scope.newReview).success(function(data) {
+				//$scope.tournaments.push($scope.newTournament);
+				//console.log($scope.newTournament);
+				$http.get($rootScope.baseURL + '/matchup/profile').success(function(data) {
+					$scope.user = data;
+					var now = new Date;
+
+					$scope.reviews.unshift({
+						"review_title" : $scope.newReview.title,
+						"review_content" : $scope.newReview.content,
+						"star_rating" : $scope.newReview.rating,
+						"review_date_created" : now,
+						"customer_username" : $scope.user.customer_username,
+						"customer_first_name" : $scope.user.customer_first_name,
+						"customer_last_name" : $scope.user.customer_last_name,
+						"customer_tag" : $scope.user.customer_tag,
+						"customer_profile_pic" : $scope.user.customer_profile_pic,
+						"is_writer" : true
+					});
+
+					$('#postReviewModal').modal("hide");
+					$scope.newReview = {};
+
+				}).error(function(err) {
+					console.log(err);
+				});
+
+			}).error(function(err) {
+				console.log(err);
+			});
+
+		}
+
+	};
+
+	$scope.editReviewPrompt = function(review) {
+		//get news Index
+		//show modal
+		$scope.newReview = review;
+		$('#editReviewModal').modal("show");
+
+		//load information
+
+	};
+
+	$scope.editReview = function() {
+		//REST PUT REQUEST
+		if ($scope.newReview.star_rating < 1 || $scope.newReview.star_rating > 5 || isNaN($scope.newReview.star_rating)) {
+			alert("Please choose a rating between 1 and 5!");
+			return;
+		}
+		if (!$scope.newReview.review_title || !$scope.newReview.review_content || !$scope.newReview.star_rating) {
+			alert("Please fill all fields!");
+			return;
+		} else {
+
+			$http.get($rootScope.baseURL + '/matchup/profile').success(function(data) {
+			}).success(function(data) {
+				$scope.user = data;
+
+				$http.put($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/reviews/' + $scope.user.customer_username + '?date=' + $stateParams.date + '&location=' + $stateParams.location, {
+					"title" : $scope.newReview.review_title,
+					"content" : $scope.newReview.review_content,
+					"rating" : $scope.newReview.star_rating
+				}).success(function(data) {
+					$('#editReviewModal').modal("hide");
+					$scope.newNews = {};
+
+				}).error(function(err) {
+					console.log(err);
+				});
+			}).error(function(err) {
+				console.log(err);
+			});
+
+		}
+	};
+
+	$scope.deleteReviewPrompt = function(review, index) {
+		//get news Index
+		$scope.reviewIndex = index;
+		//show modal
+		$scope.newReview = review;
+		$('#deleteReviewModal').modal("show");
+	};
+
+	$scope.deleteReview = function() {
+		//REST DELETE REQUEST
+
+		$http.get($rootScope.baseURL + '/matchup/profile').success(function(data) {
+		}).success(function(data) {
+			$scope.user = data;
+			$http.delete($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/reviews/' + $scope.user.customer_username + '?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function(data) {
+				$scope.reviews.splice($scope.reviewIndex, 1);
+				$('#deleteReviewModal').modal("hide");
+				$scope.newReview = {};
+
+			}).error(function(err) {
+				console.log(err);
+				alert("Review was not deleted, error ocurred");
+			});
+		}).error(function(err) {
+			console.log(err);
+			alert("Review was not deleted, error ocurred");
+		});
+
+	};
+
 });
 
+
 //Meetup List controller, shows all meetups for a specific event
-myApp.controller('meetupListController', ['$scope', '$http', '$state', '$stateParams', '$window',
-function($scope, $http, $state, $stateParams, $window) {
+myApp.controller('meetupListController', ['$scope', '$http', '$state', '$stateParams', '$window', '$rootScope',
+function($scope, $http, $state, $stateParams, $window, $rootScope) {
 	var config = {
 		headers : {
 			'Authorization' : "Bearer " + $window.sessionStorage.token
@@ -155,7 +368,7 @@ function($scope, $http, $state, $stateParams, $window) {
 	var now = new Date();
 	var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
 
-	$http.get('http://136.145.116.232/matchup/events/' + $stateParams.eventname + '/meetups?date=' + $stateParams.date + '&location=' + $stateParams.location + '').success(function(data, status, headers) {
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/meetups?date=' + $stateParams.date + '&location=' + $stateParams.location + '').success(function(data, status, headers) {
 
 		$scope.meetupsInfo = angular.fromJson(data);
 		console.log($scope.meetupsInfo);
@@ -172,7 +385,7 @@ function($scope, $http, $state, $stateParams, $window) {
 	});
 
 	//Get Event Info from server
-	$http.get('http://136.145.116.232/matchup/events/' + $stateParams.eventname + '?date=' + $stateParams.date + '&location=' + $stateParams.location + '').success(function(data, status, headers) {
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '?date=' + $stateParams.date + '&location=' + $stateParams.location + '').success(function(data, status, headers) {
 
 		$scope.eventInfo = angular.fromJson(data);
 		var endDate = new Date($scope.eventInfo.event_end_date);

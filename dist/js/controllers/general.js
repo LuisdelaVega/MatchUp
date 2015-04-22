@@ -1,23 +1,23 @@
 var myApp = angular.module('home', []);
 
-myApp.controller('generalViewController', ['$scope', '$http', '$state', 'sharedDataService', '$window',
-function ($scope, $http, $state, sharedDataService, $window) {
+myApp.controller('generalViewController', ['$scope', '$http', '$state', 'sharedDataService', '$window', '$rootScope',
+function ($scope, $http, $state, sharedDataService, $window, $rootScope) {
 
 
-        $http.get('http://matchup.neptunolabs.com/matchup/events?type=hosted&state=upcoming').success(function (data, status, headers) {
+        $http.get($rootScope.baseURL +'/matchup/events?type=hosted&state=upcoming').success(function (data, status, headers) {
             $scope.hostedEvents = data;
             console.log($scope.hostedEvents);
 
-            $http.get('http://matchup.neptunolabs.com/matchup/events?type=hosted&state=live').success(function (data, status, headers) {
+            $http.get($rootScope.baseURL +'/matchup/events?type=hosted&state=live').success(function (data, status, headers) {
 
                 $scope.hostedLiveEvents = data;
                 console.log($scope.hostedEvents);
 
-                $http.get('http://matchup.neptunolabs.com/matchup/events?type=regular&state=upcoming').success(function (data, status, headers) {
+                $http.get($rootScope.baseURL +'/matchup/events?type=regular&state=upcoming').success(function (data, status, headers) {
 
                     $scope.regularEvents = data;
 
-                    $http.get('http://matchup.neptunolabs.com/matchup/events?type=regular&state=live').success(function (data, status, headers) {
+                    $http.get($rootScope.baseURL + '/matchup/events?type=regular&state=live').success(function (data, status, headers) {
                         $scope.regularLiveEvents = data;
 
                     }).error(function (data, status) {
@@ -77,16 +77,15 @@ function ($scope, $http, $state, sharedDataService, $q, $rootScope) {
 
 }]);
 
+myApp.controller('searchController', ['$scope', '$http', '$state', '$window', '$stateParams', 'MatchUpCache', '$rootScope', function ($scope, $http, $state, $window, $stateParams, MatchUpCache, $rootScope) {
 
-myApp.controller('searchController', ['$scope', '$http', '$state', '$window', '$stateParams', 'MatchUpCache', function ($scope, $http, $state, $window, $stateParams, MatchUpCache) {
-
-    MatchUpCache.remove('http://136.145.116.232/matchup/search/' + $stateParams.query + '');
-    $http.get('http://136.145.116.232/matchup/search/' + $stateParams.query + '', {
+    MatchUpCache.remove($rootScope.baseURL+'/matchup/search/' + $stateParams.query + '');
+    $http.get($rootScope.baseURL+'/matchup/search/' + $stateParams.query + '', {
         cache: MatchUpCache
     }).
     success(function (data, status, headers) {
 
-        console.log('http://136.145.116.232/matchup/search/' + $stateParams.query + '');
+        console.log($rootScope.baseURL+'/matchup/search/' + $stateParams.query + '');
 
         $scope.searchData = angular.fromJson(data);
         $scope.searchQuery = $stateParams.query;
@@ -115,14 +114,13 @@ myApp.controller('searchController', ['$scope', '$http', '$state', '$window', '$
 
  }]);
 
-
-myApp.controller('searchResultsController', ['$scope', '$http', '$state', '$window', '$stateParams', 'MatchUpCache',
-function ($scope, $http, $state, $window, $stateParams, MatchUpCache) {
+myApp.controller('searchResultsController', ['$scope', '$http', '$state', '$window', '$stateParams', 'MatchUpCache', '$rootScope',
+function ($scope, $http, $state, $window, $stateParams, MatchUpCache, $rootScope) {
         console.log("resultscontroller");
 
         $scope.type = $stateParams.type;
         console.log($scope.type);
-        $http.get('http://136.145.116.232/matchup/search/' + $stateParams.query + '', {
+        $http.get($rootScope.baseURL +'/matchup/search/' + $stateParams.query + '', {
             cache: MatchUpCache
         }).success(function (data, status, headers) {
 
@@ -157,7 +155,6 @@ function ($scope, $http, $state, $window, $stateParams, MatchUpCache) {
 
 }]);
 
-
 myApp.controller('loginController', ['$scope', '$http', '$state', '$window', 'AuthenticationService', '$rootScope',
 function ($scope, $http, $state, $window, AuthenticationService, $rootScope) {
 
@@ -170,11 +167,13 @@ function ($scope, $http, $state, $window, AuthenticationService, $rootScope) {
                     if (status == 200) {
                         AuthenticationService.SetCredentials($scope.credentials.username, response.token);
                         $scope.badCredentials = false;
-                        $state.go("app.home");
-                    } else {
-                        $scope.badCredentials = true;
-                    }
-                });
+                         $state.go("app.home");
+
+				} else {
+					$scope.badCredentials = true;
+				}
+				});
+
             }
         };
 
@@ -195,12 +194,12 @@ function ($scope, $http, $state, $window, AuthenticationService, $rootScope) {
         };
 }]);
 
-myApp.controller('sidebarController', ['$scope', '$window', '$http', '$state', 'AuthenticationService',
-function ($scope, $window, $http, $state, AuthenticationService) {
+myApp.controller('sidebarController', ['$scope', '$window', '$http', '$state', 'AuthenticationService', '$rootScope',
+function ($scope, $window, $http, $state, AuthenticationService, $rootScope) {
 	$scope.me = $window.sessionStorage.username;
 	
 	$scope.userSearch = function(query) {
- 		$http.get('http://136.145.116.232/matchup/search/users/' + query + '').success(function(data, status, headers) {
+ 		$http.get($rootScope.baseURL +'/matchup/search/users/' + query + '').success(function(data, status, headers) {
 			$scope.users = angular.fromJson(data);
 			console.log($scope.users);
 		}).error(function(data, status, headers) {
@@ -302,7 +301,7 @@ function ($scope, $window, $http, $state, AuthenticationService) {
             location = location.replace(" ", "%20");
             var params = [eventName, date, location];
 
-            $http.get('http://136.145.116.232/matchup/events/' + eventName + '?date=' + date + '&location=' + location + '').success(function (data, status) {
+            $http.get($rootScope.baseURL +'/matchup/events/' + eventName + '?date=' + date + '&location=' + location + '').success(function (data, status) {
 
                 if (data.host != null) {
                     $state.go('app.premiumEvent', {
@@ -331,10 +330,10 @@ function ($scope, $window, $http, $state, AuthenticationService) {
 
 }]);
 
-myApp.controller('gameViewController', ['$scope', '$http', '$state', 'sharedDataService', '$window',
-function ($scope, $http, $state, sharedDataService, $window) {
+myApp.controller('gameViewController', ['$scope', '$http', '$state', 'sharedDataService', '$window', '$rootScope',
+function ($scope, $http, $state, sharedDataService, $window, $rootScope) {
 
-        $http.get('http://matchup.neptunolabs.com/matchup/popular/games').success(function (data, status, headers) {
+        $http.get($rootScope.baseURL +'/matchup/popular/games').success(function (data, status, headers) {
             $scope.games = angular.fromJson(data);
 
         }).error(function (data, status) {
@@ -346,10 +345,10 @@ function ($scope, $http, $state, sharedDataService, $window) {
 
 }]);
 
-myApp.controller('genreViewController', ['$scope', '$http', '$state', 'sharedDataService', '$window',
-function ($scope, $http, $state, sharedDataService, $window) {
+myApp.controller('genreViewController', ['$scope', '$http', '$state', 'sharedDataService', '$window','$rootScope', 
+function ($scope, $http, $state, sharedDataService, $window, $rootScope) {
 
-        $http.get('http://matchup.neptunolabs.com/matchup/popular/genres').success(function (data, status, headers) {
+        $http.get($rootScope.baseURL +'/matchup/popular/genres').success(function (data, status, headers) {
             $scope.genres = angular.fromJson(data);
 
         }).error(function (data, status) {
@@ -363,8 +362,8 @@ function ($scope, $http, $state, sharedDataService, $window) {
 
 }]);
 
-myApp.controller('gameProfileController', ['$scope', '$http', '$state', 'sharedDataService', '$stateParams', '$window',
-function ($scope, $http, $state, sharedDataService, $stateParams, $window) {
+myApp.controller('gameProfileController', ['$scope', '$http', '$state', 'sharedDataService', '$stateParams', '$window', '$rootScope',
+function ($scope, $http, $state, sharedDataService, $stateParams, $window, $rootScope) {
 
         //TODO Need a route to look for info about a specific game!
         $scope.game = {
@@ -372,19 +371,19 @@ function ($scope, $http, $state, sharedDataService, $stateParams, $window) {
             "game_image": "http://upload.wikimedia.org/wikipedia/en/9/92/Halo_4_box_artwork.png"
         };
 
-        $http.get('http://136.145.116.232/matchup/events?filter=game&value=' + $stateParams.game + '&state=upcoming&hosted=true').success(function (data, status, headers) {
+        $http.get($rootScope.baseURL +'/matchup/events?filter=game&value=' + $stateParams.game + '&state=upcoming&hosted=true').success(function (data, status, headers) {
             $scope.gamesUpcomingHosted = angular.fromJson(data);
 
-            $http.get('http://136.145.116.232/matchup/events?filter=game&value=' + $stateParams.game + '&state=live&hosted=true').success(function (data, status, headers) {
+            $http.get($rootScope.baseURL +'/matchup/events?filter=game&value=' + $stateParams.game + '&state=live&hosted=true').success(function (data, status, headers) {
                 $scope.gamesLiveHosted = angular.fromJson(data);
 
-                $http.get('http://136.145.116.232/matchup/events?filter=game&value=' + $stateParams.game + '&state=upcoming').success(function (data, status, headers) {
+                $http.get($rootScope.baseURL +'/matchup/events?filter=game&value=' + $stateParams.game + '&state=upcoming').success(function (data, status, headers) {
                     $scope.gamesUpcoming = angular.fromJson(data);
 
-                    $http.get('http://136.145.116.232/matchup/events?filter=game&value=' + $stateParams.game + '&state=live').success(function (data, status, headers) {
+                    $http.get($rootScope.baseURL +'/matchup/events?filter=game&value=' + $stateParams.game + '&state=live').success(function (data, status, headers) {
                         $scope.gamesLive = angular.fromJson(data);
 
-                        $http.get('http://136.145.116.232/matchup/events?filter=game&value=' + $stateParams.game + '&state=past').success(function (data, status, headers) {
+                        $http.get($rootScope.baseURL +'/matchup/events?filter=game&value=' + $stateParams.game + '&state=past').success(function (data, status, headers) {
                             $scope.gamesPast = angular.fromJson(data);
 
                         }).error(function (data, status) {
@@ -423,16 +422,16 @@ function ($scope, $http, $state, sharedDataService, $stateParams, $window) {
 
 }]);
 
-myApp.controller('genreProfileController', ['$scope', '$http', '$state', 'sharedDataService', '$stateParams', '$window',
-function ($scope, $http, $state, sharedDataService, $stateParams, $window) {
+myApp.controller('genreProfileController', ['$scope', '$http', '$state', 'sharedDataService', '$stateParams', '$window', '$rootScope',
+function ($scope, $http, $state, sharedDataService, $stateParams, $window, $rootScope) {
 
-        $http.get('http://136.145.116.232/matchup/events?filter=genre&value=' + $stateParams.genre + '&state=upcoming').success(function (data, status, headers) {
+        $http.get($rootScope.baseURL +'/matchup/events?filter=genre&value=' + $stateParams.genre + '&state=upcoming').success(function (data, status, headers) {
             $scope.genresUpcoming = angular.fromJson(data);
 
-            $http.get('http://136.145.116.232/matchup/events?filter=genre&value=' + $stateParams.genre + '&state=live').success(function (data, status, headers) {
+            $http.get($rootScope.baseURL +'/matchup/events?filter=genre&value=' + $stateParams.genre + '&state=live').success(function (data, status, headers) {
                 $scope.genresLive = angular.fromJson(data);
 
-                $http.get('http://136.145.116.232/matchup/events?filter=genre&value=' + $stateParams.genre + '&state=past').success(function (data, status, headers) {
+                $http.get($rootScope.baseURL +'/matchup/events?filter=genre&value=' + $stateParams.genre + '&state=past').success(function (data, status, headers) {
                     $scope.genresPast = angular.fromJson(data);
 
                 }).error(function (data, status) {

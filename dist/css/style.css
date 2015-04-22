@@ -40,7 +40,7 @@ a:hover {
 }
 
 .banner-cover {
-	height: 40vh;
+	height: 350px;
 	width: 100%;
 }
 
@@ -113,7 +113,7 @@ a:hover {
 /*Matchup*/
 
 .img-circular {
-	background-image: url('http://neptunolabs.com/images/badillo.jpg');
+	/*background-image: url('http://neptunolabs.com/images/badillo.jpg');*/
 	background-size: cover;
 	border-style: solid;
 	border-width: 3px;
@@ -411,6 +411,25 @@ input[readonly] {
 	border-radius: 3px;
 	background-clip: padding-box;
 }
+.review .user-pic {
+	width: 60px;
+	height: 60px;
+	-webkit-border-radius: 3px;
+	-webkit-background-clip: padding-box;
+	-moz-border-radius: 3px;
+	-moz-background-clip: padding;
+	border-radius: 3px;
+	background-clip: padding-box;
+	float: left;
+}
+
+p.review-title {
+	padding-left: 20px;
+}
+
+.unsub {
+	float: right;
+}
 
 .tickets-container .tickets-list .ticket-item .ticket-user {
 	height: 80px;
@@ -545,4 +564,12 @@ input[readonly] {
 	-moz-box-shadow: none;
 	box-shadow: none;
 	margin: 3px 0 30px 0;
+}
+.content {
+	text-align: center;
+}
+.inner {
+	display: inline-block;
+}
+
 }

@@ -1,6 +1,6 @@
 var myApp = angular.module('organizer', []);
 
-myApp.controller("SeedingController", function($scope) {
+myApp.controller("SeedingController", function($scope, $rootScope) {
 
 	// Initiate Get from server and get tournaments in the event
 	$scope.tournaments = [{
@@ -113,117 +113,97 @@ myApp.controller("SeedingController", function($scope) {
 	}
 });
 
-myApp.controller("RegistrationController", function($scope) {
+myApp.controller("RegistrationController", function($scope, $http, $window, $rootScope, $state, $stateParams, $rootScope) {
 
 	// Initiate Get from server and get tournaments in the event
-	$scope.tournaments = [{
-		"name" : "Tournament 1"
-	}];
-	$scope.tournaments.unshift({
-		"name" : "Spectator"
+
+	//get all SPECTATORS for this event
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/spectators?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+		console.log("Spectators");
+		console.log(data);
+		$scope.spectators = data;
+	}).error(function(err) {
+		console.log(err);
 	});
 
-	$scope.index = 0;
+	//get all tournaments for this event
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+		console.log("Event Tournaments");
+		console.log(data);
+		$scope.tournaments = data;
 
-	$scope.signups = [{
-		"customer_username" : "thecap1",
-		"customer_first_name" : "James",
-		"customer_last_name" : "Kirk",
-		"customer_tag" : "The Real Cap",
-		"customer_profile_pic" : "http://neptunolabs.com/images/kirk.png",
-		"spec_fee_name" : "2-day Pass",
-		"check_in" : true
-	}, {
-		"customer_username" : "thecap2",
-		"customer_first_name" : "Jean-Luc",
-		"customer_last_name" : "Picard",
-		"customer_tag" : "Dragon",
-		"customer_profile_pic" : "http://neptunolabs.com/images/luc.png",
-		"spec_fee_name" : "3-day Pass",
-		"check_in" : false
-	}, {
-		"customer_username" : "thecap",
-		"customer_first_name" : "Jonathan",
-		"customer_last_name" : "Archer",
-		"customer_tag" : "Rocket",
-		"customer_profile_pic" : "http://neptunolabs.com/images/Archer.png",
-		"spec_fee_name" : "Opening Day Pass",
-		"check_in" : true
-	}];
+		$scope.tournaments.unshift({
+			"tournament_name" : "Spectator"
+		});
+
+	}).error(function(err) {
+		console.log(err);
+	}).finally(function() {
+		$scope.signups = $scope.spectators;
+		$scope.index = 0;
+	});
 
 	$scope.getRegistrationInfo = function(index) {
 		if (index == 0) {
 			$scope.index = index;
-			$scope.seedingCreated = false;
-			$scope.signups = [{
-				"customer_username" : "thecap1",
-				"customer_first_name" : "James",
-				"customer_last_name" : "Kirk",
-				"customer_tag" : "The Real Cap",
-				"customer_profile_pic" : "http://neptunolabs.com/images/kirk.png",
-				"spec_fee_name" : "2-day Pass",
-				"check_in" : true
-			}, {
-				"customer_username" : "thecap2",
-				"customer_first_name" : "Jean-Luc",
-				"customer_last_name" : "Picard",
-				"customer_tag" : "Dragon",
-				"customer_profile_pic" : "http://neptunolabs.com/images/luc.png",
-				"spec_fee_name" : "3-day Pass",
-				"check_in" : false
-			}, {
-				"customer_username" : "thecap",
-				"customer_first_name" : "Jonathan",
-				"customer_last_name" : "Archer",
-				"customer_tag" : "Rocket",
-				"customer_profile_pic" : "http://neptunolabs.com/images/Archer.png",
-				"spec_fee_name" : "Opening Day Pass",
-				"check_in" : true
-			}];
+			$scope.signups = $scope.spectators;
+
 		} else {
 			$scope.index = index;
-			$scope.seedingCreated = true;
-			$scope.signups = [{
-				"customer_username" : "thecap1",
-				"customer_first_name" : "James",
-				"customer_last_name" : "Smith",
-				"customer_tag" : "Duck",
-				"customer_profile_pic" : "http://neptunolabs.com/images/kirk.png",
-				"spec_fee_name" : "2-day Pass",
-				"check_in" : true
-			}, {
-				"customer_username" : "thecap2",
-				"customer_first_name" : "John",
-				"customer_last_name" : "117",
-				"customer_tag" : "Rodgers",
-				"customer_profile_pic" : "http://neptunolabs.com/images/luc.png",
-				"spec_fee_name" : "3-day Pass",
-				"check_in" : false
-			}, {
-				"customer_username" : "thecap",
-				"customer_first_name" : "Fitz",
-				"customer_last_name" : "Miranda",
-				"customer_tag" : "Donut",
-				"customer_profile_pic" : "http://neptunolabs.com/images/Archer.png",
-				"spec_fee_name" : "Opening Day Pass",
-				"check_in" : false
-			}];
+			$scope.signups = [];
+			//get competitors for tournament $scope.tournaments[index].tournament_name
+			$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[index].tournament_name + '/competitors?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+				console.log("Tournament Competitors");
+				console.log(data);
+				$scope.signups = data;
+
+			}).error(function(err) {
+				console.log(err);
+			});
+
 		}
 	}
 
 	$scope.checkIn = function(item) {
-		if (item.check_in) {
-			alert(item.customer_username + " (" + item.customer_tag + ") was unchecked");
-			item.check_in = false;
+		if ($scope.index == 0) {
+			//check or uncheck a spectator
+			$http.put($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/spectators/'+ item.customer_username +'?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+				
+				//console.log("Checking in " + item.customer_username + " as a spectator");
+				alert(item.customer_username + " ( " + item.customer_first_name + " " + item.customer_last_name + " ) " + checked(item) + " as a spectator");
+ 
+			}).error(function(err) {
+				console.log(err);
+			});
 		} else {
-			alert(item.customer_username + " (" + item.customer_tag + ") was checked");
+			//check or uncheck a competitor for tournament $scope.tournaments[$scope.index].tournament_name
+			$http.put($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '/competitors/' + item.competitor_number + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+				//console.log("Checking in " + item.customer_username + " as a competitor to the following tournament: '" + $scope.tournaments[index].tournament_name +"'");
+				alert(item.customer_username + " ( " + item.customer_first_name + " " + item.customer_last_name + " ) " + checked(item) + " as a competitor for the following tournament: '" + $scope.tournaments[$scope.index].tournament_name +"'");
+			}).error(function(err) {
+				console.log(err);
+			});
+		}
+
+		
+	};
+	
+	var checked = function(item){
+ 		if (item.check_in) {
+			//alert(item.customer_username + " (" + item.customer_tag + ") was unchecked");
+			item.check_in = false;
+			return "has been un-checked";
+			
+		} else {
+			//alert(item.customer_username + " (" + item.customer_tag + ") was checked");
 			item.check_in = true;
+			return "has succesfully been checked in";
 		}
 	};
 
 });
 
-myApp.controller("ReportsController", function($scope) {
+myApp.controller("ReportsController", function($scope, $rootScope) {
 
 	$scope.reports = [{
 		"type" : "Score Dispute",
