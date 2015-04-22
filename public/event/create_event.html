@@ -180,8 +180,8 @@
 								<li class="ticket-item">
 									<div class="row">
 										<div class="ticket-user col-md-10 col-sm-10 col-xs-10">
-											<img ng-src="{{item.img}}" class="user-avatar">
-											<span class="user-name">{{item.name}}</span>
+											<img ng-src="{{item.sponsor_logo}}" class="user-avatar">
+											<span class="user-name">{{item.sponsor_name}}</span>
 										</div>
 										<div class="ticket-time  col-md-2 col-sm-2 col-xs-2">
 											<div class="checkbox">
@@ -220,11 +220,9 @@
 						</div>
 					</div>
 					<div class="col-xs-12 col-md-6 col-lg-6">
-						<div class="form-group has-feedback">
-							<label class="control-label">Game</label>
-							<!-- 	TOOOOOOOOODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO   -->
-							<input type="text" class="form-control" placeholder="Search for Games" ng-model="tournament.game" />
-							<i class="form-control-feedback glyphicon glyphicon-search"></i>
+						<label>Game: </label>
+						<div class="form-group">
+							<ac-select ac-model="tournament.game" ac-options="game.game_name for game in games" ac-settings="{ itemHeight: '32' }"></select>
 						</div>
 					</div>
 				</div>
@@ -262,18 +260,28 @@
 				</div>
 				<div class="row">
 					<div ng-if="host != userOrganization[0]">
-						<div class="col-xs-12 col-md-6 col-lg-6">
+						<div class="col-xs-12 col-md-4 col-lg-4">
 							<label>Competitor Fee: </label>
 							<div class="form-group input-group">
 								<span class="input-group-addon">$</span>
 								<input type="text" class="form-control" ng-model="tournament.fee" valid-decimal>
 							</div>
 						</div>
-						<div class="col-xs-12 col-md-6 col-lg-6">
+						<div class="col-xs-12 col-md-4 col-lg-4">
 							<label>Seed Money: </label>
 							<div class="form-group input-group">
 								<span class="input-group-addon">$</span>
 								<input type="text" class="form-control" ng-model="tournament.seed_money" valid-decimal>
+							</div>
+						</div>
+						<div class="col-xs-12 col-md-4 col-lg-4">
+							<label>Seed Money: </label>
+							<div class="form-group">
+								<select class="form-control" ng-model="tournament.prize_distribution" ng-init="tournament.prize_distribution = 'Standard'">
+									<option ng-value="'Standard'">Standard</option>
+									<option ng-value="'First and Second'">First and Second</option>
+									<option ng-value="'Winner Takes All'">Winner Takes All</option>
+								</select>
 							</div>
 						</div>
 					</div>

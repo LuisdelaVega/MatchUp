@@ -1,4 +1,4 @@
-var myApp = angular.module('MatchUp', ['ui.router', 'ngResource', 'as.sortable', 'ui.bootstrap.datetimepicker', 'panhandler', 'Authentication', 'InputDirectives', 'bracketDirective', 'home', 'premium-events', 'tournaments', 'user', 'organizer', 'organization', 'forms']);
+var myApp = angular.module('MatchUp', ['ui.router', 'ngResource', 'as.sortable', 'ui.bootstrap.datetimepicker', 'panhandler', 'Authentication', 'InputDirectives', 'bracketDirective', 'acute.select' , 'home', 'premium-events', 'tournaments', 'user', 'organizer', 'organization', 'forms']);
 
 myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider) {
 	//
@@ -338,10 +338,13 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 	});
 });
 
-myApp.run(function ($rootScope, $state, AuthenticationService, $window) {
+myApp.run(function ($rootScope, $state, AuthenticationService, $window, acuteSelectService) {
 
 	$rootScope.baseURL = "http://136.145.116.232";
 	$rootScope.imgurKey = "6528448c258cff474ca9701c5bab6927";
+	
+	// Set the template path for all instances for acute template
+    acuteSelectService.updateSetting("templatePath", "../../public/event");
 
 	// Authenticated selected states, not used for capstone
 	//	$rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams,error) {
@@ -358,11 +361,11 @@ myApp.run(function ($rootScope, $state, AuthenticationService, $window) {
 
 myApp.factory("MatchUpCache", function ($cacheFactory) {
 	return $cacheFactory("cache");
-
 });
+
 myApp.factory('sharedDataService', function () {
 	var savedData = {}
-
+	
 	function set(data) {
 		savedData = data;
 	}
@@ -375,5 +378,4 @@ myApp.factory('sharedDataService', function () {
 		set: set,
 		get: get
 	}
-
 })

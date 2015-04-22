@@ -78,7 +78,8 @@ function($scope, $http, $stateParams, sharedDataService, $q, $state, $rootScope)
 				$scope.competitors = results[1].data;
 
 				initStuff();
-				getRounds();
+				// Comentado por ahora
+//				getRounds();
 			}, function(err) {
 				console.log(err);
 				console.log("Oh oh");
@@ -109,9 +110,11 @@ function($scope, $http, $stateParams, sharedDataService, $q, $state, $rootScope)
 		//http://matchup.neptunolabs.com/matchup/events/Event 01/tournaments/Ultra Street Fighter IV Qualifiers/rounds/1/matches/1?date=2015-03-25 09:00:00&location=miradero
 		//http://matchup.neptunolabs.com/matchup/events/Event 01/tournaments/Ultra Street Fighter IV Qualifiers/rounds?date=2015-03-25T09:00:00.000Z&location=miradero
 		//http://matchup.neptunolabs.com/matchup/events/Event 01/tournaments/Ultra Street Fighter IV Qualifiers/rounds?date=2015-03-25 09:00:00&location=miradero
-		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/rounds?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function(data, status) {
+		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $scope.tournamentInfo.tournament_name + '/rounds?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function(data, status) {
 			$scope.tournamentInfo = data;
-
+			
+			// Lo puse por ahora, manejo de tabs se debe hacer antes
+			$scope.roundsTab = true;
 			//console.log(data);
 		}).then(function() {
 			$scope.bracketType = $scope.tournamentInfo.finalStage.winnerRounds
