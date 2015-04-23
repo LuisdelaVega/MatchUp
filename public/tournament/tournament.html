@@ -14,9 +14,9 @@
 		<a data-target="#groupStage" data-toggle="tab">Group Stage</a>
 	</li>
 	<li ng-if="tournamentInfo.finalStage">
-		<a data-target="#rounds" data-toggle="tab" >Rounds</a>
+		<a data-target="#rounds" data-toggle="tab">Rounds</a>
 	</li>
-	<li ng-if="bracketTab">
+	<li>
 		<a data-target="#bracket" data-toggle="tab">Bracket</a>
 	</li>
 </ul>
@@ -27,13 +27,14 @@
 		<div class="panel-padding">
 			<!--			General Info    	 -->
 			<div class="box box-margin">
-				<h2 align="middle">{{tournamentInfo.tournament_name}}</h2>
+				<h2 align="middle">{{tournament.tournament_name}}</h2>
 				<div class="row">
 					<!--				Event Info   	  -->
 					<div class="col-xs-12 col-sm-8 col-md-8 col-lg-6 col-md-offset-2 col-sm-offset-2 col-lg-offset-0">
 						<div class="row">
 							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-5">
-								<a class="thumbnail" ng-click="goToEvent(eventInfo.event_name,  eventInfo.event_start_date, eventInfo.event_location)"><img class="profile-picture" ng-src='{{eventInfo.event_logo}}'></img> </a>
+								<a class="thumbnail" ng-click="goToEvent(eventInfo.event_name,  eventInfo.event_start_date, eventInfo.event_location)"><img class="profile-picture" ng-src='{{eventInfo.event_logo}}'></img>
+								</a>
 							</div>
 							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-7">
 								<h2>{{eventInfo.event_name}}</h2>
@@ -96,7 +97,8 @@
 				<!--					Tournament Info-->
 				<div class="row tab-padding-top">
 					<div class="col-lg-2 col-md-3 col-xs-12">
-						<a class="thumbnail" ng-click="goToGameProfile(tournamentInfo.game_name)"> <img ng-src="{{tournamentInfo.game_image}}"> <h4 align="center">{{tournamentInfo.game_name}}</h4> </a>
+						<a class="thumbnail" ng-click="goToGameProfile(tournament.game_name)"> <img ng-src="{{tournament.game_image}}">
+							<h4 align="center">{{tournament.game_name}}</h4> </a>
 					</div>
 					<div class="col-lg-10 col-md-9 col-xs-12">
 						<!--						Tournament Details-->
@@ -271,103 +273,26 @@
 		</div>
 	</div>
 	<div class="tab-pane fade" id="standings" ng-if="standingsTab"></div>
-	<div class="tab-pane fade" id="rounds" >
-
-		<div class="header" align="center" >
-			<h3>Rounds</h3>
-		</div>
-		<div class="panel-padding" >
-			<div class="row ">
-				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-lg-offset-4">
-					<div class="media panel-padding" >
-						<div class="media-header" align="center" >
-							<div ng-if="tournamentInfo.finalStage.loserRounds">
-								<label >Bracket: </label>
-								<select class="form-control" ng-model="bracket" ng-options="item for item in bracketTypes" ng-change="bracketChange(bracket)"></select>
-								<br/>
-							</div>
-
-							<label>Rounds: </label>
-							<select class="form-control" ng-model="selectedRound" ng-options="'Round '+item.round_number for item in bracketType" ></select>
-
-						</div>
-						<div class="media-body panel-padding"></div>
-						<form>
-							<div class="input-group custom-search-form" >
-								<input ng-model="roundQuery" type="text" class="form-control" placeholder="Search...">
-								<span class="input-group-btn">
-									<button class="btn btn-default disabled" type="button" >
-										<i class="fa fa-search"></i>
-									</button> </span>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-			<div class="row" >
-				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6"  ng-repeat="match in bracketType[selectedRound.round_number-1].matches  | filter:roundQuery">
-					<div class="row">
-						<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-md-offset-1 col-lg-offset-1">
-							<div class="box box-margin cursor">
-								<h4 class="modal-title" align="center"> Round {{selectedRound.round_number}} Match {{match.match_number}}</h4>
-								<br>
-								<div class="row" align="center">
-									<!-- {{tournamentInfo.finalStage.winnerRounds[1].matches[1].players[1].customer_username}} -->
-
-									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
-										<!-- <div class="img-circular player-1 large center-block"></div> -->
-										<img class="img-circular player-1 large center-block" ng-src="{{match.players[0].customer_profile_pic}}" />
-									</div>
-									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-										<h1 style="text-align:center">
-										<br>
-										{{match.players[0].score}}-{{match.players[1].score}}</h1>
-									</div>
-									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-										<!-- <div class="img-circular player-2 large center-block"></div> -->
-										<img class="img-circular player-2 large center-block" ng-src="{{match.players[1].customer_profile_pic}}" />
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-										<h3 style="text-align:center">{{match.players[0].customer_tag}}</h3>
-									</div>
-									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-										<h4 style="text-align:center"></h4>
-									</div>
-									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-										<h3 style="text-align:center">{{match.players[1].customer_tag}}</h3>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-
-	</div>
-	<!-- ng-if="roundsTab" -->
 	<div class="tab-pane fade" id="groupStage" ng-if="tournamentInfo.groupStage">
 		<div class="header" align="center">
 			<h3>Group Stage</h3>
 		</div>
 
-		<div class="panel-padding" >
+		<div class="panel-padding">
 			<div class="row ">
 				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-lg-offset-4">
-					<div class="media panel-padding" >
+					<div class="media panel-padding">
 						<div class="media-header">
 							<label>Groups: </label>
 							<select class="form-control" ng-model="selectedGroup" ng-options="'Group '+item.group_number for item in tournamentInfo.groupStage.groups" ng-change="resetGroup(selectedGroup)"></select>
 							<br/>
 							<label>Rounds: </label>
 							<select class="form-control" ng-model="selectedGroupRound" ng-options="'Round '+item.round_number for item in selectedGroup.rounds"></select>
- 
+
 						</div>
 						<div class="media-body panel-padding"></div>
 						<form>
-							<div class="input-group custom-search-form" >
+							<div class="input-group custom-search-form">
 								<input ng-model="groupRoundQuery" type="text" class="form-control" placeholder="Search...">
 								<span class="input-group-btn">
 									<button class="btn btn-default disabled" type="button" >
@@ -378,8 +303,8 @@
 					</div>
 				</div>
 			</div>
-			<div class="row" >
-				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6"  ng-repeat="match in selectedGroup.rounds[selectedGroupRound.round_number-1].matches  | filter:groupRoundQuery">
+			<div class="row">
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6" ng-repeat="match in selectedGroup.rounds[selectedGroupRound.round_number-1].matches  | filter:groupRoundQuery">
 					<div class="row">
 						<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-md-offset-1 col-lg-offset-1">
 							<div class="box box-margin cursor">
@@ -423,7 +348,122 @@
 		<div class="tab-pane fade" id="bracket" ng-if="bracketTab"></div>
 		<!--	registered users -->
 	</div>
+	<div class="tab-pane fade" id="rounds">
+
+		<div class="header" align="center">
+			<h3>Rounds</h3>
+		</div>
+		<div class="panel-padding">
+			<div class="row ">
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-lg-offset-4">
+					<div class="media panel-padding">
+						<div class="media-header" align="center">
+							<div ng-if="tournamentInfo.finalStage.loserRounds">
+								<label>Bracket: </label>
+								<select class="form-control" ng-model="bracket" ng-options="item for item in bracketTypes" ng-change="bracketChange(bracket)"></select>
+								<br/>
+							</div>
+
+							<label>Rounds: </label>
+							<select class="form-control" ng-model="selectedRound" ng-options="'Round '+item.round_number for item in bracketType"></select>
+
+						</div>
+						<div class="media-body panel-padding"></div>
+						<form>
+							<div class="input-group custom-search-form">
+								<input ng-model="roundQuery" type="text" class="form-control" placeholder="Search...">
+								<span class="input-group-btn">
+									<button class="btn btn-default disabled" type="button" >
+										<i class="fa fa-search"></i>
+									</button> </span>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6" ng-repeat="match in bracketType[selectedRound.round_number-1].matches  | filter:roundQuery">
+					<div class="row">
+						<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-md-offset-1 col-lg-offset-1">
+							<div class="box box-margin cursor">
+								<h4 class="modal-title" align="center"> Round {{selectedRound.round_number}} Match {{match.match_number}}</h4>
+								<br>
+								<div class="row" align="center">
+									<!-- {{tournamentInfo.finalStage.winnerRounds[1].matches[1].players[1].customer_username}} -->
+
+									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+										<!-- <div class="img-circular player-1 large center-block"></div> -->
+										<img class="img-circular player-1 large center-block" ng-src="{{match.players[0].customer_profile_pic}}" />
+									</div>
+									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+										<h1 style="text-align:center">
+										<br>
+										{{match.players[0].score}}-{{match.players[1].score}}</h1>
+									</div>
+									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+										<!-- <div class="img-circular player-2 large center-block"></div> -->
+										<img class="img-circular player-2 large center-block" ng-src="{{match.players[1].customer_profile_pic}}" />
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+										<h3 style="text-align:center">{{match.players[0].customer_tag}}</h3>
+									</div>
+									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+										<h4 style="text-align:center"></h4>
+									</div>
+									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+										<h3 style="text-align:center">{{match.players[1].customer_tag}}</h3>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<div class="tab-pane fade" id="bracket">
+		<div class="panel-padding">
+			<div class="box box-margin">
+				<h3 ng-if="tournament.tournament_format == 'Double Elimination'" class="page-header">Winners Bracket</h3>
+				<div class="overflow-container" ng-style="bracketHeight">
+					<div class="overflow">
+						<div class="tournament">
+							<h4 ng-repeat="round in rounds" style="width:200px" align="middle">Round {{$index + 1}}</h4>
+						</div>
+						<div class="tournament format">
+							<ul class="round" ng-repeat="round in rounds">
+								<li class="spacer" ng-repeat-start="item in round" ng-if="$first">&nbsp;</li>
+								<match player1={{item.players[0].customer_tag}} score1={{item.players[0].score}} position1={{item.players[0].position}} player2={{item.players[1].customer_tag}} score2={{item.players[1].score}} position1={{item.players[1].position}} bye='{{item.bye}}' match="{{item.match_number}}" completed="{{item.match_completed}}" loser-bye="{{item.isLoser}}" extra="{{item.extra}}"></match>
+								<li class="spacer" ng-repeat-end>&nbsp;</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="box box-margin" ng-if="tournament.tournament_format == 'Double Elimination'">
+				<h3 class="page-header">Loser Bracket</h3>
+				<div class="overflow-container" ng-style="loserBracketHeight">
+					<div class="overflow">
+						<div class="tournament">
+							<h4 ng-repeat="round in loserRounds" style="width:200px" align="middle">Round {{$index + 1}}</h4>
+						</div>
+						<div class="tournament format">
+							<ul class="round" ng-repeat="round in loserRounds">
+								<li class="spacer" ng-repeat-start="item in round" ng-if="$first">&nbsp;</li>
+								<match player1={{item.players[0].customer_tag}} score1={{item.players[0].score}} position1={{item.players[0].position}} player2={{item.players[1].customer_tag}} score2={{item.players[1].score}} position1={{item.players[1].position}} bye='{{item.bye}}' match="{{item.match_number}}" completed="{{item.match_completed}}" loser-bye="{{round.isLoser}}" extra="{{item.extra}}"></match>
+								<li class="spacer" ng-repeat-end>&nbsp;</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
+
 <div class="modal fade" id="competitorSignUpModal" tabindex="-1" role="dialog" aria-labelledby="competitorSignUpModal" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
@@ -441,18 +481,15 @@
 					<div class="form-group">
 						<div class="radio">
 							<label>
-								<input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
-								Team 1 </label>
+								<input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked> Team 1 </label>
 						</div>
 						<div class="radio">
 							<label>
-								<input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
-								Team 2 </label>
+								<input type="radio" name="optionsRadios" id="optionsRadios2" value="option2"> Team 2 </label>
 						</div>
 						<div class="radio">
 							<label>
-								<input type="radio" name="optionsRadios" id="optionsRadios3" value="option3">
-								Team 3 </label>
+								<input type="radio" name="optionsRadios" id="optionsRadios3" value="option3"> Team 3 </label>
 						</div>
 					</div>
 				</form>

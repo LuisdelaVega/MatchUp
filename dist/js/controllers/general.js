@@ -364,12 +364,8 @@ function ($scope, $http, $state, sharedDataService, $window, $rootScope) {
 
 myApp.controller('gameProfileController', ['$scope', '$http', '$state', 'sharedDataService', '$stateParams', '$window', '$rootScope',
 function ($scope, $http, $state, sharedDataService, $stateParams, $window, $rootScope) {
-
-        //TODO Need a route to look for info about a specific game!
-        $scope.game = {
-            "game_name": "Got route?",
-            "game_image": "http://upload.wikimedia.org/wikipedia/en/9/92/Halo_4_box_artwork.png"
-        };
+	
+	$scope.gameName = $stateParams.game;
 
         $http.get($rootScope.baseURL +'/matchup/events?filter=game&value=' + $stateParams.game + '&state=upcoming&hosted=true').success(function (data, status, headers) {
             $scope.gamesUpcomingHosted = angular.fromJson(data);
@@ -463,13 +459,12 @@ myApp.controller('myEventsController', ['$scope', '$http', '$state', '$statePara
         $scope.live = [];
         $scope.history = [];
         for (var i = 0; i < data.length; i++) {
-            // Categorize events by date
             var start = new Date(data[i].event_start_date).getTime();
             var end = new Date(data[i].event_end_date).getTime();
             var now = new Date().getTime();
             if (now < start)
                 $scope.upcoming.push(data[i]);
-            if (now > start && now < end)
+            else if (now > start && now < end)
                 $scope.live.push(data[i]);
             else
                 $scope.history.push(data[i]);

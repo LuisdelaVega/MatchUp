@@ -1,3 +1,5 @@
+<h2 class="page-header">{{gameName}}</h2>
+
 <!-- Nav tabs -->
 <ul class="nav nav-tabs nav-justified tab-padding-top">
 	<li class="active">
@@ -15,7 +17,7 @@
 	<div class="tab-pane fade in active" id="upcomingGame">
 		<div class="row">
 			<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat= "event in gamesUpcoming">
-				<a class="thumbnail" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_logo}}" alt="{{event.event_name}}" >
+				<a class="thumbnail" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_banner}}" alt="{{event.event_name}}" >
 					<hr class="hr-custom-padding">
 					<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 						overflow: hidden;">
@@ -37,7 +39,7 @@
 	<div class="tab-pane fade" id="liveGame">
 		<div class="row">
 			<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat= "event in gamesLive">
-				<a class="thumbnail" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_logo}}" alt="{{event.event_name}}" >
+				<a class="thumbnail" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_banner}}" alt="{{event.event_name}}" >
 					<hr class="hr-custom-padding">
 					<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 						overflow: hidden;">
@@ -58,7 +60,7 @@
 	<div class="tab-pane fade" id="historyGame">
 		<div class="row">
 			<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat= "event in gamesPast">
-				<a class="thumbnail" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_logo}}" alt="{{event.event_name}}" >
+				<a class="thumbnail" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_banner}}" alt="{{event.event_name}}" >
 					<hr class="hr-custom-padding">
 					<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 						overflow: hidden;">

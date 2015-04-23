@@ -71,7 +71,7 @@
 	<div class="tab-pane fade" id="regular">
 		<div class="row">
 			<div class="col-lg-6 col-md-12 col-sm-12 regular-event-card" ng-repeat="regular in regularLiveEvents">
-				<div class="box cursor" ng-click="goToEvent(hosted.event_name,  hosted.event_start_date, hosted.event_location)">
+				<div class="box cursor" ng-click="goToEvent(regular.event_name,  regular.event_start_date, regular.event_location)">
 					<div class="media">
 						<img class="pull-left event-organizer-thumbnail center-block" ng-src="{{regular.event_logo}}">
 						<div class="media-body">
@@ -86,7 +86,7 @@
 				</div>
 			</div>
 			<div class="col-lg-6 col-md-12 col-sm-12 regular-event-card" ng-repeat="regular in regularEvents">
-				<div class="box cursor" ng-click="goToEvent(hosted.event_name,  hosted.event_start_date, hosted.event_location)">
+				<div class="box cursor" ng-click="goToEvent(regular.event_name,  regular.event_start_date, regular.event_location)">
 					<div class="media">
 						<img class="pull-left event-organizer-thumbnail center-block" ng-src="{{regular.event_logo}}">
 						<div class="media-body">

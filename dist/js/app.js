@@ -320,7 +320,6 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 				if (!AuthenticationService.isAuthenticated() || rejection.status == 401) {
 					$state.go("login");
 					AuthenticationService.clearCredentials();
-					console.log("hey");
 				}
 				// Handle other routes
 				else if (rejection.status == 404)

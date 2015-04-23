@@ -5,7 +5,8 @@
 .overflow-container{
 	width: 100%;
 	position: relative;
-	overflow-x:hidden;
+	overflow-x:scroll;
+	overflow-y: hidden;
 }
 
 .overflow{
