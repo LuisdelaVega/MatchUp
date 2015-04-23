@@ -17,7 +17,7 @@
 				<h4 class="list-group-item-heading">Station</h4>
 				<p class="list-group-item-text">Manage station across the event.</p>
 			</a>
-			<a ui-sref="app.seeding" class="list-group-item ">
+			<a ui-sref="app.seeding({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location})" class="list-group-item ">
 				<h4 class="list-group-item-heading">Seeding and Rounds</h4>
 				<p class="list-group-item-text">Arrange seeds for each tournament and create the bracket. Assign dates to the round of the tournament.</p>
 			</a>

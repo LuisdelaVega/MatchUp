@@ -133,7 +133,7 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			controller: "StationController"
 		})
 		.state('app.seeding', {
-			url: "/seeding",
+			url: "/event/:eventName/:eventDate/:eventLocation/seeding",
 			templateUrl: "organizer/seeding.html",
 			controller: "SeedingController"
 		})

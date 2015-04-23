@@ -1,119 +1,78 @@
 var myApp = angular.module('organizer', []);
 
-myApp.controller("SeedingController", function($scope, $rootScope) {
+myApp.controller("SeedingController", function($scope, $http, $window, $rootScope, $state, $stateParams) {
+	$scope.competitors = [];
 
 	// Initiate Get from server and get tournaments in the event
-	$scope.tournaments = [{
-		"name" : "Tournament 1"
-	}, {
-		"name" : "Tournament 2"
-	}, {
-		"name" : "Tournament 3"
-	}];
+	//get all tournaments for this event
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+		$scope.tournaments = data;
 
-	$scope.competitors = [{
-		name : 'tag 1',
-		firstName : 'Rafa'
-	}, {
-		name : 'tag 2',
-		firstName : 'Luis'
-	}, {
-		name : 'tag 3',
-		firstName : 'Sam'
-	}, {
-		name : 'tag 4',
-		firstName : 'Badillo'
-	}];
+	}).error(function(err) {
+		console.log(err);
+	}).then(function() {
+		$scope.index = 0;
+		$scope.getTournament(0);
 
-	$scope.index = 0;
+	});
 
-	$scope.seedingCreated = false;
-	$scope.rounds = [{
-		name : 'Round 1',
-	}, {
-		name : 'Round 2',
-	}, {
-		name : 'Round 3',
+	$scope.getTournament = function(index) {
+		$scope.index = index;
+		//get competitors for tournament $scope.tournaments[index].tournament_name
+		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '/competitors/checked?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+			$scope.competitors = data.competitors;
+			$scope.bracket = data.stages_created;
+			$scope.teamBased = data.team_size > 1;
+			console.log(data);
 
-	}, {
-		name : 'Round 4'
-	}];
+		}).error(function(err) {
+			console.log(err);
+		});
 
-	$scope.getSeedingInfo = function(index) {
-		if (index == 0) {
-			$scope.index = index;
-			$scope.seedingCreated = false;
-			$scope.competitors = [{
-				name : 'tag 1',
-				firstName : 'Rafa'
-			}, {
-				name : 'tag 2',
-				firstName : 'Luis'
-			}, {
-				name : 'tag 3',
-				firstName : 'Sam'
-			}, {
-				name : 'tag 4',
-				firstName : 'Badillo'
-			}];
-		} else if (index == 1) {
-			$scope.index = index;
-			$scope.seedingCreated = true;
-			$scope.competitors = [{
-				name : 'tag 1',
-				firstName : 'Jill'
-			}, {
-				name : 'tag 2',
-				firstName : 'Apu'
-			}];
-			$scope.rounds = [{
-				name : 'Round 1',
-			}, {
-				name : 'Round 2',
-			}, {
-				name : 'Round 3',
+	};
 
-			}, {
-				name : 'Round 4'
-			}];
-		} else {
-			$scope.index = index;
-			$scope.seedingCreated = true;
-			$scope.rounds = [{
-				name : 'Round 1',
-				date : new Date()
-			}, {
-				name : 'Round 2',
-				date : new Date()
-			}, {
-				name : 'Round 3',
-				date : new Date()
+	$scope.deleteBracket = function() {
+		$scope.index
+		//TODO call to delete bracket
+		console.log("Still testing, we need the current brackets!");
 
-			}, {
-				name : 'Round 4',
-				date : new Date()
-			}];
+	};
+	$scope.createBracket = function() {
+		//TODO call create bracket
+		///* /matchup/events/:event/tournaments/:tournament/create?date=date&location=string
+		$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '/create?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+			console.log(data);
+			$scope.bracket = true;
+			alert("Bracket succesfully created for the following tournament: " + $scope.tournaments[$scope.index].tournament_name);
+
+		}).error(function(err) {
+			console.log(err);
+		});
+
+	};
+	$scope.saveSeeding = function() {
+		var seedList = $scope.competitors;
+		for (var i = 0; i < seedList.length; i++) {
+			seedList[i].seed = i + 1;
 		}
-	}
+		$http.put($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '/competitors/checked?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation, {
+			"players" : seedList
+		}).success(function(data) {
+			console.log(data);
+		}).error(function(err) {
+			console.log(err);
+		});
+
+	};
+
 	// Configure draggable table
 	$scope.sortableOptions = {
 		containment : '#sortable-container'
 	};
 
-	$scope.createTournament = function() {
-		$scope.seedingCreated = true;
-	}
-
-	$scope.setDate = function() {
-		for ( i = 0; i < $scope.rounds.length - 1; i++) {
-			if ($scope.rounds[i].date > $scope.rounds[i + 1].date) {
-				alert("Invalid dates");
-			}
-		}
-	}
 });
 
-myApp.controller("RegistrationController", function($scope, $http, $window, $rootScope, $state, $stateParams, $rootScope) {
+myApp.controller("RegistrationController", function($scope, $http, $window, $rootScope, $state, $stateParams) {
 
 	// Initiate Get from server and get tournaments in the event
 
@@ -167,11 +126,11 @@ myApp.controller("RegistrationController", function($scope, $http, $window, $roo
 	$scope.checkIn = function(item) {
 		if ($scope.index == 0) {
 			//check or uncheck a spectator
-			$http.put($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/spectators/'+ item.customer_username +'?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
-				
+			$http.put($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/spectators/' + item.customer_username + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+
 				//console.log("Checking in " + item.customer_username + " as a spectator");
 				alert(item.customer_username + " ( " + item.customer_first_name + " " + item.customer_last_name + " ) " + checked(item) + " as a spectator");
- 
+
 			}).error(function(err) {
 				console.log(err);
 			});
@@ -179,21 +138,20 @@ myApp.controller("RegistrationController", function($scope, $http, $window, $roo
 			//check or uncheck a competitor for tournament $scope.tournaments[$scope.index].tournament_name
 			$http.put($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '/competitors/' + item.competitor_number + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
 				//console.log("Checking in " + item.customer_username + " as a competitor to the following tournament: '" + $scope.tournaments[index].tournament_name +"'");
-				alert(item.customer_username + " ( " + item.customer_first_name + " " + item.customer_last_name + " ) " + checked(item) + " as a competitor for the following tournament: '" + $scope.tournaments[$scope.index].tournament_name +"'");
+				alert(item.customer_username + " ( " + item.customer_first_name + " " + item.customer_last_name + " ) " + checked(item) + " as a competitor for the following tournament: '" + $scope.tournaments[$scope.index].tournament_name + "'");
 			}).error(function(err) {
 				console.log(err);
 			});
 		}
 
-		
 	};
-	
-	var checked = function(item){
- 		if (item.check_in) {
+
+	var checked = function(item) {
+		if (item.check_in) {
 			//alert(item.customer_username + " (" + item.customer_tag + ") was unchecked");
 			item.check_in = false;
 			return "has been un-checked";
-			
+
 		} else {
 			//alert(item.customer_username + " (" + item.customer_tag + ") was checked");
 			item.check_in = true;
