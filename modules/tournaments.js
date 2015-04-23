@@ -2376,7 +2376,7 @@ var arrangeSeeds = function(req, res, pg, conString, log) {
 			if (result.rows.length) {
 				if (req.body.players && req.body.players.length == parseInt(result.rows[0].players) && req.body.players.length > 1) {
 					for (var i = 0, index = 0; i < result.rows[0].players; i++) {
-						changeSeedValue(req, res, client, done, log, req.body.players[i].competitor_number, req.body.players[i].seed, index++, req.body.players.length-1);
+						changeSeedValue(req, res, client, done, log, parseInt(req.body.players[i].competitor_number), parseInt(req.body.players[i].seed), index++, req.body.players.length-1);
 					}
 				} else {
 					client.query("ROLLBACK");
