@@ -10,13 +10,13 @@
 	<li ng-if="standingsTab">
 		<a data-target="#standings" data-toggle="tab">Standings</a>
 	</li>
-	<li ng-if="tournamentInfo.groupStage">
+	<li ng-if="groupStageTab">
 		<a data-target="#groupStage" data-toggle="tab">Group Stage</a>
 	</li>
-	<li ng-if="tournamentInfo.finalStage">
+	<li ng-if="roundsTab">
 		<a data-target="#rounds" data-toggle="tab">Rounds</a>
 	</li>
-	<li>
+	<li ng-if="roundsTab">
 		<a data-target="#bracket" data-toggle="tab">Bracket</a>
 	</li>
 </ul>
@@ -216,13 +216,13 @@
 				</div>
 
 				<div class="btn-group btn-group-justified box-margin" role="group">
-					<div class="btn-group" role="group">
+					<div class="btn-group" role="group" ng-if="!eventInfo.is_organizer && !tournament.is_competitor && canRegister">
 						<button type="button" class="btn btn-default" data-target="#competitorSignUpModal" data-toggle="modal">
 							Competitor Sign Up
 						</button>
 					</div>
 
-					<div class="btn-group" role="group" ng-if="eventInfo.is_organizer && !finished && eventInfo.is_organizer">
+					<div class="btn-group" role="group" ng-if="eventInfo.is_organizer && !finished">
 						<button type="button" class="btn btn-primary" ui-sref="app.eventSettings({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location })">
 							Settings
 						</button>
@@ -231,7 +231,7 @@
 
 			</div>
 			<!--			Sponsors-->
-			<div class="box box-margin" ng-if="eventInfo.host">
+			<div class="box box-margin" ng-if="sponsors.length">
 				<p class="info-title">
 					Sponsors
 				</p>
@@ -274,10 +274,6 @@
 	</div>
 	<div class="tab-pane fade" id="standings" ng-if="standingsTab"></div>
 	<div class="tab-pane fade" id="groupStage" ng-if="tournamentInfo.groupStage">
-		<div class="header" align="center">
-			<h3>Group Stage</h3>
-		</div>
-
 		<div class="panel-padding">
 			<div class="row ">
 				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-lg-offset-4">
@@ -308,7 +304,7 @@
 					<div class="row">
 						<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-md-offset-1 col-lg-offset-1">
 							<div class="box box-margin cursor">
-								<h4 class="modal-title" align="center"> Round {{selectedRound.round_number}} Match {{match.match_number}}</h4>
+								<h4 class="modal-title" align="center"> Round {{selectedGroupRound.round_number}} Match {{match.match_number}}</h4>
 								<br>
 								<div class="row" align="center">
 									<!-- {{tournamentInfo.finalStage.winnerRounds[1].matches[1].players[1].customer_username}} -->
@@ -344,15 +340,8 @@
 				</div>
 			</div>
 		</div>
-
-		<div class="tab-pane fade" id="bracket" ng-if="bracketTab"></div>
-		<!--	registered users -->
 	</div>
 	<div class="tab-pane fade" id="rounds">
-
-		<div class="header" align="center">
-			<h3>Rounds</h3>
-		</div>
 		<div class="panel-padding">
 			<div class="row ">
 				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-lg-offset-4">
@@ -429,7 +418,7 @@
 			<div class="box box-margin">
 				<h3 ng-if="tournament.tournament_format == 'Double Elimination'" class="page-header">Winners Bracket</h3>
 				<div class="overflow-container" ng-style="bracketHeight">
-					<div class="overflow">
+					<div class="overflow noselect">
 						<div class="tournament">
 							<h4 ng-repeat="round in rounds" style="width:200px" align="middle">Round {{$index + 1}}</h4>
 						</div>
@@ -446,7 +435,7 @@
 			<div class="box box-margin" ng-if="tournament.tournament_format == 'Double Elimination'">
 				<h3 class="page-header">Loser Bracket</h3>
 				<div class="overflow-container" ng-style="loserBracketHeight">
-					<div class="overflow">
+					<div class="overflow noselect">
 						<div class="tournament">
 							<h4 ng-repeat="round in loserRounds" style="width:200px" align="middle">Round {{$index + 1}}</h4>
 						</div>
