@@ -1,58 +1,93 @@
 <div class="row">
 	<div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+
 		<div class="list-group">
-			<a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="tournament in tournaments" ng-click="getSeedingInfo($index)">
-				<h4 class="list-group-item-heading">{{tournament.name}}</h4>
-			</a>
+			<!-- <a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="tournament in tournaments" ng-click="getSeedingInfo($index)"> -->
+			<a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="tournament in tournaments" ng-click="getTournament($index)"> <h4 class="list-group-item-heading">{{tournament.tournament_name}}</h4> </a>
 		</div>
 	</div>
-	<div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+	<div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
 		<div class="box">
-			<legend>Seed</legend>
+			<legend>
+				Seed
+			</legend>
 			<div class="row">
-				<div class="col-md-8 col-md-offset-2">
-					<table class="table table-hover" as-sortable="sortableOptions" ng-model="competitors" is-disabled="seedingCreated">
+				<!-- IF the tournament is not team based  -->
+				<div class="col-md-6 col-md-offset-3" ng-if="!teamBased">
+					<table class="table table-hover noselect" as-sortable="sortableOptions" ng-model="competitors" is-disabled="seedingCreated" ng-change="sdf()">
 						<thead>
 							<tr>
 								<th>Seed</th>
 								<th>Tag</th>
-								<th>Name</th>
+								<th>User Name</th>
 							</tr>
 						</thead>
-						<tbody ng-repeat="item in competitors" as-sortable-item class="as-sortable-item">
+						<tbody ng-repeat="competitor in competitors" as-sortable-item class="as-sortable-item">
 							<tr as-sortable-item-handle class="as-sortable-item-handle">
-								<td style="width:10%">{{$index + 1}}</td>
-								<td data-ng-bind="item.name"></td>
-								<td data-ng-bind="item.firstName"></td>
+								<td style="width:30%">{{$index + 1}}</td>
+								<td data-ng-bind="competitor.customer_tag"></td>
+								<td data-ng-bind="competitor.customer_username"></td>
+
 							</tr>
 						</tbody>
 					</table>
+					<div class="btn-group btn-group-justified box-margin" role="group">
+						<div class="btn-group" role="group" ng-if="!bracket" >
+							<button class="btn btn-primary" ng-click="saveSeeding()" >
+								Save Seeding
+							</button>
+						</div>
+						<div class="btn-group " role="group" ng-if="!bracket" >
+							<button class="btn btn-success" ng-click="createBracket()">
+								Create Bracket
+							</button>
+						</div>
+						<div class="btn-group" role="group" ng-if="bracket" >
+							<button class="btn btn-danger" ng-click="deleteBracket()">
+								Delete Bracket
+							</button>
+						</div>
+					</div>
+
 				</div>
-				<div class="col-md-6 col-md-offset-3" ng-if="!seedingCreated">
-					<button class="btn btn-success btn-block" ng-click="createTournament()">Create Tournament Bracket</button>
-				</div>
-			</div>
-		</div>
-		<div class="box box-margin" ng-if="seedingCreated">
-			<legend>Group Stages</legend>
-			<div class="row">
-				<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-repeat="round in rounds">
-					<div class="dropdown">
-						<lable>{{round.name}}</lable>
-						<a class="dropdown-toggle" id="dropdown{{$index}}" role="button" data-toggle="dropdown">
-							<div class="input-group">
-								<input type="text" class="form-control" data-ng-model="round.date"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-							</div>
-						</a>
-						<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-							<datetimepicker data-ng-model="round.date" data-datetimepicker-config="{ dropdownSelector: '#dropdown{{$index}}' }" />
-						</ul>
+				<!-- IF the tournament is team based  -->
+				<div class="col-md-6 col-md-offset-3" ng-if="teamBased">
+					<table class="table table-hover noselect" as-sortable="sortableOptions" ng-model="competitors" is-disabled="seedingCreated" ng-change="sdf()">
+						<thead>
+							<tr>
+								<th>Seed</th>
+								<th>Team Name</th>
+							</tr>
+						</thead>
+						<tbody ng-repeat="competitor in competitors" as-sortable-item class="as-sortable-item">
+							<tr as-sortable-item-handle class="as-sortable-item-handle">
+								<td style="width:30%">{{$index + 1}}</td>
+								<td data-ng-bind="competitor.team_name"></td>
+
+							</tr>
+						</tbody>
+					</table>
+					<div class="btn-group btn-group-justified box-margin" role="group">
+						<div class="btn-group" role="group" ng-if="!bracket" >
+							<button class="btn btn-primary" ng-click="saveSeeding()" >
+								Save Seeding
+							</button>
+						</div>
+						<div class="btn-group " role="group" ng-if="!bracket" >
+							<button class="btn btn-success" ng-click="createBracket()">
+								Create Bracket
+							</button>
+						</div>
+						<div class="btn-group" role="group" ng-if="bracket" >
+							<button class="btn btn-danger" ng-click="deleteBracket()">
+								Delete Bracket
+							</button>
+						</div>
 					</div>
 				</div>
-				<div class="col-md-6 col-md-offset-3 box-margin">
-					<button class="btn btn-success btn-block" ng-click="setDate()"> Set Dates </button>
-				</div>
+
 			</div>
 		</div>
+
 	</div>
 </div>

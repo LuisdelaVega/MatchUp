@@ -13,7 +13,7 @@
 	<li ng-if="tournamentInfo.groupStage">
 		<a data-target="#groupStage" data-toggle="tab">Group Stage</a>
 	</li>
-	<li ng-if="roundsTab">
+	<li ng-if="tournamentInfo.finalStage">
 		<a data-target="#rounds" data-toggle="tab" >Rounds</a>
 	</li>
 	<li ng-if="bracketTab">
@@ -107,29 +107,29 @@
 									Tournament Type
 								</dt>
 								<dd>
-									{{tournamentInfo.tournament_type}}
+									{{tournament.tournament_type}}
 								</dd>
 								<dt>
 									Format
 								</dt>
 								<dd>
-									{{tournamentInfo.tournament_format}}
+									{{tournament.tournament_format}}
 								</dd>
 								<div ng-if="groupStage">
 									<dt>
 										# of competitors per group
 									</dt>
 									<dd>
-										{{tournamentInfo.number_of_people_per_group}}
+										{{tournament.number_of_people_per_group}}
 									</dd>
 									<dt>
 										# of competitors advancing
 									</dt>
 									<dd>
-										{{tournamentInfo.amount_of_winners_per_group}}
+										{{tournament.amount_of_winners_per_group}}
 									</dd>
 								</div>
-								<div ng-if="tournamentInfo.is_team_based">
+								<div ng-if="tournament.is_team_based">
 									<dt>
 										Team Based
 									</dt>
@@ -141,7 +141,7 @@
 									Score Type
 								</dt>
 								<dd>
-									{{tournamentInfo.score_type}}
+									{{tournament.score_type}}
 								</dd>
 							</dl>
 						</div>
@@ -153,26 +153,26 @@
 									Tournament Start Date
 								</dt>
 								<dd>
-									{{tournamentInfo.tournament_start_date | date: 'medium'}}
+									{{tournament.tournament_start_date | date: 'medium'}}
 								</dd>
 								<dt>
 									Check in Deadline
 								</dt>
 								<dd>
-									{{tournamentInfo.tournament_check_in_deadline | date: 'medium'}}
+									{{tournament.tournament_check_in_deadline | date: 'medium'}}
 								</dd>
 								<div ng-if="eventInfo.host">
 									<dt>
 										Prize Pool
 									</dt>
 									<dd>
-										{{tournamentInfo.seed_money | currency}}
+										{{tournament.seed_money | currency}}
 									</dd>
 									<dt>
 										Competitor Fee
 									</dt>
 									<dd>
-										{{tournamentInfo.competitor_fee | currency}}
+										{{tournament.competitor_fee | currency}}
 									</dd>
 								</div>
 							</dl>
@@ -246,7 +246,7 @@
 		<div class="panel-padding">
 			<div class="widget-box">
 				<div class="widget-header bordered-bottom bordered-themesecondary">
-					<h4 class="widget-title themesecondary">Tournament Capacity({{competitors.length}}/{{tournamentInfo.tournament_max_capacity}})</h4>
+					<h4 class="widget-title themesecondary">Tournament Capacity({{competitors.length}}/{{tournament.tournament_max_capacity}})</h4>
 				</div>
 				<!--Widget Header-->
 				<div class="widget-body">
@@ -359,11 +359,11 @@
 					<div class="media panel-padding" >
 						<div class="media-header">
 							<label>Groups: </label>
-							<select class="form-control" ng-model="selectedGroup" ng-options="'Group '+item.group_number for item in tournamentInfo.groupStage.groups" ng-change="resetGroup()"></select>
+							<select class="form-control" ng-model="selectedGroup" ng-options="'Group '+item.group_number for item in tournamentInfo.groupStage.groups" ng-change="resetGroup(selectedGroup)"></select>
 							<br/>
 							<label>Rounds: </label>
 							<select class="form-control" ng-model="selectedGroupRound" ng-options="'Round '+item.round_number for item in selectedGroup.rounds"></select>
-
+ 
 						</div>
 						<div class="media-body panel-padding"></div>
 						<form>
