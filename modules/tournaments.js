@@ -2101,7 +2101,7 @@ var getPrizeDistributions = function(req, res, pg, conString, log) {
 function customerIsACompetitor(req, res, client, done, log, customer_username, competitor_number, index, length) {
 	client.query({
 		text: "INSERT INTO is_a (event_name, event_start_date, event_location, tournament_name, competitor_number, customer_username) VALUES($1, $2, $3, $4, $5, $6)",
-		values: [req.params.event, req.query.date, req.query.location, req.params.tournament, competitor_number, customer_username]
+		values: [req.params.event, req.query.date, req.query.location, req.params.tournament, parseInt(competitor_number), customer_username]
 	}, function (err, result) {
 		if (err) {
 			client.query("ROLLBACK");
@@ -2188,13 +2188,13 @@ var registerForTournament = function(req, res, pg, conString, log) {
 							}, 'done response');
 						} else {
 							if (tournament.team_size > 1) {
-								if (!req.body.team || !req.body.players || req.body.players != tournament.team_size) {
+								if (!req.body.team || !req.body.players || req.body.players != parseInt(tournament.team_size)) {
 									client.query("ROLLBACK");
 									done();
 									res.status(403).json({
 										missing_team_name : !req.body.team,
 										missing_players_array : !req.body.players,
-										invalid_amount_of_players : req.body.players != tournament.team_size
+										invalid_amount_of_players :  req.body.players != parseInt(tournament.team_size)
 									});
 									log.info({
 										res : res
@@ -2213,8 +2213,8 @@ var registerForTournament = function(req, res, pg, conString, log) {
 												res: res
 											}, 'done response');
 										} else {
-											for (var i = 0, index = 0; i < tournament.team_size; i++) {
-												customerIsACompetitor(req, res, client, done, log, req.body.players[i], nextCompetitor, index++, tournament.team_size-1);
+											for (var i = 0, index = 0; i < parseInt(tournament.team_size); i++) {
+												customerIsACompetitor(req, res, client, done, log, req.body.players[i], nextCompetitor, index++, parseInt(tournament.team_size)-1);
 											}
 										}
 									});
