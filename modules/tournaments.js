@@ -534,7 +534,7 @@ function generateBracket(bracket, players, tournament, station, assignStations) 
 
 	if (tournament.tournament_format == "Single Elimination") {
 		bracket.winnerRounds = [];
-		singleEliminationBracket(bracket, players);
+		singleEliminationBracket(bracket, players, tournament);
 	} else if (tournament.tournament_format == "Double Elimination") {
 		bracket.winnerRounds = [];
 		singleEliminationBracket(bracket, players, tournament);
