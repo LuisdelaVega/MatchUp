@@ -44,7 +44,7 @@
 		</div>
 	</form>
 
-	<form>
+	<form id="manageMembersBox">
 		<!-- Manage Members -->
 		<legend>
 			Manage Members
@@ -52,44 +52,16 @@
 		<div class="tickets-container">
 			<ul class="tickets-list">
 				<div class="row">
-					<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-						<li class="ticket-item">
-							<div class="row">
-								<div class="ticket-user col-md-10 col-sm-10 col-xs-10">
-									<img src="http://neptunolabs.com/images/badillo.jpg" class="user-avatar">
-									<span class="user-name">Rapol (Rafael Pol)</span>
-								</div>
-								<div class="ticket-time  col-md-2 col-sm-2 col-xs-2">
-									<a class="btn btn-sm btn-danger pull-right" data-toggle="modal" data-target="#deleteMemberModal"><span class="fa fa-times"></span></a>
-								</div>
-							</div>
-						</li>
-					</div>
-
-					<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+					<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" ng-repeat = "member in members">
 						<li class="ticket-item">
 							<div class="row">
 								<div class="ticket-user col-md-7 col-sm-7 col-xs-7">
-									<img src="http://neptunolabs.com/images/badillo.jpg" class="user-avatar">
-									<span class="user-name">Donut (Luis)</span>
+									<img ng-src="{{member.customer_profile_pic}}" class="user-avatar">
+									<span class="user-name"> {{member.customer_tag}} ({{member.customer_first_name}} {{member.customer_last_name}})</span>
 								</div>
 								<div class="ticket-time  col-md-5 col-sm-5 col-xs-5">
-									<a class="btn btn-sm btn-danger pull-right" data-toggle="modal" data-target="#deleteMemberModal"><span class="fa fa-times"></span></a>
-									<a class="btn btn-sm btn-default pull-right second-button-ticket" data-toggle="modal" data-target="#addOwnerModal"><span class="fa fa-briefcase "></span></a>
-								</div>
-							</div>
-						</li>
-					</div>
-					<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-						<li class="ticket-item">
-							<div class="row">
-								<div class="ticket-user col-md-7 col-sm-7 col-xs-7">
-									<img src="http://neptunolabs.com/images/badillo.jpg" class="user-avatar">
-									<span class="user-name">Donut (Luis)</span>
-								</div>
-								<div class="ticket-time  col-md-5 col-sm-5 col-xs-5">
-									<a class="btn btn-sm btn-danger pull-right" data-toggle="modal" data-target="#deleteMemberModal"><span class="fa fa-times"></span></a>
-									<a class="btn btn-sm btn-default pull-right second-button-ticket" data-toggle="modal" data-target="#addOwnerModal"><span class="fa fa-briefcase "></span></a>
+									<a class="btn btn-sm btn-danger pull-right" ng-click="deleteUserPrompt(member)" ng-if="(!member.is_owner || (member.customer_username == currentUser.customer_username)) && currentUser.is_owner"><span class="fa fa-times"></span></a>
+									<a class="btn btn-sm btn-default pull-right second-button-ticket" ng-click="makeMemberOwnerPrompt(member)" ng-if="!member.is_owner && currentUser.is_owner"><span class="fa fa-briefcase "></span></a>
 								</div>
 							</div>
 						</li>
@@ -102,38 +74,27 @@
 				<button class="btn btn-success btn-block" data-toggle="modal" data-target="#addMemberModal">
 					Add
 				</button>
+
 			</div>
 		</div>
 	</form>
-	<form>
+	<form id="sponsorBox">
 		<legend class="box-margin">
 			Sponsors
 		</legend>
 		<div class="tickets-container">
 			<ul class="tickets-list">
-				<div class="row">
-					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+				<div class="row" >
+					<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4" ng-repeat="sponsor in sponsors">
 						<li class="ticket-item">
 							<div class="row">
 								<div class="ticket-user col-md-10 col-sm-10 col-xs-10">
-									<img src="http://neptunolabs.com/images/badillo.jpg" class="user-avatar">
-									<span class="user-name">Razer</span>
+									<img ng-src="{{sponsor.sponsor_logo}}" class="user-avatar">
+									<span class="user-name">{{sponsor.sponsor_name}}</span>
 								</div>
 								<div class="ticket-time  col-md-2 col-sm-2 col-xs-2">
-									<a class="btn btn-sm btn-danger pull-right" data-toggle="modal" data-target="#removeSponsorModal"><span class="fa fa-times"></span></a>
-								</div>
-							</div>
-						</li>
-					</div>
-					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-						<li class="ticket-item">
-							<div class="row">
-								<div class="ticket-user col-md-10 col-sm-10 col-xs-10">
-									<img src="http://neptunolabs.com/images/badillo.jpg" class="user-avatar">
-									<span class="user-name">Sprite</span>
-								</div>
-								<div class="ticket-time  col-md-2 col-sm-2 col-xs-2">
-									<a class="btn btn-sm btn-danger pull-right" data-toggle="modal" data-target="#removeSponsorModal"><span class="fa fa-times"></span></a>
+									<a class="btn btn-sm btn-danger pull-right" ng-click ="deleteSponsorPrompt(sponsor)"><span class="fa fa-times"></span></a>
+
 								</div>
 							</div>
 						</li>
@@ -150,178 +111,344 @@
 		</div>
 	</form>
 
-	<!--modal add Member -->
-	<div class="modal fade" id="addMemberModal">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-					<h4 class="modal-title">Add Member</h4>
-				</div>
-				<div class="modal-body">
-					<div class="form-group has-feedback">
-						<input type="text" class="form-control" placeholder="Search for Users" />
-						<i class="form-control-feedback glyphicon glyphicon-search"></i>
-					</div>
-					<div class="tickets-container">
-						<ul class="tickets-list">
-							<li class="ticket-item">
-								<div class="ticket-user">
-									<img src="http://neptunolabs.com/images/badillo.jpg" class="user-avatar">
-									<span class="user-name">odillab (Edwin Badillo)</span>
-								</div>
-							</li>
-							<li class="ticket-item">
-								<div class="ticket-user">
-									<img src="http://neptunolabs.com/images/badillo.jpg" class="user-avatar">
-									<span class="user-name">odillab2 (Edwin Vadillo)</span>
-								</div>
-							</li>
-						</ul>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">
-						Close
-					</button>
-				</div>
-			</div>
-			<!-- /.modal-content -->
-		</div>
-		<!-- /.modal-dialog -->
-	</div>
+</div>
 
-	<!-- modal delete Member -->
-	<div class="modal fade" id="deleteMemberModal">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-					<h4 class="modal-title">Delete Member</h4>
-				</div>
-				<div class="modal-body">
-					<p>
-						Are you sure you want to delete this member?
-					</p>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">
-						Close
-					</button>
-					<button type="button" class="btn btn-primary">
-						Delete
-					</button>
-				</div>
-			</div>
-			<!-- /.modal-content -->
+<div class="box box-margin-bottom" id="deleteOrganization" >
+	<legend>
+		Delete Organization
+	</legend>
+	<p>
+		Deleting the organization will make it's profile no longer visible to other users.
+	</p>
+	<p>
+		Organization Data such as past events will still be preserved.
+	</p>
+	<div class="form-group">
+		<div class="col-sm-offset-4 col-sm-4">
+			<button class="btn btn-danger btn-block" data-toggle="modal" data-target="#deleteOrganizationModal">
+				Delete
+			</button>
 		</div>
-		<!-- /.modal-dialog -->
+		<br>
+		<br>
 	</div>
-
-	<!-- modal add owner Member -->
-	<div class="modal fade" id="addOwnerModal">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-					<h4 class="modal-title">Add owner</h4>
-				</div>
-				<div class="modal-body">
-					<p>
-						Are you sure you want to assign member as an owner of the organization?
-					</p>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">
-						Close
-					</button>
-					<button type="button" class="btn btn-primary">
-						Okay
-					</button>
-				</div>
+</div>
+<!--modal add Member -->
+<div class="modal fade" id="addMemberModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Add Member</h4>
 			</div>
-			<!-- /.modal-content -->
-		</div>
-		<!-- /.modal-dialog -->
-	</div>
+			<div class="modal-body">
+				<div class="form-group has-feedback">
+					<form ng-submit="userSearch(query)">
 
-	<!-- modal remove Sponsor -->
-	<div class="modal fade" id="removeSponsorModal">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-					<h4 class="modal-title">Remove Sponsor</h4>
-				</div>
-				<div class="modal-body">
-					<p>
-						Are you sure you want to remove this sponsor?
-					</p>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">
-						Close
-					</button>
-					<button type="button" class="btn btn-primary">
-						Delete
-					</button>
-				</div>
-			</div>
-			<!-- /.modal-content -->
-		</div>
-		<!-- /.modal-dialog -->
-	</div>
-
-	<!-- modal request Sponsor -->
-	<div class="modal fade" id="requestSponsorModal">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-					<h4 class="modal-title">Request Sponsor</h4>
-				</div>
-				<div class="modal-body">
-					<form class="form-horizontal">
-						<div class="form-group">
-							<label for="sponsorName" class="col-sm-2 control-label">Sponsor Name</label>
-							<div class="col-sm-10">
-								<input type="text" class="form-control" id="sponsorName">
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="sponsorLink" class="col-sm-2 control-label">Sponsor Website</label>
-							<div class="col-sm-10">
-								<input type="text" class="form-control" id="sponsorLink">
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="sponsorDescription" class="col-sm-2 control-label">Description</label>
-							<div class="col-sm-10">
-								<textarea class="form-control" rows="4" id="sponsorDescription"></textarea>
-							</div>
+						<div class="input-group custom-search-form" >
+							<!-- ng-change="goToSearch(query)" -->
+							<input ng-model="query"  type="text" class="form-control" placeholder="Search for Users">
+							<span class="input-group-btn">
+								<button ng-click="userSearch(query)" class="btn btn-default" type="button" >
+									<i class="fa fa-search"></i>
+								</button> </span>
 						</div>
 					</form>
+					<div class="form-group">
+						<div class="checkbox">
+							<label>
+								<input type="checkbox" data-ng-model="addOwner">
+								Add member as an owner? </label>
+						</div>
+					</div>
 				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">
-						Close
-					</button>
-					<button type="button" class="btn btn-primary">
-						Request
-					</button>
+				<div class="tickets-container">
+					<ul class="tickets-list">
+						<li class="ticket-item" ng-repeat="user in users | filter: filterArray">
+							<div class="ticket-user" ng-click="addMember(user)">
+								<img ng-src="{{user.customer_profile_pic}}" class="user-avatar">
+								<span class="user-name">{{user.customer_tag}} ({{user.customer_first_name}} {{user.customer_last_name}})</span>
+							</div>
+						</li>
+
 				</div>
 			</div>
-			<!-- /.modal-content -->
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+			</div>
 		</div>
-		<!-- /.modal-dialog -->
+		<!-- /.modal-content -->
 	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- modal add Succes teammate -->
+<div class="modal fade" id="memberAddSuccesModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="OK">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Succesfully added {{lastUserAdded.customer_tag}}</h4>
+			</div>
+			<div class="modal-body">
+				<p>
+					You have succesfully added {{lastUserAdded.customer_tag}} ({{lastUserAdded.customer_first_name}} {{lastUserAdded.customer_last_name}}) to {{organization.organization_name}}
+				</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal" >
+					OK
+				</button>
+
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- modal add Succes teammate -->
+<div class="modal fade" id="memberAddOwnerSuccesModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="OK">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Succesfully made {{lastUserAdded.customer_tag}} an Owner</h4>
+			</div>
+			<div class="modal-body">
+				<p>
+					You have succesfully made {{lastUserAdded.customer_tag}} ({{lastUserAdded.customer_first_name}} {{lastUserAdded.customer_last_name}}) an Owner of {{organization.organization_name}}
+				</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal" >
+					OK
+				</button>
+
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+
+<!-- modal delete Member -->
+<div class="modal fade" id="deleteMemberModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Delete Member</h4>
+			</div>
+			<div class="modal-body">
+				<p>
+					Are you sure you want to delete this member?
+				</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="removeMember()">
+					Delete
+				</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+
+<!-- modal delete Member -->
+<div class="modal fade" id="deleteSponsorModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Delete Sponsor</h4>
+			</div>
+			<div class="modal-body">
+				<p>
+					Are you sure you want to delete this sponsor?
+				</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="removeSponsor()">
+					Delete
+				</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+
+<!-- modal delete Succes member -->
+<div class="modal fade" id="memberDeleteSuccesModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="OK">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Succesfully removed {{deleteMember.customer_tag}}</h4>
+			</div>
+			<div class="modal-body">
+				<p>
+					You have succesfully removed {{deleteMember.customer_tag}} ({{deleteMember.customer_first_name}} {{deleteMember.customer_last_name}}) from {{organization.organization_name}}
+				</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					OK
+				</button>
+
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- modal add owner Member -->
+<div class="modal fade" id="addOwnerModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Add owner</h4>
+			</div>
+			<div class="modal-body">
+				<p>
+					Are you sure you want to assign member as an owner of the organization?
+				</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="makeMemberOwner()">
+					Okay
+				</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+
+<!-- modal remove Sponsor -->
+<div class="modal fade" id="removeSponsorModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Remove Sponsor</h4>
+			</div>
+			<div class="modal-body">
+				<p>
+					Are you sure you want to remove this sponsor?
+				</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="removeSponsor()">
+					Delete
+				</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- modal deleteorg -->
+<div class="modal fade" id="deleteOrganizationModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Delete Team</h4>
+			</div>
+			<div class="modal-body">
+				<p>
+					Are you sure you want to delete this team?
+				</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="deleteOrganization()">
+					Okay
+				</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- modal request Sponsor -->
+<div class="modal fade" id="requestSponsorModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Request Sponsor</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal">
+					<div class="form-group">
+						<label for="sponsorName" class="col-sm-2 control-label">Sponsor Name</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="sponsorName">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="sponsorLink" class="col-sm-2 control-label">Sponsor Website</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="sponsorLink">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="sponsorDescription" class="col-sm-2 control-label">Description</label>
+						<div class="col-sm-10">
+							<textarea class="form-control" rows="4" id="sponsorDescription"></textarea>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-primary">
+					Request
+				</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>

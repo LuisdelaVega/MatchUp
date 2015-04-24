@@ -55,10 +55,11 @@ myApp.controller("SeedingController", function($scope, $http, $window, $rootScop
 		for (var i = 0; i < seedList.length; i++) {
 			seedList[i].seed = i + 1;
 		}
+		console.log(seedList);
 		$http.put($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '/competitors/checked?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation, {
 			"players" : seedList
 		}).success(function(data) {
-			console.log(data);
+			alert("Seeding succesfully updated for the following tournament: " + $scope.tournaments[$scope.index].tournament_name);
 		}).error(function(err) {
 			console.log(err);
 		});
