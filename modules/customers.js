@@ -124,6 +124,50 @@ var getMatchups = function(req, res, pg, conString, log) {
 	});
 };
 
+var getMatchupsForUser = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var queryText = "";
+		if (req.query.state === "Past") {
+			queryText = "SELECT match.event_name, match.event_start_date, match.event_location, match.tournament_name, match.round_number, match.round_of, round.round_best_of, match.match_number, tournament.team_size, is_played_in.station_number FROM match NATURAL JOIN round JOIN competes ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND match.round_number = competes.round_number AND match.round_of = competes.round_of AND match.match_number = competes.match_number JOIN is_a ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number JOIN tournament ON match.event_name = tournament.event_name AND match.event_start_date = tournament.event_start_date AND match.event_location = tournament.event_location AND match.tournament_name = tournament.tournament_name LEFT OUTER JOIN is_played_in ON match.event_name = is_played_in.event_name AND match.event_start_date = is_played_in.event_start_date AND match.event_location = is_played_in.event_location AND match.tournament_name = is_played_in.tournament_name AND match.round_number = is_played_in.round_number AND match.round_of = is_played_in.round_of AND match.match_number = is_played_in.match_number WHERE is_a.customer_username = $1 AND match.match_completed ORDER BY match.event_start_date DESC, match.event_name, match.tournament_name, CASE WHEN match.round_of = 'Loser' THEN 1 WHEN match.round_of = 'Round Robin' THEN 2 WHEN match.round_of = 'Winner' THEN 3 WHEN match.round_of = 'Group' THEN 4 END, match.round_number DESC";
+		} else {
+			queryText = "SELECT match.event_name, match.event_start_date, match.event_location, match.tournament_name, match.round_number, match.round_of, round.round_best_of, match.match_number, tournament.team_size, is_played_in.station_number FROM match NATURAL JOIN round JOIN competes ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND match.round_number = competes.round_number AND match.round_of = competes.round_of AND match.match_number = competes.match_number JOIN is_a ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number JOIN tournament ON match.event_name = tournament.event_name AND match.event_start_date = tournament.event_start_date AND match.event_location = tournament.event_location AND match.tournament_name = tournament.tournament_name JOIN event ON event.event_name = tournament.event_name AND event.event_start_date = tournament.event_start_date AND event.event_location = tournament.event_location LEFT OUTER JOIN is_played_in ON match.event_name = is_played_in.event_name AND match.event_start_date = is_played_in.event_start_date AND match.event_location = is_played_in.event_location AND match.tournament_name = is_played_in.tournament_name AND match.round_number = is_played_in.round_number AND match.round_of = is_played_in.round_of AND match.match_number = is_played_in.match_number WHERE is_a.customer_username = $1 AND NOT match.match_completed AND event.event_active AND event.event_start_date < now() at time zone 'utc' AND event.event_end_date > now() at time zone 'utc' ORDER BY match.event_start_date DESC, match.event_name, match.tournament_name, CASE WHEN match.round_of = 'Loser' THEN 1 WHEN match.round_of = 'Round Robin' THEN 2 WHEN match.round_of = 'Winner' THEN 3 WHEN match.round_of = 'Group' THEN 4 END, match.round_number DESC";
+		}
+
+		var query = client.query({
+			text : queryText,
+			values : [req.params.username]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			done();
+			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+		query.on("end", function(result) {
+			if (result.rows.length) {
+				var myMatchups = result.rows;
+				for (var i = 0; i < myMatchups.length; i++) {
+					getDetailsForMatchup(res, pg, conString, log, client, done, myMatchups[i], i, (myMatchups.length - 1), myMatchups);
+				}
+			} else {
+				done();
+				res.status(200).send([]);
+				log.info({
+					res : res
+				}, 'done response');
+			}
+		});
+	});
+};
+
 var getSubscriptions = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -1327,3 +1371,4 @@ module.exports.getStandings = getStandings;
 module.exports.getRequests = getRequests;
 module.exports.registerAsSpectator = registerAsSpectator;
 module.exports.getSpecFees = getSpecFees;
+module.exports.getMatchupsForUser = getMatchupsForUser;

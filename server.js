@@ -1006,6 +1006,21 @@ app.route('/matchup/profile/matchups').get(function(req, res) {
 	customers.getMatchups(req, res, pg, conString, log);
 });
 
+/* /matchup/profile/:username/matchups?state=string
+ *
+ * 	params:
+ * 		state = Indicates whether to look for past matchups or current matchups. Possible values: [Past, Upcoming]
+ * 			note: Defaults to Upcoming
+ *
+ * [GET] Get a list of your upcoming or past matches
+ */
+app.route('/matchup/profile/:username/matchups').get(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	customers.getMatchupsForUser(req, res, pg, conString, log);
+});
+
 /* /matchup/profile/:username
  *
  * [GET] Get the details of a specific Customer
