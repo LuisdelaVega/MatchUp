@@ -1478,7 +1478,7 @@ var getRounds = function(req, res, pg, conString, log) {
 					values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Group", "Round Robin", "Winner", "Loser", ",;!;,"]
 				});
 				query.on("row", function (row, result) {
-					console.log(row);
+					//console.log(row);
 					var info_string = row.info;
 					var info_array = (!info_string ? new Array((details.team_size > 1 ? 2 : 3)) : info_string.split(",;!;,"));
 					var temp = {};
