@@ -311,7 +311,7 @@ var addOrganizationMember = function(req, res, pg, conString, log) {
 
 		client.query("BEGIN");
 		var query = client.query({
-			text : "SELECT organization_name FROM customer NATURAL JOIN belongs_to NATURAL JOIN organization" + (!(req.query.owner) ? "" : " NATURAL JOIN owns") + " WHERE customer_username = $1 AND organization_active AND customer_active AND organization_name = $2",
+			text : "SELECT organization_name FROM customer NATURAL JOIN belongs_to NATURAL JOIN organization" + (!(req.query.owner && req.query.owner === "true") ? "" : " NATURAL JOIN owns") + " WHERE customer_username = $1 AND organization_active AND customer_active AND organization_name = $2",
 			values : [req.user.username, req.params.organization]
 		});
 		query.on("row", function(row, result) {
