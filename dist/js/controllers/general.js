@@ -85,6 +85,7 @@ myApp.controller('searchController', ['$scope', '$http', '$state', '$window', '$
 	}).
 	success(function (data, status, headers) {
 
+		$scope.searchData = data;
 		$scope.searchQuery = $stateParams.query;
 
 		$scope.liveEvents = $scope.searchData.events.live;
@@ -96,8 +97,6 @@ myApp.controller('searchController', ['$scope', '$http', '$state', '$window', '$
 		$scope.organizations = $scope.searchData.organizations;
 		$scope.games = $scope.searchData.games;
 		$scope.genres = $scope.searchData.genres;
-		//console.log(searchCache.get('http://136.145.116.232/matchup/search/' + $stateParams.query + ''));
-
 	}).
 	error(function (data, status, headers) {
 		console.log("error in search controller");
@@ -118,7 +117,7 @@ function ($scope, $http, $state, $window, $stateParams, MatchUpCache, $rootScope
 			//console.log('http://136.145.116.232/matchup/search/' + $stateParams.query + '');
 
 
-			$scope.searchData = angular.fromJson(data);
+			$scope.searchData = data;
 			if ($scope.type == "live-events")
 				$scope.liveEvents = $scope.searchData.events.live;
 			if ($scope.type == "past-events")
@@ -190,6 +189,7 @@ myApp.controller('sidebarController', ['$scope', '$window', '$http', '$state', '
 
 	$scope.userSearch = function (query) {
 		$http.get($rootScope.baseURL + '/matchup/search/users/' + query).success(function (data, status, headers) {}).error(function (data, status, headers) {
+			$scope.users = data;
 			console.log("error in search controller");
 		});
 
@@ -313,7 +313,7 @@ myApp.controller('gameViewController', ['$scope', '$http', '$state', 'sharedData
 function ($scope, $http, $state, sharedDataService, $window, $rootScope) {
 
 		$http.get($rootScope.baseURL + '/matchup/popular/games').success(function (data, status, headers) {
-			$scope.games = angular.fromJson(data);
+			$scope.games = data;
 
 		}).error(function (data, status) {
 
@@ -328,7 +328,7 @@ myApp.controller('genreViewController', ['$scope', '$http', '$state', 'sharedDat
 function ($scope, $http, $state, sharedDataService, $window, $rootScope) {
 
 		$http.get($rootScope.baseURL + '/matchup/popular/genres').success(function (data, status, headers) {
-			$scope.genres = angular.fromJson(data);
+			$scope.genres = data;
 
 		}).error(function (data, status) {
 
