@@ -343,7 +343,7 @@ myApp.run(function ($rootScope, $state, AuthenticationService, $window, acuteSel
 	$rootScope.imgurKey = "6528448c258cff474ca9701c5bab6927";
 	
 	// Set the template path for all instances for acute template
-    acuteSelectService.updateSetting("templatePath", "../../public/event");
+    acuteSelectService.updateSetting("templatePath", "event");
 
 	// Authenticated selected states, not used for capstone
 	//	$rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams,error) {

@@ -25,7 +25,7 @@
 					<div class="col-xs-12 col-sm-8 col-md-8 col-lg-6 col-md-offset-2 col-sm-offset-2 col-lg-offset-0">
 						<div class="row">
 							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-5">
-								<img class="profile-picture" ng-src='{{eventInfo.event_logo}}'></img>
+								<img class="profile-picture" ng-src='{{eventInfo.event_logo}}' style="width: 75%"></img>
 							</div>
 							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-7">
 								<h2>{{eventInfo.event_name}}</h2>
@@ -90,9 +90,7 @@
 					</div>
 					<div class="col-xs-12 col-md-12 col-lg-6">
 						<h3>Rules</h3>
-						<p class="info-paragraph">
-							{{ eventInfo.event_rules }}
-						</p>
+						<p class="info-paragraph angular-space-line">{{ eventInfo.event_rules }}</p>
 					</div>
 					<div class="col-xs-12 col-md-12 col-lg-6">
 						<h3>Hosted by</h3>
@@ -277,10 +275,10 @@
 						<div class="radio" ng-repeat="fee in fees">
 							<div class="box box-margin">
 								<label>
-									<input type="radio" name="optionsRadios" ng-model="selected.name" ng-value="fee.spec_fee_name">
+									<input type="radio" name="optionsRadios" ng-model="selected.name" ng-value="fee.spec_fee_name" ng-disabled="!(fee.spec_fee_amount_available - fee.sold)">
 									<span class="lead">{{fee.spec_fee_name}} ({{fee.spec_fee_amount | currency}})</span> </label>
 								<p>{{fee.spec_fee_description}}
-									<br><small>Available: {{fee.spec_fee_amount_available}}</small>
+									<br><small>Available: {{fee.spec_fee_amount_available - fee.sold}}/{{fee.spec_fee_amount_available}}</small>
 								</p>
 							</div>
 						</div>

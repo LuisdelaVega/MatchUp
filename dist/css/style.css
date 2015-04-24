@@ -600,3 +600,7 @@ p.review-title {
 	-ms-user-select: none;
 	user-select: none;
 }
+.angular-space-line {
+  white-space: pre;
+}
+
