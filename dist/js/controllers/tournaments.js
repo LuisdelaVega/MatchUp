@@ -23,33 +23,29 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data) {
 		$scope.tournament = data;
 		initDateAndTabs();
+		// Get competitors
+		if ($scope.competitorsTab)
+			getCompetitors();
 	});
 
 	// Get event Info
 	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data, status) {
-		
+
 		$scope.eventInfo = data;
 		MatchUpCache.remove($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '?date=' + $stateParams.date + '&location=' + $stateParams.location);
-		
+
 		// Check if event is premium
-		if ($scope.eventInfo.host){
+		if ($scope.eventInfo.host) {
 			premiumDetails();
-		}
-		else
+		} else
 			regularDetails();
-		
-		if($scope.competitorsTab){
-			$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/competitors?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data){
-				$scope.competitors = data;
-			})
-		}
 	});
 
 	var initDateAndTabs = function () {
 
 		var start_date = new Date($scope.tournament.tournament_start_date);
 		// Check registration deadline with current time
-		$scope.canRegister = (new Date($scope.tournament.deadline)).getTime() > now_utc.getTime();
+		$scope.canRegister = (new Date($scope.tournament.tournament_check_in_deadline)).getTime() > now_utc.getTime();
 
 		// Check if ongoing
 		if (now_utc.getTime() > start_date.getTime()) {
@@ -116,6 +112,12 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 		});
 	};
 
+	var getCompetitors = function () {
+		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/competitors?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data) {
+			$scope.competitors = data;
+		});
+	}
+
 	$scope.resetGroup = function (selectedGroup) {
 		$scope.selectedGroup = selectedGroup;
 		$scope.selectedGroupRound = $scope.selectedGroup.rounds[0];
@@ -150,6 +152,19 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 		});
 
 	};
+
+	$scope.checkOut = function () {
+		if ($scope.tournament.team_size == 1) {
+			$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/register?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data, status) {
+				getCompetitors();
+				$('#competitorSignUpModal').modal('hide');
+			}).error(function (status) {
+				$('#competitorSignUpModal').modal('hide');
+			});
+		} else {
+
+		}
+	}
 }]);
 
 myApp.controller('editTournamentController', ['$scope', '$http', '$stateParams', 'sharedDataService', '$q', '$state', '$rootScope', '$filter',
@@ -182,8 +197,6 @@ function ($scope, $http, $stateParams, sharedDataService, $q, $state, $rootScope
 
 			$http.get($rootScope.baseURL + '/matchup/popular/games').success(function (data, status) {
 				$scope.games = data;
-				console.log($scope.games);
-
 			});
 
 		});

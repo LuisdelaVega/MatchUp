@@ -305,7 +305,7 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 			return;
 		}
 		// Check null value
-		if (!$scope.event.deduction_fee) {
+		if (!isNaN($scope.event.deduction_fee) && $scope.event.deduction_fee <= 0 &&  $scope.event.deduction_fee >= 100) {
 			alert("Please specify a spectator deduction fee");
 			return;
 		}

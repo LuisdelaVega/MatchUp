@@ -37,7 +37,7 @@
 								</a>
 							</div>
 							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-7">
-								<h2>{{eventInfo.event_name}}</h2>
+								<h3>{{eventInfo.event_name}}</h3>
 								<p class="info-paragraph">
 									{{eventInfo.event_description}}
 								</p>
@@ -93,7 +93,7 @@
 					</div>
 
 				</div>
-				<h2 class="info-title">Tournament Details</h2>
+				<h3 class="info-title">Tournament Details</h3>
 				<!--					Tournament Info-->
 				<div class="row tab-padding-top">
 					<div class="col-lg-2 col-md-3 col-xs-12">
@@ -131,12 +131,20 @@
 										{{tournament.amount_of_winners_per_group}}
 									</dd>
 								</div>
-								<div ng-if="tournament.is_team_based">
+								<div ng-if="tournament.team_size > 1">
 									<dt>
-										Team Based
+										Play Style
 									</dt>
 									<dd>
-										Yes (Size 5)
+										Team ({{tournament.team_size}} competitors)
+									</dd>
+								</div>
+								<div ng-if="tournament.team_size == 1">
+									<dt>
+										Play Style
+									</dt>
+									<dd>
+										Solo
 									</dd>
 								</div>
 								<dt>
@@ -171,6 +179,12 @@
 										{{tournament.seed_money | currency}}
 									</dd>
 									<dt>
+										Prize distribution
+									</dt>
+									<dd>
+										{{tournament.prize_distribution_name}}
+									</dd>
+									<dt>
 										Competitor Fee
 									</dt>
 									<dd>
@@ -191,22 +205,22 @@
 				<!--					Hosted by/ Creator-->
 				<h2 class="info-title">Hosted By</h2>
 				<div class="row tab-padding-top">
-					<div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 col-md-offset-2 col-sm-offset-2" ng-if="eventInfo.host">
-						<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+					<div ng-if="eventInfo.host">
+						<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
 							<a class="thumbnail" ng-click="goToOrganizationProfile(hostInfo.organization_name)"><img class="profile-picture cursor" ng-src="{{hostInfo.organization_cover_photo}}"> </a>
 						</div>
-						<div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
+						<div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
 							<h3 style="margin-top:0px;padding-top:0px">{{hostInfo.organization_name}}</h3>
 							<p class="info-paragraph">
 								{{hostInfo.organization_bio}}
 							</p>
 						</div>
 					</div>
-					<div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 col-md-offset-2 col-sm-offset-2" ng-if="!eventInfo.host">
-						<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+					<div ng-if="!eventInfo.host">
+						<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
 							<a class="thumbnail" ng-click="goToUser(hostInfo.customer_username)"><img class="profile-picture cursor" ng-src="{{hostInfo.customer_profile_pic}}"> </a>
 						</div>
-						<div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
+						<div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
 							<h3 style="margin-top:0px;padding-top:0px">{{hostInfo.customer_tag}}</h3>
 							<p class="info-paragraph">
 								{{hostInfo.customer_bio}}
@@ -217,8 +231,11 @@
 
 				<div class="btn-group btn-group-justified box-margin" role="group">
 					<div class="btn-group" role="group" ng-if="!eventInfo.is_organizer && !tournament.is_competitor && canRegister">
-						<button type="button" class="btn btn-default" data-target="#competitorSignUpModal" data-toggle="modal">
+						<button type="button" class="btn btn-success" data-target="#competitorSignUpModal" ng-if="tournament.team_size == 1" data-toggle="modal">
 							Competitor Sign Up
+						</button>
+						<button type="button" class="btn btn-success" data-target="#teamSignUpModal" ng-if="tournament.team_size > 1" data-toggle="modal">
+							Team Sign Up
 						</button>
 					</div>
 
@@ -248,7 +265,7 @@
 		<div class="panel-padding">
 			<div class="widget-box">
 				<div class="widget-header bordered-bottom bordered-themesecondary">
-					<h4 class="widget-title themesecondary">Tournament Capacity({{competitors.length}}/{{tournament.tournament_max_capacity}})</h4>
+					<h4 class="widget-title themesecondary"><span ng-if="tournament.team_size == 1">Competitors</span><span ng-if="tournament.team_size > 1">Teams</span> Registered ({{competitors.length}}/{{tournament.tournament_max_capacity}})</h4>
 				</div>
 				<!--Widget Header-->
 				<div class="widget-body">
@@ -454,6 +471,48 @@
 </div>
 
 <div class="modal fade" id="competitorSignUpModal" tabindex="-1" role="dialog" aria-labelledby="competitorSignUpModal" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Competitor Sign Up</h4>
+			</div>
+			<div class="modal-body">
+				<div>
+					<h3 class="info-title">{{tournament.tournament_name}}</h3>
+					<div class="row">
+						<div class="col-md-4 col-md-offset-4">
+							<a class="thumbnail" ng-click="goToGameProfile(tournament.game_name)"> <img ng-src="{{tournament.game_image}}">
+								<h4 align="center">{{tournament.game_name}}</h4> </a>
+						</div>
+					</div>
+					<hr>
+					<div class="row">
+						<div class="col-md-6 col-md-offset-3">
+							<p class="info-paragraph" ng-if="eventInfo.host">1 Competitor <span class="pull-right">{{tournament.competitor_fee | currency}}</span>
+							</p>
+							<p class="info-paragraph" ng-if="!eventInfo.host">Are your sure you want to sign up to {{tournament.tournament_name}}?
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-success" ng-click="checkOut()">
+					<span ng-if="eventInfo.host">Check Out</span>
+					<span ng-if="!eventInfo.host">Sign Up</span>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="teamSignUpModal" tabindex="-1" role="dialog" aria-labelledby="teamSignUpModal" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
