@@ -106,6 +106,58 @@ myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$st
 
 }]);
 
+myApp.controller('profileStandingsController', ['$scope', '$http', '$stateParams', '$window', 'sharedDataService', '$state', function ($scope, $http, $stateParams, $window, sharedDataService, $state) {
+
+    $scope.$on('$ionicView.enter', function () {
+
+        var customerUsername = sharedDataService.get();
+
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+
+
+        $http.get('http://136.145.116.232/matchup/profile/'+customerUsername+'', config).success(function (data){
+            $scope.customerTag = data.customer_tag;
+
+            $http.get('http://136.145.116.232/matchup/profile/'+customerUsername+'/standings', config).success(function (data){
+
+                $scope.standings = data;
+                
+                angular.forEach($scope.standings, function(event){
+
+                    $http.get('http://136.145.116.232/matchup/events/'+event.event_name+'?date='+event.event_start_date+'&location='+event.event_location+'', config).success(function (data){
+                        
+                        event.event_logo = data.event_logo;
+
+                    }).error(function (err) {
+                        console.log(err);
+                    });
+
+                });
+                
+                console.log($scope.standings);
+
+            }).error(function (err) {
+                console.log(err);
+            });
+
+        }).error(function (err) {
+            console.log(err);
+        });
+
+
+
+
+
+
+    });
+
+}]);
+
 myApp.controller('mySubscriptionsController', ['$scope', '$http', '$window', '$stateParams', '$ionicPopup', '$timeout', 'sharedDataService', function ($scope, $http, $window, $stateParams, $ionicPopup, $timeout, sharedDataService) {
 
     var customerUsername = sharedDataService.get();
