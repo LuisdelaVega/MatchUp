@@ -8,7 +8,7 @@
 		<a data-target="#news" data-toggle="tab">News</a>
 	</li>
 	<li>
-		<a data-target="#registeredUsers" data-toggle="tab">Spectators</a>
+		<a data-target="#registeredUsers" data-toggle="tab">Attendes</a>
 	</li>
 	<li ng-if="isOngoing || finished">
 		<a data-target="#reviews" data-toggle="tab">Reviews</a>
@@ -240,12 +240,37 @@
 						<div class="tickets-container">
 							<ul class="tickets-list">
 								<div class="row">
-									<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat="participant in participants | limitTo: 20">
+									<div class="col-lg-3 col-md-4 col-sm-12 col-xs-12" ng-repeat="participant in participants">
 										<li class="ticket-item" ng-click="goToUser(participant.customer_username)">
 											<div class="ticket-user">
 												<img ng-src="{{ participant.customer_profile_pic }}" class="user-avatar">
 												<!-- <img src="http://neptunolabs.com/images/badillo.jpg" class="user-avatar">-->
 												<span class="user-name">{{participant.customer_tag}}</span>
+											</div>
+										</li>
+									</div>
+								</div>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="widget-box" ng-repeat="tournament in tournamentsInfo">
+				<div class="widget-header bordered-bottom bordered-themesecondary">
+					<h4 class="widget-title themesecondary">{{tournament.tournament_name}} ({{competitorsResult[$index].data.length}}/{{tournament.tournament_max_capacity}})</h4>
+				</div>
+				<!--Widget Header-->
+				<div class="widget-body">
+					<div class="widget-main no-padding">
+						<div class="tickets-container">
+							<ul class="tickets-list">
+								<div class="row">
+									<div class="col-lg-3 col-md-4 col-sm-12 col-xs-12" ng-repeat="competitor in competitorsResult[$index].data">
+										<li class="ticket-item" ng-click="goToUser(competitor.customer_username)">
+											<div class="ticket-user">
+												<img ng-src="{{ competitor.customer_profile_pic }}" class="user-avatar">
+												<!-- <img src="http://neptunolabs.com/images/badillo.jpg" class="user-avatar">-->
+												<span class="user-name">{{competitor.customer_tag}}</span>
 											</div>
 										</li>
 									</div>
@@ -517,4 +542,31 @@
 		<!-- /.modal-content -->
 	</div>
 	<!-- /.modal-dialog -->
+</div>
+
+
+<div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModal" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Sign Up</h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-8 col-md-offset-2">
+						<p class="info-paragraph">You have succesfully sign up to {{eventInfo.event_name}}
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Ok
+				</button>
+			</div>
+		</div>
+	</div>
 </div>

@@ -172,6 +172,7 @@
 									{{tournament.tournament_check_in_deadline | date: 'medium'}}
 								</dd>
 								<div ng-if="eventInfo.host">
+									<!--
 									<dt>
 										Prize Pool
 									</dt>
@@ -184,6 +185,7 @@
 									<dd>
 										{{tournament.prize_distribution_name}}
 									</dd>
+-->
 									<dt>
 										Competitor Fee
 									</dt>
@@ -234,7 +236,7 @@
 						<button type="button" class="btn btn-success" data-target="#competitorSignUpModal" ng-if="tournament.team_size == 1" data-toggle="modal">
 							Competitor Sign Up
 						</button>
-						<button type="button" class="btn btn-success" data-target="#teamSignUpModal" ng-if="tournament.team_size > 1" data-toggle="modal">
+						<button type="button" class="btn btn-success" ng-click="teamModal()" ng-if="tournament.team_size > 1">
 							Team Sign Up
 						</button>
 					</div>
@@ -519,46 +521,47 @@
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 class="modal-title">Competitor Sign Up</h4>
+				<h4 class="modal-title">Team Sign Up</h4>
 			</div>
 			<div class="modal-body">
 				<legend>
 					Choose Team
 				</legend>
-				<form>
-					<div class="form-group">
-						<div class="radio">
-							<label>
-								<input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked> Team 1 </label>
+				<div class="tickets-container">
+					<ul class="tickets-list">
+						<div class="row">
+							<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" ng-repeat="team in teams">
+								<li class="ticket-item" ng-click="teamSelected($index)">
+									<div class="row">
+										<div class="ticket-user col-md-12 col-sm-12 col-xs-12" ng-style="$index === selected.team && {'-webkit-box-shadow': '0 0 3px rgba(42,47,62,0.4)',
+	'-moz-box-shadow': '0 0 3px rgba(42,47,62,0.4)'}">
+											<img ng-src="{{team.team_logo}}" class="user-avatar">
+											<span class="user-name">{{team.team_name}}</span>
+										</div>
+									</div>
+								</li>
+							</div>
 						</div>
-						<div class="radio">
-							<label>
-								<input type="radio" name="optionsRadios" id="optionsRadios2" value="option2"> Team 2 </label>
-						</div>
-						<div class="radio">
-							<label>
-								<input type="radio" name="optionsRadios" id="optionsRadios3" value="option3"> Team 3 </label>
-						</div>
-					</div>
-				</form>
+					</ul>
+				</div>
 				<form>
 					<legend class="box-margin">
-						Choose Roster (Size 4)
+						Choose Roster (Tournament Team Size {{tournament.team_size}})
 					</legend>
 					<div class="tickets-container">
 						<ul class="tickets-list">
 							<div class="row">
-								<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+								<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" ng-repeat="member in members">
 									<li class="ticket-item">
 										<div class="row">
 											<div class="ticket-user col-md-10 col-sm-10 col-xs-10">
-												<img src="http://neptunolabs.com/images/badillo.jpg" class="user-avatar">
-												<span class="user-name">Usertag</span>
+												<img ng-src="{{member.customer_profile_pic}}" class="user-avatar">
+												<span class="user-name">{{member.customer_tag}}</span>
 											</div>
 											<div class="ticket-time  col-md-2 col-sm-2 col-xs-2">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" value="">
+														<input type="checkbox" ng-model="member.checked" ng-change="memberRadio(member.checked)" ng-init="member.checked=false">
 													</label>
 												</div>
 											</div>
@@ -568,11 +571,52 @@
 							</div>
 						</ul>
 					</div>
+					<h4 style="text-align:center" ng-class="{'text-danger': !sizeCorrect}">{{currentSize}}/{{tournament.team_size}} members selected</h4>
 				</form>
+				<hr>
+				<div class="row">
+					<div class="col-md-6 col-md-offset-3">
+						<p class="info-paragraph" ng-if="eventInfo.host">Team Sign Up <span class="pull-right">{{tournament.competitor_fee | currency}}</span>
+						</p>
+						<p class="info-paragraph" ng-if="!eventInfo.host">Are your sure you want to sign up {{teams[selected.team].team_name}} to {{tournament.tournament_name}}?
+						</p>
+					</div>
+				</div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-primary" data-dismiss="modal">
-					Sign Up
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-success" ng-click="checkOut()" ng-disabled="!sizeCorrect">
+					<span ng-if="eventInfo.host">Check Out</span>
+					<span ng-if="!eventInfo.host">Sign Up</span>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModal" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Sign Up</h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-8 col-md-offset-2">
+						<p class="info-paragraph">Sign up to {{tournament.tournament_name}} successful
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Ok
 				</button>
 			</div>
 		</div>

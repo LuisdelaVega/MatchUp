@@ -53,6 +53,17 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 		$scope.participants = results[3].data;
 		// Get Tournaments
 		$scope.tournamentsInfo = results[4].data;
+
+		var competitorsGets = [];
+		for (var i = 0; i < $scope.tournamentsInfo.length; i++) {
+			competitorsGets.push($http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $scope.tournamentsInfo[i].tournament_name + '/competitors?date=' + $stateParams.date + '&location=' + $stateParams.location))
+		}
+		
+		$q.all(competitorsGets).then(function (results) {
+			$scope.competitorsResult = results;
+			console.log($scope.competitorsResult);
+		});
+
 	}, function (err) {
 		console.log(err);
 		console.log("Oh oh");
@@ -74,8 +85,9 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 		$scope.paySelected = true;
 		if ($scope.selected.name) {
 			$http.post($rootScope.baseURL + '/matchup/events/' + $scope.eventInfo.event_name + '/specfees/' + $scope.selected.name + '?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data) {
+				$scope.eventInfo.is_spectator = true;
 				$('#signUpModal').modal("hide");
-				console.log(data);
+				$('#successModal').modal('show');
 			});
 		}
 	}
