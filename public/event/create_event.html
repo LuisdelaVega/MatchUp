@@ -40,24 +40,38 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<label>Upload Banner:</label>
-					<div class="input-group">
-						<span class="group-span-filestyle input-group-btn" tabindex="0"> <label  class="btn btn-default btn-file"> <span class="glyphicon glyphicon-picture">   Browse&hellip;
-                           <input type="file" onchange="upload(this.files[0], this.id + 'Label')"> </span>
-						</span>
-						<input type="text" class="form-control" readonly ng-model="event.banner">
+					<div class="row">
+						<label class="col-sm-1 control-label">Upload Logo</label>
+						<div class="col-sm-2">
+							<span class="file-input btn btn-primary btn-file btn-block">
+                Browse&hellip; <input ng-model="event.logo" onchange="angular.element(this).scope().file_changed(this)" id="logo" type="file" accept="image/*">
+            </span>
+							<div class="form-group panel-padding">
+								<label>Logo URL: </label>
+								<input class="form-control" ng-model="event.logo" name="logo" maxlength="127">
+							</div>
+						</div>
+						<div class="col-sm-4">
+							<img style="width:100%" src="{{event.logo}}">
+						</div>
 					</div>
-					<span class="help-block">img resolution herem.....        </span>
 				</div>
 				<div class="form-group">
-					<label class="">Upload Logo:</label>
-					<div class="input-group">
-						<span class="group-span-filestyle input-group-btn" tabindex="0"> <label  class="btn btn-default btn-file"> <span class="glyphicon glyphicon-picture">   Browse&hellip;
-                           <input type="file" onchange="upload(this.files[0],'sellitemimg')"> </span>
-						</span>
-						<input type="text" class="form-control" readonly ng-model="event.logo">
+					<div class="row">
+						<label class="col-sm-1 control-label">Upload Banner</label>
+						<div class="col-sm-2">
+							<span class="file-input btn btn-primary btn-file btn-block">
+                Browse&hellip; <input ng-model="event.banner" onchange="angular.element(this).scope().file_changed(this)" id="cover" type="file" accept="image/*">
+            </span>
+							<div class="form-group panel-padding">
+								<label>Banner URL: </label>
+								<input class="form-control" ng-model="event.banner" name="banner" maxlength="127">
+							</div>
+						</div>
+						<div class="col-sm-7">
+							<img style="width:100%" src="{{event.banner}}">
+						</div>
 					</div>
-					<span class="help-block">img resolution herem.....        </span>
 				</div>
 				<legend>Location and Time</legend>
 				<div class="row">
@@ -222,7 +236,8 @@
 					<div class="col-xs-12 col-md-6 col-lg-6">
 						<label>Game: </label>
 						<div class="form-group">
-							<ac-select ac-model="tournament.game" ac-options="game.game_name for game in games" ac-settings="{ itemHeight: '32' }"></select>
+							<ac-select ac-model="tournament.game" ac-options="game.game_name for game in games" ac-settings="{ itemHeight: '32' }">
+								</select>
 						</div>
 					</div>
 				</div>
