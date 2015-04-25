@@ -111,7 +111,7 @@ var getMatchups = function(req, res, pg, conString, log) {
 			if (result.rows.length) {
 				var myMatchups = result.rows;
 				for (var i = 0; i < myMatchups.length; i++) {
-					getDetailsForMatchup(res, pg, conString, log, client, done, myMatchups[i], i, (myMatchups.length - 1), myMatchups);
+					getDetailsForMatchup(res, log, client, done, myMatchups[i], i, (myMatchups.length - 1), myMatchups);
 				}
 			} else {
 				done();
@@ -155,7 +155,7 @@ var getMatchupsForUser = function(req, res, pg, conString, log) {
 			if (result.rows.length) {
 				var myMatchups = result.rows;
 				for (var i = 0; i < myMatchups.length; i++) {
-					getDetailsForMatchup(res, pg, conString, log, client, done, myMatchups[i], i, (myMatchups.length - 1), myMatchups);
+					getDetailsForMatchup(res, log, client, done, myMatchups[i], i, (myMatchups.length - 1), myMatchups);
 				}
 			} else {
 				done();
