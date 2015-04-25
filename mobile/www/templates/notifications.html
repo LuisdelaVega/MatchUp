@@ -3,14 +3,14 @@
 
         <div class="list">
 
-<!--
-            <a class="item item-avatar" ng-click="goToMatchupOngoing()">
-                <img ng-src="{{ matchup.details[0].customer_profile_pic }}">
-                <h2>TEST CLICK HERE</h2>
-                <p>STATIC DATA TEST SCORE REPORTING</p>
-            </a>
+            <!--
+<a class="item item-avatar" ng-click="goToMatchupOngoing()">
+<img ng-src="{{ matchup.details[0].customer_profile_pic }}">
+<h2>TEST CLICK HERE</h2>
+<p>STATIC DATA TEST SCORE REPORTING</p>
+</a>
 -->
-            
+
             <a class="item item-avatar" ng-repeat="matchup in matchups" ng-click="goToMatchupOngoing(matchup)">
                 <img ng-src="{{ matchup.details[0].customer_profile_pic }}">
                 <h2>Scheduled to play against {{matchup.details[0].customer_tag}}</h2>

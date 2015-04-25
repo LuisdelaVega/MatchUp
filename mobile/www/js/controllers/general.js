@@ -468,7 +468,7 @@ myApp.controller('createAccountController', ['$scope', '$http', '$state', 'share
 
 }]);
 
-myApp.controller('sidebarController', ['$scope', '$http', '$state', 'sharedDataService', '$window', function ($scope, $http, $state, sharedDataService, $window) {
+myApp.controller('sidebarController', ['$scope', '$http', '$state', 'sharedDataService', '$window', '$timeout', function ($scope, $http, $state, sharedDataService, $window, $timeout) {
 
     //Load profile information of currently logged in user. The token is used by the server to obtain user credentials.
     $scope.$on('$ionicView.enter', function () {
@@ -492,18 +492,27 @@ myApp.controller('sidebarController', ['$scope', '$http', '$state', 'sharedDataS
 
         });
 
+        $scope.pollNotifications();
+    });
+
+
+    $scope.pollNotifications = function () {
+
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
         $http.get('http://136.145.116.232/matchup/profile/matchups?state=Upcoming', config).success(function (data) {
-
             $scope.notifications = angular.fromJson(data).length;
-
+            $timeout( function(){ $scope.pollNotifications(); }, 3000);
         }).error(function (err) {
             console.log(err);
-
+            $timeout( function(){ $scope.pollNotifications(); }, 3000);
         });
+    };
 
-
-
-    });
     $scope.goToMyEvents = function (customer_username) {
 
         sharedDataService.set(customer_username);
@@ -593,7 +602,6 @@ myApp.controller('matchupMatchController', ['$scope', '$http', '$state', 'shared
     $scope.$on('$ionicView.enter', function () {
 
         $scope.matchupInfo = sharedDataService.get();
-        console.log($scope.matchupInfo);
 
         var config = {
             headers: {
@@ -604,17 +612,17 @@ myApp.controller('matchupMatchController', ['$scope', '$http', '$state', 'shared
         $http.get('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'', config).success(function (data) {
 
             $scope.players = data.players;
+
             $scope.matchInfo = data;
             var sets = data.sets;
 
             $scope.sets = [ ];
 
-            var posZero = $scope.players[0].customer_username
+            var posZero = $scope.players[0].customer_username;
 
             angular.forEach(sets, function(set){
-
-                if(set.scores.length != 1){
-                    if(posZero == set.scores[0].customer_username)
+                if(set.scores.length != 1){     
+                    if(posZero == set.scores[0].name)
                         $scope.sets.push(set);
                     else{
                         var temp = set.scores[0];
@@ -624,8 +632,6 @@ myApp.controller('matchupMatchController', ['$scope', '$http', '$state', 'shared
                     }
                 }
             });
-
-            console.log($scope.sets);
 
         }).error(function (err) {
             console.log(err);
@@ -654,7 +660,31 @@ myApp.controller('notificationsController', ['$scope', '$http', '$state', 'share
 
         $http.get('http://136.145.116.232/matchup/profile/matchups?state=Upcoming', config).success(function (data) {
 
-            $scope.matchups = angular.fromJson(data);
+            var matchups = angular.fromJson(data);
+
+            $http.get('http://136.145.116.232/matchup/profile', config).success(function (data) {
+
+                $scope.matchups = [ ];
+
+                angular.forEach(matchups, function(matchup){
+
+                    if(matchup.details[0].customer_tag == data.customer_username){
+
+                        var temp = matchup.details[0];
+                        matchup.details[0] = matchup.details[1];
+                        matchup.details[1] = temp;
+                        $scope.matchups.push(matchup);
+
+                    }
+                    else
+                        $scope.matchups.push(matchup);
+
+                });
+
+            }).error(function (err) {
+                console.log(err);
+
+            });
 
         }).error(function (err) {
             console.log(err);
@@ -665,34 +695,8 @@ myApp.controller('notificationsController', ['$scope', '$http', '$state', 'share
 
     $scope.goToMatchupOngoing = function (matchupData) {
 
-//        var matchupData = {
-//            "event_name": "Event 01",
-//            "event_start_date": "2015-03-25T09:00:00.000Z",
-//            "event_location": "miradero",
-//            "tournament_name": "Mortal Kombat X Qualifiers",
-//            "round_number": 3,
-//            "round_of": "Loser",
-//            "match_number": 1,
-//            "team_size": 1,
-//            "station_number": null,
-//            "details":
-//            [
-//                {
-//                    "customer_tag": "samdlt",
-//                    "customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-//                    "score": "0"
-//                },
-//                {
-//                    "customer_tag": "jems9102",
-//                    "customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-//                    "score": "0"
-//                }
-//            ]
-//        };
-
         sharedDataService.set(matchupData);
         $state.go('app.matchupoingoing');
-
     };
 
 }]);
@@ -703,7 +707,7 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
         $scope.matchupInfo = sharedDataService.get();
 
         $scope.scoreInput = [ ];
-        
+
         $scope.scoreInput.score = 'Win';
 
         $scope.matchCompleted = false;
@@ -724,6 +728,12 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
         $http.get('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'', config).success(function (data) {
 
             $scope.players = data.players;
+            angular.forEach($scope.players, function(player){
+                if(player.score == null){
+                    player.score = 0;
+                }
+            });
+
             $scope.matchInfo = data;
 
             var sets = data.sets;
@@ -734,7 +744,7 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
 
             angular.forEach(sets, function(set){
                 if(set.scores.length != 1){
-                    if(posZero == set.scores[0].customer_username)
+                    if(posZero == set.scores[0].name)
                         $scope.sets.push(set);
                     else{
                         var temp = set.scores[0];
@@ -745,15 +755,15 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
                 }
             });
 
-            angular.forEach($scope.sets, function(set){
-                var foundSet = false;
-                if(set.set_completed == false && !foundSet){
+            var foundSet = false;
+            angular.forEach(sets, function(set){
+                if(!set.set_completed && !foundSet){
                     $scope.currentSet = set.set_seq;
                     foundSet = true;
                 }
             });
 
-            if($scope.sets[$scope.sets.length - 1].set_completed == true){
+            if(sets[sets.length - 1].set_completed == true){
                 $scope.matchCompleted = true;              
             }
             else{
@@ -775,30 +785,29 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
             }
         }; 
 
-        console.log($scope.scoreInput.score);
-        
         if($scope.scoreInput.score == 'Win'){        
 
-            $http.post('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'/'+$scope.currentSet+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'', {
+            $http.put('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'/'+$scope.currentSet+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'', {
                 "score": 1
 
             }, config).success(function (data) {   
 
 
+                console.log('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'/'+$scope.currentSet+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'');
                 console.log("submitted score");
 
             }).error(function (err) {
                 console.log(err);
             });
         }
-        
+
         else{
-            $http.post('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'/'+$scope.currentSet+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'', {
+            $http.put('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'/'+$scope.currentSet+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'', {
                 "score": 0
 
             }, config).success(function (data) {   
 
-
+                console.log('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'/'+$scope.currentSet+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'');
                 console.log("submitted score");
 
             }).error(function (err) {
