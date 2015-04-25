@@ -42,11 +42,10 @@
 						</div>
 					</div>
 					<div class="col-xs-12 col-md-6 col-lg-6">
-						<div class="form-group has-feedback">
-							<label class="control-label">Game</label>
-							<!-- 	TOOOOOOOOODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO   -->
-							<input type="text" class="form-control" placeholder="Search for Games" ng-model="newTournament.game_name" />
-							<i class="form-control-feedback glyphicon glyphicon-search"></i>
+						<label>Game: </label>
+						<div class="form-group">
+							<ac-select ac-model="newTournament.game" ac-options="game.game_name for game in games" ac-settings="{ itemHeight: '32' }">
+								</select>
 						</div>
 					</div>
 				</div>
@@ -94,6 +93,13 @@
 							<input type="text" class="form-control" ng-model="newTournament.competitor_fee" valid-decimal>
 						</div>
 					</div>
+
+					<div class="col-xs-12 col-md-6 col-lg-6">
+						<div class="form-group">
+							<label>Capacity: </label>
+							<input type="text" class="form-control" ng-model="newTournament.tournament_max_capacity" valid-input input-pattern="[^0-9]+">
+						</div>
+					</div>
 					<div class="col-xs-12 col-md-6 col-lg-6">
 						<label>Seed Money: </label>
 						<div class="form-group input-group">
@@ -101,11 +107,14 @@
 							<input type="text" class="form-control" ng-model="newTournament.seed_money" valid-input input-pattern="[^0-9]+">
 						</div>
 					</div>
-
-					<div class="col-xs-12 col-md-6 col-lg-6">
+					<div class="col-xs-12 col-md-4 col-lg-4">
+						<label>Prize Money Distribution: </label>
 						<div class="form-group">
-							<label>Capacity: </label>
-							<input type="text" class="form-control" ng-model="newTournament.tournament_max_capacity" valid-input input-pattern="[^0-9]+">
+							<select class="form-control" ng-model="newTournament.prize_distribution" ng-init="newTournament.prize_distribution = 'Standard'">
+								<option ng-value="'Standard'">Standard</option>
+								<option ng-value="'First and Second'">First and Second</option>
+								<option ng-value="'Winner Takes All'">Winner Takes All</option>
+							</select>
 						</div>
 					</div>
 				</div>
@@ -134,7 +143,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="row" ng-show="tournament.type.name == 'Two Stage'">
+				<div class="row" ng-show="newTournament.tournament_type == 'Two Stage'">
 					<div class="col-xs-12 col-md-6 col-lg-6">
 						<div class="form-group">
 							<label># of Competitors per Group: </label>
@@ -149,11 +158,11 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-xs-12 col-md-6 col-lg-6" ng-show="newTournament.type == 'Single Stage'">
+					<div class="col-xs-12 col-md-6 col-lg-6" ng-show="newTournament.tournament_type == 'Single Stage'">
 						<label>Tournament Format: </label>
 						<select class="form-control" ng-model="newTournament.tournament_format" ng-options="item for item  in tournamentFormat" ng-init="newTournament.tournament_format = tournamentFormat[0]"></select>
 					</div>
-					<div class="col-xs-12 col-md-6 col-lg-6" ng-show="tournament.type == 'Two Stage'">
+					<div class="col-xs-12 col-md-6 col-lg-6" ng-show="newTournament.tournament_type == 'Two Stage'">
 						<label>Final Stage: </label>
 						<select class="form-control" ng-model="newTournament.tournament_format" ng-options="item for item  in tournamentFormatTwo" ng-init="newTournament.tournament_format = tournamentFormatTwo[0]"></select>
 					</div>

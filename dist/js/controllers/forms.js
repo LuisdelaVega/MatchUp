@@ -80,10 +80,10 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 			alert("Please fill out event location and venue")
 			return;
 		}
-		
-		if(!$scope.event.banner)
+
+		if (!$scope.event.banner)
 			$scope.event.banner = "http://neptunolabs.com/images/ckmagic.jpg";
-		if(!$scope.event.logo)
+		if (!$scope.event.logo)
 			$scope.event.logo = "http://neptunolabs.com/images/matchup-logo.png";
 
 		// Data was validated
@@ -306,7 +306,7 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 			return;
 		}
 		// Check null value
-		if (!isNaN($scope.event.deduction_fee) && $scope.event.deduction_fee <= 0 &&  $scope.event.deduction_fee >= 100) {
+		if (!isNaN($scope.event.deduction_fee) && $scope.event.deduction_fee <= 0 && $scope.event.deduction_fee >= 100) {
 			alert("Please specify a spectator deduction fee");
 			return;
 		}
@@ -343,22 +343,21 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 		$scope.tournament.name = $scope.tournament.start_date = $scope.tournament.deadline = $scope.tournament.rules = $scope.tournament.fee = $scope.tournament.seed_money = $scope.tournament.deduction_fee = $scope.tournament.capacity = $scope.tournament.team_size = $scope.tournament.group_players = $scope.tournament.group_winners = $scope.tournament.scoring = $scope.tournament.game = "";
 
 	}
-	
 	// Image upload
-	$scope.file_changed = function (element) {
+	$scope.file_changed = function(element) {
 
 		var photofile = element.files[0];
 		var reader = new FileReader();
 		// Function fire everytime the file changes
-		reader.onload = function (e) {
+		reader.onload = function(e) {
 			var fd = new FormData();
 			fd.append("image", e.target.result.split(",")[1]);
 			fd.append("key", $rootScope.imgurKey);
 			var xhr = new XMLHttpRequest();
 			xhr.open("POST", "http://api.imgur.com/2/upload.json");
-			xhr.onload = function () {
+			xhr.onload = function() {
 				// Apply changes to scope. Not a angular function it is needed
-				$scope.$apply(function () {
+				$scope.$apply(function() {
 					var link = JSON.parse(xhr.responseText).upload.links.original;
 					//Check which image was changed
 					if (element.id == "banner")
@@ -821,6 +820,18 @@ myApp.controller("editOrganizationController", function($scope, $window, $stateP
  *	URL (DELETE) http://matchup.neptunolabs.com/matchup/events/{{event}}/tournaments/{{tournament}}?date={{date}}&location={{location}}
  */
 myApp.controller("editHostedTournamentListController", function($scope, $http, $window, $rootScope, $state, $stateParams) {
+	// Init stuff
+	$scope.games = [];
+	// FUCK ACUTE
+	$scope.newTournament = {};
+	$scope.newTournament.game = "";
+
+	// Get games for dropdown
+	$http.get($rootScope.baseURL + '/matchup/popular/games').success(function(data) {
+		$scope.games = data;
+	}).error(function(data, status) {
+		console.log(status);
+	});
 
 	// Miscellaneous information for static data
 	var d = new Date();
@@ -860,7 +871,6 @@ myApp.controller("editHostedTournamentListController", function($scope, $http, $
 	// Array for persiting tournaments
 
 	$scope.tournamentIndex = 0;
-	$scope.newTournament = {}
 
 	// Transition function to the tournament form
 	$scope.addTournament = function() {
@@ -902,7 +912,7 @@ myApp.controller("editHostedTournamentListController", function($scope, $http, $
 			}
 		} else {
 			// If team is false init to 0
-			$scope.newTournament.team_size = 0;
+			$scope.newTournament.team_size = 1;
 		}
 
 		// Validate Tournament Type
@@ -943,10 +953,9 @@ myApp.controller("editHostedTournamentListController", function($scope, $http, $
 		// Tournament object
 		var tournament = {
 			"name" : $scope.newTournament.tournament_name,
-			"game" : $scope.newTournament.game_name,
+			"game" : $scope.newTournament.game.game_name,
 			"rules" : $scope.newTournament.rules,
-			"teams" : $scope.newTournament.teams,
-			"team_size" : $scope.newTournament.team_size,
+			"teams" : $scope.newTournament.team_size,
 			"start_date" : $scope.newTournament.start_date,
 			"deadline" : $scope.newTournament.deadline,
 			"fee" : parseFloat($scope.newTournament.competitor_fee),
@@ -957,13 +966,31 @@ myApp.controller("editHostedTournamentListController", function($scope, $http, $
 			"scoring" : $scope.newTournament.scoring,
 			"group_players" : parseInt($scope.newTournament.group_players),
 			"group_winners" : parseInt($scope.newTournament.group_winners),
+			"prize_distribution" : $scope.newTournament.prize_distribution
 		};
+		console.log(tournament);
+
+		console.log($scope.newTournament);
 
 		//ON SUCCES PUSH TO THE ARRAY THAT IS SHOWING THE TOURNAMEBTS
 		$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation, tournament).success(function(data) {
 			//TODO for some reason when I push it's not showing upcorrectly in the list. I need to check if i'm sending the parameters incorrectly or something.
-			$scope.tournaments.push($scope.newTournament);
-			console.log($scope.newTournament);
+			$scope.tournaments.push({
+				"tournament_name" : $scope.newTournament.tournament_name,
+				"game_name" : $scope.newTournament.game.game_name,
+				"tournament_rules" : $scope.newTournament.rules,
+				"team_size" : $scope.newTournament.team_size,
+				"tournament_start_date" : $scope.newTournament.start_date,
+				"tournament_check_in_deadline" : $scope.newTournament.deadline,
+				"competitor_fee" : parseFloat($scope.newTournament.competitor_fee),
+				"tournament_max_capacity" : parseInt($scope.newTournament.tournament_max_capacity),
+				"seed_money" : parseFloat($scope.newTournament.seed_money),
+				"tournament_type" : $scope.newTournament.tournament_type,
+				"tournament_format" : $scope.newTournament.tournament_format,
+				"number_of_people_per_group" : parseInt($scope.newTournament.group_players),
+				"amount_of_winners_per_group" : parseInt($scope.newTournament.group_winners),
+				"prize_distribution_name" : $scope.newTournament.prize_distribution
+			});
 
 		}).error(function(err) {
 			console.log(err);
@@ -991,6 +1018,7 @@ myApp.controller("editHostedTournamentListController", function($scope, $http, $
 		//TODO Check
 		$http.delete($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.tournamentIndex].tournament_name + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
 			$scope.tournaments.splice($scope.tournamentIndex, 1);
+			$('#deleteModal').modal("hide");
 		}).error(function(err) {
 			console.log(err);
 		});
