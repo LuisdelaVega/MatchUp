@@ -80,6 +80,11 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 			alert("Please fill out event location and venue")
 			return;
 		}
+		
+		if(!$scope.event.banner)
+			$scope.event.banner = "http://neptunolabs.com/images/ckmagic.jpg";
+		if(!$scope.event.logo)
+			$scope.event.logo = "http://neptunolabs.com/images/matchup-logo.png";
 
 		// Data was validated
 
@@ -213,10 +218,6 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 		if ($scope.event.is_online)
 			$scope.event.location = $scope.event.venue = "Online";
 
-		// Format event stuff
-		$scope.event.banner = "http://neptunolabs.com/images/ckmagic.jpg";
-		$scope.event.logo = "http://neptunolabs.com/images/matchup-logo.png";
-
 		// Tournament object
 		// Some values are to default. This values are later change if the tournament is hosted or regular
 		var tournament = {
@@ -305,7 +306,7 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 			return;
 		}
 		// Check null value
-		if (!$scope.event.deduction_fee) {
+		if (!isNaN($scope.event.deduction_fee) && $scope.event.deduction_fee <= 0 &&  $scope.event.deduction_fee >= 100) {
 			alert("Please specify a spectator deduction fee");
 			return;
 		}
@@ -342,6 +343,35 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 		$scope.tournament.name = $scope.tournament.start_date = $scope.tournament.deadline = $scope.tournament.rules = $scope.tournament.fee = $scope.tournament.seed_money = $scope.tournament.deduction_fee = $scope.tournament.capacity = $scope.tournament.team_size = $scope.tournament.group_players = $scope.tournament.group_winners = $scope.tournament.scoring = $scope.tournament.game = "";
 
 	}
+	
+	// Image upload
+	$scope.file_changed = function (element) {
+
+		var photofile = element.files[0];
+		var reader = new FileReader();
+		// Function fire everytime the file changes
+		reader.onload = function (e) {
+			var fd = new FormData();
+			fd.append("image", e.target.result.split(",")[1]);
+			fd.append("key", $rootScope.imgurKey);
+			var xhr = new XMLHttpRequest();
+			xhr.open("POST", "http://api.imgur.com/2/upload.json");
+			xhr.onload = function () {
+				// Apply changes to scope. Not a angular function it is needed
+				$scope.$apply(function () {
+					var link = JSON.parse(xhr.responseText).upload.links.original;
+					//Check which image was changed
+					if (element.id == "banner")
+						$scope.event.banner = link;
+					else
+						$scope.event.logo = link;
+				});
+			}
+			xhr.send(fd);
+
+		}
+		reader.readAsDataURL(photofile);
+	};
 });
 
 /*

@@ -26,10 +26,13 @@
                     <i class="icon ion-log-in"></i> Sign Up
                 </a>
                 <a class="tab-item" ng-click="goToMeetup(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location)">
-                    <i class="icon ion-android-people"></i> Meetup
+                    <i class="icon ion-android-people"></i> Meetups
                 </a>
                 <a class="tab-item" ng-click="goToNews(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location)">
                     <i class="icon ion-ios-paper"></i> News
+                </a>
+                <a class="tab-item" ng-if="isOngoing" ng-click="goToReviews(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location)">
+                    <i class="icon ion-star"></i> Reviews
                 </a>
             </div>
         </div>
@@ -43,12 +46,13 @@
                         <img class="game-cover" ng-src="{{ sponsors[$index].sponsor_logo }}">
                     </div>
                     <div class="col">
-                        <img class="game-cover" ng-src="{{ sponsors[$index +1].sponsor_logo }}">
+                        <img class="game-cover" ng-src="{{ sponsors[$index+1].sponsor_logo }}">
                     </div>
                 </div>
             </div>
         </div>
-        <div class="list-inset" ng-if="!isOngoing">
+        <!--        <div class="list-inset" ng-if="!isOngoing">-->
+        <div class="list-inset">
             <div class="item item-divider">
                 Tournaments
             </div>
@@ -58,76 +62,8 @@
                 <p>{{tournament.tournament_start_date | date: 'medium'}}</p>
             </a>
         </div>
-
-        <div class="list list-inset" ng-if="isOngoing" ng-repeat="tournament in tournamentsInfo">
-            <a class="item item-thumbnail-left" ng-click="goToTournament(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location, tournament.tournament_name)">
-                <img ng-src="{{ tournament.game_image }}">
-                <h2>{{tournament.tournament_name}}</h2>
-                <p>{{tournament.tournament_start_date | date: 'medium'}}</p>
-            </a>
-            <div class="item item-divider">
-                <h3>1st</h3>
-            </div>
-            <a class="item item-avatar" href="#/app/regulareventmatchups">
-                <img src="img/ron.jpg">
-                <div class="row">
-                    <div class="col col-75">
-                        <h2>Ron Paul</h2>
-                        <p>This is my info</p>
-                    </div>
-                    <div class="col center-text">
-                        <h1 class="h1-username" style="color: rgb(102, 221, 51);"> 3 - 1</h1>
-                    </div>
-                </div>
-            </a>
-            <div class="item item-divider">
-                <h3>2nd</h3>
-            </div>
-            <a class="item item-avatar" href="#/app/regulareventmatchups">
-                <img src="img/ron.jpg">
-                <div class="row">
-                    <div class="col col-75">
-                        <h2>Ron Paul</h2>
-                        <p>This is my info</p>
-                    </div>
-                    <div class="col center-text">
-                        <h1 class="h1-username" style="color: rgb(255, 102, 102);"> 2 - 2</h1>
-                    </div>
-                </div>
-            </a>
-            <div class="item item-divider">
-                <h3>3rd</h3>
-            </div>
-            <a class="item item-avatar" href="#/app/regulareventmatchups">
-                <img src="img/ron.jpg">
-                <div class="row">
-                    <div class="col col-75">
-                        <h2>Ron Paul</h2>
-                        <p>This is my info</p>
-                    </div>
-                    <div class="col center-text">
-                        <h1 class="h1-username" style="color: rgb(255, 102, 102);"> 1 - 2</h1>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <div ng-controller="ratingsController" ng-if="isOngoing">
-            <div class="card" ng-repeat="review in reviews | limitTo: 3">
-                <div class="item">
-                    <h2 style="text-align: center;">{{review.review_title}}</h2>
-                    <rating ng-model="review.star_rating" max="5" style="text-align: center;" readonly="true"></rating>
-                    <p style="text-align: center;"> by {{review.customer_username}} </p>
-                </div>
-                <div class="item item-text-wrap">
-                    {{review.review_content}}
-                </div>
-            </div>
-            <div class="padding">
-                <button class="button button-block button-positive" ng-click="goToReview(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location)">
-                    Write a review
-                </button>
-            </div>
-        </div>
+        <button class="button button-positive" style="width: 100vw">
+            Spectator Sign Up
+        </button>
     </ion-content>
 </ion-view>

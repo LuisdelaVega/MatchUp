@@ -1,5 +1,5 @@
 //Declare parent module. Module defines states and has within its parameters all the other js files containing the controllers.
-angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-events', 'user', 'team-organizations', 'genres', 'regular-events', 'events', 'game-profile', 'my-events', 'registered-events', 'ngCordova'])
+angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-events', 'user', 'team-organizations', 'genres', 'regular-events', 'events', 'game-profile', 'my-events', 'registered-events', 'ngCordova', 'ordinal'])
 
     .run(function ($ionicPlatform) {
     $ionicPlatform.ready(function () {
@@ -77,6 +77,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
         views: {
             'profile-standings-tab': {
                 templateUrl: "templates/profile/profile-standings.html",
+                controller: "profileStandingsController"
             }
         }
     })
@@ -144,7 +145,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
         url: "/mymatchups",
         templateUrl: "templates/myStuff/my-matchups.html",
         controller: "myMatchupController"
-        
+
     })
     //================================================================================
     // My Events
@@ -352,7 +353,11 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
         url: "/postnews/:type/:eventname/:date/:location",
         templateUrl: "templates/premiumEvent/post-news.html",
         controller: "postNewsController"
-
+    })
+        .state('app.review', {
+        url: "/review/:eventname/:date/:location",
+        templateUrl: "templates/premiumEvent/review.html",
+        controller: "ratingsController"
     })
 
     //================================================================================
@@ -376,7 +381,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     //================================================================================
         .state('app.teamsignup', {
         url: "/teamsignup",
-        templateUrl: "templates/team-sign-up.html"
+        templateUrl: "templates/regularevent/team-sign-up.html"
     })
     //================================================================================
     // Notifications

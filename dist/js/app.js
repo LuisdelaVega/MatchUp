@@ -1,4 +1,4 @@
-var myApp = angular.module('MatchUp', ['ui.router', 'ngResource', 'as.sortable', 'ui.bootstrap.datetimepicker', 'panhandler', 'Authentication', 'InputDirectives', 'bracketDirective', 'acute.select' , 'home', 'premium-events', 'tournaments', 'user', 'organizer', 'organization', 'forms']);
+var myApp = angular.module('MatchUp', ['ui.router', 'ngResource', 'as.sortable', 'ui.bootstrap.datetimepicker', 'panhandler', 'Authentication', 'InputDirectives', 'bracketDirective', 'acute.select', 'home', 'premium-events', 'tournaments', 'user', 'organizer', 'organization', 'forms']);
 
 myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider) {
 	//
@@ -90,10 +90,10 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 		.state('app.edit_meetup', {
 			url: "/meetup/:eventName/:eventDate/:eventLocation/:meetupDate/:meetupLocation/:customerUsername/edit",
 			templateUrl: "event/edit_meetup.html",
-			controller: "editMeetUpController"			
+			controller: "editMeetUpController"
 		})
-		
-		.state('app.competitorSignup', {
+
+	.state('app.competitorSignup', {
 			url: "/competitorSignup",
 			templateUrl: "event/competitor_signup.html"
 		})
@@ -118,8 +118,8 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			controller: "editTournamentController"
 		})
 		.state('app.tournamentList', {
- 			url: "/settings/event/:eventName/:eventDate/:eventLocation/tournaments",
- 			templateUrl: "organizer/tournament_list.html",
+			url: "/settings/event/:eventName/:eventDate/:eventLocation/tournaments",
+			templateUrl: "organizer/tournament_list.html",
 			controller: "editHostedTournamentListController"
 		})
 		.state('app.registrations', {
@@ -185,15 +185,15 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			templateUrl: "user/user_organizations.html",
 			controller: "userOrganizationsController"
 		})
+		.state('app.userMatchups', {
+			url: "/user/:username/matchups",
+			templateUrl: "user/user_matchups.html",
+			controller: "matchupsController"
+		})
 		.state('app.editProfile', {
 			url: "/user/:username/edit",
 			templateUrl: "user/edit_profile.html",
 			controller: "editProfileController"
-		})
-		.state('app.myMatchups', {
-			url: "/user/:username/matchups",
-			templateUrl: "user/my_matchups.html",
-			controller: "matchupsController"
 		})
 		.state('app.subcriptions', {
 			url: "/subcriptions",
@@ -341,9 +341,9 @@ myApp.run(function ($rootScope, $state, AuthenticationService, $window, acuteSel
 
 	$rootScope.baseURL = "http://136.145.116.232";
 	$rootScope.imgurKey = "6528448c258cff474ca9701c5bab6927";
-	
+
 	// Set the template path for all instances for acute template
-    acuteSelectService.updateSetting("templatePath", "../../public/event");
+	acuteSelectService.updateSetting("templatePath", "event");
 
 	// Authenticated selected states, not used for capstone
 	//	$rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams,error) {
@@ -364,7 +364,7 @@ myApp.factory("MatchUpCache", function ($cacheFactory) {
 
 myApp.factory('sharedDataService', function () {
 	var savedData = {}
-	
+
 	function set(data) {
 		savedData = data;
 	}

@@ -31,9 +31,9 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 		$scope.isOngoing = false;
 		// Check if event ended
 		if (endDate.getTime() < now_utc.getTime()) {
-			
+
 			$scope.finished = true;
-			
+
 		} else {
 			$scope.finished = false;
 			$scope.isOngoing = (startDate.getTime() < now_utc.getTime());
@@ -53,31 +53,45 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 		$scope.participants = results[3].data;
 		// Get Tournaments
 		$scope.tournamentsInfo = results[4].data;
+
+		var competitorsGets = [];
+		for (var i = 0; i < $scope.tournamentsInfo.length; i++) {
+			competitorsGets.push($http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $scope.tournamentsInfo[i].tournament_name + '/competitors?date=' + $stateParams.date + '&location=' + $stateParams.location))
+		}
+		
+		$q.all(competitorsGets).then(function (results) {
+			$scope.competitorsResult = results;
+			console.log($scope.competitorsResult);
+		});
+
 	}, function (err) {
 		console.log(err);
 		console.log("Oh oh");
 	});
 
-	$scope.getFees = function(){
+	$scope.getFees = function () {
 		// Model for selected fee
 		$scope.selected = {
 			name: ""
 		}
 		$('#signUpModal').modal("show");
-		
+
 		$http.get($rootScope.baseURL + '/matchup/events/' + $scope.eventInfo.event_name + '/specfees' + '?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data) {
 			$scope.fees = data;
 		});
 	}
-	
-	$scope.payFee = function (){
+
+	$scope.payFee = function () {
 		$scope.paySelected = true;
-		$http.post($rootScope.baseURL + '/matchup/events/' + $scope.eventInfo.event_name + '/specfees/' + $scope.selected.name + '?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data) {
-			$('#signUpModal').modal("hide");
-			console.log(data);
-		});
+		if ($scope.selected.name) {
+			$http.post($rootScope.baseURL + '/matchup/events/' + $scope.eventInfo.event_name + '/specfees/' + $scope.selected.name + '?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data) {
+				$scope.eventInfo.is_spectator = true;
+				$('#signUpModal').modal("hide");
+				$('#successModal').modal('show');
+			});
+		}
 	}
-	
+
 	//Go to a list of meetups for this event
 	$scope.goToMeetupList = function (eventName, eventDate, eventLocation) {
 		//heyyeah
@@ -168,15 +182,15 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 		});
 
 	};
-	
-	$scope.getNumber = function(num) {
-		return new Array(num);
-	}
-	//getr all reviews
-	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/reviews?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function(data) {
+
+	$scope.getNumber = function (num) {
+			return new Array(num);
+		}
+		//getr all reviews
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/reviews?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data) {
 		$scope.reviews = data;
 
-	}).error(function(err) {
+	}).error(function (err) {
 		console.log(err);
 	});
 

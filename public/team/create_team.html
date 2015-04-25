@@ -19,15 +19,19 @@
 					<label>Bio:</label>
 					<textarea class="form-control" rows="4" ng-model="team.bio" maxlength="255"></textarea>
 				</div>
-				<div class="form-group" >
+				<div class="form-group">
 					<div class="row">
 						<label class="col-sm-2 control-label">Upload Cover</label>
-						<div class="col-sm-3" >
+						<div class="col-sm-3">
 							<span class="file-input btn btn-primary btn-file btn-block"> Browse&hellip;
 								<input ng-model="team.cover" onchange="angular.element(this).scope().file_changed(this)"  id="cover"  name="cover" type="file" accept="image/*">
 							</span>
+							<div class="form-group panel-padding">
+								<label>Cover URL: </label>
+								<input class="form-control" ng-model="team.cover" name="cover" maxlength="127">
+							</div>
 							<div ng-show="!validCover" ng-class="{ 'has-error' : !validCover}">
-								<p  class="help-block" >
+								<p class="help-block">
 									A team cover photo is required.
 								</p>
 							</div>
@@ -40,15 +44,19 @@
 
 				</div>
 
-				<div class="form-group" >
+				<div class="form-group">
 					<div class="row">
 						<label class="col-sm-2 control-label">Upload Logo</label>
-						<div class="col-sm-3" >
+						<div class="col-sm-3">
 							<span class="file-input btn btn-primary btn-file btn-block"> Browse&hellip;
-								<input ng-model="team.cover" onchange="angular.element(this).scope().file_changed(this)"  id="logo"  name="logo" type="file" accept="image/*">
+								<input ng-model="team.logo" onchange="angular.element(this).scope().file_changed(this)"  id="logo"  name="logo" type="file" accept="image/*">
 							</span>
+							<div class="form-group panel-padding">
+								<label>Logo URL: </label>
+								<input class="form-control" ng-model="team.logo" name="logo" maxlength="127">
+							</div>
 							<div ng-show="!validCover" ng-class="{ 'has-error' : !validCover}">
-								<p  class="help-block" >
+								<p class="help-block">
 									A team logo is required.
 								</p>
 							</div>

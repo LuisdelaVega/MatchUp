@@ -1,7 +1,7 @@
 <img class="banner-cover" ng-src="{{organization.organization_cover_photo}}"></img>
 <div class="box box-margin">
 	<div class="row">
-		<div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+		<div class="col-xs-8 col-sm-4 col-md-4 col-lg-2">
 			<img class="profile-picture" ng-src='{{organization.organization_logo}}'></img>
 		</div>
 		<div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
@@ -15,6 +15,25 @@
 	<div class="row">
 		<div class="col-md-3 col-md-offset-9">
 			<a class="btn btn-primary btn-block box-margin" ui-sref="app.editOrganization({organizationName: organization.organization_name})" ng-if="organization.is_member">Edit</a>
+		</div>
+	</div>
+</div>
+<div class="widget-box box-margin">
+	<div class="widget-header bordered-bottom bordered-themesecondary">
+		<h3 class="widget-title themesecondary"> Sponsors</h3>
+	</div>
+	<!--Widget Header-->
+	<div class="widget-body">
+		<div class="widget-main no-padding">
+			<div class="tickets-container">
+				<div class="row" style="padding-left: 15px">
+					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="sponsor in sponsors">
+						<a class="thumbnail" ng-href="{{sponsor.sponsor_link}}"> <img ng-src="{{ sponsor.sponsor_logo }}" style="height: 70%">
+						<hr class="hr-custom-padding">
+						</a>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
@@ -64,11 +83,12 @@
 			<div class="tickets-container">
 				<ul class="tickets-list">
 					<div class="row">
-						<div class="col-lg-3 col-md-6 col-sm-12 col-xs-12" ng-repeat="member in members | limitTo: 4">
+						<div class="col-lg-3 col-md-6 col-sm-12 col-xs-12" ng-repeat="member in members">
+
 							<li class="ticket-item" ng-click="goToUser(member.customer_username)">
 								<div class="ticket-user">
 									<img ng-src="{{member.customer_profile_pic}}" class="user-avatar">
-									<span class="user-name">{{member.customer_first_name}} {{member.customer_last_name}} </span>
+									<span class="user-name">{{member.customer_first_name}} {{member.customer_last_name}} </span><span ng-if="member.is_owner"> (Owner)</span>
 								</div>
 							</li>
 						</div>

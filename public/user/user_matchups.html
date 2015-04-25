@@ -1,0 +1,196 @@
+<div class="box">
+	<div class="page-header" ng-if="isUser">
+		<h1>My Matchups</h1>
+	</div>
+	<div class="page-header" ng-if="!isUser">
+		<h1>{{username}}'s Matchups</h1>
+	</div>
+	<div class="row">
+		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-4" ng-repeat="match in pastMatchups">
+			<div class="box cursor box-margin" data-toggle="modal" data-target="#matchupModal" ng-if="match.details[0].customer_tag == user">
+				<h4 class="modal-title" align="center">{{match.event_name}} - {{match.tournament_name}}</h4>
+				<p align="center">
+					{{match.round_of}} Round {{match.round_number}}, Match {{match.match_number}}
+					<br/> Station {{match.station_number}}
+					<br>
+				</p>
+				<div class="row" align="center">
+					<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
+						<img class="img-circular player-2 large center-block" ng-src="{{match.details[1].customer_profile_pic}}" />
+						<h3 style="text-align:center">{{match.details[1].customer_tag}}</h3>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
+						<h1 style="text-align:center">
+							{{match.details[0].score}}-{{match.details[1].score}}</h1>
+					</div>
+				</div>
+			</div>
+			<div class="box cursor box-margin" data-toggle="modal" data-target="#matchupModal" ng-if="match.details[1].customer_tag == user">
+				<h4 class="modal-title" align="center">{{match.event_name}} - {{match.tournament_name}}</h4>
+				<p align="center">
+					{{match.round_of}} Round {{match.round_number}}, Match {{match.match_number}}
+					<br/> Station {{match.station_number}}
+					<br>
+				</p>
+				<div class="row" align="center">
+					<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
+						<img class="img-circular player-2 large center-block" ng-src="{{match.details[0].customer_profile_pic}}" />
+						<h3 style="text-align:center">{{match.details[0].customer_tag}}</h3>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
+						<h1 style="text-align:center">
+							{{match.details[1].score}}-{{match.details[0].score}}</h1>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+
+<!-- modal matchup-->
+<div class="modal fade" id="matchupModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Round 1 Match 2
+				<br>
+				<small>Station 2</small></h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5 ">
+						<div class="img-circular player-1 large center-block"></div>
+					</div>
+					<div class="col-xs-4 col-sm-2 col-md-2 col-lg-2">
+						<h1 style="text-align:center">3-2</h1>
+					</div>
+					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5">
+						<div class="img-circular player-2 large center-block"></div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5 ">
+						<h3 style="text-align:center">Player 1</h3>
+					</div>
+					<div class="col-xs-4 col-sm-2 col-md-2 col-lg-2">
+						<h4 style="text-align:center">Best of 3</h4>
+					</div>
+					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5">
+						<h3 style="text-align:center">Player 2</h3>
+					</div>
+				</div>
+				<div style="text-align: center">
+					<div class="set-circular player-1"></div>
+					<div class="set-circular player-1 set-margin"></div>
+					<div class="set-circular player-2 set-margin"></div>
+					<div class="set-circular player-1"></div>
+				</div>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+
+<!-- modal matchup with sets-->
+<div class="modal fade" id="matchupSetModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Round 1 Match 2
+				<br>
+				<small>Station 2</small></h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5 ">
+						<div class="img-circular player-1 large center-block"></div>
+					</div>
+					<div class="col-xs-4 col-sm-2 col-md-2 col-lg-2">
+						<h1 style="text-align:center">3-2</h1>
+					</div>
+					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5">
+						<div class="img-circular player-2 large center-block"></div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5 ">
+						<h3 style="text-align:center">Player 1</h3>
+					</div>
+					<div class="col-xs-4 col-sm-2 col-md-2 col-lg-2">
+						<h4 style="text-align:center">Best of 3</h4>
+					</div>
+					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5">
+						<h3 style="text-align:center">Player 2</h3>
+					</div>
+				</div>
+				<div style="text-align: center">
+					<div class="set-circular player-1"></div>
+					<div class="set-circular player-2 set-margin"></div>
+					<div class="set-circular player-1"></div>
+				</div>
+				<div class=" box-margin">
+					<p>
+						Set 1
+					</p>
+					<div class="row">
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<div class="img-circular player-1 mini center-block"></div>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+							<h2 style="text-align:center">45-30</h2>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+							<div class="img-circular player-2 mini center-block"></div>
+						</div>
+					</div>
+					<hr>
+					<p>
+						Set 2
+					</p>
+					<div class="row">
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<div class="img-circular player-1 mini center-block"></div>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+							<h2 style="text-align:center">45-30</h2>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+							<div class="img-circular player-2 mini center-block"></div>
+						</div>
+					</div>
+					<hr>
+					<p>
+						Set 3
+					</p>
+					<div class="row">
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<div class="img-circular player-1 mini center-block"></div>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+							<h2 style="text-align:center">45-30</h2>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+							<div class="img-circular player-2 mini center-block"></div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+</div>

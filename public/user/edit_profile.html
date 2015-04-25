@@ -280,14 +280,18 @@
 				</div>
 				<div class="form-group">
 					<div class="row">
-						<label class="col-sm-2 control-label">Upload Cover</label>
+						<label class="col-sm-2 control-label">Upload Logo</label>
 						<div class="col-sm-3">
 							<span class="file-input btn btn-primary btn-file btn-block">
-                Browse&hellip; <input ng-model="user.customer_cover_photo" onchange="angular.element(this).scope().file_changed(this)" id="cover" type="file" accept="image/*">
+                Browse&hellip; <input ng-model="user.customer_profile_pic" onchange="angular.element(this).scope().file_changed(this)" id="profile" type="file" accept="image/*">
             </span>
+							<div class="form-group panel-padding">
+								<label>Logo URL: </label>
+								<input class="form-control" ng-model="user.customer_profile_pic" name="profile" maxlength="127">
+							</div>
 						</div>
-						<div class="col-sm-7">
-							<img style="width:100%" src="{{user.customer_cover_photo}}">
+						<div class="col-sm-4">
+							<img style="width:100%" src="{{user.customer_profile_pic}}">
 						</div>
 					</div>
 				</div>
@@ -296,11 +300,15 @@
 						<label class="col-sm-2 control-label">Upload Cover</label>
 						<div class="col-sm-3">
 							<span class="file-input btn btn-primary btn-file btn-block">
-                Browse&hellip; <input ng-model="user.customer_profile_pic" onchange="angular.element(this).scope().file_changed(this)" id="profile" type="file" accept="image/*">
+                Browse&hellip; <input ng-model="user.customer_cover_photo" onchange="angular.element(this).scope().file_changed(this)" id="cover" type="file" accept="image/*">
             </span>
+							<div class="form-group panel-padding">
+								<label>Cover URL: </label>
+								<input class="form-control" ng-model="user.customer_cover_photo" name="cover" maxlength="127">
+							</div>
 						</div>
-						<div class="col-sm-4">
-							<img style="width:100%" src="{{user.customer_profile_pic}}">
+						<div class="col-sm-7">
+							<img style="width:100%" src="{{user.customer_cover_photo}}">
 						</div>
 					</div>
 				</div>

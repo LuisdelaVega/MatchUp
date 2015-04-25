@@ -22,23 +22,8 @@
 			<div class="row">
 				<div class="col-md-3 col-md-offset-9">
 					<a class="btn btn-primary btn-block box-margin" ng-click="gotToEditProfile()" ng-if="profileData.my_profile">Edit</a>
-				</div>
-			</div>
-			<div class="btn-group btn-group-justified box-margin" role="group" ng-if="!profileData.my_profile">
-				<div class="btn-group" role="group">
-					<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#messageModal">
-						<i class="fa fa-envelope"></i> Message
-					</button>
-				</div>
-				<div class="btn-group" role="group" ng-if="subStatus">
-					<button type="button" class="btn btn-default" ng-click="subscribe()">
-						<i class="fa fa-star"> </i> Un-Subscribe
-					</button>
-				</div>
-				<div class="btn-group" role="group" ng-if="!subStatus">
-					<button type="button" class="btn btn-default" ng-click="subscribe()">
-						<i class="fa fa-star-o"> </i> Subscribe
-					</button>
+					<a class="btn btn-success btn-block box-margin" ng-if="!profileData.my_profile" ng-if="!subStatus" ng-click="subscribe()">Subscribe</a>
+					<a class="btn btn-default btn-block box-margin" ng-if="subStatus" ng-click="subscribe()">Unsubscribe</a>
 				</div>
 			</div>
 		</div>
@@ -95,18 +80,76 @@
 	</div>
 </div>
 
+<div class="widget-box box-margin" ng-if="matchups.length>0">
+	<div class="widget-header bordered-bottom bordered-themesecondary">
+		<h3 class="widget-title themesecondary">Matchups</h3>
+		<a class="widget-more" ui-sref="app.userMatchups({username:profileData.customer_username})" ng-if="matchups.length>4"> See More<i class="fa fa-arrow-circle-o-right panel-padding"></i> </a>
+	</div>
+	<!--Widget Header-->
+	<div class="widget-body">
+		<div class="widget-main no-padding">
+			<div class="tickets-container">
+				<div class="row">
+					<div class="col-xs-12 col-md-6 col-lg-4" ng-repeat="match in matchups | limitTo: 3">
+						<div class="box cursor box-margin" data-toggle="modal" data-target="#matchupModal" ng-if="match.details[0].customer_tag == profileData.customer_username">
+							<h4 class="modal-title" align="center">{{match.event_name}} - {{match.tournament_name}}</h4>
+							<p align="center">
+								{{match.round_of}} Round {{match.round_number}}, Match {{match.match_number}}
+								<br/> Station {{match.station_number}}
+								<br>
+							</p>
+							<div class="row" align="center">
+								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
+									<img class="img-circular player-2 large center-block" ng-src="{{match.details[1].customer_profile_pic}}" />
+									<h3 style="text-align:center">{{match.details[1].customer_tag}}</h3>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
+									<h1 style="text-align:center">
+							{{match.details[0].score}}-{{match.details[1].score}}</h1>
+								</div>
+							</div>
+						</div>
+						<div class="box cursor box-margin" data-toggle="modal" data-target="#matchupModal" ng-if="match.details[1].customer_tag == profileData.customer_username">
+							<h4 class="modal-title" align="center">{{match.event_name}} - {{match.tournament_name}}</h4>
+							<p align="center">
+								{{match.round_of}} Round {{match.round_number}}, Match {{match.match_number}}
+								<br/> Station {{match.station_number}}
+								<br>
+							</p>
+							<div class="row" align="center">
+								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
+									<img class="img-circular player-2 large center-block" ng-src="{{match.details[0].customer_profile_pic}}" />
+									<h3 style="text-align:center">{{match.details[0].customer_tag}}</h3>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
+									<h1 style="text-align:center">
+							{{match.details[1].score}}-{{match.details[0].score}}</h1>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
 <!-- Teams widget -->
-<div class="widget-box box-margin">
+<div class="widget-box box-margin" ng-if="teams.length>0">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Teams</h3>
-		<a class="widget-more" ng-click="goToTeams(profileData.customer_username)">See More<i class="fa fa-arrow-circle-o-right panel-padding"></i></a>
+		<a class="widget-more" ng-click="goToTeams(profileData.customer_username)" ng-if="teams.length>4">See More<i class="fa fa-arrow-circle-o-right panel-padding"></i></a>
 	</div>
 	<!--Widget Header-->
 	<div class="widget-body">
 		<div class="widget-main no-padding">
 			<div class="tickets-container">
 				<div class="row" style="padding-left: 15px">
-					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="team in teams | limitTo: 4">
+					<div class="col-md-3 col-sm-6 col-xs-12" ng-repeat="team in teams | limitTo: 4">
 						<a class="thumbnail" ui-sref="app.teamProfile({teamName: team.team_name})"> <img ng-src="{{team.team_cover_photo}}" alt="...">
 							<hr class="hr-custom-padding">
 							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
@@ -128,10 +171,10 @@
 <!-- Teams widget -->
 
 <!-- User Events widget -->
-<div class="widget-box">
+<div class="widget-box" ng-if="userEvents.length>0">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">User Events</h3>
-		<a class="widget-more" ui-sref="app.userEvents({username:profileData.customer_username})">See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
+		<a class="widget-more" ui-sref="app.userEvents({username:profileData.customer_username})" ng-if="userEvents.length>4">See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
 		</a>
 	</div>
 	<!--Widget Header-->
@@ -139,7 +182,7 @@
 		<div class="widget-main no-padding">
 			<div class="tickets-container">
 				<div class="row" style="padding-left: 15px">
-					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="item in userEvents | limitTo: 4">
+					<div class="col-md-3 col-sm-6 col-xs-12" ng-repeat="item in userEvents | limitTo: 4">
 						<a class="thumbnail" ng-click="goToEvent(item.event_name,  item.event_start_date, item.event_location)"> <img ng-src="{{item.event_banner}}" alt="{{item.event_name}}" ui-sref="app.event">
 							<hr class="hr-custom-padding">
 							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
@@ -164,10 +207,10 @@
 <!-- User Events widget-->
 
 <!-- Organizations widget-->
-<div class="widget-box">
+<div class="widget-box" ng-if="organizations.length>0">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Organizations</h3>
-		<a class="widget-more" ng-click="goToUserOrganizations(profileData.customer_username)">
+		<a class="widget-more" ng-click="goToUserOrganizations(profileData.customer_username)" ng-if="organizations.length>4">
 						See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
 					</a>
 	</div>
@@ -176,7 +219,7 @@
 		<div class="widget-main no-padding">
 			<div class="tickets-container">
 				<div class="row" style="padding-left: 15px">
-					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="organization in organizations | limitTo: 4">
+					<div class="col-md-3 col-sm-6 col-xs-12" ng-repeat="organization in organizations | limitTo: 4">
 						<a class="thumbnail" ng-click="goToOrganizationProfile(organization.organization_name)"> <img ng-src="{{organization.organization_cover_photo}}" alt="...">
 							<hr class="hr-custom-padding">
 							<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
@@ -195,40 +238,144 @@
 <!-- Organizations widget -->
 
 
-<div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="messageModalLabel" aria-hidden="true">
+<!-- modal matchup-->
+<div class="modal fade" id="matchupModal">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 class="modal-title" id="messageModalLabel">New message</h4>
+				<h4 class="modal-title">Round 1 Match 2
+				<br>
+				<small>Station 2</small></h4>
 			</div>
 			<div class="modal-body">
-				<form>
-					<div class="form-group">
-						<label for="recipient-name" class="control-label">Recipient:</label>
-						<input type="text" class="form-control" id="recipient-name">
+				<div class="row">
+					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5 ">
+						<div class="img-circular player-1 large center-block"></div>
 					</div>
-					<div class="form-group">
-						<label for="message-text" class="control-label">Message:</label>
-						<textarea class="form-control" id="message-text"></textarea>
+					<div class="col-xs-4 col-sm-2 col-md-2 col-lg-2">
+						<h1 style="text-align:center">3-2</h1>
 					</div>
-				</form>
-			</div>
-			<div class="modal-footer">
-				<div class="col-xs-12 col-md-6 col-lg-6">
-					<button type="button" class="btn btn-primary" data-dismiss="modal">
-						Send message
-					</button>
+					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5">
+						<div class="img-circular player-2 large center-block"></div>
+					</div>
 				</div>
-				<div class="col-xs-12 col-md-6 col-lg-6">
-					<button type="button" class="btn btn-default" data-dismiss="modal">
-						Cancel
-					</button>
+				<div class="row">
+					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5 ">
+						<h3 style="text-align:center">Player 1</h3>
+					</div>
+					<div class="col-xs-4 col-sm-2 col-md-2 col-lg-2">
+						<h4 style="text-align:center">Best of 3</h4>
+					</div>
+					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5">
+						<h3 style="text-align:center">Player 2</h3>
+					</div>
+				</div>
+				<div style="text-align: center">
+					<div class="set-circular player-1"></div>
+					<div class="set-circular player-1 set-margin"></div>
+					<div class="set-circular player-2 set-margin"></div>
+					<div class="set-circular player-1"></div>
+				</div>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+
+<!-- modal matchup with sets-->
+<div class="modal fade" id="matchupSetModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Round 1 Match 2
+				<br>
+				<small>Station 2</small></h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5 ">
+						<div class="img-circular player-1 large center-block"></div>
+					</div>
+					<div class="col-xs-4 col-sm-2 col-md-2 col-lg-2">
+						<h1 style="text-align:center">3-2</h1>
+					</div>
+					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5">
+						<div class="img-circular player-2 large center-block"></div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5 ">
+						<h3 style="text-align:center">Player 1</h3>
+					</div>
+					<div class="col-xs-4 col-sm-2 col-md-2 col-lg-2">
+						<h4 style="text-align:center">Best of 3</h4>
+					</div>
+					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5">
+						<h3 style="text-align:center">Player 2</h3>
+					</div>
+				</div>
+				<div style="text-align: center">
+					<div class="set-circular player-1"></div>
+					<div class="set-circular player-2 set-margin"></div>
+					<div class="set-circular player-1"></div>
+				</div>
+				<div class=" box-margin">
+					<p>
+						Set 1
+					</p>
+					<div class="row">
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<div class="img-circular player-1 mini center-block"></div>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+							<h2 style="text-align:center">45-30</h2>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+							<div class="img-circular player-2 mini center-block"></div>
+						</div>
+					</div>
+					<hr>
+					<p>
+						Set 2
+					</p>
+					<div class="row">
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<div class="img-circular player-1 mini center-block"></div>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+							<h2 style="text-align:center">45-30</h2>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+							<div class="img-circular player-2 mini center-block"></div>
+						</div>
+					</div>
+					<hr>
+					<p>
+						Set 3
+					</p>
+					<div class="row">
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<div class="img-circular player-1 mini center-block"></div>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+							<h2 style="text-align:center">45-30</h2>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+							<div class="img-circular player-2 mini center-block"></div>
+						</div>
+					</div>
 				</div>
 
 			</div>
+
 		</div>
+
 	</div>
 </div>
