@@ -4,9 +4,10 @@ function competes(res, client, done, log, competitor, match) {
 		values : [match.event_name, match.event_start_date, match.event_location, match.tournament_name, match.round_number, match.round_of, match.match_number, competitor.competitor_number]
 	}, function(err, result) {
 		if (err) {
-			console.log("competes");
 			client.query("ROLLBACK");
 			done();
+			console.log("tournament.js - competes");
+			console.log(err);
 			res.status(500).send(err);
 			log.info({
 				res : res
@@ -21,9 +22,10 @@ function is_set(res, client, done, log, match, set_seq) {
 		values : [match.event_name, match.event_start_date, match.event_location, match.tournament_name, match.round_number, match.round_of, match.match_number, set_seq]
 	}, function(err, result) {
 		if (err) {
-			console.log("is_set");
 			client.query("ROLLBACK");
 			done();
+			console.log("tournament.js - is_set");
+			console.log(err);
 			res.status(500).send(err);
 			log.info({
 				res : res
@@ -38,9 +40,10 @@ function competitor_goes_to(res, client, done, log, competitor_goes_to, is_winne
 		values : [competitor_goes_to.event_name, competitor_goes_to.event_start_date, competitor_goes_to.event_location, competitor_goes_to.tournament_name, competitor_goes_to.past_round_number, competitor_goes_to.past_round_of, competitor_goes_to.past_match, competitor_goes_to.future_round_number, competitor_goes_to.future_round_of, competitor_goes_to.future_match, is_winner]
 	}, function(err, result) {
 		if (err) {
-			console.log("competitor_goes_to");
 			client.query("ROLLBACK");
 			done();
+			console.log("tournament.js - competitor_goes_to");
+			console.log(err);
 			res.status(500).send(err);
 			log.info({
 				res : res
@@ -55,9 +58,10 @@ function addMatch(res, client, done, log, match, round_best_of) {
 		values : [match.event_name, match.event_start_date, match.event_location, match.tournament_name, match.round_number, match.round_of, match.match_number, match.is_favourite, match.match_completed]
 	}, function(err, result) {
 		if (err) {
-			console.log(err);
 			client.query("ROLLBACK");
 			done();
+			console.log("torunament.js - addMatch");
+			console.log(err);
 			res.status(500).send(err);
 			log.info({
 				res : res
@@ -78,9 +82,10 @@ function addMatch(res, client, done, log, match, round_best_of) {
 					values : [match.event_name, match.event_start_date, match.event_location, match.tournament_name, match.round_number, match.round_of, match.match_number, match.is_played_in]
 				}, function(err, result) {
 					if (err) {
-						console.log("is_played_in");
 						client.query("ROLLBACK");
 						done();
+						console.log("tournament.js - is_played_in");
+						console.log(err);
 						res.status(500).send(err);
 						log.info({
 							res : res
@@ -104,9 +109,10 @@ function addRound(res, client, done, log, round) {
 		values : [round.event_name, round.event_start_date, round.event_location, round.tournament_name, round.round_number, round.round_of, round.round_start_date, round.round_pause, round.round_completed, round.round_best_of]
 	}, function(err, result) {
 		if (err) {
-			console.log(err);
 			client.query("ROLLBACK");
 			done();
+			console.log("torunament.js - addRound");
+			console.log(err);
 			res.status(500).send(err);
 			log.info({
 				res : res
@@ -121,9 +127,10 @@ function addCompetitorToGroup(res, client, done, log, group, competitor) {
 		values : [group.event_name, group.event_start_date, group.event_location, group.tournament_name, group.group_number, competitor.competitor_number]
 	}, function(err, result) {
 		if (err) {
-			console.log("addCompetitorToGroup");
 			client.query("ROLLBACK");
 			done();
+			console.log("torunament.js - addCompetitorToGroup");
+			console.log(err);
 			res.status(500).send(err);
 			log.info({
 				res : res
@@ -138,9 +145,10 @@ function attachGroupToMatch(res, client, done, log, match, group_number) {
 		values : [match.event_name, match.event_start_date, match.event_location, match.tournament_name, match.round_number, match.round_of, match.match_number, group_number]
 	}, function(err, result) {
 		if (err) {
-			console.log("attachGroupToMatch");
 			client.query("ROLLBACK");
 			done();
+			console.log("torunament.js - attachGroupToMatch");
+			console.log(err);
 			res.status(500).send(err);
 			log.info({
 				res : res
@@ -159,6 +167,8 @@ function createGroup(res, client, done, log, group) {
 			console.log(err);
 			client.query("ROLLBACK");
 			done();
+			console.log("torunament.js - createGroup");
+			console.log(err);
 			res.status(500).send(err);
 			log.info({
 				res : res
@@ -196,6 +206,8 @@ var createTournament = function(req, res, pg, conString, log) {
 		query.on('error', function(error) {
 			client.query("ROLLBACK");
 			done();
+			console.log("torunament.js - createTournament");
+			console.log(error);
 			res.status(500).send(error);
 			log.info({
 				res : res
@@ -219,6 +231,8 @@ var createTournament = function(req, res, pg, conString, log) {
 				query.on('error', function(error) {
 					client.query("ROLLBACK");
 					done();
+					console.log("torunament.js - createTournament");
+					console.log(error);
 					res.status(500).send(error);
 					log.info({
 						res : res
@@ -236,6 +250,8 @@ var createTournament = function(req, res, pg, conString, log) {
 					query.on('error', function(error) {
 						client.query("ROLLBACK");
 						done();
+						console.log("torunament.js - createTournament");
+						console.log(error);
 						res.status(500).send(error);
 						log.info({
 							res : res
@@ -1220,6 +1236,7 @@ function getMatchHistoryForPlayer(req, res, client, done, log, standings, player
 	});
 	query.on('error', function (error) {
 		done();
+		console.log("torunament.js - getMatchHistoryForPlayer");
 		console.log(error);
 		res.status(500).send(error);
 		log.info({
@@ -1254,6 +1271,7 @@ function getStandingsForFinalStage(req, res, client, done, log, standings) {
 	});
 	query.on('error', function (error) {
 		done();
+		console.log("torunament.js - getStandingsForFinalStage");
 		console.log(error);
 		res.status(500).send(error);
 		log.info({
@@ -1297,6 +1315,7 @@ function getStandingsForFinalStage(req, res, client, done, log, standings) {
 			});
 			query.on('error', function (error) {
 				done();
+				console.log("torunament.js - addMatch");
 				console.log(error);
 				res.status(500).send(error);
 				log.info({
@@ -1342,6 +1361,7 @@ var getStandings = function(req, res, pg, conString, log) {
 		});
 		query.on('error', function (error) {
 			done();
+			console.log("torunament.js - getStandings");
 			console.log(error);
 			res.status(500).send(error);
 			log.info({
@@ -1361,6 +1381,7 @@ var getStandings = function(req, res, pg, conString, log) {
 					});
 					query.on('error', function (error) {
 						done();
+						console.log("torunament.js - getStandings");
 						console.log(error);
 						res.status(500).send(error);
 						log.info({
@@ -1409,6 +1430,7 @@ var getStandings = function(req, res, pg, conString, log) {
 						});
 						query.on('error', function (error) {
 							done();
+							console.log("torunament.js - getStandings");
 							console.log(error);
 							res.status(500).send(error);
 							log.info({
@@ -1450,6 +1472,7 @@ var getRounds = function(req, res, pg, conString, log) {
 		});
 		query.on('error', function (error) {
 			done();
+			console.log("torunament.js - getRounds");
 			console.log(error);
 			res.status(500).send(error);
 			log.info({
@@ -1474,7 +1497,7 @@ var getRounds = function(req, res, pg, conString, log) {
 					tournament.finalStage.roundRobinRounds = [];
 				}
 				var query = client.query({
-					text: 'SELECT match.round_number, match.round_of, match.match_number, match.match_completed, round.round_start_date, round.round_pause, round.round_completed, round.round_best_of, CASE WHEN tournament.team_size > 1 THEN team.team_name || $9 || team.team_logo ELSE customer.customer_username || $9 || customer.customer_profile_pic || $9 || customer.customer_tag END AS info, competes.competitor_number, sum(submits.score) AS score, has_a.group_number, is_played_in.station_number FROM match NATURAL JOIN tournament LEFT OUTER JOIN competes ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND competes.round_number = match.round_number AND competes.round_of = match.round_of AND competes.match_number = match.match_number LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number LEFT OUTER JOIN is_a ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND competes.competitor_number = is_a.competitor_number LEFT OUTER JOIN customer ON is_a.customer_username = customer.customer_username LEFT OUTER JOIN competitor ON competitor.event_name = competes.event_name AND competitor.event_start_date = competes.event_start_date AND competitor.event_location = competes.event_location AND competitor.tournament_name = competes.tournament_name AND competitor.competitor_number = competes.competitor_number LEFT OUTER JOIN competes_for ON competes_for.event_name = competitor.event_name AND competes_for.event_start_date = competitor.event_start_date AND competes_for.event_location = competitor.event_location AND competes_for.tournament_name = competitor.tournament_name AND competes_for.competitor_number = competitor.competitor_number LEFT OUTER JOIN team ON team.team_name = competes_for.team_name LEFT OUTER JOIN has_a ON match.event_name = has_a.event_name AND match.event_start_date = has_a.event_start_date AND match.event_location = has_a.event_location AND match.tournament_name = has_a.tournament_name AND has_a.round_number = match.round_number AND has_a.round_of = match.round_of AND has_a.match_number = match.match_number LEFT OUTER JOIN is_played_in ON match.event_name = is_played_in.event_name AND match.event_start_date = is_played_in.event_start_date AND match.event_location = is_played_in.event_location AND match.tournament_name = is_played_in.tournament_name AND is_played_in.round_number = match.round_number AND is_played_in.round_of = match.round_of AND is_played_in.match_number = match.match_number JOIN round ON match.event_name = round.event_name AND match.event_start_date = round.event_start_date AND match.event_location = round.event_location AND match.tournament_name = round.tournament_name AND round.round_number = match.round_number AND round.round_of = match.round_of WHERE match.event_name = $1 AND match.event_start_date = $2 AND match.event_location = $3 AND match.tournament_name = $4 GROUP BY match.round_number, match.round_of, match.match_number, match.match_completed, customer.customer_tag, customer.customer_profile_pic, customer.customer_username, competes.competitor_number, competitor.competitor_seed, has_a.group_number, is_played_in.station_number, round.round_start_date, round.round_pause, round.round_completed, round.round_best_of, tournament.team_size, team.team_name, team.team_logo ORDER BY CASE WHEN match.round_of = $5 THEN 1 WHEN match.round_of = $6 THEN 2 WHEN match.round_of = $7 THEN 3 WHEN match.round_of = $8 THEN 4 END, match.round_number, match.match_number, competitor.competitor_seed',
+					text: 'SELECT match.round_number, match.round_of, match.match_number, match.match_completed, round.round_start_date, round.round_pause, round.round_completed, round.round_best_of, CASE WHEN tournament.team_size > 1 THEN team.team_name || $9 || team.team_logo ELSE customer.customer_username || $9 || customer.customer_profile_pic || $9 || customer.customer_tag END AS info, competes.competitor_number, sum(submits.score) AS score, has_a.group_number, is_played_in.station_number, stream.stream_link FROM match NATURAL JOIN tournament LEFT OUTER JOIN competes ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND competes.round_number = match.round_number AND competes.round_of = match.round_of AND competes.match_number = match.match_number LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number LEFT OUTER JOIN is_a ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND competes.competitor_number = is_a.competitor_number LEFT OUTER JOIN customer ON is_a.customer_username = customer.customer_username LEFT OUTER JOIN competitor ON competitor.event_name = competes.event_name AND competitor.event_start_date = competes.event_start_date AND competitor.event_location = competes.event_location AND competitor.tournament_name = competes.tournament_name AND competitor.competitor_number = competes.competitor_number LEFT OUTER JOIN competes_for ON competes_for.event_name = competitor.event_name AND competes_for.event_start_date = competitor.event_start_date AND competes_for.event_location = competitor.event_location AND competes_for.tournament_name = competitor.tournament_name AND competes_for.competitor_number = competitor.competitor_number LEFT OUTER JOIN team ON team.team_name = competes_for.team_name LEFT OUTER JOIN has_a ON match.event_name = has_a.event_name AND match.event_start_date = has_a.event_start_date AND match.event_location = has_a.event_location AND match.tournament_name = has_a.tournament_name AND has_a.round_number = match.round_number AND has_a.round_of = match.round_of AND has_a.match_number = match.match_number LEFT OUTER JOIN is_played_in ON match.event_name = is_played_in.event_name AND match.event_start_date = is_played_in.event_start_date AND match.event_location = is_played_in.event_location AND match.tournament_name = is_played_in.tournament_name AND is_played_in.round_number = match.round_number AND is_played_in.round_of = match.round_of AND is_played_in.match_number = match.match_number LEFT OUTER JOIN stream ON stream.event_name = is_played_in.event_name AND stream.event_start_date = is_played_in.event_start_date AND stream.event_location = is_played_in.event_location AND stream.station_number = is_played_in.station_number JOIN round ON match.event_name = round.event_name AND match.event_start_date = round.event_start_date AND match.event_location = round.event_location AND match.tournament_name = round.tournament_name AND round.round_number = match.round_number AND round.round_of = match.round_of WHERE match.event_name = $1 AND match.event_start_date = $2 AND match.event_location = $3 AND match.tournament_name = $4 GROUP BY match.round_number, match.round_of, match.match_number, match.match_completed, customer.customer_tag, customer.customer_profile_pic, customer.customer_username, competes.competitor_number, competitor.competitor_seed, has_a.group_number, is_played_in.station_number, round.round_start_date, round.round_pause, round.round_completed, round.round_best_of, tournament.team_size, team.team_name, team.team_logo, stream.stream_link ORDER BY CASE WHEN match.round_of = $5 THEN 1 WHEN match.round_of = $6 THEN 2 WHEN match.round_of = $7 THEN 3 WHEN match.round_of = $8 THEN 4 END, match.round_number, match.match_number, competitor.competitor_seed',
 					values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Group", "Round Robin", "Winner", "Loser", ",;!;,"]
 				});
 				query.on("row", function (row, result) {
@@ -1502,6 +1525,7 @@ var getRounds = function(req, res, pg, conString, log) {
 							tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number].match_number = row.match_number;
 							tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number].match_completed = row.match_completed;
 							tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number].station_number = row.station_number;
+							tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number].stream_link = row.stream_link;
 							tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number].players = [];
 						}
 
@@ -1537,6 +1561,7 @@ var getRounds = function(req, res, pg, conString, log) {
 							tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1].match_number = row.match_number;
 							tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1].match_completed = row.match_completed;
 							tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1].station_number = row.station_number;
+							tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1].stream_link = row.stream_link;
 							tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1].players = [];
 						}
 
@@ -1572,6 +1597,7 @@ var getRounds = function(req, res, pg, conString, log) {
 							tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1].match_number = row.match_number;
 							tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1].match_completed = row.match_completed;
 							tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1].station_number = row.station_number;
+							tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1].stream_link = row.stream_link;
 							tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1].players = [];
 						}
 
@@ -1607,6 +1633,7 @@ var getRounds = function(req, res, pg, conString, log) {
 							tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1].match_number = row.match_number;
 							tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1].match_completed = row.match_completed;
 							tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1].station_number = row.station_number;
+							tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1].stream_link = row.stream_link;
 							tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1].players = [];
 						}
 
@@ -1631,6 +1658,7 @@ var getRounds = function(req, res, pg, conString, log) {
 				});
 				query.on('error', function (error) {
 					done();
+					console.log("torunament.js - getRounds");
 					console.log(error);
 					res.status(500).send(error);
 					log.info({
@@ -1671,6 +1699,7 @@ var getMatch = function(req, res, pg, conString, log) {
 		query.on('error', function (error) {
 			client.query("ROLLBACK");
 			done();
+			console.log("torunament.js - getMatch");
 			console.log(error);
 			res.status(500).send(error);
 			log.info({
