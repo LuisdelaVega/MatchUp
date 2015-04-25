@@ -18,6 +18,25 @@
 		</div>
 	</div>
 </div>
+<div class="widget-box box-margin">
+	<div class="widget-header bordered-bottom bordered-themesecondary">
+		<h3 class="widget-title themesecondary"> Sponsors</h3>
+	</div>
+	<!--Widget Header-->
+	<div class="widget-body">
+		<div class="widget-main no-padding">
+			<div class="tickets-container">
+				<div class="row" style="padding-left: 15px">
+					<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat="sponsor in sponsors">
+						<a class="thumbnail" ng-href="{{sponsor.sponsor_link}}"> <img ng-src="{{ sponsor.sponsor_logo }}" style="height: 70%">
+						<hr class="hr-custom-padding">
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 
 <!-- Events widget -->
 <div class="widget-box box-margin">
@@ -65,11 +84,11 @@
 				<ul class="tickets-list">
 					<div class="row">
 						<div class="col-lg-3 col-md-6 col-sm-12 col-xs-12" ng-repeat="member in members">
-							
+
 							<li class="ticket-item" ng-click="goToUser(member.customer_username)">
 								<div class="ticket-user">
 									<img ng-src="{{member.customer_profile_pic}}" class="user-avatar">
-									<span class="user-name">{{member.customer_first_name}} {{member.customer_last_name}} </span> <span ng-if="member.is_owner"> (Owner)</span>
+									<span class="user-name">{{member.customer_first_name}} {{member.customer_last_name}} </span><span ng-if="member.is_owner"> (Owner)</span>
 								</div>
 							</li>
 						</div>
