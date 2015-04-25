@@ -1962,15 +1962,14 @@ var getParticipants = function(req, res, pg, conString, log) {
     });
 };
 
-//TODO Validate Date
-//TODO Validate Undefined
 var getCompetitors = function(req, res, pg, conString, log) {
     pg.connect(conString, function(err, client, done) {
         if (err) {
             return console.error('error fetching client from pool', err);
         }
+
         var query = client.query({
-            text : "SELECT distinct customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic, tournament.competitor_fee, competitor.competitor_check_in AS check_in, competitor.competitor_seed, competitor.competitor_number FROM tournament JOIN is_a ON is_a.event_name = tournament.event_name AND is_a.event_start_date = tournament.event_start_date AND is_a.event_location = tournament.event_location AND is_a.tournament_name = tournament.tournament_name JOIN competitor ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN customer ON customer.customer_username = is_a.customer_username WHERE tournament.event_name = $1 AND tournament.event_start_date = $2 AND tournament.event_location = $3 AND tournament.tournament_name = $4 ORDER BY competitor.competitor_seed",
+            text : "SELECT team_size FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
             values : [req.params.event, req.query.date, req.query.location, req.params.tournament]
         });
         query.on("row", function(row, result) {
@@ -1984,11 +1983,51 @@ var getCompetitors = function(req, res, pg, conString, log) {
             }, 'done response');
         });
         query.on("end", function(result) {
-            done();
-            res.status(200).json(result.rows);
-            log.info({
-                res : res
-            }, 'done response');
+            if (parseInt(result.rows[0].team_size) > 1) {
+                var query = client.query({
+                        text: "SELECT distinct customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic, tournament.competitor_fee, competitor.competitor_check_in AS check_in, competitor.competitor_seed, competitor.competitor_number FROM tournament JOIN is_a ON is_a.event_name = tournament.event_name AND is_a.event_start_date = tournament.event_start_date AND is_a.event_location = tournament.event_location AND is_a.tournament_name = tournament.tournament_name JOIN competitor ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN customer ON customer.customer_username = is_a.customer_username WHERE tournament.event_name = $1 AND tournament.event_start_date = $2 AND tournament.event_location = $3 AND tournament.tournament_name = $4 ORDER BY competitor.competitor_seed",
+                    values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+                });
+                query.on("row", function (row, result) {
+                    result.addRow(row);
+                });
+                query.on('error', function (error) {
+                    done();
+                    res.status(500).send(error);
+                    log.info({
+                        res: res
+                    }, 'done response');
+                });
+                query.on("end", function (result) {
+                    done();
+                    res.status(200).json(result.rows);
+                    log.info({
+                        res: res
+                    }, 'done response');
+                });
+            } else {
+                var query = client.query({
+                    text: "SELECT distinct team.team_name, team.team_logo, tournament.competitor_fee, competitor.competitor_check_in AS check_in, competitor.competitor_seed, competitor.competitor_number FROM tournament JOIN competes_for ON competes_for.event_name = tournament.event_name AND competes_for.event_start_date = tournament.event_start_date AND competes_for.event_location = tournament.event_location AND competes_for.tournament_name = tournament.tournament_name JOIN competitor ON competes_for.event_name = competitor.event_name AND competes_for.event_start_date = competitor.event_start_date AND competes_for.event_location = competitor.event_location AND competes_for.tournament_name = competitor.tournament_name AND competes_for.competitor_number = competitor.competitor_number JOIN team ON team.team_name = competes_for.team_name WHERE tournament.event_name = $1 AND tournament.event_start_date = $2 AND tournament.event_location = $3 AND tournament.tournament_name = $4 ORDER BY competitor.competitor_seed",
+                    values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+                });
+                query.on("row", function (row, result) {
+                    result.addRow(row);
+                });
+                query.on('error', function (error) {
+                    done();
+                    res.status(500).send(error);
+                    log.info({
+                        res: res
+                    }, 'done response');
+                });
+                query.on("end", function (result) {
+                    done();
+                    res.status(200).json(result.rows);
+                    log.info({
+                        res: res
+                    }, 'done response');
+                });
+            }
         });
     });
 };

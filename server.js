@@ -535,6 +535,7 @@ app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round').post(f
 /* /matchup/events/:event/tournaments/:tournament/rounds/:rounds/matches/:match?round_of=string
  * TODO Update API
  * [GET] Get a specific match
+ * [POST] Change the station for a match
  * [PUT] Mark a match as favourite
  */
 app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round/matches/:match').get(function(req, res) {
@@ -542,6 +543,11 @@ app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round/matches/
 		req : req
 	}, 'start request');
 	tournaments.getMatch(req, res, pg, conString, log);
+}).post(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	tournaments.changeStation(req, res, pg, conString, log);
 }).put(function(req, res) {
 	log.info({
 		req : req
