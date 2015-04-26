@@ -162,45 +162,18 @@ myApp.controller("RegistrationController", function($scope, $http, $window, $roo
 
 });
 
-myApp.controller("ReportsController", function($scope, $rootScope) {
+myApp.controller("ReportsController", function($scope, $http, $window, $rootScope, $state, $stateParams) {
 
-	$scope.reports = [{
-		"type" : "Score Dispute",
-		"tournamentName" : "Tournamet 1",
-		"station" : "Station 1",
-		"round" : "Round 1 Match 3 Set 2",
-		"status" : true,
-		"img" : "image",
-		"date" : "8:00PM 8 June",
-		"content" : "booth Pinterest four dollar toast occupy deep v, freegan polaroid. Fashion axe vinyl street art."
-	}, {
-		"type" : "Faulty Equipment",
-		"tournamentName" : "Tournamet 3",
-		"station" : "Station 12",
-		"round" : "Round 10 Match 4 Set 2",
-		"status" : true,
-		"img" : "image",
-		"date" : "8:13PM 8 June",
-		"content" : "booth Pinterest four dollar toast occupy deep v, freegan polaroid. Fashion axe vinyl street art."
-	}, {
-		"type" : "Score Dispute",
-		"tournamentName" : "Tournamet 1",
-		"station" : "Station 1",
-		"round" : "Round 3 Match 1 Set 2",
-		"status" : false,
-		"img" : "image",
-		"date" : "7:00PM 8 June",
-		"content" : "booth Pinterest four dollar toast occupy deep v, freegan polaroid. Fashion axe vinyl street art."
-	}, {
-		"type" : "No Show",
-		"tournamentName" : "Tournamet 3",
-		"station" : "Station 3",
-		"round" : "Round 1 Match 3 Set 2",
-		"status" : true,
-		"img" : "",
-		"date" : "8:32PM 8 June",
-		"content" : "booth Pinterest four dollar toast occupy deep v, freegan polaroid. Fashion axe vinyl street art."
-	}];
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/reports?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+		console.log("Reports");
+		console.log(data);
+		$scope.reports = data;
+		//$scope.reports = data;
+
+	}).error(function(err) {
+		console.log(err);
+	});
+
 	$scope.index
 
 	$scope.reportModal = function(index) {
@@ -209,8 +182,23 @@ myApp.controller("ReportsController", function($scope, $rootScope) {
 	};
 
 	$scope.resolve = function() {
-		$scope.reports[$scope.index].status = true;
-		$('#reportModal').modal('hide');
+ 
+		var tempStatus = "";
+		if ($scope.reports[$scope.index].report_status == "Received")
+			tempStatus = "Attending";
+		else if ($scope.reports[$scope.index].report_status == "Attending")
+			tempStatus = "Resolved";
+		//console.log($rootScope.baseURL + '/matchup/events/' + $scope.reports[$scope.index].event_name + '/tournaments/' + $scope.reports[$scope.index].tournament_name + '/rounds/' + $scope.reports[$scope.index].round_number + '/matches/' + $scope.reports[$scope.index].match_number + '/' + $scope.reports[$scope.index].set_seq + '/' + $scope.reports[$scope.index].report_number + '?date=' + $scope.reports[$scope.index].report_date + '&location=' + $scope.reports[$scope.index].event_location + '&round_of=' + $scope.reports[$scope.index].round_of);
+		$http.put($rootScope.baseURL + '/matchup/events/' + $scope.reports[$scope.index].event_name + '/tournaments/' + $scope.reports[$scope.index].tournament_name + '/rounds/' + $scope.reports[$scope.index].round_number + '/matches/' + $scope.reports[$scope.index].match_number + '/' + $scope.reports[$scope.index].set_seq + '/' + $scope.reports[$scope.index].report_number + '?date=' + $scope.reports[$scope.index].report_date + '&location=' + $scope.reports[$scope.index].event_location + '&round_of=' + $scope.reports[$scope.index].round_of, {
+			"status" : tempStatus
+		}).success(function(data) {
+			$scope.reports[$scope.index].report_status = tempStatus;
+			$('#reportModal').modal('hide');
+		}).error(function(err) {
+			console.log(err);
+		});
+
+		
 	};
 
 });

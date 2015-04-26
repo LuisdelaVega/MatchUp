@@ -21,6 +21,7 @@
 <div class="widget-box box-margin">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary"> Sponsors</h3>
+				<a class="widget-more" ui-sref="app.sponsorRequests({organizationName: organization.organization_name})" ng-if="organization.is_member"> View Requests<i class="fa fa-arrow-circle-o-right panel-padding"></i> </a>
 	</div>
 	<!--Widget Header-->
 	<div class="widget-body">
@@ -83,12 +84,12 @@
 			<div class="tickets-container">
 				<ul class="tickets-list">
 					<div class="row">
-						<div class="col-lg-3 col-md-6 col-sm-12 col-xs-12" ng-repeat="member in members">
+						<div class="col-lg-3 col-md-6 col-sm-12 col-xs-12" ng-repeat="member in members track by $index">
 
 							<li class="ticket-item" ng-click="goToUser(member.customer_username)">
 								<div class="ticket-user">
 									<img ng-src="{{member.customer_profile_pic}}" class="user-avatar">
-									<span class="user-name">{{member.customer_first_name}} {{member.customer_last_name}} </span><span ng-if="member.is_owner"> (Owner)</span>
+									<span class="user-name">{{member.customer_first_name}} {{member.customer_last_name}} </span><span ng-if="member.is_owner"> (Owner) &nbsp; &nbsp;<span class="fa fa-star fa-6"></span></span>
 								</div>
 							</li>
 						</div>

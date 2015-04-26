@@ -1,30 +1,38 @@
 <h1>Reports</h1>
 <div class="row">
-	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding" ng-repeat="item in reports">
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding" ng-repeat="report in reports">
 		<div class="box cursor" ng-click="reportModal($index)">
 			<div class="media">
-				<div class="media-left" ng-if="item.img">
-					<img class="media-object match-avatar" ng-src="{{item.img}}">
+				<div class="media-left" ng-if="report.report_image">
+					<img class="media-object match-avatar" ng-src="{{report.report_image}}">
 				</div>
 				<div class="media-body">
 					<div class="row">
 						<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-							<h4>{{item.type}}</h4>
+							<h4>{{report.report_type}} Report</h4>
 							<p>
-								{{item.tournamentName}}
-								<br> {{item.round}}
-								<br> {{item.station}}
-								<br> {{item.date}}
+								{{report.tournament_name}}
+								<br>
+								{{report.round_of}}'s Round {{report.round_number}}
+								<br>
+								Match {{report.match_number}}&nbsp; Set {{report.set_seq}}
+								<br>
+								Station Number {{report.station_number}}
+								<br>
+								{{report.report_date | date:'medium'}}
 							</p>
 						</div>
 						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 							<div class="report-status">
-								<div ng-switch on="item.status">
-									<div ng-switch-when="true">
+								<div ng-switch on="report.report_status">
+									<div ng-switch-when="Resolved">
 										<h4 style="text-align:center; color: green">Resolved</h4>
 									</div>
+									<div ng-switch-when="Attending">
+										<h4 style="text-align:center; color: blue">Attending</h4>
+									</div>
 									<div ng-switch-default>
-										<h4 style="text-align:center; color: red">Not Resolved</h4>
+										<h4 style="text-align:center; color: red">Received</h4>
 									</div>
 								</div>
 							</div>
@@ -44,38 +52,64 @@
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 class="modal-title">{{reports[index].type}}</h4>
-				<p>{{reports[index].station}}
-				<br>{{reports[index].round}}
-				<br>{{reports[index].date}}</p>
-				<div ng-switch on="reports[index].status">
-					<div ng-switch-when="true">
-						<p style="color: green">Resolved</p>
+				<h4 class="modal-title">{{reports[index].report_type}} Report</h4>
+				<p>
+					Station {{reports[index].station_number}}
+					<br>
+					Round {{reports[index].round_number}}
+					<br>
+					{{reports[index].report_date  | date:'medium'}}
+				</p>
+				<div ng-switch on="reports[index].report_status">
+					<div ng-switch-when="Resolved">
+						<h4 style="text-align:center; color: green">Resolved</h4>
+					</div>
+					<div ng-switch-when="Attending">
+						<h4 style="text-align:center; color: blue">Attending</h4>
 					</div>
 					<div ng-switch-default>
-						<p style="color: red">Not Resolved</p>
+						<h4 style="text-align:center; color: red">Received</h4>
 					</div>
 				</div>
 			</div>
 			<div class="modal-body">
-				<img style="width: 100%" ng-src="{{reports[index].img}}">
-				<p>{{reports[index].content}}</p>
+				<img style="width: 100%" ng-src="{{reports[index].report_image}}">
+				<p>
+					<br />
+					<h4>Description: </h4>
+					{{reports[index].report_description}}
+				</p>
 			</div>
 			<div class="modal-footer">
-				<div class="col-xs-12 col-md-6 col-lg-6">
-					<div class="row" align="center" ng-if="!reports[index].status">
-						<button type="button" style="width: 80%" class="btn btn-primary" data-dismiss="modal" ng-click="resolve()">
-							Resolve
-						</button>
-					</div>
-				</div>
-				<div class="col-xs-12 col-md-6 col-lg-6">
+				<div class="col-xs-12 col-md-6 col-lg-12" ng-if="reports[index].report_status == 'Resolved'">
 					<div class="row" align="center">
 						<button type="button" style="width: 80%" class="btn btn-default" data-dismiss="modal">
 							Close
 						</button>
 					</div>
 				</div>
+				<div class="col-xs-12 col-md-6 col-lg-6" ng-if="reports[index].report_status != 'Resolved'">
+					<div class="row" align="center">
+						<button type="button" style="width: 80%" class="btn btn-default" data-dismiss="modal">
+							Close
+						</button>
+					</div>
+				</div>
+				<div class="col-xs-12 col-md-6 col-lg-6" ng-if="reports[index].report_status == 'Received'">
+					<div class="row" align="center" >
+						<button type="button" style="width: 80%" class="btn btn-primary" data-dismiss="modal" ng-click="resolve()">
+							Attend Report
+						</button>
+					</div>
+				</div>
+				<div class="col-xs-12 col-md-6 col-lg-6" ng-if="reports[index].report_status == 'Attending'">
+					<div class="row" align="center" >
+						<button type="button" style="width: 80%" class="btn btn-primary" data-dismiss="modal" ng-click="resolve()">
+							Resolve
+						</button>
+					</div>
+				</div>
+
 			</div>
 		</div>
 		<!-- /.modal content -->

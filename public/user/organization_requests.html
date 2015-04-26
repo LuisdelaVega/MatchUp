@@ -1,0 +1,69 @@
+<div class="box">
+	<h2>My Organization Requests</h2>
+	<div class="row">
+		<div class="col-lg-12 col-md-12 col-sm-12">
+			<table class="table table-hover table-striped">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Organization Name</th>
+						<th>Description</th>
+						<th>Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class=""  ng-repeat="organization in organizations">
+						<td>{{$index +1}}</td>
+						<td>{{organization.request_organization_name}}</td>
+						<td>{{organization.request_description}}</td>
+						<td style="text-align:center; color: blue" ng-if="organization.request_status == 'Received'">{{organization.request_status}}</td>
+						<td style="text-align:center; color: green" ng-if="organization.request_status == 'Accepted'">{{organization.request_status}}</td>
+						<td style="text-align:center; color: red" ng-if="organization.request_status == 'Declined'">{{organization.request_status}}</td>
+					</tr>
+				</tbody>
+			</table>
+
+		</div>
+	</div>
+	 <div class="row" align="center">
+						<button type="button" style="width: 25%" class="btn btn-primary" data-target="#newRequestsModal" data-toggle="modal">
+							Request New Organization
+						</button>
+					</div>
+</div>
+<div class="modal fade" id="newRequestsModal" tabindex="-1" role="dialog" aria-labelledby="newRequestsModal" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Create Organization Request</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal">
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Organization Name</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" ng-model="newOrganization.request_organization_name" maxlength="127">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Description</label>
+						<div class="col-sm-10">
+							<textarea class="form-control" rows="4" maxlength="511" ng-model="newOrganization.request_description"></textarea>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Cancel
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="requestOrganization()">
+					Request
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

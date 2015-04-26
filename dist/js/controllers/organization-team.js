@@ -53,6 +53,59 @@ function($scope, $http, $state, $stateParams, $rootScope) {
 
 }]);
 
+myApp.controller('organizationSponsorRequestsController', ['$scope', '$http', '$state', '$stateParams', '$rootScope',
+function($scope, $http, $state, $stateParams, $rootScope) {
+	$scope.organizationName = $stateParams.organizationName;
+	$scope.newSponsor = {};
+
+	$http.get($rootScope.baseURL + '/matchup/organizations/' + $stateParams.organizationName + '').success(function(data) {
+		$scope.organization = data;
+		console.log("hehnjihjikjikhujikohnjkol");
+		console.log(data);
+
+	});
+	$http.get($rootScope.baseURL + '/matchup/organizations/' + $stateParams.organizationName + '/requests').success(function(data) {
+		$scope.sponsors = data;
+	});
+
+	$scope.requestSponsor = function() {
+		if (!$scope.newSponsor.link || !$scope.newSponsor.description) {
+			alert("Please fill out all the fields");
+			return;
+		}
+		if ($scope.newSponsor.description.length > 511) {
+			alert("Max character length for description is 511, nice try!");
+			return;
+		}
+		if ($scope.newSponsor.link > 127) {
+			alert("Max character length for the Sponsor link is 127, nice try!");
+			return;
+
+		} else {
+			for(var i=0; $scope.sponsors.length > i; i++){
+					if(!($scope.sponsors[i].request_sponsor_link.localeCompare($scope.newSponsor.link))){
+					alert("You have already submitted a request to add a sponsor with this link.");
+					$('#newRequestsModal').modal('hide');
+					$scope.newSponsor = {};
+					return;
+				}
+			}
+			$http.post($rootScope.baseURL + '/matchup/organizations/' + $stateParams.organizationName + '/sponsors', $scope.newSponsor).success(function(data) {
+				$scope.sponsors.push({
+					"request_sponsor_link": $scope.newSponsor.link,
+					"request_sponsor_description": $scope.newSponsor.description,
+					"request_sponsor_status": 'Received'
+				});
+				$scope.newSponsor = {};
+				$('#newRequestsModal').modal('hide');
+			});
+
+		}
+
+	};
+
+}]);
+
 myApp.controller('teamProfileController', ['$scope', '$http', '$state', '$stateParams', '$rootScope',
 function($scope, $http, $state, $stateParams, $rootScope) {
 
