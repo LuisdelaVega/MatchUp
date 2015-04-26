@@ -187,9 +187,15 @@ function($scope, $window, $http, $state, AuthenticationService, $rootScope, Matc
 
 	};
 	
-	$scope.getMatch = function (event,tournament,round,match,round_of,date,location){
+	$scope.getMatch = function (event,tournament,round,match,round_of,date,location,station){
 		$http.get($rootScope.baseURL + '/matchup/events/' + event + '/tournaments/' + tournament + '/rounds/' + round + '/matches/' + match + '?round_of=' + round_of + '&date=' + date + '&location=' + location).success(function (data, status) {
 			$scope.matchInfo = data;
+			$scope.matchInfo.tournament = tournament;
+			$scope.matchInfo.round = round;
+			$scope.matchInfo.round_of = round_of;
+			$scope.matchInfo.date = date;
+			$scope.matchInfo.match = match;
+			$scope.matchInfo.station_number = station;
 			$('#matchupModal').modal('show');
 			console.log(data);
 		});

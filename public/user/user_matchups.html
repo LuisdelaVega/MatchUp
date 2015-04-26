@@ -7,12 +7,13 @@
 
 <div class="row">
 	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6" ng-repeat="match in pastMatchups">
-		<div class="box cursor box-margin" ng-click="getMatch(match.event_name,match.tournament_name,match.round_number,match.match_number,match.round_of,match.event_start_date,match.event_location)">
-			<h4 class="modal-title" align="center">{{match.event_name}} - {{match.tournament_name}}</h4>
+		<div class="box cursor box-margin" ng-click="getMatch(match.event_name,match.tournament_name,match.round_number,match.match_number,match.round_of,match.event_start_date,match.event_location,match.station_number)">
+			<h4 class="modal-title" align="center">{{match.event_name}}</h4>
 			<p align="center">
-				{{match.round_of}} Round {{match.round_number}}, Match {{match.match_number}}
-				<br/> <span ng-if="match.station_number">Station {{match.station_number}}</span>
+				{{match.tournament_name}}
+				<br> {{match.round_of}} Round {{match.round_number}}, Match {{match.match_number}}
 				<br>
+				<span ng-if="match.station_number">Station {{match.station_number}}</span>
 			</p>
 			<div ng-if="match.details[0].customer_tag">
 				<div class="row" align="center">
