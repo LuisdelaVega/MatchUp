@@ -69,6 +69,7 @@
 								</div>
 								<div class="ticket-time  col-md-5 col-sm-5 col-xs-5">
 									<a class="btn btn-sm btn-danger pull-right" ng-click="deleteUserPrompt(member)" ng-if="(!member.is_owner || (member.customer_username == currentUser.customer_username)) && currentUser.is_owner"><span class="fa fa-times"></span></a>
+									<a class="pull-right" ng-if="(!(!member.is_owner || (member.customer_username == currentUser.customer_username)) && currentUser.is_owner)"><span class="fa fa-star fa-6"></span></a>
 									<a class="btn btn-sm btn-default pull-right second-button-ticket" ng-click="makeMemberOwnerPrompt(member)" ng-if="!member.is_owner && currentUser.is_owner"><span class="fa fa-briefcase "></span></a>
 								</div>
 							</div>
@@ -121,7 +122,7 @@
 
 </div>
 
-<div class="box box-margin-bottom" id="deleteOrganization">
+<div class="box box-margin-bottom" id="deleteOrganization" ng-if="currentUser.is_owner">
 	<legend>
 		Delete Organization
 	</legend>
@@ -387,7 +388,7 @@
 	<!-- /.modal-dialog -->
 </div>
 <!-- modal deleteorg -->
-<div class="modal fade" id="deleteOrganizationModal">
+<div class="modal fade" id="deleteOrganizationModal" ng-if="currentUser.is_owner">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
