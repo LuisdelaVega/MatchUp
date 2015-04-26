@@ -4365,8 +4365,8 @@ var resolveReport = function(req, res, pg, conString, log) {
         query.on("end", function(result) {
             if (result.rows.length) {
                 client.query({
-                    text : "UPDATE report SET report_status = $9 WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6 AND match_number = $7 AND report_number = $8",
-                    values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.report, req.body.status]
+                    text : "UPDATE report SET report_status = $10 WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6 AND match_number = $7 AND set_seq = $8 AND report_number = $9",
+                    values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.params.report, req.body.status]
                 }, function(err, result) {
                     if (err) {
                         client.query("ROLLBACK");
