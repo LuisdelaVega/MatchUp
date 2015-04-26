@@ -1820,7 +1820,7 @@ var changeScore = function(req, res, pg, conString, log) {
         query.on("end", function(result) {
             if (result.rows.length) {
                 var details = result.rows[0];
-                if (!req.body.players || !req.body.players[0] || !req.body.players[1] || !req.body.players[0].competitor_number || !req.body.players[1].competitor_number || isNaN(req.body.players[0].score) || isNaN(req.body.players[1].score)) {
+                if (!req.body.players || !req.body.players[0] || !req.body.players[1] || isNaN(req.body.players[0].competitor_number) || isNaN(req.body.players[1].competitor_number) || isNaN(req.body.players[0].score) || isNaN(req.body.players[1].score)) {
                     client.query("ROLLBACK");
                     done();
                     res.status(400).json({
@@ -1890,9 +1890,6 @@ var changeScore = function(req, res, pg, conString, log) {
                                 competitor_number : parseInt(req.body.players[i].competitor_number),
                                 newScore : parseInt(req.body.players[i].score)
                             };
-                            //console.log("Printing player");
-                            //console.log(newScores.players[i]);
-                            //console.log("Enetring getNewScores");
                             getNewScores(req, res, client, done, log, newScores, newScores.players[i], details, i, req.body.players.length-1);
                         }
                     }
