@@ -182,11 +182,11 @@
 					{{matchInfo.tournament}}
 				</h3>
 				<p class="info-paragraph">
-				{{matchInfo.date | date:'medium'}}
-				<br>
-					{{matchInfo.round_of}} Round {{matchInfo.round}} Match {{matchInfo.match}}
-				<br>
-				<span ng-if="matchInfo.station_number">Station {{matchInfo.station_number}}</span></p>
+					{{matchInfo.date | date:'medium'}}
+					<br> {{matchInfo.round_of}} Round {{matchInfo.round}} Match {{matchInfo.match}}
+					<br>
+					<span ng-if="matchInfo.station_number">Station {{matchInfo.station_number}}</span>
+				</p>
 			</div>
 			<div class="modal-body">
 				<div ng-if="matchInfo.players[0].customer_tag">
@@ -203,23 +203,23 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
 							<h3 style="text-align:center">{{matchInfo.players[0].customer_tag}}</h3>
 						</div>
 						<div class="col-xs-4 col-sm-2 col-md-4 col-lg-4">
-							<h4 style="text-align:center">Best of {{selectedRound.round_best_of}}</h4>
+							<h4 style="text-align:center">Best of {{matchInfo.sets.length}}</h4>
 						</div>
 						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 							<h3 style="text-align:center">{{matchInfo.players[1].customer_tag}}</h3>
 						</div>
 					</div>
 					<div style="text-align: center">
-						<div class="set-circular player-1"></div>
-						<div class="set-circular player-1 set-margin"></div>
-						<div class="set-circular player-2 set-margin"></div>
-						<div class="set-circular player-1"></div>
+						<span ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number">
+					<div class="set-circular set-margin" ng-class="set.scores[0].score > set.scores[1].score ? 'player-1' : 'player-2'"></div>
+					</span>
+
 					</div>
-					<div class="row" ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number">
+					<div class="row" ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number && matchInfo.score_type == 'Points'">
 						<hr>
 						<p class="info-paragraph" style="text-align:center">Set {{$index + 1}}</p>
 						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
@@ -253,19 +253,19 @@
 							<h3 style="text-align:center">{{matchInfo.players[0].team_name}}</h3>
 						</div>
 						<div class="col-xs-4 col-sm-2 col-md-4 col-lg-4">
-							<h4 style="text-align:center">Best of {{selectedRound.round_best_of}}</h4>
+							<h4 style="text-align:center">Best of {{matchInfo.sets.length}}</h4>
 						</div>
 						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 							<h3 style="text-align:center">{{matchInfo.players[1].team_name}}</h3>
 						</div>
 					</div>
 					<div style="text-align: center">
-						<div class="set-circular player-1"></div>
-						<div class="set-circular player-1 set-margin"></div>
-						<div class="set-circular player-2 set-margin"></div>
-						<div class="set-circular player-1"></div>
+						<span ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number">
+					<div class="set-circular set-margin" ng-class="set.scores[0].score > set.scores[1].score ? 'player-1' : 'player-2'"></div>
+					</span>
+
 					</div>
-					<div ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number">
+					<div ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number && matchInfo.score_type == 'Points'">
 						<hr>
 						<div class="row" align="center">
 							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">

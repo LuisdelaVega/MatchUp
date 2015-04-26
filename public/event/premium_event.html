@@ -266,11 +266,16 @@
 							<ul class="tickets-list">
 								<div class="row">
 									<div class="col-lg-3 col-md-4 col-sm-12 col-xs-12" ng-repeat="competitor in competitorsResult[$index].data">
-										<li class="ticket-item" ng-click="goToUser(competitor.customer_username)">
-											<div class="ticket-user">
+										<li class="ticket-item">
+											<div class="ticket-user" ng-if="competitor.customer_profile_pic" ng-click="goToUser(competitor.customer_username)">
 												<img ng-src="{{ competitor.customer_profile_pic }}" class="user-avatar">
 												<!-- <img src="http://neptunolabs.com/images/badillo.jpg" class="user-avatar">-->
 												<span class="user-name">{{competitor.customer_tag}}</span>
+											</div>
+											<div class="ticket-user" ng-if="competitor.team_name" ng-click="goToTeam(competitor.team_name)">
+												<img ng-src="{{ competitor.team_logo }}" class="user-avatar">
+												<!-- <img src="http://neptunolabs.com/images/badillo.jpg" class="user-avatar">-->
+												<span class="user-name">{{competitor.team_name}}</span>
 											</div>
 										</li>
 									</div>

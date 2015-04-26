@@ -96,13 +96,13 @@
 				<h3 class="info-title">Tournament Details</h3>
 				<!--					Tournament Info-->
 				<div class="row tab-padding-top">
-					<div class="col-lg-2 col-md-3 col-xs-12">
-						<a class="thumbnail" ng-click="goToGameProfile(tournament.game_name)"> <img ng-src="{{tournament.game_image}}">
-							<h4 align="center">{{tournament.game_name}}</h4> </a>
-					</div>
-					<div class="col-lg-10 col-md-9 col-xs-12">
+					<div class="col-lg-10 col-md-10 col-xs-12 col-lg-offset-1 col-md-offset-1">
+						<div class="col-lg-6 col-md-6 col-xs-12">
+							<a class="thumbnail" ng-click="goToGameProfile(tournament.game_name)"> <img ng-src="{{tournament.game_image}}">
+								<h4 align="center">{{tournament.game_name}}</h4> </a>
+						</div>
 						<!--						Tournament Details-->
-						<div class="col-lg-4 col-md-6 col-xs-12">
+						<div class="col-lg-6 col-md-6 col-xs-12">
 							<h3>Tournament Format</h3>
 							<dl class="info-paragraph">
 								<dt>
@@ -136,7 +136,7 @@
 										Play Style
 									</dt>
 									<dd>
-										Team ({{tournament.team_size}} competitors)
+										Team Size {{tournament.team_size}}
 									</dd>
 								</div>
 								<div ng-if="tournament.team_size == 1">
@@ -155,8 +155,12 @@
 								</dd>
 							</dl>
 						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-lg-10 col-md-10 col-xs-12 col-lg-offset-1 col-md-offset-1">
 						<!--					Dates-->
-						<div class="col-xs-12 col-md-6 col-lg-4">
+						<div class="col-xs-12 col-md-6 col-lg-6">
 							<h3>Date<span ng-if="eventInfo.host"> & Price</span></h3>
 							<dl class="info-paragraph">
 								<dt>
@@ -196,7 +200,7 @@
 							</dl>
 						</div>
 						<!--					Rules-->
-						<div class="col-xs-12 col-md-12 col-lg-4">
+						<div class="col-xs-12 col-md-6 col-lg-6">
 							<h3>Rules</h3>
 							<p class="info-paragraph">
 								{{ eventInfo.event_rules }}
@@ -207,30 +211,31 @@
 				<!--					Hosted by/ Creator-->
 				<h2 class="info-title">Hosted By</h2>
 				<div class="row tab-padding-top">
-					<div ng-if="eventInfo.host">
-						<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
-							<a class="thumbnail" ng-click="goToOrganizationProfile(hostInfo.organization_name)"><img class="profile-picture cursor" ng-src="{{hostInfo.organization_cover_photo}}"> </a>
+					<div class="col-lg-10 col-md-10 col-xs-12 col-lg-offset-1 col-md-offset-1">
+						<div ng-if="eventInfo.host">
+							<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+								<a class="thumbnail" ng-click="goToOrganizationProfile(hostInfo.organization_name)"><img class="profile-picture cursor" ng-src="{{hostInfo.organization_cover_photo}}"> </a>
+							</div>
+							<div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
+								<h3 style="margin-top:0px;padding-top:0px">{{hostInfo.organization_name}}</h3>
+								<p class="info-paragraph">
+									{{hostInfo.organization_bio}}
+								</p>
+							</div>
 						</div>
-						<div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
-							<h3 style="margin-top:0px;padding-top:0px">{{hostInfo.organization_name}}</h3>
-							<p class="info-paragraph">
-								{{hostInfo.organization_bio}}
-							</p>
-						</div>
-					</div>
-					<div ng-if="!eventInfo.host">
-						<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
-							<a class="thumbnail" ng-click="goToUser(hostInfo.customer_username)"><img class="profile-picture cursor" ng-src="{{hostInfo.customer_profile_pic}}"> </a>
-						</div>
-						<div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
-							<h3 style="margin-top:0px;padding-top:0px">{{hostInfo.customer_tag}}</h3>
-							<p class="info-paragraph">
-								{{hostInfo.customer_bio}}
-							</p>
+						<div ng-if="!eventInfo.host">
+							<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+								<a class="thumbnail" ng-click="goToUser(hostInfo.customer_username)"><img class="profile-picture cursor" ng-src="{{hostInfo.customer_profile_pic}}"> </a>
+							</div>
+							<div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
+								<h3 style="margin-top:0px;padding-top:0px">{{hostInfo.customer_tag}}</h3>
+								<p class="info-paragraph">
+									{{hostInfo.customer_bio}}
+								</p>
+							</div>
 						</div>
 					</div>
 				</div>
-
 				<div class="btn-group btn-group-justified box-margin" role="group">
 					<div class="btn-group" role="group" ng-if="!eventInfo.is_organizer && !tournament.is_competitor && canRegister && !tournament.sold_out">
 						<button type="button" class="btn btn-success" data-target="#competitorSignUpModal" ng-if="tournament.team_size == 1" data-toggle="modal">
@@ -240,8 +245,7 @@
 							Team Sign Up
 						</button>
 					</div>
-
-					<div class="btn-group" role="group" ng-if="eventInfo.is_organizer && !finished">
+					<div class="btn-group" role="group" ng-if="eventInfo.is_organizer">
 						<button type="button" class="btn btn-primary" ui-sref="app.eventSettings({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location })">
 							Settings
 						</button>
@@ -291,29 +295,29 @@
 			</div>
 		</div>
 	</div>
-	<div class="tab-pane fade" id="standings" ng-if="standingsTab"></div>
+	<div class="tab-pane fade" id="standings" ng-if="standingsTab">
+
+	</div>
 	<div class="tab-pane fade" id="groupStage" ng-if="tournamentInfo.groupStage">
 		<div class="panel-padding">
-			<div class="box">
-				<div class="row">
-					<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-md-offset-4 col-lg-offset-4">
-						<label>Groups: </label>
-						<select class="form-control" ng-model="selectedGroup" ng-options="'Group '+item.group_number for item in tournamentInfo.groupStage.groups" ng-change="resetGroup(selectedGroup)"></select>
-						<br/>
-						<label>Rounds: </label>
-						<select class="form-control" ng-model="selectedGroupRound" ng-options="'Round '+item.round_number for item in selectedGroup.rounds"></select>
-
-						<h3 class="info-title">Round {{selectedGroupRound.round_number}} Details</h3>
-					</div>
-					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-lg-offset-3">
-						<div style="text-align:center">
-							<h4 style="padding-top:0px;margin-top:0px">Best of {{selectedGroup.rounds[selectedGroupRound.round_number - 1].round_best_of}}</h4>
-							<p class="info-paragraph">Start Date: {{selectedGroup.rounds[selectedGroupRound.round_number - 1].round_start_date | date: 'medium'}}</p>
-							<p class="info-paragraph">Round Completed: {{selectedGroup.rounds[selectedGroupRound.round_number - 1].round_completed}}</p>
+			<div class="col-lg-6 col-md-6 col-xs-12 col-lg-offset-3 col-md-offset-3">
+				<div class="box">
+					<div class="row">
+						<div class="col-xs-12 col-sm-6 col-sm-offset-3 col-md-6 col-lg-6 col-md-offset-3 col-lg-offset-3">
+							<label>Groups: </label>
+							<select class="form-control" ng-model="selectedGroup" ng-options="'Group '+item.group_number for item in tournamentInfo.groupStage.groups" ng-change="resetGroup(selectedGroup)"></select>
+							<br/>
+							<label>Rounds: </label>
+							<select class="form-control" ng-model="selectedGroupRound" ng-options="'Round '+item.round_number for item in selectedGroup.rounds"></select>
 						</div>
-					</div>
-					<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-md-offset-4 col-lg-offset-4" ng-if="selectedGroup.rounds[selectedGroupRound.round_number - 1].round_completed">
-						<button class="btn btn-primary btn-block">Start</button>
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-10 col-md-offset-0 col-lg-offset-1">
+							<h3 class="info-title">Round {{selectedGroupRound.round_number}} Details</h3>
+							<div style="text-align:center">
+								<h4 style="padding-top:0px;margin-top:0px">Best of {{selectedGroup.rounds[selectedGroupRound.round_number - 1].round_best_of}}</h4>
+								<p class="info-paragraph">Start Date: {{selectedGroup.rounds[selectedGroupRound.round_number - 1].round_start_date | date: 'medium'}}</p>
+								<p class="info-paragraph">Round Completed: {{selectedGroup.rounds[selectedGroupRound.round_number - 1].round_completed}}</p>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -323,7 +327,7 @@
 						<h1>Matches</h1>
 					</div>
 				</div>
-				<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-md-offset-4 col-lg-offset-4">
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-4 col-md-offset-0 col-lg-offset-4">
 					<div class="input-group custom-search-form">
 						<input ng-model="groupRoundQuery" type="text" class="form-control" placeholder="Search...">
 						<span class="input-group-btn">
@@ -332,7 +336,9 @@
 									</button> </span>
 					</div>
 				</div>
-				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6" ng-repeat="match in selectedGroup.rounds[selectedGroupRound.round_number-1].matches  | filter:groupRoundQuery">
+			</div>
+			<div class="row">
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-4" ng-repeat="match in selectedGroup.rounds[selectedGroupRound.round_number-1].matches  | filter:groupRoundQuery">
 
 					<div class="box box-margin cursor" ng-click="getTournamentMatch(selectedRound.round_number,match.match_number,'Group')">
 						<h4 class="modal-title" align="center">Match {{match.match_number}}</h4>
@@ -398,31 +404,30 @@
 			</div>
 		</div>
 	</div>
+
 	<div class="tab-pane fade" id="rounds">
 		<div class="panel-padding">
-			<div class="box">
-				<div class="row">
-					<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-md-offset-4 col-lg-offset-4">
-						<div ng-if="tournamentInfo.finalStage.loserRounds">
-							<label>Bracket: </label>
-							<select class="form-control" ng-model="bracket" ng-options="item for item in bracketTypes" ng-change="bracketChange(bracket)"></select>
+			<div class="col-lg-6 col-md-6 col-xs-12 col-lg-offset-3 col-md-offset-3">
+				<div class="box">
+					<div class="row">
+						<div class="col-xs-12 col-sm-6 col-sm-offset-3 col-md-6 col-lg-6 col-md-offset-3 col-lg-offset-3">
+							<div ng-if="tournamentInfo.finalStage.loserRounds">
+								<label>Bracket: </label>
+								<select class="form-control" ng-model="bracket" ng-options="item for item in bracketTypes" ng-change="bracketChange(bracket)"></select>
+								<br/>
+							</div>
 							<br/>
+							<label>Rounds: </label>
+							<select class="form-control" ng-model="selectedRound" ng-options="'Round '+item.round_number for item in bracketType"></select>
 						</div>
-						<br/>
-						<label>Rounds: </label>
-						<select class="form-control" ng-model="selectedRound" ng-options="'Round '+item.round_number for item in bracketType"></select>
-
-						<h3 class="info-title">Round {{selectedRound.round_number}} Details</h3>
-					</div>
-					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-lg-offset-3">
-						<div style="text-align:center">
-							<h4 style="padding-top:0px;margin-top:0px">Best of {{selectedRound.round_best_of}}</h4>
-							<p class="info-paragraph">Start Date: {{selectedRound.round_start_date | date: 'medium'}}</p>
-							<p class="info-paragraph">Round Completed: {{selectedRound.round_completed}}</p>
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-10 col-md-offset-0 col-lg-offset-1">
+							<h3 class="info-title">Round {{selectedRound.round_number}} Details</h3>
+							<div style="text-align:center">
+								<h4 style="padding-top:0px;margin-top:0px">Best of {{selectedRound.round_best_of}}</h4>
+								<p class="info-paragraph">Start Date: {{selectedRound.round_start_date | date: 'medium'}}</p>
+								<p class="info-paragraph">Round Completed: {{selectedRound.round_completed}}</p>
+							</div>
 						</div>
-					</div>
-					<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-md-offset-4 col-lg-offset-4" ng-if="selectedRound.round_completed">
-						<button class="btn btn-primary btn-block">Start</button>
 					</div>
 				</div>
 			</div>
@@ -441,7 +446,9 @@
 									</button> </span>
 					</div>
 				</div>
-				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6" ng-repeat="match in bracketType[selectedRound.round_number-1].matches  | filter:roundQuery">
+			</div>
+			<div class="row">
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-4" ng-repeat="match in bracketType[selectedRound.round_number-1].matches  | filter:roundQuery">
 					<div class="box box-margin cursor" ng-click="getTournamentMatch(selectedRound.round_number,match.match_number,bracket)">
 						<h4 class="modal-title" align="center">Match {{match.match_number}}</h4>
 						<p align="center">Station {{match.station_number}}
@@ -503,6 +510,7 @@
 						</div>
 					</div>
 				</div>
+
 			</div>
 		</div>
 	</div>
@@ -725,23 +733,23 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
 							<h3 style="text-align:center">{{matchInfo.players[0].customer_tag}}</h3>
 						</div>
 						<div class="col-xs-4 col-sm-2 col-md-4 col-lg-4">
-							<h4 style="text-align:center">Best of {{selectedRound.round_best_of}}</h4>
+							<h4 style="text-align:center">Best of {{matchInfo.sets.length}}</h4>
 						</div>
 						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 							<h3 style="text-align:center">{{matchInfo.players[1].customer_tag}}</h3>
 						</div>
 					</div>
 					<div style="text-align: center">
-						<div class="set-circular player-1"></div>
-						<div class="set-circular player-1 set-margin"></div>
-						<div class="set-circular player-2 set-margin"></div>
-						<div class="set-circular player-1"></div>
+						<span ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number">
+					<div class="set-circular set-margin" ng-class="set.scores[0].score > set.scores[1].score ? 'player-1' : 'player-2'"></div>
+					</span>
+
 					</div>
-					<div class="row" ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number">
+					<div class="row" ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number && matchInfo.score_type == 'Points'">
 						<hr>
 						<p class="info-paragraph" style="text-align:center">Set {{$index + 1}}</p>
 						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
@@ -775,19 +783,19 @@
 							<h3 style="text-align:center">{{matchInfo.players[0].team_name}}</h3>
 						</div>
 						<div class="col-xs-4 col-sm-2 col-md-4 col-lg-4">
-							<h4 style="text-align:center">Best of {{selectedRound.round_best_of}}</h4>
+							<h4 style="text-align:center">Best of {{matchInfo.sets.length}}</h4>
 						</div>
 						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 							<h3 style="text-align:center">{{matchInfo.players[1].team_name}}</h3>
 						</div>
 					</div>
 					<div style="text-align: center">
-						<div class="set-circular player-1"></div>
-						<div class="set-circular player-1 set-margin"></div>
-						<div class="set-circular player-2 set-margin"></div>
-						<div class="set-circular player-1"></div>
+						<span ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number">
+					<div class="set-circular set-margin" ng-class="set.scores[0].score > set.scores[1].score ? 'player-1' : 'player-2'"></div>
+					</span>
+
 					</div>
-					<div ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number">
+					<div ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number && matchInfo.score_type == 'Points'">
 						<hr>
 						<div class="row" align="center">
 							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">

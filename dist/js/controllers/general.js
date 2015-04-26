@@ -196,6 +196,20 @@ function($scope, $window, $http, $state, AuthenticationService, $rootScope, Matc
 			$scope.matchInfo.date = date;
 			$scope.matchInfo.match = match;
 			$scope.matchInfo.station_number = station;
+			if($scope.matchInfo.score_type == 'Points'){
+				$scope.matchInfo.players[0].score = 0;
+				$scope.matchInfo.players[1].score = 0;
+				for(var i = 0; i < $scope.matchInfo.sets.length ;i++){
+					if($scope.matchInfo.sets[i].scores[0].competitor_number){
+						if($scope.matchInfo.sets[i].scores[0].score > $scope.matchInfo.sets[i].scores[1].score)
+							$scope.matchInfo.players[0].score++;
+						else
+							$scope.matchInfo.players[1].score++;
+					}
+					else
+						break;
+				}
+			}
 			$('#matchupModal').modal('show');
 			console.log(data);
 		});

@@ -43,22 +43,22 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 
 	var initDateAndTabs = function () {
 
-		var start_date = new Date($scope.tournament.tournament_start_date);
 		// Check registration deadline with current time
 		$scope.canRegister = (new Date($scope.tournament.tournament_check_in_deadline)).getTime() > now_utc.getTime();
 
-		// Check if ongoing
-		if (now_utc.getTime() > start_date.getTime()) {
+		// Check tournament status
+		if ($scope.tournament.tournament_completed === null) {
+			// if null tournament has not started
+			$scope.competitorsTab = true;
+		}
+		else{
 			// Tournament Started
 			$scope.standingsTab = true;
 			$scope.roundsTab = ($scope.tournament.tournament_format == 'Single Elimination' || $scope.tournament.tournament_format == 'Double Elimination');
 			$scope.groupStageTab = ($scope.tournament.tournament_format == 'Round Robin' || $scope.tournament.tournament_type == 'Two Stage');
 			getRounds();
 		}
-		// Tournament not started
-		else
-			$scope.competitorsTab = true;
-
+			
 		$scope.bracketTypes = ['Winner', 'Loser'];
 		$scope.bracket = 'Winner';
 	};
@@ -145,6 +145,20 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 			$scope.matchInfo.round = round;
 			$scope.matchInfo.match = match;
 			$scope.matchInfo.details = $scope.bracketType[round -1].matches[match - 1];
+			if($scope.matchInfo.score_type == 'Points'){
+				$scope.matchInfo.players[0].score = 0;
+				$scope.matchInfo.players[1].score = 0;
+				for(var i = 0; i < $scope.matchInfo.sets.length ;i++){
+					if($scope.matchInfo.sets[i].scores[0].competitor_number){
+						if($scope.matchInfo.sets[i].scores[0].score > $scope.matchInfo.sets[i].scores[1].score)
+							$scope.matchInfo.players[0].score++;
+						else
+							$scope.matchInfo.players[1].score++;
+					}
+					else
+						break;
+				}
+			}
 			$('#tournamentMatchupModal').modal('show');
 			console.log(data);
 		});
