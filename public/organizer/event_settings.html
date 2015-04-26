@@ -21,7 +21,7 @@
 				<h4 class="list-group-item-heading">Seeding and Rounds</h4>
 				<p class="list-group-item-text">Arrange seeds for each tournament and create the bracket. Assign dates to the round of the tournament.</p>
 			</a>
-			<a ui-sref="app.reportList" class="list-group-item ">
+			<a ui-sref="app.reportList({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location})" class="list-group-item ">
 				<h4 class="list-group-item-heading">Reports</h4>
 				<p class="list-group-item-text">See all reports from each tournaments.</p>
 			</a>

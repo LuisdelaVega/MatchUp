@@ -138,7 +138,7 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			controller: "SeedingController"
 		})
 		.state('app.reportList', {
-			url: "/reportList",
+			url: "/event/:eventName/:eventDate/:eventLocation/reports",
 			templateUrl: "organizer/report_list.html",
 			controller: "ReportsController"
 		})
@@ -267,18 +267,29 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			controller: "editOrganizationController"
 		})
 		.state('app.organizationEvents', {
-			url: "/organizationEvents/:organizationName",
+			url: "/organization/:organizationName/events",
 			templateUrl: "organization/organization_events.html",
 			controller: "organizationEventsController"
+		})
+		.state('app.sponsorRequests', {
+			url: "/organization/:organizationName/requests",
+			templateUrl: "organization/sponsor_requests.html",
+			controller: "organizationSponsorRequestsController"
 		})
 		.state('app.myOrganizations', {
 			url: "/myOrganizations",
 			templateUrl: "organization/my_organizations.html"
 		})
 		.state('app.requestOrganization', {
-			url: "user/request/organization",
+			url: "/:user/request/organization",
 			templateUrl: "organization/request_organization.html",
 			controller: "RequestOrganizationController"
+		})
+		//No lo borren...
+		.state('app.requestOrganizationStatus', {
+			url: "/:user/request/organization/status",
+			templateUrl: "user/organization_requests.html",
+			controller: "organizationRequestsController"
 		})
 
 
