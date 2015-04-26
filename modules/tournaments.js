@@ -1502,9 +1502,26 @@ var getRounds = function(req, res, pg, conString, log) {
 				});
 				query.on("row", function (row, result) {
 					//console.log(row);
+					var repeated = false;
 					var info_string = row.info;
 					var info_array = (!info_string ? new Array((details.team_size > 1 ? 2 : 3)) : info_string.split(",;!;,"));
 					var temp = {};
+					if (info_array.length == 2) {
+						temp = {
+							team_name : info_array[0],
+							team_logo : info_array[1],
+							competitor_number : parseInt(row.competitor_number),
+							score : row.score
+						};
+					} else {
+						temp = {
+							customer_username : info_array[0],
+							customer_profile_pic : info_array[1],
+							customer_tag : info_array[2],
+							competitor_number : parseInt(row.competitor_number),
+							score : row.score
+						};
+					}
 					if (row.group_number) {
 						if (!tournament.groupStage.groups[row.group_number-1]) {
 							tournament.groupStage.groups[row.group_number-1] = {};
@@ -1529,23 +1546,14 @@ var getRounds = function(req, res, pg, conString, log) {
 							tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number].players = [];
 						}
 
-						if (info_array.length == 2) {
-							temp = {
-								team_name : info_array[0],
-								team_logo : info_array[1],
-								competitor_number : row.competitor_number,
-								score : row.score
-							};
-						} else {
-							temp = {
-								customer_username : info_array[0],
-								customer_profile_pic : info_array[1],
-								customer_tag : info_array[2],
-								competitor_number : row.competitor_number,
-								score : row.score
-							};
+						for (var i = 0; i < tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number].players.length; i++) {
+							if (tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number].players[i].competitor_number == temp.competitor_number) {
+								repeated = true;
+							}
 						}
-						tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number].players.push(temp);
+						if (!repeated) {
+							tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number].players.push(temp);
+						}
 					} else if (row.round_of === "Winner") {
 						if (!tournament.finalStage.winnerRounds[row.round_number-1]) {
 							tournament.finalStage.winnerRounds[row.round_number-1] = {};
@@ -1565,23 +1573,14 @@ var getRounds = function(req, res, pg, conString, log) {
 							tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1].players = [];
 						}
 
-						if (info_array.length == 2) {
-							temp = {
-								team_name : info_array[0],
-								team_logo : info_array[1],
-								competitor_number : row.competitor_number,
-								score : row.score
-							};
-						} else {
-							temp = {
-								customer_username : info_array[0],
-								customer_profile_pic : info_array[1],
-								customer_tag : info_array[2],
-								competitor_number : row.competitor_number,
-								score : row.score
-							};
+						for (var i = 0; i < tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1].players.length; i++) {
+							if (tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1].players[i].competitor_number == temp.competitor_number) {
+								repeated = true;
+							}
 						}
-						tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1].players.push(temp);
+						if (!repeated) {
+							tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1].players.push(temp);
+						}
 					} else if (row.round_of === "Loser") {
 						if (!tournament.finalStage.loserRounds[row.round_number-1]) {
 							tournament.finalStage.loserRounds[row.round_number-1] = {};
@@ -1601,23 +1600,14 @@ var getRounds = function(req, res, pg, conString, log) {
 							tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1].players = [];
 						}
 
-						if (info_array.length == 2) {
-							temp = {
-								team_name : info_array[0],
-								team_logo : info_array[1],
-								competitor_number : row.competitor_number,
-								score : row.score
-							};
-						} else {
-							temp = {
-								customer_username : info_array[0],
-								customer_profile_pic : info_array[1],
-								customer_tag : info_array[2],
-								competitor_number : row.competitor_number,
-								score : row.score
-							};
+						for (var i = 0; i < tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1].players.length; i++) {
+							if (tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1].players[i].competitor_number == temp.competitor_number) {
+								repeated = true;
+							}
 						}
-						tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1].players.push(temp);
+						if (!repeated) {
+							tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1].players.push(temp);
+						}
 					} else {
 						if (!tournament.finalStage.roundRobinRounds[row.round_number-1]) {
 							tournament.finalStage.roundRobinRounds[row.round_number-1] = {};
@@ -1637,23 +1627,14 @@ var getRounds = function(req, res, pg, conString, log) {
 							tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1].players = [];
 						}
 
-						if (info_array.length == 2) {
-							temp = {
-								team_name : info_array[0],
-								team_logo : info_array[1],
-								competitor_number : row.competitor_number,
-								score : row.score
-							};
-						} else {
-							temp = {
-								customer_username : info_array[0],
-								customer_profile_pic : info_array[1],
-								customer_tag : info_array[2],
-								competitor_number : row.competitor_number,
-								score : row.score
-							};
+						for (var i = 0; i < tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1].players.length; i++) {
+							if (tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1].players[i].competitor_number == temp.competitor_number) {
+								repeated = true;
+							}
 						}
-						tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1].players.push(temp);
+						if (!repeated) {
+							tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1].players.push(temp);
+						}
 					}
 				});
 				query.on('error', function (error) {
