@@ -4307,8 +4307,8 @@ var getReports = function(req, res, pg, conString, log) {
         }
 
         var query = client.query({
-            text : "SELECT report.*, is_played_in.station_number FROM report NATURAL JOIN event LEFT OUTER JOIN is_played_in ON is_played_in.event_name = report.event_name AND is_played_in.event_start_date = report.event_start_date AND is_played_in.event_location = report.event_location AND is_played_in.tournament_name = report.tournament_name AND is_played_in.round_number = report.round_number AND is_played_in.round_of = report.round_of AND is_played_in.match_number = report.match_number WHERE report.event_name = $1 AND report.event_start_date = $2 AND report.event_location = $3 AND event.event_active ORDER BY report.report_date DESC, CASE WHEN report.round_of = $4 THEN 1 WHEN report.round_of = $5 THEN 2 WHEN report.round_of = $6 THEN 3 WHEN report.round_of = $7 THEN 4 END, report.round_number DESC, report.match_number DESC, report.set_seq DESC, report.report_number DESC",
-            values : [req.params.event, req.query.date, req.query.location, "Winner", "Round Robin", "Loser", "Group"]
+            text : "SELECT report.*, is_played_in.station_number FROM report NATURAL JOIN event LEFT OUTER JOIN is_played_in ON is_played_in.event_name = report.event_name AND is_played_in.event_start_date = report.event_start_date AND is_played_in.event_location = report.event_location AND is_played_in.tournament_name = report.tournament_name AND is_played_in.round_number = report.round_number AND is_played_in.round_of = report.round_of AND is_played_in.match_number = report.match_number WHERE report.event_name = $1 AND report.event_start_date = $2 AND report.event_location = $3 AND event.event_active ORDER BY CASE WHEN report.report_status = $8 THEN 1 WHEN report.report_status = $9 THEN 2 ELSE 3 END, report.report_date DESC, CASE WHEN report.round_of = $4 THEN 1 WHEN report.round_of = $5 THEN 2 WHEN report.round_of = $6 THEN 3 WHEN report.round_of = $7 THEN 4 END, report.round_number DESC, report.match_number DESC, report.set_seq DESC, report.report_number DESC",
+            values : [req.params.event, req.query.date, req.query.location, "Winner", "Round Robin", "Loser", "Group", "Received", "Attending"]
         });
         query.on("row", function(row, result) {
             result.addRow(row);
@@ -4366,7 +4366,7 @@ var resolveReport = function(req, res, pg, conString, log) {
             if (result.rows.length) {
                 client.query({
                     text : "UPDATE report SET report_status = $9 WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6 AND match_number = $7 AND report_number = $8",
-                    values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.report, "Resolved"]
+                    values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.report, req.body.status]
                 }, function(err, result) {
                     if (err) {
                         client.query("ROLLBACK");
@@ -4376,7 +4376,7 @@ var resolveReport = function(req, res, pg, conString, log) {
                     } else {
                         client.query("COMMIT");
                         done();
-                        res.status(200).send('Resolved');
+                        res.status(200).send('Updated');
                     }
                     log.info({
                         res : res
