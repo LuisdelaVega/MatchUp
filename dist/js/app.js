@@ -1,4 +1,4 @@
-var myApp = angular.module('MatchUp', ['ui.router', 'ngResource', 'as.sortable', 'ui.bootstrap.datetimepicker', 'panhandler', 'Authentication', 'InputDirectives', 'bracketDirective', 'acute.select', 'home', 'premium-events', 'tournaments', 'user', 'organizer', 'organization', 'forms']);
+var myApp = angular.module('MatchUp', ['ui.router', 'ngResource', 'as.sortable', 'ui.bootstrap.datetimepicker', 'panhandler', 'Authentication', 'InputDirectives', 'bracketDirective', 'acute.select', 'home', 'premium-events', 'tournaments', 'user', 'organizer', 'organization', 'forms', 'ordinal']);
 
 myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider) {
 	//
@@ -168,7 +168,8 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 		})
 		.state('app.userStandings', {
 			url: "/user/:username/standings",
-			templateUrl: "user/user_standings.html"
+			templateUrl: "user/user_standings.html",
+			controller: "userStandingsController"
 		})
 		.state('app.userTeams', {
 			url: "/user/:username/teams",

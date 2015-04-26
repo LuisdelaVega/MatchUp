@@ -20,10 +20,12 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-md-3 col-md-offset-9">
+				<div class="col-md-4 col-md-offset-8" ng-if="profileData.my_profile">
 					<a class="btn btn-primary btn-block box-margin" ng-click="gotToEditProfile()" ng-if="profileData.my_profile">Edit</a>
-					<a class="btn btn-success btn-block box-margin" ng-if="!profileData.my_profile" ng-if="!subStatus" ng-click="subscribe()">Subscribe</a>
-					<a class="btn btn-default btn-block box-margin" ng-if="subStatus" ng-click="subscribe()">Unsubscribe</a>
+				</div>
+				<div class="col-md-4 col-md-offset-8" ng-if="!profileData.my_profile">
+					<a class="btn btn-success btn-block box-margin" ng-if="!subStatus" ng-click="subscribe()"><i class="fa fa-star-o"></i>Subscribe</a>
+					<a class="btn btn-warning btn-block box-margin" ng-if="subStatus" ng-click="subscribe()"><i class="fa fa-star"></i>Unsubscribe</a>
 				</div>
 			</div>
 		</div>
@@ -33,7 +35,7 @@
 		<div class="widget-box box-margin">
 			<div class="widget-header bordered-bottom bordered-themesecondary">
 				<h3 class="widget-title themesecondary">Standings</h3>
-				<a class="widget-more" ui-sref="app.userStandings">
+				<a class="widget-more" ui-sref="app.userStandings({username:profileData.customer_username})" ng-if="standings.lenght>5">
 						See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
 					</a>
 			</div>
@@ -41,7 +43,7 @@
 			<div class="widget-body">
 				<div class="widget-main no-padding">
 					<div class="tickets-container">
-						<table class="table table-striped table-hover">
+						<table class="table table-striped table-hover" ng-if="standings.length>0">
 							<thead>
 								<tr>
 									<th>Placing</th>
@@ -51,31 +53,22 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr class="cursor" ui-sref="app.tournament">
-									<td>5th</td>
-									<td>Apex 2015</td>
-									<td>Halo 4</td>
-									<td>March 1, 2015</td>
-								</tr>
-								<tr class="cursor" ui-sref="app.tournament">
-									<td>5th</td>
-									<td>Apex 2015</td>
-									<td>Halo 4</td>
-									<td>March 1, 2015</td>
-								</tr>
-								<tr class="cursor" ui-sref="app.tournament">
-									<td>5th</td>
-									<td>Apex 2015</td>
-									<td>Halo 4</td>
-									<td>March 1, 2015</td>
+								<tr class="cursor" ng-click="goToTournament(standing.event_name, standing.event_start_date, standing.event_location, standing.tournament_name)" ng-repeat="standing in standings | limitTo:5">
+									<td>{{standing.standing | ordinal}}</td>
+									<td>{{standing.event_name}}</td>
+									<td>{{standing.tournament_name}}</td>
+									<td>{{standing.event_start_date | date:'longDate'}}</td>
 								</tr>
 							</tbody>
 						</table>
+						<div style="text-align:center" ng-if="!standings.length">
+							<i class="fa fa-frown-o fa-3x"></i>
+							<h3 class="info-paragraph">{{profileData.customer_tag}} has not participated in any tournament</h3>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-
 		<!-- Standings widget -->
 	</div>
 </div>
@@ -90,44 +83,63 @@
 		<div class="widget-main no-padding">
 			<div class="tickets-container">
 				<div class="row">
-					<div class="col-xs-12 col-md-6 col-lg-4" ng-repeat="match in matchups | limitTo: 3">
-						<div class="box cursor box-margin" data-toggle="modal" data-target="#matchupModal" ng-if="match.details[0].customer_tag == profileData.customer_username">
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6" ng-repeat="match in matchups | limitTo: 4">
+						<div class="box cursor box-margin" ng-click="getMatch(match.event_name,match.tournament_name,match.round_number,match.match_number,match.round_of,match.event_start_date,match.event_location)">
 							<h4 class="modal-title" align="center">{{match.event_name}} - {{match.tournament_name}}</h4>
 							<p align="center">
 								{{match.round_of}} Round {{match.round_number}}, Match {{match.match_number}}
-								<br/> Station {{match.station_number}}
+								<br/> <span ng-if="match.station_number">Station {{match.station_number}}</span>
 								<br>
 							</p>
-							<div class="row" align="center">
-								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
-									<img class="img-circular player-2 large center-block" ng-src="{{match.details[1].customer_profile_pic}}" />
-									<h3 style="text-align:center">{{match.details[1].customer_tag}}</h3>
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
-									<h1 style="text-align:center">
+							<div ng-if="match.details[0].customer_tag">
+								<div class="row" align="center">
+									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+										<img class="img-circular player-1 large center-block" ng-src="{{match.details[0].customer_profile_pic}}" />
+									</div>
+									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+										<h1 style="text-align:center">
 							{{match.details[0].score}}-{{match.details[1].score}}</h1>
+									</div>
+									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+										<img class="img-circular player-2 large center-block" ng-src="{{match.details[1].customer_profile_pic}}" />
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+										<h3 style="text-align:center">{{match.details[0].customer_tag}}</h3>
+									</div>
+									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+										<h4 style="text-align:center"></h4>
+									</div>
+									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+										<h3 style="text-align:center">{{match.details[1].customer_tag}}</h3>
+									</div>
 								</div>
 							</div>
-						</div>
-						<div class="box cursor box-margin" data-toggle="modal" data-target="#matchupModal" ng-if="match.details[1].customer_tag == profileData.customer_username">
-							<h4 class="modal-title" align="center">{{match.event_name}} - {{match.tournament_name}}</h4>
-							<p align="center">
-								{{match.round_of}} Round {{match.round_number}}, Match {{match.match_number}}
-								<br/> Station {{match.station_number}}
-								<br>
-							</p>
-							<div class="row" align="center">
-								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
-									<img class="img-circular player-2 large center-block" ng-src="{{match.details[0].customer_profile_pic}}" />
-									<h3 style="text-align:center">{{match.details[0].customer_tag}}</h3>
+							<div ng-if="match.details[0].team_name">
+								<div class="row" align="center">
+									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+
+										<img class="img-circular player-1 large center-block" ng-src="{{match.details[0].team_logo}}" />
+									</div>
+									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+										<h1 style="text-align:center">
+							{{match.details[0].score}}-{{match.details[1].score}}</h1>
+									</div>
+									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+										<img class="img-circular player-2 large center-block" ng-src="{{match.details[1].team_logo}}" />
+									</div>
 								</div>
-							</div>
-							<div class="row">
-								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
-									<h1 style="text-align:center">
-							{{match.details[1].score}}-{{match.details[0].score}}</h1>
+								<div class="row">
+									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+										<h3 style="text-align:center">{{match.details[0].team_name}}</h3>
+									</div>
+									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+										<h4 style="text-align:center"></h4>
+									</div>
+									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+										<h3 style="text-align:center">{{match.details[1].team_name}}</h3>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -236,146 +248,3 @@
 	</div>
 </div>
 <!-- Organizations widget -->
-
-
-<!-- modal matchup-->
-<div class="modal fade" id="matchupModal">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-				<h4 class="modal-title">Round 1 Match 2
-				<br>
-				<small>Station 2</small></h4>
-			</div>
-			<div class="modal-body">
-				<div class="row">
-					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5 ">
-						<div class="img-circular player-1 large center-block"></div>
-					</div>
-					<div class="col-xs-4 col-sm-2 col-md-2 col-lg-2">
-						<h1 style="text-align:center">3-2</h1>
-					</div>
-					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5">
-						<div class="img-circular player-2 large center-block"></div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5 ">
-						<h3 style="text-align:center">Player 1</h3>
-					</div>
-					<div class="col-xs-4 col-sm-2 col-md-2 col-lg-2">
-						<h4 style="text-align:center">Best of 3</h4>
-					</div>
-					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5">
-						<h3 style="text-align:center">Player 2</h3>
-					</div>
-				</div>
-				<div style="text-align: center">
-					<div class="set-circular player-1"></div>
-					<div class="set-circular player-1 set-margin"></div>
-					<div class="set-circular player-2 set-margin"></div>
-					<div class="set-circular player-1"></div>
-				</div>
-			</div>
-		</div>
-		<!-- /.modal-content -->
-	</div>
-	<!-- /.modal-dialog -->
-</div>
-
-<!-- modal matchup with sets-->
-<div class="modal fade" id="matchupSetModal">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-				<h4 class="modal-title">Round 1 Match 2
-				<br>
-				<small>Station 2</small></h4>
-			</div>
-			<div class="modal-body">
-				<div class="row">
-					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5 ">
-						<div class="img-circular player-1 large center-block"></div>
-					</div>
-					<div class="col-xs-4 col-sm-2 col-md-2 col-lg-2">
-						<h1 style="text-align:center">3-2</h1>
-					</div>
-					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5">
-						<div class="img-circular player-2 large center-block"></div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5 ">
-						<h3 style="text-align:center">Player 1</h3>
-					</div>
-					<div class="col-xs-4 col-sm-2 col-md-2 col-lg-2">
-						<h4 style="text-align:center">Best of 3</h4>
-					</div>
-					<div class="col-xs-4 col-sm-5 col-md-5 col-lg-5">
-						<h3 style="text-align:center">Player 2</h3>
-					</div>
-				</div>
-				<div style="text-align: center">
-					<div class="set-circular player-1"></div>
-					<div class="set-circular player-2 set-margin"></div>
-					<div class="set-circular player-1"></div>
-				</div>
-				<div class=" box-margin">
-					<p>
-						Set 1
-					</p>
-					<div class="row">
-						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
-							<div class="img-circular player-1 mini center-block"></div>
-						</div>
-						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-							<h2 style="text-align:center">45-30</h2>
-						</div>
-						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-							<div class="img-circular player-2 mini center-block"></div>
-						</div>
-					</div>
-					<hr>
-					<p>
-						Set 2
-					</p>
-					<div class="row">
-						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
-							<div class="img-circular player-1 mini center-block"></div>
-						</div>
-						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-							<h2 style="text-align:center">45-30</h2>
-						</div>
-						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-							<div class="img-circular player-2 mini center-block"></div>
-						</div>
-					</div>
-					<hr>
-					<p>
-						Set 3
-					</p>
-					<div class="row">
-						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
-							<div class="img-circular player-1 mini center-block"></div>
-						</div>
-						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-							<h2 style="text-align:center">45-30</h2>
-						</div>
-						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-							<div class="img-circular player-2 mini center-block"></div>
-						</div>
-					</div>
-				</div>
-
-			</div>
-
-		</div>
-
-	</div>
-</div>

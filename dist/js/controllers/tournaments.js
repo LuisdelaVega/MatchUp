@@ -59,8 +59,8 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 		else
 			$scope.competitorsTab = true;
 
-		$scope.bracketTypes = ['Winners', 'Losers'];
-		$scope.bracket = 'Winners';
+		$scope.bracketTypes = ['Winner', 'Loser'];
+		$scope.bracket = 'Winner';
 	};
 
 	var premiumDetails = function () {
@@ -107,8 +107,6 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 					$scope.selectedGroupRound = $scope.tournamentInfo.groupStage.groups[0].rounds[0];
 				}
 			}
-			//console.log($scope.selectedGroupRound);
-			$scope.getMatch(1, 1);
 		});
 	};
 
@@ -140,17 +138,16 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 		}
 	};
 
-	//not sure if needed, waiting on new DB dump
-	$scope.getMatch = function (round, match) {
-		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/rounds/' + round + '/matches/' + match + '?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data, status) {
+	// Get match details
+	$scope.getTournamentMatch = function (round, match,round_of) {
+		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/rounds/' + round + '/matches/' + match + '?round_of=' + round_of + '&date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data, status) {
 			$scope.matchInfo = data;
-
-			//	console.log(data);
-		}).then(function () {
-			///console.log($scope.matchInfo);
-
+			$scope.matchInfo.round = round;
+			$scope.matchInfo.match = match;
+			$scope.matchInfo.details = $scope.bracketType[round -1].matches[match - 1];
+			$('#tournamentMatchupModal').modal('show');
+			console.log(data);
 		});
-
 	};
 
 	$scope.teamModal = function () {

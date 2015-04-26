@@ -169,3 +169,115 @@
 	<!-- /.container-fluid -->
 </div>
 <!-- /#page-wrapper -->
+
+<!-- modal matchup-->
+<div class="modal fade" id="matchupModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Round {{matchInfo.round_number}} Match {{matchInfo.match_number}}
+				<br>
+				<small ng-if="matchInfo.station_number">Station {{matchInfo.station_number}}</small></h4>
+			</div>
+			<div class="modal-body">
+				<div ng-if="matchInfo.players[0].customer_tag">
+					<div class="row" align="center">
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<img class="img-circular player-1 large center-block" ng-src="{{matchInfo.players[0].customer_profile_pic}}" />
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<h1 style="text-align:center">
+							{{matchInfo.players[0].score}}-{{matchInfo.players[1].score}}</h1>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<img class="img-circular player-2 large center-block" ng-src="{{matchInfo.players[1].customer_profile_pic}}" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<h3 style="text-align:center">{{matchInfo.players[0].customer_tag}}</h3>
+						</div>
+						<div class="col-xs-4 col-sm-2 col-md-4 col-lg-4">
+							<h4 style="text-align:center">Best of {{selectedRound.round_best_of}}</h4>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<h3 style="text-align:center">{{matchInfo.players[1].customer_tag}}</h3>
+						</div>
+					</div>
+					<div style="text-align: center">
+						<div class="set-circular player-1"></div>
+						<div class="set-circular player-1 set-margin"></div>
+						<div class="set-circular player-2 set-margin"></div>
+						<div class="set-circular player-1"></div>
+					</div>
+					<div class="row" ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number">
+						<hr>
+						<p class="info-paragraph" style="text-align:center">Set {{$index + 1}}</p>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<img class="img-circular player-1 large center-block" ng-src="{{matchInfo.players[0].customer_profile_pic}}" />
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<h1 style="text-align:center">
+							{{set.scores[0].score}}-{{set.scores[1].score}}</h1>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<img class="img-circular player-2 large center-block" ng-src="{{matchInfo.players[1].customer_profile_pic}}" />
+						</div>
+					</div>
+				</div>
+				<div ng-if="matchInfo.players[0].team_name">
+					<div class="row" align="center">
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+
+							<img class="img-circular player-1 large center-block" ng-src="{{matchInfo.players[0].team_logo}}" />
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<h1 style="text-align:center">
+							{{matchInfo.players[0].score}}-{{matchInfo.players[1].score}}</h1>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<img class="img-circular player-2 large center-block" ng-src="{{matchInfo.players[1].team_logo}}" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<h3 style="text-align:center">{{matchInfo.players[0].team_name}}</h3>
+						</div>
+						<div class="col-xs-4 col-sm-2 col-md-4 col-lg-4">
+							<h4 style="text-align:center">Best of {{selectedRound.round_best_of}}</h4>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<h3 style="text-align:center">{{matchInfo.players[1].team_name}}</h3>
+						</div>
+					</div>
+					<div style="text-align: center">
+						<div class="set-circular player-1"></div>
+						<div class="set-circular player-1 set-margin"></div>
+						<div class="set-circular player-2 set-margin"></div>
+						<div class="set-circular player-1"></div>
+					</div>
+					<div ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number">
+						<hr>
+						<div class="row" align="center">
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+								<img class="img-circular player-1 large center-block" ng-src="{{matchInfo.players[0].team_logo}}" />
+							</div>
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+								<h1 style="text-align:center">
+							{{set.scores[0].score}}-{{set.scores[1].score}}</h1>
+							</div>
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+								<img class="img-circular player-2 large center-block" ng-src="{{matchInfo.players[1].team_logo}}" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>

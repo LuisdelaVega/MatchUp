@@ -186,6 +186,14 @@ function($scope, $window, $http, $state, AuthenticationService, $rootScope, Matc
 		});
 
 	};
+	
+	$scope.getMatch = function (event,tournament,round,match,round_of,date,location){
+		$http.get($rootScope.baseURL + '/matchup/events/' + event + '/tournaments/' + tournament + '/rounds/' + round + '/matches/' + match + '?round_of=' + round_of + '&date=' + date + '&location=' + location).success(function (data, status) {
+			$scope.matchInfo = data;
+			$('#matchupModal').modal('show');
+			console.log(data);
+		});
+	};
 
 	//function for going into a page that will display all the teams the customer belongs to
 	$scope.goToTeams = function(username) {
@@ -386,6 +394,8 @@ function($scope, $http, $state, sharedDataService, $stateParams, $window, $rootS
 
 myApp.controller('genreProfileController', ['$scope', '$http', '$state', 'sharedDataService', '$stateParams', '$window', '$rootScope',
 function($scope, $http, $state, sharedDataService, $stateParams, $window, $rootScope) {
+	
+	$scope.genreName = $stateParams.genre;
 
 	$http.get($rootScope.baseURL + '/matchup/events?filter=genre&value=' + $stateParams.genre + '&state=upcoming').success(function(data, status, headers) {
 		$scope.genresUpcoming = angular.fromJson(data);

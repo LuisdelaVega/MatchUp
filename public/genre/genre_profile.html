@@ -1,5 +1,6 @@
-<!-- Events based by a game -->
-<h1>Genre</h1>
+<div class="page-header">
+	<h1>{{genreName}}</h1>
+</div>
 <!-- Nav tabs -->
 <ul class="nav nav-tabs nav-justified tab-padding-top">
 	<li class="active">
@@ -17,7 +18,7 @@
 	<div class="tab-pane fade in active" id="upcomingGenre">
 		<div class="row">
 			<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat= "event in genresUpcoming">
-				<a class="thumbnail" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_logo}}" alt="{{event.event_name}}" >
+				<a class="thumbnail" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_banner}}" alt="{{event.event_name}}" >
 					<hr class="hr-custom-padding">
 					<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 						overflow: hidden;">
@@ -39,7 +40,7 @@
 	<div class="tab-pane fade" id="liveGenre">
 		<div class="row">
 			<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat= "event in genresLive">
-				<a class="thumbnail" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_logo}}" alt="{{event.event_name}}" >
+				<a class="thumbnail" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_banner}}" alt="{{event.event_name}}" >
 					<hr class="hr-custom-padding">
 					<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 						overflow: hidden;">
@@ -60,7 +61,7 @@
 	<div class="tab-pane fade" id="historyGenre">
 		<div class="row">
 			<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat= "event in genresPast">
-				<a class="thumbnail" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_logo}}" alt="{{event.event_name}}" >
+				<a class="thumbnail" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)"> <img ng-src="{{event.event_banner}}" alt="{{event.event_name}}" >
 					<hr class="hr-custom-padding">
 					<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
 						overflow: hidden;">

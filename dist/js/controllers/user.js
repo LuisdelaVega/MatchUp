@@ -10,14 +10,24 @@ myApp.controller('profileSummaryController', function ($scope, $state, $http, $s
 		$scope.profileData = data;
 	});
 
+	// Standings
+	$http.get($rootScope.baseURL + '/matchup/profile/' + customer + '/standings').success(function (data) {
+		$scope.standings = data;
+		console.log(data);
+	});
 
+	// MATCHUPS
+	$http.get($rootScope.baseURL + '/matchup/profile/' + customer + '/matchups?state=Past').success(function (data) {
+		$scope.matchups = data;
+		console.log(data);
+	});
 
-	//Get the teams this customer belongs to (PARA QUE SE USA ESTO??)
+	//Get the teams this customer belongs to
 	$http.get($rootScope.baseURL + '/matchup/profile/' + customer + '/teams').success(function (data) {
 		var promiseArray = [];
 		// Team the user belongs
 		$scope.teams = data;
-		// Get members for each team
+		// Get members for each team (PARA QUE SE USA ESTO??)
 		for (var i = 0; i < data.length; i++) {
 			promiseArray.push($http.get($rootScope.baseURL + '/matchup/teams/' + data[i].team_name + '/members'));
 		}
@@ -38,12 +48,6 @@ myApp.controller('profileSummaryController', function ($scope, $state, $http, $s
 		});
 	});
 
-	// MATCHUPS
-	$http.get($rootScope.baseURL + '/matchup/profile/matchups?state=Past').success(function (data) {
-		$scope.matchups = data;
-		console.log(data);
-	});
-
 	//Get the organization the customer belongs to
 	$http.get($rootScope.baseURL + '/matchup/profile/' + customer + '/organizations').success(function (data) {
 		$scope.organizations = data;
@@ -51,6 +55,7 @@ myApp.controller('profileSummaryController', function ($scope, $state, $http, $s
 		console.log(status);
 	});
 
+	// Get events
 	$http.get($rootScope.baseURL + '/matchup/profile/' + customer + '/events').success(function (data) {
 		$scope.userEvents = data;
 	});
@@ -85,42 +90,45 @@ myApp.controller('profileSummaryController', function ($scope, $state, $http, $s
 		});
 	};
 
-	$http.get($rootScope.baseURL + '/matchup/profile/' + $scope.me + '/subscriptions').success(function (data) {
+	if ($scope.me != customer) {
+	
+		$http.get($rootScope.baseURL + '/matchup/profile/' + $scope.me + '/subscriptions').success(function (data) {
 
-		$scope.subscriptions = data;
-		angular.forEach($scope.subscriptions, function (sub) {
-			if ($scope.profileData.customer_username == sub.customer_username) {
-				$scope.subStatus = true;
-				return;
-			}
+			$scope.subscriptions = data;
+			angular.forEach($scope.subscriptions, function (sub) {
+				if (customer == sub.customer_username) {
+					$scope.subStatus = true;
+					return;
+				}
+			});
+
+		}).error(function (data, status) {
+			console.log(status);
 		});
+		
+		$scope.subscribe = function () {
+			if ($scope.subStatus) {
+				//unsubscribe
+				$http.delete($rootScope.baseURL + '/matchup/profile/' + $scope.profileData.customer_username).success(function (data) {
+					$scope.subStatus = false;
 
-	}).error(function (data, status) {
-		console.log(status);
-	});
+				}).error(function (data, status) {
+					console.log(status);
+				});
 
-	$scope.subscribe = function () {
-		if ($scope.subStatus) {
-			//unsubscribe
-			$http.delete($rootScope.baseURL + '/matchup/profile/' + $scope.profileData.customer_username).success(function (data) {
-				$scope.subStatus = false;
+			} else {
+				//subscribe
+				$http.post($rootScope.baseURL + '/matchup/profile/' + $scope.profileData.customer_username).success(function (data) {
+					$scope.subStatus = true;
 
-			}).error(function (data, status) {
-				console.log(status);
-			});
+				}).error(function (data, status) {
+					console.log(status);
+				});
 
-		} else {
-			//subscribe
-			$http.post($rootScope.baseURL + '/matchup/profile/' + $scope.profileData.customer_username).success(function (data) {
-				$scope.subStatus = true;
+			}
 
-			}).error(function (data, status) {
-				console.log(status);
-			});
-
-		}
-
-	};
+		};
+	}
 
 });
 
@@ -269,21 +277,32 @@ myApp.controller('editProfileController', ['$scope', '$http', '$state', 'sharedD
 
 // REUSANDO este controller en my matchups y el see more en el profile
 myApp.controller('matchupsController', function ($scope, $state, $http, $stateParams, sharedDataService, $q, $rootScope) {
-	
-	if ($stateParams.username == $scope.me)
-			$scope.isUser = true;
-		else
-			$scope.isUser = false;
 
-		$scope.user = $stateParams.username;
-	
-	$http.get($rootScope.baseURL + '/matchup/profile/matchups?state=Past').success(function (data) {
+	if ($stateParams.username == $scope.me)
+		$scope.isUser = true;
+	else
+		$scope.isUser = false;
+
+	$scope.user = $stateParams.username;
+
+	$http.get($rootScope.baseURL + '/matchup/profile/' + $scope.user + '/matchups?state=Past').success(function (data) {
 		console.log(data);
 		$scope.pastMatchups = data;
 		//		data[0].details[0].score = 2;
 		//		data[0].details[1].score = 1;
 		//		data[0].station_number=1;
-		
+
 		//		console.log($scope.pastMatchups);
+	});
+});
+
+
+myApp.controller('userStandingsController', function ($scope, $state, $http, $stateParams, sharedDataService, $q, $rootScope) {
+
+	$scope.user = $stateParams.username;
+
+	// Standings
+	$http.get($rootScope.baseURL + '/matchup/profile/' + $scope.user + '/standings').success(function (data) {
+		$scope.standings = data;
 	});
 });
