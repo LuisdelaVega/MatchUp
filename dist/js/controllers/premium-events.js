@@ -379,17 +379,7 @@ function ($scope, $http, $state, $stateParams, $window, $rootScope) {
 myApp.controller('meetupController', ['$scope', '$http', '$state', '$stateParams', '$window', '$rootScope',
 function ($scope, $http, $state, $stateParams, $window, $rootScope) {
 
-		$scope.eventInfo = {
-			event_name: "",
-			event_start_date: "",
-			event_location: ""
-		};
-
-		$scope.meetup = {
-			customer_username: "",
-			meetup_start_date: "",
-			meetup_location: ""
-		};
+		$scope.eventInfo = {};
 
 		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/meetups/' + $stateParams.customerUsername + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&meetup_date=' + $stateParams.meetupDate + '&meetup_location=' + $stateParams.meetupLocation).success(function (data, status, headers) {
 			$scope.meetup = data;
@@ -397,8 +387,6 @@ function ($scope, $http, $state, $stateParams, $window, $rootScope) {
 			$scope.meetup.customer_username = $stateParams.customerUsername;
 			$scope.eventInfo.event_start_date = $stateParams.eventDate;
 			$scope.eventInfo.event_location = $stateParams.eventLocation;
-			$scope.meetup.meetup_start_date = $stateParams.meetupDate;
-			$scope.meetup.meetup_location = $stateParams.meetupLocation;
 
 		});
 
@@ -414,6 +402,7 @@ function ($scope, $http, $state, $stateParams, $window, $rootScope) {
 			});
 
 		};
+	
 }]);
 
 myApp.controller('eventSettingsController', function ($scope, $state, $http, $stateParams, sharedDataService, $q, $rootScope) {

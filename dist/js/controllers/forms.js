@@ -1023,35 +1023,39 @@ myApp.controller("editHostedTournamentListController", function($scope, $http, $
 			console.log(err);
 		});
 
-		$scope.submitEditmeetup = function(valid) {
-
-			var meetUp = {
-				"name" : $scope.meetup.meetup_name,
-				"location" : $scope.meetup.meetup_location,
-				"start_date" : $scope.meetup.meetup_start_date,
-				"end_date" : $scope.meetup.meetup_end_date,
-				"description" : $scope.meetup.meetup_description,
-
-			};
-
-			$http.put($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/meetups/' + $stateParams.customerUsername + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&meetup_date=' + $stateParams.meetupDate + '&meetup_location=' + $stateParams.meetupLocation, {
-				"location" : meetUp.location,
-				"name" : meetUp.name,
-				"start_date" : meetUp.start_date,
-				"end_date" : meetUp.end_date,
-				"description" : meetUp.description
-
-			}).success(function(data, status, headers) {
-				alert("Editing of a MeetUp successful");
-				$state.go("app.meetup", {
-					"eventName" : $stateParams.eventName,
-					"eventDate" : $stateParams.eventDate,
-					"eventLocation" : $stateParams.eventLocation,
-					"meetupDate" : meetUp.start_date,
-					"meetupLocation" : meetUp.location,
-					"customerUsername" : $stateParams.customerUsername,
-				});
-			});
-		};
 	}
+});
+
+myApp.controller("editMeetUpController", function($scope, $http, $window, $rootScope, $state, $stateParams) {
+	console.log("fixed");
+
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/meetups/' + $stateParams.customerUsername + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&meetup_date=' + $stateParams.meetupDate + '&meetup_location=' + $stateParams.meetupLocation).success(function(data, status, headers) {
+		$scope.meetup = data;
+		$scope.meetup.meetup_end_date = new Date($scope.meetup.meetup_end_date);
+		$scope.meetup.meetup_start_date = new Date($scope.meetup.meetup_start_date);
+		console.log(data);
+		$scope.meetup.customer_username = $stateParams.customerUsername;
+	});
+
+	$scope.submitEditmeetup = function(valid) {
+
+		$http.put($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/meetups/' + $stateParams.customerUsername + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&meetup_date=' + $stateParams.meetupDate + '&meetup_location=' + $stateParams.meetupLocation, {
+			"location" : $scope.meetup.meetup_location,
+			"name" : $scope.meetup.meetup_name,
+			"start_date" : $scope.meetup.meetup_start_date,
+			"end_date" : $scope.meetup.meetup_end_date,
+			"description" : $scope.meetup.meetup_description
+
+		}).success(function(data, status, headers) {
+			alert("Editing of a MeetUp successful");
+			$state.go("app.meetup", {
+				"eventName" : $stateParams.eventName,
+				"eventDate" : $stateParams.eventDate,
+				"eventLocation" : $stateParams.eventLocation,
+				"meetupDate" : $scope.meetup.meetup_start_date.toJSON(),
+				"meetupLocation" : $scope.meetup.meetup_location,
+				"customerUsername" : $stateParams.customerUsername,
+			});
+		});
+	};
 });

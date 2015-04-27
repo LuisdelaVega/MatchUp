@@ -122,7 +122,12 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			templateUrl: "organizer/tournament_list.html",
 			controller: "editHostedTournamentListController"
 		})
-		.state('app.registrations', {
+			.state('app.tournamentDetails', {
+			url: "/settings/event/:eventName/:eventDate/:eventLocation/tournaments/:tournamentName",
+			templateUrl: "organizer/tournament_details.html",
+			controller: "tournamentDetailsController"
+		})
+ 		.state('app.registrations', {
 			url: "/event/:eventName/:eventDate/:eventLocation/registrations",
 			templateUrl: "organizer/registrations.html",
 			controller: "RegistrationController"

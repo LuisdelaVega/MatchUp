@@ -182,7 +182,7 @@ myApp.controller("ReportsController", function($scope, $http, $window, $rootScop
 	};
 
 	$scope.resolve = function() {
- 
+
 		var tempStatus = "";
 		if ($scope.reports[$scope.index].report_status == "Received")
 			tempStatus = "Attending";
@@ -198,7 +198,6 @@ myApp.controller("ReportsController", function($scope, $http, $window, $rootScop
 			console.log(err);
 		});
 
-		
 	};
 
 });
@@ -733,4 +732,228 @@ myApp.controller("editEventController", function($scope, $http, $window, $rootSc
 				"host" : $scope.host
 			}];
 	}
+});
+
+myApp.controller("tournamentDetailsController", function($scope, $http, $window, $rootScope, $state, $stateParams) {
+	$scope.competitors = [];
+
+	$scope.hasGroupStage = false;
+	$scope.groupStageCompleted = true;
+
+	$scope.winnerRoundsExist = true;
+	$scope.winnerRoundsCompleted = true;
+
+	$scope.losersRoundsExist = false;
+	$scope.losersRoundsCompleted = true;
+	$scope.tournament = {};
+	$scope.tournament.tournament_name = $stateParams.tournamentName;
+
+	//Get all rounds and matches
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $stateParams.tournamentName + '/rounds?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data, status) {
+		$scope.tournamentInfo = data;
+		console.log(data);
+
+	}).then(function() {
+		$scope.stagesCheck();
+
+	});
+
+	$scope.stagesCheck = function() {
+
+		if ($scope.tournamentInfo.groupStage) {
+			$scope.hasGroupStage = true;
+
+			//iterate over groups
+			for (var i = 0; $scope.tournamentInfo.groupStage.groups.length > i; i++) {
+				//iterate over rounds of that group
+				for (var j = 0; $scope.tournamentInfo.groupStage.groups[i].rounds.length > j; j++) {
+					if (!$scope.tournamentInfo.groupStage.groups[i].rounds[j].round_completed) {
+						$scope.groupStageCompleted = false;
+						$scope.winnerRoundsCompleted = false;
+						$scope.losersRoundsCompleted = false;
+					}
+
+				}
+			}
+		} else {
+			$scope.groupStageCompleted = false;
+		}
+
+		$scope.finalStagesCheck();
+
+		//Assign Dropdowns
+		$scope.assignDropdowns();
+		loggingTime();
+
+	};
+	$scope.finalStagesCheck = function() {
+		//Just double checking if a winners round exist
+		if ($scope.tournamentInfo.finalStage.winnerRounds) {
+			$scope.winnerRoundsExist = true;
+
+			//iterating over all the rounds in the winners rounds to see if all of these have been completed, if not then winners bracket has not been finished
+			for (var j = 0; $scope.tournamentInfo.finalStage.winnerRounds.length > j; j++) {
+				if (!$scope.tournamentInfo.finalStage.winnerRounds[j].round_completed) {
+					$scope.winnerRoundsCompleted = false;
+				}
+
+			}
+
+		} else {
+			$scope.winnerRoundsCompleted = false;
+		}
+		console.log('$scope.tournamentInfo.finalStage.loserRounds');
+
+		console.log($scope.tournamentInfo.finalStage.loserRounds);
+
+		//Checking if this tournament has losers bracket
+		if ($scope.tournamentInfo.finalStage.loserRounds) {
+			$scope.losersRoundsExist = true;
+			//iterating over all the rounds in the losers bracket to see if all of these have been completed, if not then the losers bracket is still in progress
+			for (var j = 0; $scope.tournamentInfo.finalStage.loserRounds.length > j; j++) {
+				if (!($scope.tournamentInfo.finalStage.loserRounds[j].round_completed)) {
+					$scope.losersRoundsCompleted = false;
+				}
+
+			}
+
+		} else {
+			$scope.losersRoundsCompleted = false;
+		}
+	};
+
+	var loggingTime = function() {
+		console.log('hasGroupStage: ' + $scope.hasGroupStage);
+		console.log('groupStageCompleted: ' + $scope.groupStageCompleted);
+		console.log('\n');
+		console.log('winnerRoundsExist: ' + $scope.winnerRoundsExist);
+		console.log('winnerRoundsCompleted: ' + $scope.winnerRoundsCompleted);
+		console.log('\n');
+		console.log('losersRoundsExist: ' + $scope.losersRoundsExist);
+		console.log('losersRoundsCompleted: ' + $scope.losersRoundsCompleted);
+
+	};
+
+	$scope.assignDropdowns = function() {
+		//assign what the drop down will have
+		if ($scope.winnerRoundsExist && $scope.losersRoundsExist && $scope.hasGroupStage) {
+			$scope.stages = ['Group Stage', 'Winners Round', 'Losers Round'];
+			$scope.selectedGroup = $scope.tournamentInfo.groupStage.groups[0];
+
+		} else if ($scope.winnerRoundsExist && $scope.losersRoundsExist) {
+			$scope.stages = ['Winners Round', 'Losers Round'];
+
+		} else if ($scope.winnerRoundsExist && $scope.hasGroupStage) {
+			$scope.stages = ['Group Stage', 'Winners Round'];
+			$scope.selectedGroup = $scope.tournamentInfo.groupStage.groups[0];
+
+		} else if ($scope.winnerRoundsExist) {
+			$scope.stages = ['Winners Round'];
+		} else {
+			//what???? how!?!?!?
+		}
+
+		$scope.selectedStage = 'Winners Round';
+		$scope.rounds = $scope.tournamentInfo.finalStage.winnerRounds;
+		$scope.selectedRound = $scope.tournamentInfo.finalStage.winnerRounds[0];
+	};
+
+	$scope.changeSelectedStage = function() {
+		$scope.rounds = [];
+
+		if ($scope.selectedStage == 'Group Stage') {
+			console.log($scope.selectedGroup);
+			$scope.rounds = $scope.selectedGroup.rounds;
+			$scope.selectedRound = $scope.rounds[0];
+			$scope.index = 0;
+
+		} else if ($scope.selectedStage == 'Winners Round') {
+			$scope.rounds = $scope.tournamentInfo.finalStage.winnerRounds;
+			$scope.selectedRound = $scope.rounds[0];
+			$scope.index = 0;
+		} else if ($scope.selectedStage == 'Losers Round') {
+			$scope.rounds = $scope.tournamentInfo.finalStage.loserRounds;
+			$scope.selectedRound = $scope.rounds[0];
+			$scope.index = 0;
+		} else {
+			return;
+		}
+		//console.log($scope.rounds);
+
+	};
+
+	$scope.getRoundMatches = function(round, index) {
+		$scope.index = index;
+		$scope.selectedRound = round;
+		console.log(round);
+
+	};
+	// Initiate Get from server and get tournaments in the event
+	//get all tournaments for this event
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+		$scope.tournaments = data;
+
+	}).error(function(err) {
+		console.log(err);
+	}).then(function() {
+		$scope.index = 0;
+		$scope.getTournament(0);
+
+	});
+
+	$scope.getTournament = function(index) {
+		$scope.index = index;
+		//get competitors for tournament $scope.tournaments[index].tournament_name
+		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '/competitors/checked?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+			$scope.competitors = data.competitors;
+			$scope.bracket = data.stages_created;
+			$scope.teamBased = data.team_size > 1;
+			console.log(data);
+
+		}).error(function(err) {
+			console.log(err);
+		});
+
+	};
+
+	$scope.deleteBracket = function() {
+		$scope.index
+		//TODO call to delete bracket
+		console.log("Still testing, we need the current brackets!");
+
+	};
+	$scope.createBracket = function() {
+		//TODO call create bracket
+		///* /matchup/events/:event/tournaments/:tournament/create?date=date&location=string
+		$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '/create?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+			console.log(data);
+			$scope.bracket = true;
+			alert("Bracket succesfully created for the following tournament: " + $scope.tournaments[$scope.index].tournament_name);
+
+		}).error(function(err) {
+			console.log(err);
+		});
+
+	};
+	$scope.saveSeeding = function() {
+		var seedList = $scope.competitors;
+		for (var i = 0; i < seedList.length; i++) {
+			seedList[i].seed = i + 1;
+		}
+		console.log(seedList);
+		$http.put($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '/competitors/checked?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation, {
+			"players" : seedList
+		}).success(function(data) {
+			alert("Seeding succesfully updated for the following tournament: " + $scope.tournaments[$scope.index].tournament_name);
+		}).error(function(err) {
+			console.log(err);
+		});
+
+	};
+
+	// Configure draggable table
+	$scope.sortableOptions = {
+		containment : '#sortable-container'
+	};
+
 });
