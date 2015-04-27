@@ -11,9 +11,8 @@
 			<h4 class="modal-title" align="center">{{match.event_name}}</h4>
 			<p align="center">
 				{{match.tournament_name}}
-				<br> {{match.round_of}} Round {{match.round_number}}, Match {{match.match_number}}
 				<br>
-				<span ng-if="match.station_number">Station {{match.station_number}}</span>
+				<small>{{match.round_of}} Round {{match.round_number}}, Match {{match.match_number}}<span ng-if="match.station_number">, Station {{match.station_number}}</span></small>
 			</p>
 			<div ng-if="match.details[0].customer_tag">
 				<div class="row" align="center">

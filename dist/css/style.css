@@ -22,12 +22,6 @@
 	background-color: #fafafa;
 }
 
-.alert-matchUp {
-  color: #fff;
-  background-color: #5EC0BB;
-  border-color: #56a09c;
-}
-
 .cover-photo {
 	width: 100%;
 }
@@ -175,6 +169,21 @@
 .set-margin {
 	margin-right: 5px;
 	margin-left: 5px;
+}
+
+.match-square {
+	height: 20px;
+	width: 20px;
+	margin-top: 2px;
+	display: inline-block;
+	text-align: center;
+	color: #292929;
+	cursor: pointer;
+}
+
+#competitor-name:hover{
+	color: black;
+	cursor: pointer;
 }
 
 .report-status {

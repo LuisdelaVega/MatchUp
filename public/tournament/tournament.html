@@ -284,7 +284,7 @@
 											</div>
 										</li>
 									</div>
-									
+
 								</div>
 							</ul>
 						</div>
@@ -294,12 +294,83 @@
 		</div>
 	</div>
 	<div class="tab-pane fade" id="standings" ng-if="standingsTab">
-
+		<div class="panel-padding">
+			<div class="row">
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-10 col-md-offset-0 col-lg-offset-1">
+					<div class="page-header">
+						<h1>Final Stage</h1>
+					</div>
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th style="text-align:center">Standing</th>
+								<th>Competitor</th>
+								<th>Match History</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="standing in standings">
+								<td width="10%" style="text-align:center" rowspan="{{standing.lenght}}" ng-if="$first" ng-repeat-start="competitor in standing">{{competitor.standing | ordinal}}</td>
+								<td id="competitor-name" ng-click="goToUser(competitor.customer_username)">{{competitor.customer_tag}}</td>
+								<td ng-repeat-end>
+									<span ng-repeat="match in competitor.match_history">
+									<span ng-if="match.win" class="match-square player-1" ng-click="getTournamentMatch(match.round_number,match.match_number,match.round_of)">
+										W
+									</span>
+									<span ng-if="!match.win" class="match-square player-2" ng-click="getTournamentMatch(match.round_number,match.match_number,match.round_of)">
+										L
+									</span>
+									</span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-10 col-md-offset-0 col-lg-offset-1">
+					<div class="page-header">
+						<h1>Group Stage</h1>
+					</div>
+					<div ng-repeat="group in groups">
+						<p class="lead">Group {{$index + 1}}</p>
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th style="text-align:center">Standing</th>
+									<th>Competitor</th>
+									<th>Wins-Losses</th>
+									<th>Match History</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="competitor in group">
+									<td width="10%" style="text-align:center">{{competitor.standing | ordinal}}
+									</td>
+									<td id="competitor-name" ng-click="goToUser(competitor.customer_username)">{{competitor.customer_tag}} <span class="text-success" ng-if="competitor.advanced">(Advancing)</span></td>
+									<td width="15%">{{competitor.wins}} - {{competitor.loses}}</td>
+									<td>
+										<span ng-repeat="match in competitor.match_history">
+									<span ng-if="match.win" class="match-square player-1" ng-click="getTournamentMatch(match.round_number,match.match_number,match.round_of)">
+										W
+									</span>
+										<span ng-if="!match.win" class="match-square player-2" ng-click="getTournamentMatch(match.round_number,match.match_number,match.round_of)">
+										L
+									</span>
+										</span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 	<div class="tab-pane fade" id="groupStage" ng-if="tournamentInfo.groupStage">
 		<div class="panel-padding">
 			<div class="col-lg-6 col-md-6 col-xs-12 col-lg-offset-3 col-md-offset-3">
-				<div class="box">
+				<div class="box box-margin">
 					<div class="row">
 						<div class="col-xs-12 col-sm-6 col-sm-offset-3 col-md-6 col-lg-6 col-md-offset-3 col-lg-offset-3">
 							<label>Groups: </label>
@@ -339,10 +410,8 @@
 			<div class="row">
 				<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" ng-repeat="match in selectedGroup.rounds[selectedGroupRound.round_number-1].matches  | filter:groupRoundQuery">
 
-					<div class="box box-margin cursor" ng-click="getTournamentMatch(selectedRound.round_number,match.match_number,'Group')">
-						<h4 class="modal-title" align="center">Match {{match.match_number}}</h4>
-						<p align="center">Station {{match.station_number}}
-						</p>
+					<div class="box box-margin cursor" ng-click="getTournamentMatch(selectedGroupRound.round_number,match.match_number,'Group')">
+						<h4 align="center">Match {{match.match_number}}<span ng-if="match.station_number"> (Station {{match.station_number}})</span></h4>
 						<div ng-if="match.players[0].customer_tag">
 							<div class="row" align="center">
 								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
@@ -403,11 +472,10 @@
 			</div>
 		</div>
 	</div>
-
 	<div class="tab-pane fade" id="rounds">
 		<div class="panel-padding">
 			<div class="col-lg-6 col-md-6 col-xs-12 col-lg-offset-3 col-md-offset-3">
-				<div class="box">
+				<div class="box box-margin">
 					<div class="row">
 						<div class="col-xs-12 col-sm-6 col-sm-offset-3 col-md-6 col-lg-6 col-md-offset-3 col-lg-offset-3">
 							<div ng-if="tournamentInfo.finalStage.loserRounds">
@@ -449,9 +517,7 @@
 			<div class="row">
 				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6" ng-repeat="match in bracketType[selectedRound.round_number-1].matches  | filter:roundQuery">
 					<div class="box box-margin cursor" ng-click="getTournamentMatch(selectedRound.round_number,match.match_number,bracket)">
-						<h4 class="modal-title" align="center">Match {{match.match_number}}</h4>
-						<p align="center">Station {{match.station_number}}
-						</p>
+						<h4 class="modal-title" align="center">Match {{match.match_number}}<span ng-if="match.station_number"> (Station {{match.station_number}})</span></h4>
 						<div ng-if="match.players[0].customer_tag">
 							<div class="row" align="center">
 								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">

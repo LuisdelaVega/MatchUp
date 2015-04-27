@@ -56,7 +56,8 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 			$scope.standingsTab = true;
 			$scope.roundsTab = ($scope.tournament.tournament_format == 'Single Elimination' || $scope.tournament.tournament_format == 'Double Elimination');
 			$scope.groupStageTab = ($scope.tournament.tournament_format == 'Round Robin' || $scope.tournament.tournament_type == 'Two Stage');
-			getStandings();
+			if($scope.tournament.tournament_completed)
+				getStandings();
 			getRounds();
 		}
 			
@@ -93,7 +94,6 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 
 		}).then(function () {
 			console.log($scope.tournamentInfo.finalStage);
-
 			if ($scope.tournamentInfo.finalStage) {
 				if (Object.keys($scope.tournamentInfo.finalStage).length) {
 					$scope.bracketType = $scope.tournamentInfo.finalStage.winnerRounds
@@ -103,7 +103,6 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 			}
 			if ($scope.tournamentInfo.groupStage) {
 				if (Object.keys($scope.tournamentInfo.groupStage).length) {
-
 					$scope.selectedGroup = $scope.tournamentInfo.groupStage.groups[0];
 					$scope.selectedGroupRound = $scope.tournamentInfo.groupStage.groups[0].rounds[0];
 				}
@@ -113,7 +112,12 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 	
 	var getStandings = function (){
 		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/standings?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data) {
+			$scope.standings = data.finalStage.standings;
+			$scope.groups = data.groupStage.groups;
+			
 			console.log(data);
+			console.log($scope.standings);
+			console.log($scope.groups);
 		});
 	}
 
