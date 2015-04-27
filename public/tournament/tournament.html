@@ -28,81 +28,15 @@
 			<!--			General Info    	 -->
 			<div class="box box-margin">
 				<h2 align="middle">{{tournament.tournament_name}}</h2>
-				<div class="row">
-					<!--				Event Info   	  -->
-					<div class="col-xs-12 col-sm-8 col-md-8 col-lg-6 col-md-offset-2 col-sm-offset-2 col-lg-offset-0">
-						<div class="row">
-							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-5">
-								<a class="thumbnail" ng-click="goToEvent(eventInfo.event_name,  eventInfo.event_start_date, eventInfo.event_location)"><img class="profile-picture" ng-src='{{eventInfo.event_logo}}'></img>
-								</a>
-							</div>
-							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-7">
-								<h3>{{eventInfo.event_name}}</h3>
-								<p class="info-paragraph">
-									{{eventInfo.event_description}}
-								</p>
-							</div>
-						</div>
-					</div>
-					<div class="col-xs-12 col-md-12 col-lg-6">
-						<h3>General Info</h3>
-						<dl class="info-paragraph">
-							<div class="row">
-								<div class="col-xs-12 col-md-6 col-lg-6">
-									<dt>
-										Start Date
-									</dt>
-									<dd>
-										{{ eventInfo.event_start_date | date: 'medium'}}
-									</dd>
-									<dt>
-										End Date
-									</dt>
-									<dd>
-										{{ eventInfo.event_end_date | date: 'medium'}}
-									</dd>
-									<dt>
-										Registration Deadline
-									</dt>
-									<dd>
-										{{ eventInfo.event_registration_deadline | date: 'medium'}}
-									</dd>
-								</div>
-								<div class="col-xs-12 col-md-6 col-lg-6">
-									<dt>
-										Location
-									</dt>
-									<dd>
-										{{ eventInfo.event_location }}
-									</dd>
-									<dt ng-if="!eventInfo.event_is_online">
-										Venue
-									</dt>
-									<dd ng-if="!eventInfo.event_is_online">
-										{{ eventInfo.event_venue }}
-									</dd>
-									<dt>
-										Event Type
-									</dt>
-									<dd>
-										{{ eventInfo.event_type }}
-									</dd>
-								</div>
-							</div>
-						</dl>
-					</div>
-
-				</div>
-				<h3 class="info-title">Tournament Details</h3>
 				<!--					Tournament Info-->
 				<div class="row tab-padding-top">
-					<div class="col-lg-10 col-md-10 col-xs-12 col-lg-offset-1 col-md-offset-1">
-						<div class="col-lg-6 col-md-6 col-xs-12">
-							<a class="thumbnail" ng-click="goToGameProfile(tournament.game_name)"> <img ng-src="{{tournament.game_image}}">
-								<h4 align="center">{{tournament.game_name}}</h4> </a>
-						</div>
-						<!--						Tournament Details-->
-						<div class="col-lg-6 col-md-6 col-xs-12">
+					<div class="col-lg-4 col-md-4 col-sm-8 col-xs-12 col-lg-offset-0 col-md-offset-0 col-sm-offset-2">
+						<a class="thumbnail" ng-click="goToGameProfile(tournament.game_name)"> <img ng-src="{{tournament.game_image}}">
+							<h4 align="center">{{tournament.game_name}}</h4> </a>
+					</div>
+					<!--						Tournament Details-->
+					<div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+						<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 							<h3>Tournament Format</h3>
 							<dl class="info-paragraph">
 								<dt>
@@ -117,7 +51,7 @@
 								<dd>
 									{{tournament.tournament_format}}
 								</dd>
-								<div ng-if="groupStageTab">
+								<div ng-if="tournament.tournament_type == 'Two Stage'">
 									<dt>
 										# of competitors per group
 									</dt>
@@ -136,7 +70,7 @@
 										Play Style
 									</dt>
 									<dd>
-										Team Size {{tournament.team_size}}
+										Team (Size {{tournament.team_size}})
 									</dd>
 								</div>
 								<div ng-if="tournament.team_size == 1">
@@ -155,12 +89,9 @@
 								</dd>
 							</dl>
 						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-lg-10 col-md-10 col-xs-12 col-lg-offset-1 col-md-offset-1">
+
 						<!--					Dates-->
-						<div class="col-xs-12 col-md-6 col-lg-6">
+						<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 							<h3>Date<span ng-if="eventInfo.host"> & Price</span></h3>
 							<dl class="info-paragraph">
 								<dt>
@@ -176,7 +107,7 @@
 									{{tournament.tournament_check_in_deadline | date: 'medium'}}
 								</dd>
 								<div ng-if="eventInfo.host">
-									<!--
+									<!-- MONO
 									<dt>
 										Prize Pool
 									</dt>
@@ -199,14 +130,77 @@
 								</div>
 							</dl>
 						</div>
-						<!--					Rules-->
-						<div class="col-xs-12 col-md-6 col-lg-6">
-							<h3>Rules</h3>
-							<p class="info-paragraph">
-								{{ eventInfo.event_rules }}
-							</p>
+					</div>
+				</div>
+				<!--					Rules-->
+				<div class="row">
+					<div class="col-xs-12 col-md-12 col-lg-12">
+						<h3>Rules</h3>
+						<p class="info-paragraph">{{ eventInfo.event_rules }}</p>
+					</div>
+				</div>
+				<!--				Event Info   	  -->
+				<div class="row tab-padding-top">
+					<div class="col-xs-12 col-sm-8 col-md-8 col-lg-6 col-md-offset-2 col-sm-offset-2 col-lg-offset-0">
+						<div class="row">
+							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-5">
+								<a class="thumbnail" ng-click="goToEvent(eventInfo.event_name,  eventInfo.event_start_date, eventInfo.event_location)"><img class="profile-picture" ng-src='{{eventInfo.event_logo}}'></img>
+								</a>
+							</div>
+							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-7">
+								<h3>{{eventInfo.event_name}}</h3>
+								<p class="info-paragraph">{{eventInfo.event_description}}</p>
+							</div>
 						</div>
 					</div>
+					<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+						<h3>General Info</h3>
+						<dl class="info-paragraph">
+							<div class="row">
+								<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+									<dt>
+										Start Date
+									</dt>
+									<dd>
+										{{ eventInfo.event_start_date | date: 'medium'}}
+									</dd>
+									<dt>
+										End Date
+									</dt>
+									<dd>
+										{{ eventInfo.event_end_date | date: 'medium'}}
+									</dd>
+									<dt>
+										Registration Deadline
+									</dt>
+									<dd>
+										{{ eventInfo.event_registration_deadline | date: 'medium'}}
+									</dd>
+								</div>
+								<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+									<dt>
+										Location <span ng-if="eventInfo.event_is_online">(Online)</span>
+									</dt>
+									<dd>
+										{{ eventInfo.event_location }}
+									</dd>
+									<dt>
+										Venue
+									</dt>
+									<dd>
+										{{ eventInfo.event_venue }}
+									</dd>
+									<dt>
+										Event Type
+									</dt>
+									<dd>
+										{{ eventInfo.event_type }}
+									</dd>
+								</div>
+							</div>
+						</dl>
+					</div>
+
 				</div>
 				<!--					Hosted by/ Creator-->
 				<h2 class="info-title">Hosted By</h2>
@@ -251,7 +245,6 @@
 						</button>
 					</div>
 				</div>
-
 			</div>
 			<!--			Sponsors-->
 			<div class="box box-margin" ng-if="sponsors.length">
@@ -281,12 +274,17 @@
 								<div class="row">
 									<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat="competitor in competitors">
 										<li class="ticket-item">
-											<div class="ticket-user">
-												<img ng-src="{{competitor.customer_profile_pic}}" class="user-avatar">
+											<div class="ticket-user" ng-if="competitor.customer_profile_pic" ng-click="goToUser(competitor.customer_username)">
+												<img ng-src="{{ competitor.customer_profile_pic }}" class="user-avatar">
 												<span class="user-name">{{competitor.customer_tag}}</span>
+											</div>
+											<div class="ticket-user" ng-if="competitor.team_name" ng-click="goToTeam(competitor.team_name)">
+												<img ng-src="{{ competitor.team_logo }}" class="user-avatar">
+												<span class="user-name">{{competitor.team_name}}</span>
 											</div>
 										</li>
 									</div>
+									
 								</div>
 							</ul>
 						</div>
@@ -308,7 +306,7 @@
 							<select class="form-control" ng-model="selectedGroup" ng-options="'Group '+item.group_number for item in tournamentInfo.groupStage.groups" ng-change="resetGroup(selectedGroup)"></select>
 							<br/>
 							<label>Rounds: </label>
-							<select class="form-control" ng-model="selectedGroupRound" ng-options="'Round '+item.round_number for item in selectedGroup.rounds"></select>
+							<select class="form-control" ng-model="$parent.selectedGroupRound" ng-options="'Round '+item.round_number for item in selectedGroup.rounds"></select>
 						</div>
 						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-10 col-md-offset-0 col-lg-offset-1">
 							<h3 class="info-title">Round {{selectedGroupRound.round_number}} Details</h3>
@@ -333,12 +331,13 @@
 						<span class="input-group-btn">
 									<button class="btn btn-default disabled" type="button" >
 										<i class="fa fa-search"></i>
-									</button> </span>
+									</button> 
+						</span>
 					</div>
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-4" ng-repeat="match in selectedGroup.rounds[selectedGroupRound.round_number-1].matches  | filter:groupRoundQuery">
+				<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" ng-repeat="match in selectedGroup.rounds[selectedGroupRound.round_number-1].matches  | filter:groupRoundQuery">
 
 					<div class="box box-margin cursor" ng-click="getTournamentMatch(selectedRound.round_number,match.match_number,'Group')">
 						<h4 class="modal-title" align="center">Match {{match.match_number}}</h4>
@@ -448,7 +447,7 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-4" ng-repeat="match in bracketType[selectedRound.round_number-1].matches  | filter:roundQuery">
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6" ng-repeat="match in bracketType[selectedRound.round_number-1].matches  | filter:roundQuery">
 					<div class="box box-margin cursor" ng-click="getTournamentMatch(selectedRound.round_number,match.match_number,bracket)">
 						<h4 class="modal-title" align="center">Match {{match.match_number}}</h4>
 						<p align="center">Station {{match.station_number}}
@@ -655,12 +654,10 @@
 					</div>
 					<h4 style="text-align:center" ng-class="{'text-danger': !sizeCorrect}">{{currentSize}}/{{tournament.team_size}} members selected</h4>
 				</form>
-				<hr>
-				<div class="row">
+				<div class="row" ng-if="eventInfo.host">
+					<hr>
 					<div class="col-md-6 col-md-offset-3">
 						<p class="info-paragraph" ng-if="eventInfo.host">Team Sign Up <span class="pull-right">{{tournament.competitor_fee | currency}}</span>
-						</p>
-						<p class="info-paragraph" ng-if="!eventInfo.host">Are your sure you want to sign up {{teams[selected.team].team_name}} to {{tournament.tournament_name}}?
 						</p>
 					</div>
 				</div>

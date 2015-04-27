@@ -26,7 +26,7 @@
 		<div class="widget-box box-margin">
 			<div class="widget-header bordered-bottom bordered-themesecondary">
 				<h3 class="widget-title themesecondary">Standings</h3>
-				<a class="widget-more" ui-sref="app.teamStandings">
+				<a class="widget-more" ui-sref="app.teamStandings({teamName: teamProfile.team_name})" ng-if="standings.lenght>5">
 						See More<i class="fa fa-arrow-circle-o-right panel-padding"></i>
 					</a>
 			</div>
@@ -34,7 +34,7 @@
 			<div class="widget-body">
 				<div class="widget-main no-padding">
 					<div class="tickets-container">
-						<table class="table table-striped table-hover">
+						<table class="table table-striped table-hover" ng-if="standings.length>0">
 							<thead>
 								<tr>
 									<th>Placing</th>
@@ -44,26 +44,18 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr class="cursor" ui-sref="app.tournament">
-									<td>5th</td>
-									<td>Apex 2015</td>
-									<td>Halo 4</td>
-									<td>March 1, 2015</td>
-								</tr>
-								<tr class="cursor" ui-sref="app.tournament">
-									<td>5th</td>
-									<td>Apex 2015</td>
-									<td>Halo 4</td>
-									<td>March 1, 2015</td>
-								</tr>
-								<tr class="cursor" ui-sref="app.tournament">
-									<td>5th</td>
-									<td>Apex 2015</td>
-									<td>Halo 4</td>
-									<td>March 1, 2015</td>
+								<tr class="cursor" ng-click="goToTournament(standing.event_name, standing.event_start_date, standing.event_location, standing.tournament_name)" ng-repeat="standing in standings | limitTo:5">
+									<td>{{standing.standing | ordinal}}</td>
+									<td>{{standing.event_name}}</td>
+									<td>{{standing.tournament_name}}</td>
+									<td>{{standing.event_start_date | date:'longDate'}}</td>
 								</tr>
 							</tbody>
 						</table>
+						<div style="text-align:center" ng-if="!standings.length">
+							<i class="fa fa-frown-o fa-3x"></i>
+							<h3 class="info-paragraph">{{teamProfile.team_name}} has not participated in any tournament</h3>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -72,8 +64,8 @@
 	</div>
 </div>
 
-<!-- Owners widget -->
-<div class="widget-box">
+<!-- Member widget -->
+<div class="widget-box box-margin">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Members</h3>
 	</div>
@@ -97,4 +89,4 @@
 		</div>
 	</div>
 </div>
-<!-- Owners widget -->
+<!-- Member widget -->

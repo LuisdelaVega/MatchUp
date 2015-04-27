@@ -1,50 +1,60 @@
-<div class="row">
-	<div class="col-xs-12 col-md-10" ng-if="isHosted">
-		<div class="list-group">
-			<a  ui-sref="app.editEvent({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location})" class="list-group-item">
-				<h4 class="list-group-item-heading">Edit Event</h4>
-				<p class="list-group-item-text">Edit general information of the event like rules, fees,and sponsors, etc.</p>
-			</a>
-			<a ui-sref="app.tournamentList({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location})" class="list-group-item">
-				<h4 class="list-group-item-heading">Tournaments</h4>
-				<p class="list-group-item-text">View, add, delete, and edit tournaments in the event.</p>
-			</a>
-			<a ui-sref="app.registrations({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location})" class="list-group-item">
-				<h4 class="list-group-item-heading">Registrations</h4>
-				<p class="list-group-item-text">Check in spectators and competitors.</p>
-			</a>
-			<a ui-sref="app.stationAssignment({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location})" class="list-group-item ">
-				<h4 class="list-group-item-heading">Station</h4>
-				<p class="list-group-item-text">Manage station across the event.</p>
-			</a>
-			<a ui-sref="app.seeding({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location})" class="list-group-item ">
-				<h4 class="list-group-item-heading">Seeding and Rounds</h4>
-				<p class="list-group-item-text">Arrange seeds for each tournament and create the bracket. Assign dates to the round of the tournament.</p>
-			</a>
-			<a ui-sref="app.reportList({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location})" class="list-group-item ">
-				<h4 class="list-group-item-heading">Reports</h4>
-				<p class="list-group-item-text">See all reports from each tournaments.</p>
-			</a>
+<div ng-if="event.is_organizer">
+	<div class="row">
+		<div class="col-xs-12 col-md-10" ng-if="isHosted">
+			<div class="list-group">
+				<a ui-sref="app.editEvent({eventName: event.event_name , eventDate: event.event_start_date, eventLocation: event.event_location})" class="list-group-item">
+					<h4 class="list-group-item-heading">Edit Event</h4>
+					<p class="list-group-item-text">Edit general information of the event like rules, fees,and sponsors, etc.</p>
+				</a>
+				<a ui-sref="app.tournamentList({eventName: event.event_name , eventDate: event.event_start_date, eventLocation: event.event_location})" class="list-group-item">
+					<h4 class="list-group-item-heading">Tournaments</h4>
+					<p class="list-group-item-text">View, add, delete, and edit tournaments in the event.</p>
+				</a>
+				<a ui-sref="app.registrations({eventName: event.event_name , eventDate: event.event_start_date, eventLocation: event.event_location})" class="list-group-item">
+					<h4 class="list-group-item-heading">Registrations</h4>
+					<p class="list-group-item-text">Check in spectators and competitors.</p>
+				</a>
+				<a ui-sref="app.stationAssignment({eventName: event.event_name , eventDate: event.event_start_date, eventLocation: event.event_location})" class="list-group-item ">
+					<h4 class="list-group-item-heading">Station</h4>
+					<p class="list-group-item-text">Manage station across the event.</p>
+				</a>
+				<a ui-sref="app.seeding({eventName: event.event_name , eventDate: event.event_start_date, eventLocation: event.event_location})" class="list-group-item ">
+					<h4 class="list-group-item-heading">Seeding and Rounds</h4>
+					<p class="list-group-item-text">Arrange seeds for each tournament and create the bracket. Assign dates to the round of the tournament.</p>
+				</a>
+				<a ui-sref="app.reportList({eventName: event.event_name , eventDate: event.event_start_date, eventLocation: event.event_location})" class="list-group-item ">
+					<h4 class="list-group-item-heading">Reports</h4>
+					<p class="list-group-item-text">See all reports from each tournaments.</p>
+				</a>
+			</div>
 		</div>
-	</div>
-    
-    	<div class="col-xs-12 col-md-10" ng-if="!isHosted">
-		<div class="list-group">
-			<a ui-sref="app.editEvent({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location})" class="list-group-item">
-				<h4 class="list-group-item-heading">Edit Event</h4>
-				<p class="list-group-item-text">Edit general information of the event like rules, etc.</p>
-			</a>
-			<a ui-sref="app.editTournament({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location, tournamentName: tournament})" class="list-group-item">
-				<h4 class="list-group-item-heading">Edit Tournament</h4>
-				<p class="list-group-item-text">Edit the tournament "{{tournament}}"</p>
-			</a>
- 
-			<a ui-sref="app.seeding" class="list-group-item ">
-				<h4 class="list-group-item-heading">Seeding and Rounds</h4>
-				<p class="list-group-item-text">Arrange seeds for each tournament and create the bracket. Assign dates to the round of the tournament.</p>
-			</a>
- 
+
+		<div class="col-xs-12 col-md-10" ng-if="!isHosted">
+			<div class="list-group">
+				<a ui-sref="app.editEvent({eventName: event.event_name , eventDate: event.event_start_date, eventLocation: event.event_location})" class="list-group-item">
+					<h4 class="list-group-item-heading">Edit Event</h4>
+					<p class="list-group-item-text">Edit general information of the event like rules, etc.</p>
+				</a>
+				<a ui-sref="app.editTournament({eventName: event.event_name , eventDate: event.event_start_date, eventLocation: event.event_location, tournamentName: tournament})" class="list-group-item">
+					<h4 class="list-group-item-heading">Edit Tournament</h4>
+					<p class="list-group-item-text">Edit the tournament "{{tournament}}"</p>
+				</a>
+
+				<a ui-sref="app.seeding" class="list-group-item ">
+					<h4 class="list-group-item-heading">Seeding and Rounds</h4>
+					<p class="list-group-item-text">Arrange seeds for each tournament and create the bracket. Assign dates to the round of the tournament.</p>
+				</a>
+
+			</div>
 		</div>
+
 	</div>
-  
+</div>
+
+<div ng-if="!event.is_organizer && event.host">
+	<h1>You are not a member of this organization and therefore cannot manage this event!</h1>
+</div>
+
+<div ng-if="!event.is_organizer && !event.host">
+	<h1>You are not the creator of this event and therefore cannot manage it!</h1>
 </div>

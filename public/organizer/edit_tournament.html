@@ -10,13 +10,11 @@
 						</div>
 					</div>
 					<div class="col-xs-12 col-md-6 col-lg-6">
-						<div class="form-group has-feedback">
-							<label class="control-label">Game</label>
- 							<input type="text" class="form-control" ng-model="tournament.game_name" ng-change="searchGame(tournament.game_name)"/>
-							<i class="form-control-feedback glyphicon glyphicon-search"></i>
- 
-                        
-                        </div>
+						<label>Game: </label>
+						<div class="form-group">
+							<ac-select ac-model="tournament.game" ac-options="game.game_name for game in games" ac-settings="{ itemHeight: '32' }">
+								</select>
+						</div>
 					</div>
 				</div>
 				<div class="row">

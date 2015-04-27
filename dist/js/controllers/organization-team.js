@@ -112,9 +112,26 @@ function($scope, $http, $state, $stateParams, $rootScope) {
 	$http.get($rootScope.baseURL + '/matchup/teams/' + $stateParams.teamName).success(function(data) {
 		$scope.teamProfile = data;
 	});
+	
+	// Standings
+	$http.get($rootScope.baseURL + '/matchup/teams/' + $stateParams.teamName + '/standings').success(function(data) {
+		$scope.standings = data;
+		console.log(data);
+	});
 
 	//get all users that belong to an organization
 	$http.get($rootScope.baseURL + '/matchup/teams/' + $stateParams.teamName + '/members').success(function(data) {
 		$scope.members = data;
 	});
 }]);
+
+myApp.controller('teamStandingsController', function($scope, $state, $http, $stateParams, sharedDataService, $q, $rootScope) {
+
+	$scope.team = $stateParams.teamName;
+
+	// Standings
+	$http.get($rootScope.baseURL + '/matchup/teams/' + $scope.team + '/standings').success(function(data) {
+		$scope.standings = data;
+		console.log(data);
+	});
+});

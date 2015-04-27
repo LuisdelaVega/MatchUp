@@ -76,7 +76,7 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 			return;
 		}
 		// Prompt the user to fill location and venue if the event is not online
-		if (!$scope.event.is_online && (!$scope.event.location || !$scope.event.venue)) {
+		if (!$scope.event.location || !$scope.event.venue) {
 			alert("Please fill out event location and venue")
 			return;
 		}
@@ -107,6 +107,16 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 
 	// Creates a fee and clears input in addFeeModal
 	$scope.createFee = function() {
+		if(!$scope.fee.name || !$scope.fee.available || !$scope.fee.amount || !$scope.fee.description){
+			alert("Please fill out all fields");
+			return;
+		}
+		for(var i = 0; i < $scope.fees; i++){
+			if($scope.fees[i].name == $scope.fee.name){
+				alert("Fee name can not be repeated");
+				return;
+			}
+		}
 		// Create fee object to be added to the fees array
 		var fee = {
 			"name" : $scope.fee.name,
@@ -214,10 +224,6 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 		else
 			$scope.tournament.scoring = "Match";
 
-		// Check if event is online to default location and venue to online
-		if ($scope.event.is_online)
-			$scope.event.location = $scope.event.venue = "Online";
-
 		// Tournament object
 		// Some values are to default. This values are later change if the tournament is hosted or regular
 		var tournament = {
@@ -306,10 +312,12 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 			return;
 		}
 		// Check null value
-		if (!isNaN($scope.event.deduction_fee) && $scope.event.deduction_fee <= 0 && $scope.event.deduction_fee >= 100) {
+		if (!isNaN($scope.event.deduction_fee) && parseFloat($scope.event.deduction_fee) <= 0 && parseFloat($scope.event.deduction_fee) >= 100) {
 			alert("Please specify a spectator deduction fee");
 			return;
 		}
+		
+		$scope.event.deduction_fee = parseFloat($scope.event.deduction_fee); 
 
 		var selectedSponsors = [];
 

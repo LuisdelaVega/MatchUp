@@ -387,6 +387,8 @@ function ($scope, $http, $state, $stateParams, $window, $rootScope) {
 			$scope.meetup.customer_username = $stateParams.customerUsername;
 			$scope.eventInfo.event_start_date = $stateParams.eventDate;
 			$scope.eventInfo.event_location = $stateParams.eventLocation;
+			$scope.meetup.meetup_start_date = $stateParams.meetupDate;
+			$scope.meetup.meetup_location = $stateParams.meetupLocation;
 
 		});
 
@@ -402,48 +404,4 @@ function ($scope, $http, $state, $stateParams, $window, $rootScope) {
 			});
 
 		};
-	
 }]);
-
-myApp.controller('eventSettingsController', function ($scope, $state, $http, $stateParams, sharedDataService, $q, $rootScope) {
-	$q.all([
-	// Get Event Info
-	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + ''),
-	// Tournaments
-	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation)]).then(function (results) {
-
-		// Get Events
-		$scope.event = results[0].data;
-		// Get Tournaments
-		$scope.tournamentsInfo = results[1].data;
-		if ($scope.event.host == null)
-			$scope.isHosted = false;
-		else
-			$scope.isHosted = true;
-
-		console.log($scope.event);
-
-		if ($scope.isHosted)
-			hostedEventSettings($scope.event, $scope.tournamentsInfo);
-		else
-			regularEventSettings($scope.event, $scope.tournamentsInfo);
-
-	}, function (err) {
-		console.log(err);
-		console.log("Oh oh");
-	});
-
-	var hostedEventSettings = function (event, tournamentsInfo) {
-		//stuff will go here
-		$scope.eventInfo = event;
-		$scope.tournaments = tournamentsInfo[0].tournament_name;
-
-	};
-	var regularEventSettings = function (event, tournamentsInfo) {
-		//console.log(tournamentsInfo[0]);
-		$scope.eventInfo = event;
-		$scope.tournament = tournamentsInfo[0].tournament_name;
-
-	};
-
-});

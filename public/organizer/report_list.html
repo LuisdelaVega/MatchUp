@@ -1,4 +1,6 @@
-<h1>Reports</h1>
+<div class="page-header">
+	<h1>Reports</h1>
+</div>
 <div class="row">
 	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding" ng-repeat="report in reports">
 		<div class="box cursor" ng-click="reportModal($index)">
@@ -12,14 +14,10 @@
 							<h4>{{report.report_type}} Report</h4>
 							<p>
 								{{report.tournament_name}}
-								<br>
-								{{report.round_of}}'s Round {{report.round_number}}
-								<br>
-								Match {{report.match_number}}&nbsp; Set {{report.set_seq}}
-								<br>
-								Station Number {{report.station_number}}
-								<br>
-								{{report.report_date | date:'medium'}}
+								<br> {{report.round_of}}'s Round {{report.round_number}}
+								<br> Match {{report.match_number}}&nbsp; Set {{report.set_seq}}
+								<br> Station Number {{report.station_number}}
+								<br> {{report.report_date | date:'medium'}}
 							</p>
 						</div>
 						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
@@ -55,10 +53,8 @@
 				<h4 class="modal-title">{{reports[index].report_type}} Report</h4>
 				<p>
 					Station {{reports[index].station_number}}
-					<br>
-					Round {{reports[index].round_number}}
-					<br>
-					{{reports[index].report_date  | date:'medium'}}
+					<br> Round {{reports[index].round_number}}
+					<br> {{reports[index].report_date | date:'medium'}}
 				</p>
 				<div ng-switch on="reports[index].report_status">
 					<div ng-switch-when="Resolved">
@@ -73,11 +69,15 @@
 				</div>
 			</div>
 			<div class="modal-body">
-				<img style="width: 100%" ng-src="{{reports[index].report_image}}">
+				<div class="row">
+					<div class="col-md-8 col-md-offset-2">
+						<a class="thumbnail" ng-href="{{reports[index].report_image}}"> <img ng-src="{{reports[index].report_image}}">
+							</a>
+					</div>
+				</div>
 				<p>
 					<br />
-					<h4>Description: </h4>
-					{{reports[index].report_description}}
+					<h4>Description: </h4> {{reports[index].report_description}}
 				</p>
 			</div>
 			<div class="modal-footer">
@@ -96,14 +96,14 @@
 					</div>
 				</div>
 				<div class="col-xs-12 col-md-6 col-lg-6" ng-if="reports[index].report_status == 'Received'">
-					<div class="row" align="center" >
+					<div class="row" align="center">
 						<button type="button" style="width: 80%" class="btn btn-primary" data-dismiss="modal" ng-click="resolve()">
 							Attend Report
 						</button>
 					</div>
 				</div>
 				<div class="col-xs-12 col-md-6 col-lg-6" ng-if="reports[index].report_status == 'Attending'">
-					<div class="row" align="center" >
+					<div class="row" align="center">
 						<button type="button" style="width: 80%" class="btn btn-primary" data-dismiss="modal" ng-click="resolve()">
 							Resolve
 						</button>

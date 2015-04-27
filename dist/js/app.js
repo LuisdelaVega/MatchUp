@@ -244,8 +244,9 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			controller: "teamProfileController"
 		})
 		.state('app.teamStandings', {
-			url: "/teamStandings",
-			templateUrl: "team/team_standings.html"
+			url: "/team/:teamName/standings",
+			templateUrl: "team/team_standings.html",
+			controller: "teamStandingsController"
 		})
 		.state('app.editTeam', {
 			url: "/team/:teamName/edit",

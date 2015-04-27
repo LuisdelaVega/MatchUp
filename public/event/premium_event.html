@@ -67,15 +67,15 @@
 								</div>
 								<div class="col-xs-12 col-md-6 col-lg-6">
 									<dt>
-										Location
+										Location <span ng-if="eventInfo.event_is_online">(Online)</span>
 									</dt>
 									<dd>
 										{{ eventInfo.event_location }}
 									</dd>
-									<dt ng-if="!eventInfo.event_is_online">
+									<dt>
 										Venue
 									</dt>
-									<dd ng-if="!eventInfo.event_is_online">
+									<dd>
 										{{ eventInfo.event_venue }}
 									</dd>
 									<dt>
@@ -90,7 +90,7 @@
 					</div>
 					<div class="col-xs-12 col-md-12 col-lg-6">
 						<h3>Rules</h3>
-						<p class="info-paragraph angular-space-line">{{ eventInfo.event_rules }}</p>
+						<p class="info-paragraph">{{ eventInfo.event_rules }}</p>
 					</div>
 					<div class="col-xs-12 col-md-12 col-lg-6">
 						<h3>Hosted by</h3>
@@ -269,12 +269,10 @@
 										<li class="ticket-item">
 											<div class="ticket-user" ng-if="competitor.customer_profile_pic" ng-click="goToUser(competitor.customer_username)">
 												<img ng-src="{{ competitor.customer_profile_pic }}" class="user-avatar">
-												<!-- <img src="http://neptunolabs.com/images/badillo.jpg" class="user-avatar">-->
 												<span class="user-name">{{competitor.customer_tag}}</span>
 											</div>
 											<div class="ticket-user" ng-if="competitor.team_name" ng-click="goToTeam(competitor.team_name)">
 												<img ng-src="{{ competitor.team_logo }}" class="user-avatar">
-												<!-- <img src="http://neptunolabs.com/images/badillo.jpg" class="user-avatar">-->
 												<span class="user-name">{{competitor.team_name}}</span>
 											</div>
 										</li>
@@ -306,7 +304,7 @@
 							<div class="box box-margin">
 								<label>
 									<input type="radio" name="optionsRadios" ng-model="selected.name" ng-value="fee.spec_fee_name" ng-disabled="!(fee.spec_fee_amount_available - fee.sold)">
-									<span class="lead">{{fee.spec_fee_name}} ({{fee.spec_fee_amount | currency}})</span> </label>
+									<span class="lead">{{fee.spec_fee_name}} ({{fee.spec_fee_amount | currency}}) <span class="text-danger" ng-if="!(fee.spec_fee_amount_available - fee.sold)">Sold Out!</span></span> </label>
 								<p>{{fee.spec_fee_description}}
 									<br><small>Available: {{fee.spec_fee_amount_available - fee.sold}}/{{fee.spec_fee_amount_available}}</small>
 								</p>
