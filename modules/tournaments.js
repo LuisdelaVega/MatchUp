@@ -2459,7 +2459,7 @@ var registerForTournament = function(req, res, pg, conString, log) {
 								res : res
 							}, 'done response');
 						} else {
-							if (tournament.team_size > 1) {
+							if (parseInt(tournament.team_size) > 1) {
 								if (!req.body.team || !req.body.players || req.body.players.length != parseInt(tournament.team_size)) {
 									client.query("ROLLBACK");
 									done();
