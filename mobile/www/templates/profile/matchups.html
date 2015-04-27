@@ -1,17 +1,7 @@
-<ion-view view-title="My Matchups">
+<ion-view view-title="Matchups">
     <ion-content>
-        <!--
-<div class="list list-inset">
-<label class="item item-input">
-<i class="icon ion-search placeholder-icon"></i>
-<input type="text" placeholder="Search">
-</label>
-</div>
--->
-
-
         <div class="list list-inset" ng-repeat="matchup in matchups">
-            <a class="item item-avatar" ng-click="goToPastMatchup(matchup)">
+            <a class="item item-avatar">
                 <img ng-if="matchup.team_size == 1" ng-src="{{otherUser[$index].customer_profile_pic}}">
                 <img ng-if="matchup.team_size > 1" ng-src="{{otherUser[$index].team_logo}}">
                 <div ng-if="matchup.team_size == 1">
@@ -24,7 +14,6 @@
                     <h2 style="color: rgb(255, 102, 102);" ng-if="loggedInUser[$index].score < otherUser[$index].score">LOSE vs. {{otherUser[$index].team_name}}</h2>
                     <p>Round {{matchup.round_number}}: {{matchup.details[1].score}} - {{matchup.details[0].score}} @ {{matchup.event_name}}</p>
                 </div>
-                
             </a>
         </div>
 

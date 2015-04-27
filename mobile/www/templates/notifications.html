@@ -2,18 +2,11 @@
     <ion-content>
 
         <div class="list">
-
-            <!--
-<a class="item item-avatar" ng-click="goToMatchupOngoing()">
-<img ng-src="{{ matchup.details[0].customer_profile_pic }}">
-<h2>TEST CLICK HERE</h2>
-<p>STATIC DATA TEST SCORE REPORTING</p>
-</a>
--->
-
             <a class="item item-avatar" ng-repeat="matchup in matchups" ng-click="goToMatchupOngoing(matchup)">
-                <img ng-src="{{ matchup.details[0].customer_profile_pic }}">
-                <h2>Scheduled to play against {{matchup.details[0].customer_tag}}</h2>
+                <img ng-if="matchup.team_size == 1" ng-src="{{ matchup.details[0].customer_profile_pic }}">
+                <img ng-if="matchup.team_size > 1" ng-src="{{matchup.details[0].team_logo }}">
+                <h2 ng-if="matchup.team_size == 1">Scheduled to play against {{matchup.details[0].customer_tag}}</h2>
+                <h2 ng-if="matchup.team_size > 1">Scheduled to play against {{matchup.details[0].team_name}}</h2>
                 <p ng-if="matchup.station_number != null">Station: {{ matchup.station_number }}</p>
             </a>          
         </div>

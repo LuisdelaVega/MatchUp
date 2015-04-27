@@ -1,6 +1,6 @@
 var myApp = angular.module('regular-events',[]);
 
-myApp.controller('REController', ['$scope', '$http', '$ionicPopup', function ($scope, $http, $ionicPopup) {
+myApp.controller('REController', ['$scope', '$http', '$ionicPopup', '$stateParams', '$window', 'sharedDataService', function ($scope, $http, $ionicPopup, $stateParams, $window, sharedDataService) {
 
     //Create popup when user clicks the sign up button
     $scope.showConfirm = function () {
@@ -10,9 +10,26 @@ myApp.controller('REController', ['$scope', '$http', '$ionicPopup', function ($s
         });
         confirmPopup.then(function (res) {
             if (res) {
-                console.log('Yes');
+
+                var selectedTournament = sharedDataService.get(); //Get info from sharedDataService
+
+                var config = {
+                    headers: {
+                        'Authorization': "Bearer "+ $window.sessionStorage.token
+                    }
+                };
+
+                $http.post('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+selectedTournament+'/register?date='+$stateParams.date+'&location='+$stateParams.location+'', { }, config).success(function(data, status, headers, config) {
+
+                    console.log("entered tournament");
+
+                }).
+                error(function(data, status, headers, config) {
+                    console.log("error in regularEventController");
+                }); 
+
             } else {
-                console.log('No');
+
             }
         });
     };
@@ -45,14 +62,13 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
         success(function(data, status, headers, config) {
 
             $scope.eventInfo = angular.fromJson(data);
-            var startDate = new Date($scope.eventInfo.event_start_date);
+            var startDate = new Date($scope.eventInfo.event_registration_deadline);
 
             //isOngoing is true if startdate is equal to or greater than the current start date
             if(startDate > now_utc)
                 $scope.isOngoing = false;
             else
                 $scope.isOngoing = true;
-
 
             //If user came from a premium event sharedDataService is used to find what tournament is to be displayed.
             if($scope.eventInfo.host != null){
@@ -71,7 +87,6 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
                     //Get tournament rounds 
                     $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+$scope.currentTournament.tournament_name+'/rounds?date='+$stateParams.date+'&location='+$stateParams.location+'', config).success(function(data, status, headers, config) {
 
-                        console.log('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+$scope.currentTournament.tournament_name+'/rounds?date='+$stateParams.date+'&location='+$stateParams.location+'');
                         $scope.roundInfo = data;
 
                         $scope.selectedRound = $scope.roundInfo.finalStage.winnerRounds[0];
@@ -80,8 +95,6 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
                             $scope.selectedType.type = 'Winner\'s Bracket'; 
                         else if($scope.currentTournament.tournament_format == "Single Elimination")
                             $scope.selectedType.type = 'Bracket'; 
-
-
 
                     }).
                     error(function(data, status, headers, config) {
@@ -108,9 +121,14 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
 
                     //Get tournament rounds 
                     $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+$scope.currentTournament.tournament_name+'/rounds?date='+$stateParams.date+'&location='+$stateParams.location+'', config).success(function(data, status, headers, config) {
-                        console.log('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+$scope.currentTournament.tournament_name+'/rounds?date='+$stateParams.date+'&location='+$stateParams.location+'');
+
                         $scope.roundInfo = data;  
                         $scope.selectedRound = $scope.roundInfo.finalStage.winnerRounds[0];
+
+                        if($scope.currentTournament.tournament_format == "Double Elimination")
+                            $scope.selectedType.type = 'Winner\'s Bracket'; 
+                        else if($scope.currentTournament.tournament_format == "Single Elimination")
+                            $scope.selectedType.type = 'Bracket'; 
 
                     }).
                     error(function(data, status, headers, config) {
@@ -129,6 +147,101 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
         });
     });
 
+}]);
 
+myApp.controller('teamSignUpController', ['$scope', '$http', '$ionicPopup', '$stateParams', '$window', 'sharedDataService', function ($scope, $http, $ionicPopup, $stateParams, $window, sharedDataService) {
+
+    $scope.$on('$ionicView.enter', function () {
+
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+        $scope.checkedMembers = [ ];
+
+        $scope.selectedTeam = [ ];
+
+        $http.get('http://136.145.116.232/matchup/profile/'+$window.sessionStorage.username+'/teams', config).success(function(data) {
+
+            $scope.myTeams = data;
+
+            $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+$stateParams.tournament+'?date='+$stateParams.date+'&location='+$stateParams.location+'', config).success(function(data) {
+
+                $scope.tournamentInfo = data;
+
+            }).
+            error(function(data, status, headers, config) {
+                console.log("error in regularEventController");
+            });
+
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in regularEventController");
+        });
+
+    });
+
+    $scope.updateTeamMembers = function (teamName) {
+
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+        $http.get('http://136.145.116.232/matchup/teams/'+teamName+'/members', config).success(function(data) {
+
+            $scope.teamMembers = data;
+
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in regularEventController");
+        });
+
+    };
+
+    $scope.countCheckedMembers = function (teamMembers) {
+
+        $scope.checkedMembers = [ ];
+
+        angular.forEach(teamMembers, function(member){
+            if(member.checkbox == true){
+
+                $scope.checkedMembers.push(member.customer_username);
+
+            }
+        });     
+    };
+
+    $scope.teamSignUp = function () {
+
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+        
+        console.log($scope.checkedMembers);
+        console.log('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+$stateParams.tournament+'/register?date='+$stateParams.date+'&location='+$stateParams.location+'');
+        $http.post('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+$stateParams.tournament+'/register?date='+$stateParams.date+'&location='+$stateParams.location+'', {
+            
+            "team": $stateParams.tournament,
+            "players": $scope.checkedMembers
+            
+        }, config).success(function(data) {
+            
+            console.log("signed up team");
+
+
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in regularEventController");
+        });
+
+
+
+    };
 
 }]);

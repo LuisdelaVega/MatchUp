@@ -73,11 +73,20 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
         }
     })
         .state('app.profile.standings', {
-        url: "/standings/:username",
+        url: "/standings",
         views: {
             'profile-standings-tab': {
                 templateUrl: "templates/profile/profile-standings.html",
                 controller: "profileStandingsController"
+            }
+        }
+    })
+        .state('app.profile.matchups', {
+        url: "/matchups",
+        views: {
+            'profile-matchups-tab': {
+                templateUrl: "templates/profile/matchups.html",
+                controller: "profileMatchupsController"
             }
         }
     })
@@ -95,7 +104,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
 
     })
         .state('app.profile.events', {
-        url: "/events/:username",
+        url: "/events",
         views: {
             'profile-events-tab': {
                 templateUrl: "templates/profile/profile-events.html",               
@@ -343,7 +352,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     })
     // Sigun Up Event Premium
         .state('app.premiumsignup', {
-        url: "/premiumsignup",
+        url: "/premiumsignup/:eventname/:date/:location",
         templateUrl: "templates/premiumEvent/signup.html",
         controller: "premiumSignUpController"
 
@@ -380,8 +389,9 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     // Team Sign Up
     //================================================================================
         .state('app.teamsignup', {
-        url: "/teamsignup",
-        templateUrl: "templates/regularevent/team-sign-up.html"
+        url: "/teamsignup/:eventname/:date/:location/:tournament",
+        templateUrl: "templates/regularevent/team-sign-up.html",
+        controller: "teamSignUpController"
     })
     //================================================================================
     // Notifications

@@ -42,19 +42,23 @@
                     <div class="item item-divider">
                         Report Score
                     </div>
-                    <label class="item item-radio">
+                    <label class="item item-radio"  ng-if="matchInfo.score_type == 'Match'">
                         <input type="radio" name="group" ng-model="scoreInput.score" value="Win">
                         <div class="item-content">
                             Win
                         </div>
                         <i class="radio-icon ion-checkmark"></i>
                     </label>
-                    <label class="item item-radio">
+                    <label class="item item-radio" ng-if="matchInfo.score_type == 'Match'">
                         <input type="radio" name="group" ng-model="scoreInput.score" value="Lose">
                         <div class="item-content">
                             Lose
                         </div>
                         <i class="radio-icon ion-checkmark"></i>
+                    </label>
+                    <label class="item item-input" ng-if="!matchCompleted && matchInfo.score_type == 'Points'">
+                        <span class="input-label" >Score</span>
+                        <input type="number" ng-model="scoreInput.score">
                     </label>
                 </div>
                 <div class="row">
@@ -67,6 +71,9 @@
                 </div>
             </div>
         </div>
+
+
+
         <div class="card" ng-if="matchCompleted">
             <div class="item item-text-wrap">
                 Match has concluded.

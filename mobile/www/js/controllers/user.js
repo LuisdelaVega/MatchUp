@@ -1,6 +1,6 @@
 var myApp = angular.module('user',[]);
 
-myApp.controller('ProfileController', function ($scope, $ionicPopover, $state, sharedDataService, $ionicPopup) {
+myApp.controller('ProfileController', function ($scope, $ionicPopover, $state, sharedDataService, $ionicPopup, $stateParams) {
     //Create popover event that allows further navigation to profile owner
     $ionicPopover.fromTemplateUrl('templates/profile/profile-popover.html', {
         scope: $scope,
@@ -20,20 +20,23 @@ myApp.controller('ProfileController', function ($scope, $ionicPopover, $state, s
         $state.go("app.editprofile");
     }
 
-    $scope.customerUsername = sharedDataService.get();
+    $scope.$on('$ionicView.enter', function () {
 
+        $scope.customerUsername = sharedDataService.get();
+
+    });
 });
 
 myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$stateParams', '$ionicPopup', '$timeout', '$state', function ($scope, $http, $window, $stateParams, $ionicPopup, $timeout, $state) {
 
-    var config = {
-        headers: {
-            'Authorization': "Bearer "+ $window.sessionStorage.token
-        }
-    };
-
     //Make server calls everytime upon entering profile. ENsures changes are visual when changing back to user profile.
     $scope.$on('$ionicView.enter', function () {
+
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
 
         //Synchronously fetch profile info from server
         //Get profile information of specified user such as: tag, profile picture and cover photo. 
@@ -49,8 +52,34 @@ myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$st
 
                 //Get organizations the user belongs to
                 $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/organizations', config).success(function (data) {
-
                     $scope.organizations = angular.fromJson(data);
+
+                    $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/matchups?state=Past', config).success(function (data){
+
+                        $scope.matchups = data;
+
+                        $scope.win = 0;
+                        $scope.lose = 0;
+
+                        angular.forEach($scope.matchups, function(matchup){
+
+                            if(matchup.details[0].customer_username == $stateParams.username){
+                                if(matchup.details[0].score > matchup.details[1].score)
+                                    $scope.win++;
+                                else
+                                    $scope.lose++;
+                            }
+                            else{
+                                if(matchup.details[1].score > matchup.details[0].score)
+                                    $scope.win++;
+                                else
+                                    $scope.lose++;
+                            }
+                        });
+
+                    }).error(function (err) {
+                        console.log(err);
+                    });
 
                 }).error(function (err) {
                     console.log(err);
@@ -77,6 +106,11 @@ myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$st
                     text: '<b>Yes</b>',
                     type: 'button-positive',
                     onTap: function(e) {
+                        var config = {
+                            headers: {
+                                'Authorization': "Bearer "+ $window.sessionStorage.token
+                            }
+                        };
                         //Call to subscribe to the user
                         $http.post('http://136.145.116.232/matchup/profile/'+username+'', {}, config).success(function (data) {
                             console.log('http://136.145.116.232/matchup/profile/'+username+'');
@@ -126,11 +160,11 @@ myApp.controller('profileStandingsController', ['$scope', '$http', '$stateParams
             $http.get('http://136.145.116.232/matchup/profile/'+customerUsername+'/standings', config).success(function (data){
 
                 $scope.standings = data;
-                
+
                 angular.forEach($scope.standings, function(event){
 
                     $http.get('http://136.145.116.232/matchup/events/'+event.event_name+'?date='+event.event_start_date+'&location='+event.event_location+'', config).success(function (data){
-                        
+
                         event.event_logo = data.event_logo;
 
                     }).error(function (err) {
@@ -138,7 +172,7 @@ myApp.controller('profileStandingsController', ['$scope', '$http', '$stateParams
                     });
 
                 });
-                
+
                 console.log($scope.standings);
 
             }).error(function (err) {
@@ -148,11 +182,6 @@ myApp.controller('profileStandingsController', ['$scope', '$http', '$stateParams
         }).error(function (err) {
             console.log(err);
         });
-
-
-
-
-
 
     });
 
@@ -223,49 +252,53 @@ myApp.controller('mySubscriptionsController', ['$scope', '$http', '$window', '$s
 
 myApp.controller('profileEventsController', ['$scope', '$http', '$stateParams', '$window', 'sharedDataService', '$state', function ($scope, $http, $stateParams, $window, sharedDataService, $state) {
 
-    var config = {
-        headers: {
-            'Authorization': "Bearer "+ $window.sessionStorage.token
-        }
-    };
-
-    //Event call has to be called from a seperate controller due to it being a seperate tab, therefore, this call occurs when the parent view is selected and run asynchronously from the server calls found in the summary tab. Other option is to call from a parent controller (ProfileController). This approach was used to reduce the scope of the controller to only where it is necessary.
-    $http.get('http://136.145.116.232/matchup/profile/'+$stateParams.username+'/events', config).success(function (data) {
-
-        $scope.eventsData = angular.fromJson(data);
-
-    }).error(function (err) {
-        console.log(err);
-    });
-
-    $scope.goToEvent = function(eventName, date, location){
-
-        eventName = eventName.replace(" ", "%20");
-        var params = [eventName, date, location];
-
-        //Server call to get event information
-        $http.get('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'', config).
-        success(function(data, status, headers, config) {
-
-            var eventData = angular.fromJson(data);
-
-            var isHosted = eventData.hosted;
-
-            sharedDataService.set(params);
-
-            if(isHosted){
-                $state.go('app.eventpremium', {"eventname": eventName, "date": date, "location": location});
+    $scope.$on('$ionicView.enter', function () {
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
             }
-            else{
-                $state.go('app.regularevent', {"eventname": eventName, "date": date, "location": location});
-            }
+        };
 
-        }).
-        error(function(data, status, headers, config) {
-            console.log("error in goToEvent");
+        var customerUsername = sharedDataService.get();
+
+        //Event call has to be called from a seperate controller due to it being a seperate tab, therefore, this call occurs when the parent view is selected and run asynchronously from the server calls found in the summary tab. Other option is to call from a parent controller (ProfileController). This approach was used to reduce the scope of the controller to only where it is necessary.
+        $http.get('http://136.145.116.232/matchup/profile/'+customerUsername+'/events', config).success(function (data) {
+
+            $scope.eventsData = angular.fromJson(data);
+
+        }).error(function (err) {
+            console.log(err);
         });
 
-    };
+        $scope.goToEvent = function(eventName, date, location){
+
+            eventName = eventName.replace(" ", "%20");
+            var params = [eventName, date, location];
+
+            //Server call to get event information
+            $http.get('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'', config).
+            success(function(data, status, headers, config) {
+
+                var eventData = angular.fromJson(data);
+
+                var isHosted = eventData.hosted;
+
+                sharedDataService.set(params);
+
+                if(isHosted){
+                    $state.go('app.eventpremium', {"eventname": eventName, "date": date, "location": location});
+                }
+                else{
+                    $state.go('app.regularevent', {"eventname": eventName, "date": date, "location": location});
+                }
+
+            }).
+            error(function(data, status, headers, config) {
+                console.log("error in goToEvent");
+            });
+
+        };
+    });
 
 }]);
 
@@ -475,5 +508,74 @@ myApp.controller('profileOrganizationsController', ['$scope', '$http', '$statePa
     $scope.gotToProfile = function (customerUsername) {
         $state.go("app.profile.summary", {"username": customerUsername});
     };
+
+}]);
+
+myApp.controller('profileMatchupsController', ['$scope', '$http', '$stateParams', '$window', '$state', 'sharedDataService', function ($scope, $http, $stateParams, $window, $state, sharedDataService) {
+
+    $scope.$on('$ionicView.enter', function () {
+
+        var customerUsername = sharedDataService.get();
+
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+        $http.get('http://136.145.116.232/matchup/profile/'+customerUsername+'/matchups?state=Past', config).success(function (data){
+
+            $scope.matchups = data;
+
+            $scope.loggedInUser = [ ];
+            $scope.otherUser = [ ];
+
+            angular.forEach($scope.matchups, function(matchup){
+
+                if(matchup.team_size == 1){
+                    if(matchup.details[0].customer_username == $window.sessionStorage.username){
+                        $scope.loggedInUser.push(matchup.details[0]);
+                        $scope.otherUser.push(matchup.details[1]);
+                    }
+                    else{
+                        $scope.loggedInUser.push(matchup.details[1]);
+                        $scope.otherUser.push(matchup.details[0]);
+                    }
+                }
+                else{
+                    $http.get('http://136.145.116.232/matchup/teams/'+matchup.details[0].team_name+'/members', config).success(function (data){
+
+                        var members = data;
+
+                        angular.forEach(members, function(member){
+
+                            if(member.customer_username == $window.sessionStorage.username){
+
+                                $scope.loggedInUser.push(matchup.details[0]);
+                                $scope.otherUser.push(matchup.details[1]);
+
+                            }
+
+                            else{
+
+                                $scope.loggedInUser.push(matchup.details[1]);
+                                $scope.otherUser.push(matchup.details[0]);
+
+                            }
+
+                        });
+
+                    }).error(function (err) {
+                        console.log(err);
+
+                    });
+                }
+            });
+
+        }).error(function (err) {
+            console.log(err);
+        });
+
+    });
 
 }]);

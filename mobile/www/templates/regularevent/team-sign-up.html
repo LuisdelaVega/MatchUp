@@ -1,62 +1,25 @@
 <ion-view view-title="Team Sign Up">
     <ion-content>
-
-
         <div class="list">
-
             <label class="item item-input item-select">
                 <div class="input-label">
-              Choose Team
+                    Choose Team
                 </div>
-                <select>
-                    <option>Cloud 9</option>
-                    <option selected>EG</option>
-                    <option>Secret</option>
+                <select ng-model="selectedTeam.team" ng-change="updateTeamMembers(selectedTeam.team.team_name)" ng-options="team.team_name for team in myTeams">
                 </select>
             </label>
-
         </div>
         <ul class="list">
-            <li class="item item-checkbox">
+            <li class="item item-checkbox" ng-repeat="member in teamMembers">
                 <label class="checkbox">
-                    <input type="checkbox">
+                    <input type="checkbox" ng-model="member.checkbox" ng-init="member.checkbox = false" ng-change="countCheckedMembers(teamMembers)">
                 </label>
-                Competitor Name
+                {{ member.customer_tag }}
             </li>
-            <li class="item item-checkbox">
-                <label class="checkbox">
-                    <input type="checkbox">
-                </label>
-                Competitor Name
-            </li>
-            <li class="item item-checkbox">
-                <label class="checkbox">
-                    <input type="checkbox">
-                </label>
-                Competitor Name
-            </li>
-            <li class="item item-checkbox">
-                <label class="checkbox">
-                    <input type="checkbox">
-                </label>
-                Competitor Name
-            </li>
-            <li class="item item-checkbox">
-                <label class="checkbox">
-                    <input type="checkbox">
-                </label>
-                Competitor Name
-            </li>
-            <li class="item item-checkbox">
-                <label class="checkbox">
-                    <input type="checkbox">
-                </label>
-                Competitor Name
-            </li>
-
         </ul>
-
-        <button class="button" ui-sref="app.regularevent" style="width: 100vw">
+        <h2 style="color: rgb(102, 221, 51);" ng-if="checkedMembers.length == tournamentInfo.team_size">{{ checkedMembers.length }}/{{ tournamentInfo.team_size }} selected</h2>
+        <h2 style="color: rgb(255, 102, 102);" ng-if="checkedMembers.length != tournamentInfo.team_size">{{ checkedMembers.length }}/{{ tournamentInfo.team_size }} selected</h2>
+        <button class="button" style="width: 100vw" ng-click="teamSignUp()" ng-if="checkedMembers.length == tournamentInfo.team_size">
             Finish
         </button>
     </ion-content>

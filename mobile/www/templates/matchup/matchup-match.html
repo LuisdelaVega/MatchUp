@@ -12,7 +12,8 @@
             </div>
             <div class="row">
                 <div class="col .col-33 absolute-center">
-                    <img class="img-circular large player-1" ng-src="{{players[0].customer_profile_pic}}">
+                    <img ng-if="matchupInfo.team_size == 1" class="img-circular large player-1" ng-src="{{players[0].customer_profile_pic}}">
+                    <img ng-if="matchupInfo.team_size > 1" class="img-circular large player-1" ng-src="{{players[0].team_logo}}">
                 </div>
                 <div class="col .col-33 absolute-center">
                     <div class="full-width">
@@ -20,13 +21,16 @@
                     </div>
                 </div>
                 <div class="col .col-33 absolute-center">
-                    <img class="img-circular large player-2" ng-src="{{players[1].customer_profile_pic}}">
+                    <img ng-if="matchupInfo.team_size == 1" class="img-circular large player-2" ng-src="{{players[1].customer_profile_pic}}">
+                    <img ng-if="matchupInfo.team_size > 1" class="img-circular large player-2" ng-src="{{players[1].team_logo}}">
+
                 </div>
             </div>
             <div class="row">
                 <div class="col col-33 absolute-center">
                     <div class="full-width">
-                        <p class="center-text">{{ players[0].customer_tag }}</p>
+                        <p ng-if="matchupInfo.team_size == 1" class="center-text">{{ players[0].customer_tag }}</p>
+                        <p ng-if="matchupInfo.team_size > 1" class="center-text">{{ players[0].team_name }}</p>
                     </div>
                 </div>
                 <div class="col col-33 absolute-center">
@@ -36,7 +40,8 @@
                 </div>
                 <div class="col col-33 absolute-center">
                     <div class="full-width">
-                        <p class="center-text">{{ players[1].customer_tag }}</p>
+                        <p ng-if="matchupInfo.team_size == 1" class="center-text">{{ players[1].customer_tag }}</p>
+                        <p ng-if="matchupInfo.team_size > 1" class="center-text">{{ players[1].team_name }}</p>
                     </div>
                 </div>
             </div>

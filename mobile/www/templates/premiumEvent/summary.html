@@ -62,7 +62,7 @@
                 <p>{{tournament.tournament_start_date | date: 'medium'}}</p>
             </a>
         </div>
-        <button class="button button-positive" style="width: 100vw">
+        <button class="button button-positive" style="width: 100vw" ui-sref="app.premiumsignup({eventname: eventInfo.event_name, date: eventInfo.event_start_date, location: eventInfo.event_location})" ng-if="!eventInfo.is_spectator">
             Spectator Sign Up
         </button>
     </ion-content>

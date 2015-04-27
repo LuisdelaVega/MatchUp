@@ -552,21 +552,18 @@ myApp.controller('myMatchupController', ['$scope', '$http', '$state', 'sharedDat
             }
         };
 
-        $http.get('http://136.145.116.232/matchup/profile', config).success(function (data) {
 
+        $http.get('http://matchup.neptunolabs.com/matchup/profile/matchups?state=Past', config).success(function (data) {
 
-            var tag = data.customer_tag;
+            $scope.matchups = angular.fromJson(data);
 
-            $http.get('http://matchup.neptunolabs.com/matchup/profile/matchups?state=Past', config).success(function (data) {
+            $scope.loggedInUser = [ ];
+            $scope.otherUser = [ ];
 
-                $scope.matchups = angular.fromJson(data);
+            angular.forEach($scope.matchups, function(matchup){
 
-                $scope.loggedInUser = [ ];
-                $scope.otherUser = [ ];
-
-                angular.forEach($scope.matchups, function(matchup){
-
-                    if(matchup.details[0].customer_tag == tag){
+                if(matchup.team_size == 1){
+                    if(matchup.details[0].customer_username == $window.sessionStorage.username){
                         $scope.loggedInUser.push(matchup.details[0]);
                         $scope.otherUser.push(matchup.details[1]);
                     }
@@ -574,11 +571,35 @@ myApp.controller('myMatchupController', ['$scope', '$http', '$state', 'sharedDat
                         $scope.loggedInUser.push(matchup.details[1]);
                         $scope.otherUser.push(matchup.details[0]);
                     }
-                });
+                }
+                else{
+                    $http.get('http://136.145.116.232/matchup/teams/'+matchup.details[0].team_name+'/members', config).success(function (data){
 
-            }).error(function (err) {
-                console.log(err);
+                        var members = data;
 
+                        angular.forEach(members, function(member){
+
+                            if(member.customer_username == $window.sessionStorage.username){
+
+                                $scope.loggedInUser.push(matchup.details[0]);
+                                $scope.otherUser.push(matchup.details[1]);
+
+                            }
+
+                            else{
+
+                                $scope.loggedInUser.push(matchup.details[1]);
+                                $scope.otherUser.push(matchup.details[0]);
+
+                            }
+
+                        });
+
+                    }).error(function (err) {
+                        console.log(err);
+
+                    });
+                }
             });
 
         }).error(function (err) {
@@ -602,6 +623,7 @@ myApp.controller('matchupMatchController', ['$scope', '$http', '$state', 'shared
     $scope.$on('$ionicView.enter', function () {
 
         $scope.matchupInfo = sharedDataService.get();
+        console.log($scope.matchupInfo);
 
         var config = {
             headers: {
@@ -614,34 +636,54 @@ myApp.controller('matchupMatchController', ['$scope', '$http', '$state', 'shared
             $scope.players = data.players;
 
             $scope.matchInfo = data;
+            console.log($scope.matchInfo);
+
             var sets = data.sets;
 
             $scope.sets = [ ];
 
-            var posZero = $scope.players[0].customer_username;
+            if($scope.matchupInfo.team_size == 1){
+                var posZero = $scope.players[0].customer_username;
 
-            angular.forEach(sets, function(set){
-                if(set.scores.length != 1){     
-                    if(posZero == set.scores[0].name)
-                        $scope.sets.push(set);
-                    else{
-                        var temp = set.scores[0];
-                        set.scores[0] = set.scores[1];
-                        set.scores[1] = temp;
-                        $scope.sets.push(set);
+                angular.forEach(sets, function(set){
+                    if(set.scores.length != 1){     
+                        if(posZero == set.scores[0].name)
+                            $scope.sets.push(set);
+                        else{
+                            var temp = set.scores[0];
+                            set.scores[0] = set.scores[1];
+                            set.scores[1] = temp;
+                            $scope.sets.push(set);
+                        }
                     }
-                }
-            });
+                });
+            }
+
+            else{
+
+                var posZero = $scope.players[0].team_name;
+
+                angular.forEach(sets, function(set){
+                    if(set.scores.length != 1){     
+                        if(posZero == set.scores[0].name)
+                            $scope.sets.push(set);
+                        else{
+                            var temp = set.scores[0];
+                            set.scores[0] = set.scores[1];
+                            set.scores[1] = temp;
+                            $scope.sets.push(set);
+                        }
+                    }
+                });
+
+            }
 
         }).error(function (err) {
             console.log(err);
 
         });
 
-
-
     });
-
 
 }]);
 
@@ -662,13 +704,13 @@ myApp.controller('notificationsController', ['$scope', '$http', '$state', 'share
 
             var matchups = angular.fromJson(data);
 
-            $http.get('http://136.145.116.232/matchup/profile', config).success(function (data) {
+            $scope.matchups = [ ];
 
-                $scope.matchups = [ ];
+            angular.forEach(matchups, function(matchup){
 
-                angular.forEach(matchups, function(matchup){
+                if(matchup.team_size == 1){
 
-                    if(matchup.details[0].customer_tag == data.customer_username){
+                    if(matchup.details[0].customer_username == $window.sessionStorage.username){
 
                         var temp = matchup.details[0];
                         matchup.details[0] = matchup.details[1];
@@ -679,11 +721,34 @@ myApp.controller('notificationsController', ['$scope', '$http', '$state', 'share
                     else
                         $scope.matchups.push(matchup);
 
-                });
+                }
 
-            }).error(function (err) {
-                console.log(err);
+                else {
 
+                    $http.get('http://136.145.116.232/matchup/teams/'+matchup.details[0].team_name+'/members', config).success(function (data){
+
+                        var members = data;
+
+                        angular.forEach(members, function(member){
+
+                            if(member.customer_username == $window.sessionStorage.username){
+
+                                var temp = matchup.details[0];
+                                matchup.details[0] = matchup.details[1];
+                                matchup.details[1] = temp;
+                                $scope.matchups.push(matchup);
+
+                            }
+
+                        });
+
+                    }).error(function (err) {
+                        console.log(err);
+
+                    });
+
+                }
+                
             });
 
         }).error(function (err) {
@@ -707,8 +772,6 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
         $scope.matchupInfo = sharedDataService.get();
 
         $scope.scoreInput = [ ];
-
-        $scope.scoreInput.score = 'Win';
 
         $scope.matchCompleted = false;
 
@@ -740,7 +803,7 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
 
             $scope.sets = [ ];
 
-            var posZero = $scope.players[0].customer_username
+            var posZero = $scope.players[0].customer_username;
 
             angular.forEach(sets, function(set){
                 if(set.scores.length != 1){
@@ -778,36 +841,51 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
 
     $scope.submitScore = function() {
 
-
+        console.log("entered submitScore");
+        
         var config = {
             headers: {
                 'Authorization': "Bearer "+ $window.sessionStorage.token
             }
         }; 
 
-        if($scope.scoreInput.score == 'Win'){        
+        if($scope.matchInfo.score_type == "Match"){
+            if($scope.scoreInput.score == 'Win'){        
 
-            $http.put('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'/'+$scope.currentSet+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'', {
-                "score": 1
+                $http.put('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'/'+$scope.currentSet+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'', {
+                    "score": 1
 
-            }, config).success(function (data) {   
+                }, config).success(function (data) {   
 
+                    console.log("submitted score");
 
-                console.log('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'/'+$scope.currentSet+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'');
-                console.log("submitted score");
+                }).error(function (err) {
+                    console.log(err);
+                });
+            }
 
-            }).error(function (err) {
-                console.log(err);
-            });
+            else{
+                $http.put('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'/'+$scope.currentSet+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'', {
+                    "score": 0
+
+                }, config).success(function (data) {   
+
+                    console.log("submitted score");
+
+                }).error(function (err) {
+                    console.log(err);
+                });
+
+            }
         }
 
-        else{
+        else if($scope.matchInfo.score_type == "Points"){
+
             $http.put('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'/'+$scope.currentSet+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'', {
-                "score": 0
+                "score": $scope.scoreInput.score
 
             }, config).success(function (data) {   
 
-                console.log('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'/'+$scope.currentSet+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'');
                 console.log("submitted score");
 
             }).error(function (err) {

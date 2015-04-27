@@ -145,16 +145,60 @@ myApp.controller('createMeetupController', function ($scope, $state, $http, $sta
 
 });
 
-myApp.controller('premiumSignUpController', function ($scope, $state, $http, $stateParams, sharedDataService) {
-
-    var params = sharedDataService.get();
+myApp.controller('premiumSignUpController', function ($scope, $state, $http, $stateParams, sharedDataService, $window) {
 
     $scope.returnToPremiumEvent = function () {
         $state.go("app.eventpremium", {
-            eventname: params[0],
-            date: params[1],
-            location: params[2]
+            eventname: $stateParams.eventname,
+            date: $stateParams.date,
+            location: $stateParams.location
         })
+    }
+
+    $scope.$on('$ionicView.enter', function () {
+
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+        $scope.spectator = [ ];
+
+        $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/specfees?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
+        success(function(data, status, headers, config) {
+
+            $scope.spectatorFees = data;
+
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in eventPremiumSummaryController");
+        });
+
+    });
+
+    $scope.signUpSpectator = function () {
+
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+        $http.post('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/specfees/'+$scope.spectator.Fee+'?date='+$stateParams.date+'&location='+$stateParams.location+'', { }, config).
+        success(function(data, status, headers, config) {
+
+            $state.go("app.eventpremium", {
+                eventname: $stateParams.eventname,
+                date: $stateParams.date,
+                location: $stateParams.location
+            });
+
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in eventPremiumSummaryController");
+        });
+
     }
 
 });
@@ -181,7 +225,7 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
         //Server call to get event info
         $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
         success(function(data, status, headers, config) {
-            console.log('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'?date='+$stateParams.date+'&location='+$stateParams.location+'');
+
             $scope.eventInfo = angular.fromJson(data);
             var startDate = new Date($scope.eventInfo.event_start_date);
 
@@ -256,7 +300,6 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 
     $scope.goToTournament = function (eventName, eventDate, eventLocation, selectedTournament) {
 
-
         eventName = eventName.replace(" ", "%20"); //Replace spaces with a %20
         var params = [eventName, eventDate, eventLocation];
         sharedDataService.set(selectedTournament);
@@ -268,7 +311,6 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
     }
 
     $scope.goToNews = function (eventName, eventDate, eventLocation, selectedTournament) {
-
 
         eventName = eventName.replace(" ", "%20"); //Replace spaces with a %20
         var params = [eventName, eventDate, eventLocation];

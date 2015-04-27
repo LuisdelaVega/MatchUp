@@ -1,27 +1,22 @@
-<ion-view view-title="Sign Up">
+<ion-view view-title="Spectator">
     <ion-nav-buttons side="left">
         <button class="button button-icon" ng-click="returnToPremiumEvent()">
             <i class="icon ion-ios-arrow-back"></i>
         </button>
     </ion-nav-buttons>
     <ion-content class="padding">
-        <ul class="list list-inset">
-            <li>
-                <h4>Spectator</h4>
-            </li>
-            <li class="item item-checkbox">
-                <label class="checkbox">
-                    <input type="checkbox">
-                </label>
-                One Day <span class="item-note">$10</span>
-            </li>
+        <label class="item item-radio" ng-repeat="spectatorFee in spectatorFees">
+            <input type="radio" ng-model="spectator.Fee" name="group" value="{{ spectatorFee.spec_fee_name }}">
+            <div class="item-content">
+                {{ spectatorFee.spec_fee_name }} (${{ spectatorFee.spec_fee_amount }}) <br>
+                <small> {{ spectatorFee.spec_fee_description }} </small>
+            </div>
+            <i class="radio-icon ion-checkmark"></i>
+        </label>
 
-            <li class="item item-checkbox">
-                <label class="checkbox">
-                    <input type="checkbox">
-                </label>
-                VIP Pass <span class="item-note">$20</span>
-            </li>
-        </ul>
+        <br>
+        <button class="button button-positive" style="width: 100vw" ng-click="signUpSpectator()">
+            Sign Up
+        </button>
     </ion-content>
 </ion-view>

@@ -197,9 +197,6 @@ myApp.controller('teamController', function ($scope, $ionicPopover, $state, $ion
 
             $scope.players = teamProfileData;
 
-
-
-
             //Get the members of the team
             $http.get('http://136.145.116.232/matchup/teams/'+$stateParams.teamname+'/members', config).
             success(function(data, status, headers, config) {
@@ -216,6 +213,19 @@ myApp.controller('teamController', function ($scope, $ionicPopover, $state, $ion
             error(function(data, status, headers, config) {
                 console.log("error getting team info");    
             });
+
+            //Get the members of the team
+            $http.get('http://136.145.116.232/matchup/teams/'+$stateParams.teamname+'/standings', config).
+            success(function(data, status, headers, config) {
+
+                console.log(data);
+                
+            }).
+            error(function(data, status, headers, config) {
+                console.log("error getting team info");    
+            });
+
+
 
         }).
         error(function(data, status, headers, config) {
