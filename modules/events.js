@@ -4412,19 +4412,11 @@ var getReports = function(req, res, pg, conString, log) {
             }, 'done response');
         });
         query.on("end", function(result) {
-            if (result.rows.length) {
                 done();
                 res.status(200).json(result.rows);
                 log.info({
                     res : res
                 }, 'done response');
-            } else {
-                done();
-                res.status(404).send('Event not found');
-                log.info({
-                    res : res
-                }, 'done response');
-            }
         });
     });
 };

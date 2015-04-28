@@ -1699,15 +1699,15 @@ var getMatch = function(req, res, pg, conString, log) {
 					values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.user.username, ",;!;,", "Loser", "Winner"]
 				});
 				query.on("row", function (row, result) {
+					var repeated = false;
 					var info_string = row.info;
-					//var info_array = info_string.split(",;!;,");
 					var info_array = (!info_string ? new Array((details.team_size > 1 ? 2 : 3)) : info_string.split(",;!;,"));
 					var temp = {};
 					if (info_array.length == 2) {
 						temp = {
 							team_name : info_array[0],
 							team_logo : info_array[1],
-							competitor_number: row.competitor_number,
+							competitor_number: parseInt(row.competitor_number),
 							score : row.score
 						};
 					} else {
@@ -1715,12 +1715,21 @@ var getMatch = function(req, res, pg, conString, log) {
 							customer_username : info_array[0],
 							customer_profile_pic : info_array[1],
 							customer_tag : info_array[2],
-							competitor_number: row.competitor_number,
+							competitor_number: parseInt(row.competitor_number),
 							score : row.score
 						};
 					}
 
-					matchDetails.players.push(temp);
+					for (var i = 0; i < matchDetails.players.length; i++) {
+						if (matchDetails.players[i].competitor_number == temp.competitor_number) {
+							repeated = true;
+						}
+					}
+					if (!repeated) {
+						matchDetails.players.push(temp);
+					}
+
+					//matchDetails.players.push(temp);
 					matchDetails.match_completed = row.match_completed;
 					matchDetails.stage_completed = row.stage_completed;
 					matchDetails.is_favourite = row.is_favourite;
@@ -1747,17 +1756,32 @@ var getMatch = function(req, res, pg, conString, log) {
 						values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match]
 					});
 					query.on("row", function (row, result) {
+						var repeated = false;
 						if (!matchDetails.sets[row.set_seq-1]) {
 							matchDetails.sets[row.set_seq-1] = {};
 							matchDetails.sets[row.set_seq-1].set_seq = row.set_seq;
 							matchDetails.sets[row.set_seq-1].set_completed = row.set_completed;
 							matchDetails.sets[row.set_seq-1].scores = [];
 						}
-						matchDetails.sets[row.set_seq-1].scores.push({
-							name : row.info,
-							competitor_number: row.competitor_number,
-							score : row.score
-						});
+
+						for (var i = 0; i < matchDetails.sets[row.set_seq-1].scores.length; i++) {
+							if (matchDetails.sets[row.set_seq-1].scores[i].competitor_number == parseInt(row.competitor_number)) {
+								repeated = true;
+							}
+						}
+						if (!repeated) {
+							matchDetails.sets[row.set_seq-1].scores.push({
+								name : row.info,
+								competitor_number: parseInt(row.competitor_number),
+								score : row.score
+							});
+						}
+
+						//matchDetails.sets[row.set_seq-1].scores.push({
+						//	name : row.info,
+						//	competitor_number: row.competitor_number,
+						//	score : row.score
+						//});
 					});
 					query.on('error', function (error) {
 						client.query("ROLLBACK");
@@ -2839,6 +2863,82 @@ var createReport = function(req, res, pg, conString, log) {
 	});
 };
 
+var deleteStages = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		client.query("BEGIN");
+		var query = client.query({
+			text: "SELECT tournament_name FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
+			values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+		});
+		query.on("row", function (row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function (error) {
+			client.query("ROLLBACK");
+			done();
+			console.log("torunament.js - deleteStages");
+			console.log(error);
+			res.status(500).send(error);
+			log.info({
+				res: res
+			}, 'done response');
+		});
+		query.on("end", function (result) {
+			if (result.rows.length) {
+				client.query({
+					text: "DELETE FROM round WHERE (event_name, event_start_date, event_location, tournament_name) = ($1, $2, $3, $4)",
+					values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+				}, function (err, result) {
+					if (err) {
+						client.query("ROLLBACK");
+						done();
+						console.log("torunament.js - deleteStages");
+						console.log(err);
+						res.status(500).send(err);
+						log.info({
+							res: res
+						}, 'done response');
+					} else {
+						client.query({
+							text: 'DELETE FROM "group" WHERE (event_name, event_start_date, event_location, tournament_name) = ($1, $2, $3, $4)',
+							values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+						}, function (err, result) {
+							if (err) {
+								client.query("ROLLBACK");
+								done();
+								console.log("torunament.js - deleteStages");
+								console.log(err);
+								res.status(500).send(err);
+								log.info({
+									res: res
+								}, 'done response');
+							} else {
+								client.query("COMMIT");
+								done();
+								res.status(204).send("");
+								log.info({
+									res: res
+								}, 'done response');
+							}
+						});
+					}
+				});
+			} else {
+				client.query("ROLLBACK");
+				done();
+				res.status(404).send('Tournament was not found');
+				log.info({
+					res : res
+				}, 'done response');
+			}
+		});
+	});
+};
+
 module.exports.createTournament = createTournament;
 module.exports.getStandings = getStandings;
 module.exports.getRounds = getRounds;
@@ -2853,3 +2953,4 @@ module.exports.unPauseRound = unPauseRound;
 module.exports.editBestOf = editBestOf;
 module.exports.changeStation = changeStation;
 module.exports.changeTimeAndDateOfRound = changeTimeAndDateOfRound;
+module.exports.deleteStages = deleteStages;

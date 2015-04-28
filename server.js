@@ -471,6 +471,11 @@ app.route('/matchup/events/:event/tournaments/:tournament/create').post(function
 		req : req
 	}, 'start request');
 	tournaments.createTournament(req, res, pg, conString, log);
+}).delete(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	tournaments.deleteStages(req, res, pg, conString, log);
 });
 
 /* /matchup/events/:event/tournaments/:tournament/register?date=date&location=string
