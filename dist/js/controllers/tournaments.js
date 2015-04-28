@@ -145,14 +145,14 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 
 	$scope.bracketChange = function (bracket) {
 		//testing.....
-		// console.log('enter');
-		console.log("Winners");
-		if (bracket == 'Winners') {
+		console.log('enter');
+ 		if (bracket == 'Winner') {
 			$scope.bracketType = $scope.tournamentInfo.finalStage.winnerRounds;
 			$scope.selectedRound = $scope.tournamentInfo.finalStage.winnerRounds[0];
+			console.log('winner');
 
 		} else {
-			console.log("Losers");
+			console.log("Loser");
 			$scope.bracketType = $scope.tournamentInfo.finalStage.loserRounds;
 			$scope.selectedRound = $scope.tournamentInfo.finalStage.loserRounds[0];
 
