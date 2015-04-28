@@ -24,13 +24,13 @@
 					<label>Group: </label><select class="form-control" ng-model="$parent.selectedGroup" ng-options="'Group '+ group.group_number for group in tournamentInfo.groupStage.groups" ng-change="changeSelectedStage()"></select>
 				</p>
 			</div>
-			<div class="list-group">
+			<div class="list-group text-center">
 				<span class="input-group-btn">
 					<button class="btn btn-default">
 						Pause Round
 					</button>
 					<button class="btn btn-primary">
-						Change Round Best Of
+						Change Best Of
 					</button></span>
 			</div>
 			<div class="list-group">
@@ -38,13 +38,34 @@
 				<a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="round in rounds" ng-click="getRoundMatches(round, $index)"> <h4 class="list-group-item-heading">Round {{round.round_number}}</h4> </a>
 			</div>
 		</div>
-		<div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+		<div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
 
 			<div class="row">
 				<!-- IF the tournament is not team based  -->
 				<div class="col-md-8 col-md-offset-2" ng-if="!teamBased">
+					<table class="table table-striped table-hover ">
+						<thead>
+							<tr>
+								<th>Match #</th>
+								<th>Player 1</th>
+								<th>Player 2</th>
+								<th>Score</th>
+								<th>Station</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="match in selectedRound.matches">
+								<td>{{match.match_number}}</td>
+								<td>{{match.players[0].customer_tag}}</td>
+								<td>{{match.players[1].customer_tag}}</td>
+								<td>{{match.players[0].score}}-{{match.players[1].score}}</td>
+								<td ng-if="match.station_number">Station {{match.station_number}}</td>
+								<td ng-if="!match.station_number">None Assigned</td>
 
-					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-repeat="match in selectedRound.matches">
+							</tr>
+						</tbody>
+					</table>
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-repeat="match in selectedRound.matches" ng-if="">
 						<div class="box cursor box-margin" ng-click="">
 
 							<div class="row" align="center">
