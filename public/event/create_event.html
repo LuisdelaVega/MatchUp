@@ -61,7 +61,7 @@
 						<label class="col-sm-1 control-label">Upload Banner</label>
 						<div class="col-sm-2">
 							<span class="file-input btn btn-primary btn-file btn-block">
-                Browse&hellip; <input ng-model="event.banner" onchange="angular.element(this).scope().file_changed(this)" id="cover" type="file" accept="image/*">
+                Browse&hellip; <input ng-model="event.banner" onchange="angular.element(this).scope().file_changed(this)" id="banner" type="file" accept="image/*">
             </span>
 							<div class="form-group panel-padding">
 								<label>Banner URL: </label>
@@ -290,7 +290,7 @@
 							</div>
 						</div>
 						<div class="col-xs-12 col-md-4 col-lg-4">
-							<label>Seed Money: </label>
+							<label>Prize Distribution: </label>
 							<div class="form-group">
 								<select class="form-control" ng-model="tournament.prize_distribution" ng-init="tournament.prize_distribution = 'Standard'">
 									<option ng-value="'Standard'">Standard</option>

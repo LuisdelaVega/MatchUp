@@ -18,10 +18,10 @@
 		</div>
 	</div>
 </div>
-<div class="widget-box box-margin">
+
+<div class="widget-box box-margin" ng-if="sponsors.lenght >0">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary"> Sponsors</h3>
-				<a class="widget-more" ui-sref="app.sponsorRequests({organizationName: organization.organization_name})" ng-if="organization.is_member"> View Requests<i class="fa fa-arrow-circle-o-right panel-padding"></i> </a>
 	</div>
 	<!--Widget Header-->
 	<div class="widget-body">
@@ -40,10 +40,10 @@
 </div>
 
 <!-- Events widget -->
-<div class="widget-box box-margin">
+<div class="widget-box box-margin" ng-if="events.lenght >0">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Events</h3>
-		<a class="widget-more" ui-sref="app.organizationEvents({organizationName: organization.organization_name})"> See More<i class="fa fa-arrow-circle-o-right panel-padding"></i> </a>
+		<a class="widget-more" ng-if="events.lenght >4" ui-sref="app.organizationEvents({organizationName: organization.organization_name})"> See More<i class="fa fa-arrow-circle-o-right panel-padding"></i> </a>
 	</div>
 	<!--Widget Header-->
 	<div class="widget-body">
@@ -74,7 +74,7 @@
 <!-- Organization Events widget-->
 
 <!-- Owners widget -->
-<div class="widget-box">
+<div class="widget-box box-margin">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Members</h3>
 	</div>
@@ -84,12 +84,11 @@
 			<div class="tickets-container">
 				<ul class="tickets-list">
 					<div class="row">
-						<div class="col-lg-3 col-md-6 col-sm-12 col-xs-12" ng-repeat="member in members track by $index">
-
+						<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12" ng-repeat="member in members track by $index">
 							<li class="ticket-item" ng-click="goToUser(member.customer_username)">
 								<div class="ticket-user">
 									<img ng-src="{{member.customer_profile_pic}}" class="user-avatar">
-									<span class="user-name">{{member.customer_first_name}} {{member.customer_last_name}} </span><span ng-if="member.is_owner"> (Owner) &nbsp; &nbsp;<span class="fa fa-star fa-6"></span></span>
+									<span class="user-name"><span class="fa fa-star fa-6" ng-if="member.is_owner">&nbsp;</span>{{member.customer_tag}} ({{member.customer_first_name}} {{member.customer_last_name}})</span>
 								</div>
 							</li>
 						</div>

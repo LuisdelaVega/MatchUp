@@ -1,143 +1,145 @@
 <div class="box">
-			<h2>Tournament</h2>
-			<form>
-				<legend>General Info</legend>
-				<div class="row">
-					<div class="col-xs-12 col-md-6 col-lg-6">
-						<div class="form-group">
-							<label>Tournament Name: </label>
-							<input class="form-control" ng-model="tournament.tournament_name" maxlength="127" >
-						</div>
-					</div>
-					<div class="col-xs-12 col-md-6 col-lg-6">
-						<label>Game: </label>
-						<div class="form-group">
-							<ac-select ac-model="tournament.game" ac-options="game.game_name for game in games" ac-settings="{ itemHeight: '32' }">
-								</select>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xs-12 col-md-6 col-lg-6">
-						<div class="dropdown">
-							<lable>Start Date</lable>
-							<a class="dropdown-toggle" id="dropdown4" role="button" data-toggle="dropdown">
-								<div class="input-group">
-									<input type="text" class="form-control" data-ng-model="tournament.tournament_start_date "><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-								</div>
-							</a>
-							<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-								<datetimepicker data-ng-model="tournament.tournament_start_date" data-datetimepicker-config="{ dropdownSelector: '#dropdown4' }" />
-							</ul>
-						</div>
-					</div>
-					<div class="col-xs-12 col-md-6 col-lg-6">
-						<div class="dropdown">
-							<lable>Check In Deadline</lable>
-							<a class="dropdown-toggle" id="dropdown5" role="button" data-toggle="dropdown">
-								<div class="input-group">
-									<input type="text" class="form-control" data-ng-model="tournament.tournament_check_in_deadline "><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-								</div>
-							</a>
-							<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-								<datetimepicker data-ng-model="tournament.tournament_check_in_deadline" data-datetimepicker-config="{ dropdownSelector: '#dropdown5' }" />
-							</ul>
-						</div>
-					</div>
-				</div>
+	<h2>Tournament</h2>
+	<form>
+		<legend>General Info</legend>
+		<div class="row">
+			<div class="col-xs-12 col-md-6 col-lg-6">
 				<div class="form-group">
-					<label>Rules:</label>
-					<textarea class="form-control" rows="4" ng-model="tournament.tournament_rules" maxlength="127"></textarea>
+					<label>Tournament Name: </label>
+					<input class="form-control" ng-model="tournament.tournament_name" maxlength="127">
 				</div>
-				<div class="row">
-					<div class="col-xs-12 col-md-6 col-lg-4" ng-if="event.isHosted">
-						<label>Competitor Fee: </label>
-						<div class="form-group input-group">
-							<span class="input-group-addon">$</span>
-							<input type="text" class="form-control" ng-model="tournament.competitor_fee" valid-decimal>
-						</div>
-					</div>
-					<div class="col-xs-12 col-md-6 col-lg-4" ng-if="event.isHosted">
-						<label>Seed Money: </label>
-						<div class="form-group input-group">
-							<span class="input-group-addon">$</span>
-							<input type="text" class="form-control" ng-model="tournament.seed_money" valid-input input-pattern="[^0-9]+">
-						</div>
-					</div>
-					 
-					<div class="col-xs-12 col-md-6 col-lg-4">
-						<div class="form-group">
-							<label>Capacity: </label>
-							<input type="text" class="form-control" ng-model="tournament.tournament_max_capacity" valid-input input-pattern="[^0-9]+">
-						</div>
-					</div>
-				</div>
-				<legend>Format</legend>
-				<label>Team based</label>
-				<div class="form-inline">
-					<div class="form-group">
-						<input type="radio" ng-model="tournament.is_team_based" ng-value="true" > Yes
-						<br>
-						<input type="radio" ng-model="tournament.is_team_based" ng-value="false"> No
-					</div>
-					<div class="form-group" ng-show="tournament.is_team_based" style="margin-left:60px">
-						<label>Team Size: </label>
-						<input class="form-control" type="number" ng-model="tournament.team_size">
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xs-12 col-md-6 col-lg-6">
-						<div class="form-group">
-							<label>Tournament Type: </label>
-							<select class="form-control" ng-model="tournament.tournament_type" ng-options="item for item in tournamentType" >
+			</div>
+			<div class="col-xs-12 col-md-6 col-lg-6">
+				<label>Game: </label>
+				<div class="form-group">
+					<ac-select ac-model="tournament.game" ac-options="game.game_name for game in games" ac-settings="{ itemHeight: '32' }">
 						</select>
-						</div>
-					</div>
 				</div>
-				<div class="row" ng-show="tournament.tournament_type == 'Two Stage'">
-					<div class="col-xs-12 col-md-6 col-lg-6">
-						<div class="form-group">
-							<label># of Competitors per Group: </label>
-							<input class="form-control" type="text" ng-model="tournament.number_of_people_per_group" valid-input input-pattern="[^0-9]+">
-						</div>
-					</div>
-					<div class="col-xs-12 col-md-6 col-lg-6">
-						<div class="form-group">
-							<label># of Competitors advancing: </label>
-							<input class="form-control" type="text" ng-model="tournament.amount_of_winners_per_group" valid-input input-pattern="[^0-9]+">
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xs-12 col-md-6 col-lg-6" ng-show="tournament.tournament_type == 'Single Stage'">
-						<label>Tournament Format: </label>
-						<select class="form-control" ng-model="tournament.tournament_format" ng-options="item for item in tournamentFormat" ng-init="tournament.format = tournamentFormat[0]">
-						</select>
-					</div>
-					<div class="col-xs-12 col-md-6 col-lg-6" ng-show="tournament.tournament_type == 'Two Stage'">
-						<label>Final Stage: </label>
-						<select class="form-control" ng-model="tournament.tournament_format" ng-options="item for item in tournamentFormatTwo" ng-init="tournament.format = tournamentFormatTwo[0]">
-						</select>
-					</div>
-				</div>
-				<div class="row custom-padding">
-					<div class="col-xs-12 col-md-6 col-lg-6">
-						<div class="form-group">
-							<div class="checkbox">
-								<label>
-									<input type="checkbox" data-ng-model="tournament.scoring"> Allow set points
-								</label>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="btn-group btn-group-justified" role="group">
-					<div class="btn-group" role="group">
-						<a class="btn btn-default" ng-click="cancelTournament()">Cancel</a>
-					</div>
-					<div class="btn-group" role="group">
-						<a class="btn btn-primary" ng-click="validateTournament()">Submit</a>
-					</div>
-				</div>
-			</form>
+			</div>
 		</div>
+		<div class="row">
+			<div class="col-xs-12 col-md-6 col-lg-6">
+				<div class="dropdown">
+					<lable>Start Date</lable>
+					<a class="dropdown-toggle" id="dropdown4" role="button" data-toggle="dropdown">
+						<div class="input-group">
+							<input type="text" class="form-control" data-ng-model="tournament.tournament_start_date "><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+						</div>
+					</a>
+					<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+						<datetimepicker data-ng-model="tournament.tournament_start_date" data-datetimepicker-config="{ dropdownSelector: '#dropdown4' }" />
+					</ul>
+				</div>
+			</div>
+			<div class="col-xs-12 col-md-6 col-lg-6">
+				<div class="dropdown">
+					<lable>Check In Deadline</lable>
+					<a class="dropdown-toggle" id="dropdown5" role="button" data-toggle="dropdown">
+						<div class="input-group">
+							<input type="text" class="form-control" data-ng-model="tournament.tournament_check_in_deadline "><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+						</div>
+					</a>
+					<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+						<datetimepicker data-ng-model="tournament.tournament_check_in_deadline" data-datetimepicker-config="{ dropdownSelector: '#dropdown5' }" />
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label>Rules:</label>
+			<textarea class="form-control" rows="4" ng-model="tournament.tournament_rules" maxlength="127"></textarea>
+		</div>
+		<div class="row">
+			<div class="col-xs-12 col-md-6 col-lg-4" ng-if="event.isHosted">
+				<label>Competitor Fee: </label>
+				<div class="form-group input-group">
+					<span class="input-group-addon">$</span>
+					<input type="text" class="form-control" ng-model="tournament.competitor_fee" valid-decimal>
+				</div>
+			</div>
+			<div class="col-xs-12 col-md-6 col-lg-4" ng-if="event.isHosted">
+				<label>Seed Money: </label>
+				<div class="form-group input-group">
+					<span class="input-group-addon">$</span>
+					<input type="text" class="form-control" ng-model="tournament.seed_money" valid-input input-pattern="[^0-9]+">
+				</div>
+			</div>
+
+			<div class="col-xs-12 col-md-6 col-lg-4">
+				<div class="form-group">
+					<label>Capacity: </label>
+					<input type="text" class="form-control" ng-model="tournament.tournament_max_capacity" valid-input input-pattern="[^0-9]+">
+				</div>
+			</div>
+		</div>
+	</form>
+	<form ng-if="tournament.tournament_completed == null">
+		<legend>Format</legend>
+		<label>Team based</label>
+		<div class="form-inline">
+			<div class="form-group">
+				<input type="radio" ng-model="tournament.is_team_based" ng-value="true"> Yes
+				<br>
+				<input type="radio" ng-model="tournament.is_team_based" ng-value="false"> No
+			</div>
+			<div class="form-group" ng-show="tournament.is_team_based" style="margin-left:60px">
+				<label>Team Size: </label>
+				<input class="form-control" type="number" ng-model="tournament.team_size">
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-12 col-md-6 col-lg-6">
+				<div class="form-group">
+					<label>Tournament Type: </label>
+					<select class="form-control" ng-model="tournament.tournament_type" ng-options="item for item in tournamentType">
+					</select>
+				</div>
+			</div>
+		</div>
+		<div class="row" ng-show="tournament.tournament_type == 'Two Stage'">
+			<div class="col-xs-12 col-md-6 col-lg-6">
+				<div class="form-group">
+					<label># of Competitors per Group: </label>
+					<input class="form-control" type="text" ng-model="tournament.number_of_people_per_group" valid-input input-pattern="[^0-9]+">
+				</div>
+			</div>
+			<div class="col-xs-12 col-md-6 col-lg-6">
+				<div class="form-group">
+					<label># of Competitors advancing: </label>
+					<input class="form-control" type="text" ng-model="tournament.amount_of_winners_per_group" valid-input input-pattern="[^0-9]+">
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-12 col-md-6 col-lg-6" ng-show="tournament.tournament_type == 'Single Stage'">
+				<label>Tournament Format: </label>
+				<select class="form-control" ng-model="tournament.tournament_format" ng-options="item for item in tournamentFormat" ng-init="tournament.format = tournamentFormat[0]">
+				</select>
+			</div>
+			<div class="col-xs-12 col-md-6 col-lg-6" ng-show="tournament.tournament_type == 'Two Stage'">
+				<label>Final Stage: </label>
+				<select class="form-control" ng-model="tournament.tournament_format" ng-options="item for item in tournamentFormatTwo" ng-init="tournament.format = tournamentFormatTwo[0]">
+				</select>
+			</div>
+		</div>
+		<div class="row custom-padding">
+			<div class="col-xs-12 col-md-6 col-lg-6">
+				<div class="form-group">
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" data-ng-model="tournament.scoring"> Allow set points
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+	<div class="btn-group btn-group-justified" role="group">
+		<div class="btn-group" role="group">
+			<a class="btn btn-default" ng-click="cancelTournament()">Cancel</a>
+		</div>
+		<div class="btn-group" role="group">
+			<a class="btn btn-primary" ng-click="validateTournament()">Submit</a>
+		</div>
+	</div>
+</div>

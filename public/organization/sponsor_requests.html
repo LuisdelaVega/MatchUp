@@ -12,13 +12,24 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr class=""  ng-repeat="sponsor in sponsors">
+					<tr ng-repeat="sponsor in sponsors">
 						<td>{{$index +1}}</td>
 						<td>{{sponsor.request_sponsor_link}}</td>
 						<td>{{sponsor.request_sponsor_description}}</td>
-						<td style="text-align:center; color: blue" ng-if="sponsor.request_sponsor_status == 'Received'">{{sponsor.request_sponsor_status}}</td>
-						<td style="text-align:center; color: green" ng-if="sponsor.request_sponsor_status == 'Accepted'">{{sponsor.request_sponsor_status}}</td>
-						<td style="text-align:center; color: red" ng-if="sponsor.request_sponsor_status == 'Declined'">{{sponsor.request_sponsor_status}}</td>
+						<td ng-switch on="sponsor.request_sponsor_status">
+							<div ng-switch-when="Accepted">
+								<span style="text-align:center; color: green">Resolved</span>
+							</div>
+							<div ng-switch-when="Declined">
+								<span style="text-align:center; color: red">Declined</span>
+							</div>
+							<div ng-switch-when="Pending">
+								<span style="text-align:center; color: orange">Pending</span>
+							</div>
+							<div ng-switch-default>
+								<span>Received</span>
+							</div>
+						</td>
 					</tr>
 				</tbody>
 			</table>
@@ -42,7 +53,7 @@
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 class="modal-title">Create News</h4>
+				<h4 class="modal-title">Request Sponsor</h4>
 			</div>
 			<div class="modal-body">
 				<form class="form-horizontal">
@@ -65,7 +76,7 @@
 					Cancel
 				</button>
 				<button type="button" class="btn btn-primary" ng-click="requestSponsor()">
-					Post News
+					Request
 				</button>
 			</div>
 		</div>

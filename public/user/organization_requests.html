@@ -12,24 +12,35 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr class=""  ng-repeat="organization in organizations">
+					<tr ng-repeat="organization in organizations">
 						<td>{{$index +1}}</td>
 						<td>{{organization.request_organization_name}}</td>
 						<td>{{organization.request_description}}</td>
-						<td style="text-align:center; color: blue" ng-if="organization.request_status == 'Received'">{{organization.request_status}}</td>
-						<td style="text-align:center; color: green" ng-if="organization.request_status == 'Accepted'">{{organization.request_status}}</td>
-						<td style="text-align:center; color: red" ng-if="organization.request_status == 'Declined'">{{organization.request_status}}</td>
+						<td ng-switch on="organization.request_status">
+							<div ng-switch-when="Accepted">
+								<span style="text-align:center; color: green">Resolved</span>
+							</div>
+							<div ng-switch-when="Declined">
+								<span style="text-align:center; color: red">Declined</span>
+							</div>
+							<div ng-switch-when="Pending">
+								<span style="text-align:center; color: orange">Pending</span>
+							</div>
+							<div ng-switch-default>
+								<span>Received</span>
+							</div>
+						</td>
 					</tr>
 				</tbody>
 			</table>
 
 		</div>
 	</div>
-	 <div class="row" align="center">
-						<button type="button" style="width: 25%" class="btn btn-primary" data-target="#newRequestsModal" data-toggle="modal">
-							Request New Organization
-						</button>
-					</div>
+	<div class="row" align="center">
+		<button type="button" style="width: 25%" class="btn btn-primary" data-target="#newRequestsModal" data-toggle="modal">
+			Request New Organization
+		</button>
+	</div>
 </div>
 <div class="modal fade" id="newRequestsModal" tabindex="-1" role="dialog" aria-labelledby="newRequestsModal" aria-hidden="true">
 	<div class="modal-dialog">

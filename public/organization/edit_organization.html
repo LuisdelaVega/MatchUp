@@ -65,11 +65,10 @@
 							<div class="row">
 								<div class="ticket-user col-md-7 col-sm-7 col-xs-7">
 									<img ng-src="{{member.customer_profile_pic}}" class="user-avatar">
-									<span class="user-name"> {{member.customer_tag}} ({{member.customer_first_name}} {{member.customer_last_name}})</span>
+									<span class="user-name"><span class="fa fa-star fa-6" ng-if="member.is_owner">&nbsp;</span>{{member.customer_tag}} ({{member.customer_first_name}} {{member.customer_last_name}})</span>
 								</div>
 								<div class="ticket-time  col-md-5 col-sm-5 col-xs-5">
-									<a class="btn btn-sm btn-danger pull-right" ng-click="deleteUserPrompt(member)" ng-if="(!member.is_owner || (member.customer_username == currentUser.customer_username)) && currentUser.is_owner"><span class="fa fa-times"></span></a>
-									<a class="pull-right" ng-if="(!(!member.is_owner || (member.customer_username == currentUser.customer_username)) && currentUser.is_owner)"><span class="fa fa-star fa-6"></span></a>
+									<a class="btn btn-sm btn-danger pull-right" ng-click="deleteUserPrompt(member)" ng-if="(currentUser.customer_username == member.customer_username) || (currentUser.is_owner && !member.is_owner)"><span class="fa fa-times"></span></a>
 									<a class="btn btn-sm btn-default pull-right second-button-ticket" ng-click="makeMemberOwnerPrompt(member)" ng-if="!member.is_owner && currentUser.is_owner"><span class="fa fa-briefcase "></span></a>
 								</div>
 							</div>
@@ -80,10 +79,9 @@
 		</div>
 		<div class="row">
 			<div class="col-sm-offset-9 col-sm-3">
-				<button class="btn btn-success btn-block" data-toggle="modal" data-target="#addMemberModal">
+				<button class="btn btn-success btn-block" data-toggle="modal" data-target="#addMemberModal" ng-if="currentUser.is_owner">
 					Add
 				</button>
-
 			</div>
 		</div>
 	</form>
@@ -254,11 +252,11 @@
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 class="modal-title">Delete Member</h4>
+				<h4 class="modal-title">Remove Member</h4>
 			</div>
 			<div class="modal-body">
 				<p>
-					Are you sure you want to delete this member?
+					Are you sure you want to remove this member?
 				</p>
 			</div>
 			<div class="modal-footer">
@@ -266,7 +264,62 @@
 					Close
 				</button>
 				<button type="button" class="btn btn-primary" ng-click="removeMember()">
-					Delete
+					Remove
+				</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+
+<!-- modal delete Member -->
+<div class="modal fade" id="leaveModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Leave Organization</h4>
+			</div>
+			<div class="modal-body">
+				<p>
+					Are you sure you want to leave this organization?
+				</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="removeMember()">
+					Leave
+				</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+
+<!-- modal delete Member -->
+<div class="modal fade" id="alertOwnerModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">Leave Organization</h4>
+			</div>
+			<div class="modal-body">
+				<p>
+					You cannot leave this organization without assigning another person as owner
+				</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Close
 				</button>
 			</div>
 		</div>
@@ -342,7 +395,7 @@
 			</div>
 			<div class="modal-body">
 				<p>
-					Are you sure you want to assign member as an owner of the organization?
+					Are you sure you want to assign this member as an owner of the organization?
 				</p>
 			</div>
 			<div class="modal-footer">
@@ -395,11 +448,11 @@
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 class="modal-title">Delete Team</h4>
+				<h4 class="modal-title">Delete organization</h4>
 			</div>
 			<div class="modal-body">
 				<p>
-					Are you sure you want to delete this team?
+					Are you sure you want to delete this organization?
 				</p>
 			</div>
 			<div class="modal-footer">

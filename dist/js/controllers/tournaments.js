@@ -22,21 +22,19 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 	// Get Tournament Information
 	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data) {
 		$scope.tournament = data;
+		// Based on the tournament status init tabs
 		initDateAndTabs();
-		// Get competitors
-		if ($scope.competitorsTab)
-			getCompetitors();
 	});
 
 	// Get event Info
 	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data, status) {
-
 		$scope.eventInfo = data;
+
 		MatchUpCache.remove($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '?date=' + $stateParams.date + '&location=' + $stateParams.location);
 
 		// Check registration deadline with current time
 		$scope.canRegister = (new Date($scope.eventInfo.event_registration_deadline)).getTime() > now_utc.getTime();
-		
+
 		// Check if event is premium
 		if ($scope.eventInfo.host) {
 			premiumDetails();
@@ -44,25 +42,39 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 			regularDetails();
 	});
 
-	var initDateAndTabs = function () {		
-
+	var initDateAndTabs = function () {
+		
 		// Check tournament status
 		if ($scope.tournament.tournament_completed === null) {
 			// if null tournament has not started
 			$scope.competitorsTab = true;
-		}
-		else{
+			getCompetitors();
+		} else {
 			// Tournament Started
-			$scope.standingsTab = true;
-			$scope.roundsTab = ($scope.tournament.tournament_format == 'Single Elimination' || $scope.tournament.tournament_format == 'Double Elimination');
-			$scope.groupStageTab = ($scope.tournament.tournament_format == 'Round Robin' || $scope.tournament.tournament_type == 'Two Stage');
-			if($scope.tournament.tournament_completed)
+			if ($scope.tournament.tournament_completed) {
+				// Tournament ended, show standings
+				$scope.standingsTab = true;
+				$scope.competitorsTab = false;
 				getStandings();
-			getRounds();
-		}
+			} else {
+				// Tournament ongoing, show competitors instead of standings
+				$scope.competitorsTab = true;
+				$scope.standingsTab = true;
+				getStandings();
+				getCompetitors();
+			}
 			
-		$scope.bracketTypes = ['Winner', 'Loser'];
-		$scope.bracket = 'Winner';
+			// Show rounds tab if single, double, or round robin
+			$scope.roundsTab = ($scope.tournament.tournament_format == 'Single Elimination' || $scope.tournament.tournament_format == 'Double Elimination' || $scope.tournament.tournament_format == 'Round Robin');
+			
+			// Show groupstage tab if Two stage
+			$scope.groupStageTab = $scope.tournament.tournament_type == 'Two Stage';	
+
+			getRounds();
+			
+			$scope.bracketTypes = ['Winner', 'Loser'];
+			$scope.bracket = 'Winner';
+		}
 	};
 
 	var premiumDetails = function () {
@@ -109,15 +121,13 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 			}
 		});
 	};
-	
-	var getStandings = function (){
+
+	var getStandings = function () {
 		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/standings?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data) {
-			$scope.standings = data.finalStage.standings;
-			$scope.groups = data.groupStage.groups;
-			
 			console.log(data);
-			console.log($scope.standings);
-			console.log($scope.groups);
+			$scope.standings = data.finalStage.standings;
+			if($scope.tournament.tournament_type == 'Two Stage')
+				$scope.groups = data.groupStage.groups;
 		});
 	}
 
@@ -150,23 +160,22 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 	};
 
 	// Get match details
-	$scope.getTournamentMatch = function (round, match,round_of) {
+	$scope.getTournamentMatch = function (round, match, round_of) {
 		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/rounds/' + round + '/matches/' + match + '?round_of=' + round_of + '&date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data, status) {
 			$scope.matchInfo = data;
 			$scope.matchInfo.round = round;
 			$scope.matchInfo.match = match;
-			$scope.matchInfo.details = $scope.bracketType[round -1].matches[match - 1];
-			if($scope.matchInfo.score_type == 'Points'){
+			$scope.matchInfo.details = $scope.bracketType[round - 1].matches[match - 1];
+			if ($scope.matchInfo.score_type == 'Points') {
 				$scope.matchInfo.players[0].score = 0;
 				$scope.matchInfo.players[1].score = 0;
-				for(var i = 0; i < $scope.matchInfo.sets.length ;i++){
-					if($scope.matchInfo.sets[i].scores[0].competitor_number){
-						if($scope.matchInfo.sets[i].scores[0].score > $scope.matchInfo.sets[i].scores[1].score)
+				for (var i = 0; i < $scope.matchInfo.sets.length; i++) {
+					if ($scope.matchInfo.sets[i].scores[0].competitor_number) {
+						if ($scope.matchInfo.sets[i].scores[0].score > $scope.matchInfo.sets[i].scores[1].score)
 							$scope.matchInfo.players[0].score++;
 						else
 							$scope.matchInfo.players[1].score++;
-					}
-					else
+					} else
 						break;
 				}
 			}
@@ -205,19 +214,19 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 	}
 
 	$scope.teamSelected = function (selectedIndex) {
-		if(selectedIndex == $scope.selected.team)
+		if (selectedIndex == $scope.selected.team)
 			return
 		$scope.currentSize = 0;
 		$scope.selected.team = selectedIndex;
 		$scope.members = $scope.teamsRoster[selectedIndex].data;
 	}
-	
-	$scope.memberRadio = function(checked){
-		if(checked)
+
+	$scope.memberRadio = function (checked) {
+		if (checked)
 			$scope.currentSize++;
 		else
 			$scope.currentSize--;
-		if($scope.currentSize == $scope.tournament.team_size)
+		if ($scope.currentSize == $scope.tournament.team_size)
 			$scope.sizeCorrect = true;
 		else
 			$scope.sizeCorrect = false;
@@ -238,12 +247,12 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 				team: $scope.teams[$scope.selected.team].team_name,
 				players: []
 			}
-			for(var i = 0; i < $scope.members.length ; i++){
-				if($scope.members[i].checked)
+			for (var i = 0; i < $scope.members.length; i++) {
+				if ($scope.members[i].checked)
 					request.players.push($scope.members[i].customer_username);
 			}
 			console.log(request);
-			$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/register?date=' + $stateParams.date + '&location=' + $stateParams.location,request).success(function (data, status) {
+			$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/register?date=' + $stateParams.date + '&location=' + $stateParams.location, request).success(function (data, status) {
 				$scope.tournament.is_competitor = true;
 				$('#teamSignUpModal').modal('hide');
 				$('#successModal').modal('show');

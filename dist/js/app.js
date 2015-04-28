@@ -122,15 +122,20 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			templateUrl: "organizer/tournament_list.html",
 			controller: "editHostedTournamentListController"
 		})
-			.state('app.tournamentDetails', {
+		.state('app.tournamentDetails', {
 			url: "/settings/event/:eventName/:eventDate/:eventLocation/tournaments/:tournamentName",
 			templateUrl: "organizer/tournament_details.html",
 			controller: "tournamentDetailsController"
 		})
- 		.state('app.registrations', {
+		.state('app.registrations', {
 			url: "/event/:eventName/:eventDate/:eventLocation/registrations",
 			templateUrl: "organizer/registrations.html",
 			controller: "RegistrationController"
+		})
+		.state('app.registrationsRegular', {
+			url: "/event/:eventName/:eventDate/:eventLocation/:tournamentName/regular/registrations",
+			templateUrl: "organizer/registrations_regular.html",
+			controller: "RegistrationRegularController"
 		})
 		.state('app.stationAssignment', {
 			url: "/event/:eventName/:eventDate/:eventLocation/stations/edit",
@@ -166,8 +171,6 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 		 */
 		.state('app.userProfile', {
 			url: "/user/:username",
-			// using my profile for now to fix edit page
-			// TODO change to user_profile and use ng-if
 			templateUrl: "user/user_profile.html",
 			controller: "profileSummaryController"
 		})

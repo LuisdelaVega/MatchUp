@@ -1,12 +1,5 @@
 <div class="row">
-	<div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
-		<div class="list-group">
-			<a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="tournament in tournaments" ng-click="getRegistrationInfo($index)">
-				<h4 class="list-group-item-heading">{{tournament.tournament_name}}</h4>
-			</a>
-		</div>
-	</div>
-	<div class="col-lg-9 col-md-9 col-sm-12 col-xs-12" ng-if="index == 0 || tournaments[index].team_size == 1">
+	<div class="col-lg-9 col-md-9 col-sm-12 col-xs-12" ng-if="tournament.team_size == 1">
 		<div class="box">
 			<form role="form">
 				<div class="form-group">
@@ -28,7 +21,7 @@
 			</form>
 		</div>
 	</div>
-	<div class="col-lg-9 col-md-9 col-sm-12 col-xs-12" ng-if="tournaments[index].team_size > 1">
+	<div class="col-lg-9 col-md-9 col-sm-12 col-xs-12" ng-if="tournament.team_size > 1">
 		<div class="box">
 			<form role="form">
 				<div class="form-group">

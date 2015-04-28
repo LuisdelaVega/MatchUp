@@ -1,4 +1,23 @@
-
+<div class="page-header">
+	<h1 style="display:inline">Browse Events</h1>
+	<div class="btn-group pull-right" style="padding-right:60px">
+		<div class="btn-group">
+			<a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+     			Event Type: {{filterBy}}<span class="caret"></span>
+      		</a>
+			<ul class="dropdown-menu">
+				<li><a ng-click="filter('All')">All</a>
+				</li>
+				<li><a ng-click="filter('local')">Local</a>
+				</li>
+				<li><a ng-click="filter('regional')">Regional</a>
+				</li>
+				<li><a ng-click="filter('national')">National</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>
 <!-- Nav tabs -->
 <ul class="nav nav-tabs nav-justified tab-padding-top">
 	<li class="active">
@@ -12,11 +31,12 @@
 <div class="tab-content panel-padding">
 	<div class="tab-pane fade in active" id="premium">
 		<div class="row">
-			<div class="col-lg-6 col-md-12 col-sm-12" ng-repeat ="hosted in hostedLiveEvents">
+			<div class="col-lg-6 col-md-12 col-sm-12" ng-repeat="hosted in hostedLiveEvents">
 				<div class="panel panel-default cursor" ng-click="goToEvent(hosted.event_name,  hosted.event_start_date, hosted.event_location)">
 					<!---TODO: change to ngclick go to event and params-->
 					<div class="panel-body">
-						<img style="width:100%;" ng-src="{{hosted.event_banner}}"><!--TODO change to banner-->
+						<img style="width:100%;" ng-src="{{hosted.event_banner}}">
+						<!--TODO change to banner-->
 					</div>
 					<div class="panel-footer">
 						<div class="row">
@@ -26,24 +46,26 @@
 							<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9">
 								<h3 class="event-footer-title">{{hosted.event_name}}</h3>
 								<p>
-									{{hosted.event_start_date  | date: 'medium'}}
+									{{hosted.event_start_date | date: 'medium'}}
 								</p>
 								<p>
 									{{hosted.event_location}}
 								</p>
 								<p>
-									Hosted by {{hosted.organization_name}} <!--TODO get who hosted-->
+									Hosted by {{hosted.organization_name}}
+									<!--TODO get who hosted-->
 								</p>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="col-lg-6 col-md-12 col-sm-12" ng-repeat ="hosted in hostedEvents">
+			<div class="col-lg-6 col-md-12 col-sm-12" ng-repeat="hosted in hostedEvents">
 				<div class="panel panel-default cursor" ng-click="goToEvent(hosted.event_name,  hosted.event_start_date, hosted.event_location)">
 					<!---TODO: change to ngclick go to event and params-->
 					<div class="panel-body">
-						<img style="width:100%;" ng-src="{{hosted.event_banner}}"><!--TODO change to banner-->
+						<img style="width:100%;" ng-src="{{hosted.event_banner}}">
+						<!--TODO change to banner-->
 					</div>
 					<div class="panel-footer">
 						<div class="row">
@@ -53,13 +75,14 @@
 							<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9">
 								<h3 class="event-footer-title">{{hosted.event_name}}</h3>
 								<p>
-									{{hosted.event_start_date  | date: 'medium'}}
+									{{hosted.event_start_date | date: 'medium'}}
 								</p>
 								<p>
 									{{hosted.event_location}}
 								</p>
 								<p>
-									Hosted by {{hosted.organization_name}} <!--TODO get who hosted-->
+									Hosted by {{hosted.organization_name}}
+									<!--TODO get who hosted-->
 								</p>
 							</div>
 						</div>
@@ -77,9 +100,8 @@
 						<div class="media-body">
 							<h3 class="event-footer-title">{{regular.event_name}}</h3>
 							<p>
-								{{regular.event_start_date  | date: 'medium'}}
-								<br>
-								{{regular.event_location}}
+								{{regular.event_start_date | date: 'medium'}}
+								<br> {{regular.event_location}}
 							</p>
 						</div>
 					</div>
@@ -92,9 +114,8 @@
 						<div class="media-body">
 							<h3 class="event-footer-title">{{regular.event_name}}</h3>
 							<p>
-								{{regular.event_start_date  | date: 'medium'}}
-								<br>
-								{{regular.event_location}}
+								{{regular.event_start_date | date: 'medium'}}
+								<br> {{regular.event_location}}
 							</p>
 						</div>
 					</div>

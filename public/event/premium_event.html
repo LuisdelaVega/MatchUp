@@ -303,10 +303,10 @@
 						<div class="radio" ng-repeat="fee in fees">
 							<div class="box box-margin">
 								<label>
-									<input type="radio" name="optionsRadios" ng-model="selected.name" ng-value="fee.spec_fee_name" ng-disabled="!(fee.spec_fee_amount_available - fee.sold)">
-									<span class="lead">{{fee.spec_fee_name}} ({{fee.spec_fee_amount | currency}}) <span class="text-danger" ng-if="!(fee.spec_fee_amount_available - fee.sold)">Sold Out!</span></span> </label>
+									<input type="radio" name="optionsRadios" ng-model="selected.name" ng-value="fee.spec_fee_name" ng-disabled="fee.spec_fee_amount_available <= fee.sold">
+									<span class="lead">{{fee.spec_fee_name}} ({{fee.spec_fee_amount | currency}}) <span class="text-danger" ng-if="fee.spec_fee_amount_available <= fee.sold">Sold Out!</span></span> </label>
 								<p>{{fee.spec_fee_description}}
-									<br><small>Available: {{fee.spec_fee_amount_available - fee.sold}}/{{fee.spec_fee_amount_available}}</small>
+									<br><small>Tickets available: {{fee.spec_fee_amount_available - fee.sold}}/{{fee.spec_fee_amount_available}}</small>
 								</p>
 							</div>
 						</div>
