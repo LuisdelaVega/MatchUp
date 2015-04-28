@@ -102,7 +102,7 @@
 						<li class="ticket-item" ng-repeat="member in members">
 							<div class="ticket-user">
 								<a class="btn btn-sm btn-danger pull-right" data-toggle="modal" data-target="#deleteCaptainPromptModal" ng-if="member.is_captain && currentUser.is_captain"><span class="fa fa-times"></span></a>
-								<a class="btn btn-sm btn-danger pull-right" ng-click="deleteUserPrompt(member)" ng-if="!member.is_captain"><span class="fa fa-times"></span></a>
+								<a class="btn btn-sm btn-danger pull-right" ng-click="deleteUserPrompt(member)" ng-if=" !member.is_captain && (currentUser.customer_username == member.customer_username || currentUser.is_captain)"><span class="fa fa-times"></span></a>
 								<a class="btn btn-sm btn-default pull-right second-button-ticket" ng-click="makeUserCaptainPrompt(member)" ng-if="!member.is_captain && currentUser.is_captain"><span class="fa fa-star"></span></a>
 								<img ng-src="{{member.customer_profile_pic}}" class="user-avatar">
 								<span class="user-name">{{member.customer_tag}} ({{member.customer_first_name}} {{member.customer_last_name}})</span>
@@ -112,7 +112,7 @@
 				</div>
 				<div class="row">
 					<div class="col-sm-offset-4 col-sm-4">
-						<button class="btn btn-success btn-block" data-toggle="modal" data-target="#addTeammateModal">
+						<button class="btn btn-success btn-block" data-toggle="modal" data-target="#addTeammateModal" ng-if="currentUser.is_captain">
 							Add
 						</button>
 					</div>
@@ -177,11 +177,16 @@
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
-					<h4 class="modal-title">Delete Teammate</h4>
+					<h4 class="modal-title" ng-if="deleteTeammate.customer_username != me">
+						Remove Teammate
+					</h4>
+					<h4 class="modal-title" ng-if="deleteTeammate.customer_username == me">
+						Leave Team
+					</h4>
 				</div>
 				<div class="modal-body">
 					<p ng-if="deleteTeammate.customer_username != me">
-						Are you sure you want to delete this teammate?
+						Are you sure you want to remove this teammate?
 					</p>
 					<p ng-if="deleteTeammate.customer_username == me">
 						Are you sure you want to leave this team?
@@ -192,7 +197,12 @@
 						Close
 					</button>
 					<button type="button" ng-click="removeMember()" class="btn btn-primary">
-						Delete
+						<span ng-if="deleteTeammate.customer_username != me">
+						Remove
+					</span>
+						<span ng-if="deleteTeammate.customer_username == me">
+						Leave
+					</span>
 					</button>
 				</div>
 			</div>
@@ -211,8 +221,11 @@
 					<h4 class="modal-title">Leave Team</h4>
 				</div>
 				<div class="modal-body">
-					<p>
+					<p ng-if="membersList.length > 1">
 						You cannot leave this team without assignning the position of captain to another member.
+					</p>
+					<p ng-if="membersList.length == 1">
+						You cannot leave a team with no members! Please delete the team if you like so. 
 					</p>
 				</div>
 				<div class="modal-footer">
