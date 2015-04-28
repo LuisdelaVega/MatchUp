@@ -2152,6 +2152,66 @@ var unPauseRound = function(req, res, pg, conString, log) {
 	});
 };
 
+var changeTimeAndDateOfRound = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		client.query("BEGIN");
+		var query = client.query({
+			text : "SELECT tournament_name FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
+			values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+		});
+		query.on("row", function(row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function(error) {
+			client.query("ROLLBACK");
+			done();
+			console.log("torunament.js - changeTimeAndDateOfRound");
+			console.log(error);
+			res.status(500).send(error);
+			log.info({
+				res : res
+			}, 'done response');
+		});
+		query.on("end", function(result) {
+			if (result.rows.length) {
+				client.query({
+					text: "UPDATE round SET round_start_date = $7 WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6",
+					values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.body.start_date]
+				}, function (err, result) {
+					if (err) {
+						client.query("ROLLBACK");
+						done();
+						console.log("torunament.js - changeTimeAndDateOfRound");
+						console.log(err);
+						res.status(500).send(err);
+						log.info({
+							res: res
+						}, 'done response');
+					} else {
+						client.query("COMMIT");
+						done();
+						res.status(200).send("Updated");
+						log.info({
+							res: res
+						}, 'done response');
+					}
+				});
+			} else {
+				client.query("ROLLBACK");
+				done();
+				res.status(404).send("Tournament not found");
+				log.info({
+					res: res
+				}, 'done response');
+			}
+		});
+	});
+};
+
 function addSet(req, res, client, done, log, match_number, next_set, index, length, canEnd) {
 	client.query({
 		text: "INSERT INTO is_set (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
@@ -2792,3 +2852,4 @@ module.exports.markAsFavourite = markAsFavourite;
 module.exports.unPauseRound = unPauseRound;
 module.exports.editBestOf = editBestOf;
 module.exports.changeStation = changeStation;
+module.exports.changeTimeAndDateOfRound = changeTimeAndDateOfRound;

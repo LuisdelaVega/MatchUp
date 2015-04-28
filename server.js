@@ -518,7 +518,12 @@ app.route('/matchup/events/:event/tournaments/:tournament/rounds').get(function(
  * TODO Update API
  *
  * [POST] Edit the amount of sets for the matches in a round
- * [PUT] Un-pause a round
+ * [PUT] Un-pause a round or change the start date of a round
+ *      params:
+ *          + Body
+ *              {
+ *                  "start_date" : timestamp
+ *              }
  */
 app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round').post(function(req, res) {
 	log.info({
@@ -529,7 +534,20 @@ app.route('/matchup/events/:event/tournaments/:tournament/rounds/:round').post(f
 	log.info({
 		req : req
 	}, 'start request');
-	tournaments.unPauseRound(req, res, pg, conString, log);
+	if (req.body.start_date) {
+		if ((new Date(req.body.start_date)).getTime() == -1) {
+			res.status(400).json({
+				invalid_date_value : true
+			});
+			log.info({
+				res: res
+			}, 'done response');
+		} else {
+			tournaments.changeTimeAndDateOfRound(req, res, pg, conString, log);
+		}
+	} else {
+		tournaments.unPauseRound(req, res, pg, conString, log);
+	}
 });
 
 /* /matchup/events/:event/tournaments/:tournament/rounds/:rounds/matches/:match?round_of=string
