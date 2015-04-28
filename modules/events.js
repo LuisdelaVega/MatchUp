@@ -4615,8 +4615,7 @@ var removeSpecFee = function(req, res, pg, conString, log) {
             }, 'done response');
         });
         query.on("end", function(result) {
-            console.log(result.rows[0].sold);
-            console.log(parseInt(result.rows[0].sold));
+            var sold = parseInt(result.rows[0].sold);
             if (!parseInt(result.rows[0].sold)) {
                 client.query({
                     text : "DELETE FROM spectator_fee WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND spec_fee_name = $4",
@@ -4638,8 +4637,8 @@ var removeSpecFee = function(req, res, pg, conString, log) {
                 });
             } else {
                 client.query({
-                    text : "UPDATE spectator_fee SET spec_fee_amount_available = 0 WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND spec_fee_name = $4",
-                    values : [req.params.event, req.query.date, req.query.location, req.params.spec_fee]
+                    text : "UPDATE spectator_fee SET spec_fee_amount_available = $5 WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND spec_fee_name = $4",
+                    values : [req.params.event, req.query.date, req.query.location, req.params.spec_fee, sold]
                 }, function(err, result) {
                     if (err) {
                         client.query("ROLLBACK");
