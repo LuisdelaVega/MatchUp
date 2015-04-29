@@ -290,7 +290,7 @@ SELECT CASE WHEN tournament.team_size > 1 THEN team.team_name || $6 || team.team
 
 SELECT CASE WHEN tournament.team_size > 1 THEN team.team_name || ',;!;,' || team.team_logo ELSE customer.customer_username || ',;!;,' || customer.customer_profile_pic || ',;!;,' || customer.customer_tag END AS info, competitor.competitor_number, competitor.competitor_seed FROM competitor JOIN competes ON competitor.event_name = competes.event_name AND competitor.event_start_date = competes.event_start_date AND competitor.event_location = competes.event_location AND competitor.tournament_name = competes.tournament_name AND competes.round_of = 'Winner' JOIN tournament ON competitor.event_name = tournament.event_name AND competitor.event_start_date = tournament.event_start_date AND competitor.event_location = tournament.event_location AND competitor.tournament_name = tournament.tournament_name JOIN is_a ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN customer ON customer.customer_username = is_a.customer_username LEFT OUTER JOIN competes_for ON competes_for.event_name = competitor.event_name AND competes_for.event_start_date = competitor.event_start_date AND competes_for.event_location = competitor.event_location AND competes_for.tournament_name = competitor.tournament_name AND competes_for.competitor_number = competitor.competitor_number LEFT OUTER JOIN team ON team.team_name = competes_for.team_name WHERE tournament.event_name = 'Input test' AND tournament.event_start_date = '2015-04-27 22:00:00' AND tournament.event_location = 'UPR Mayaguez' AND tournament.tournament_name = 'Dota 2 scrub tier' AND competitor.competitor_seed > 0 GROUP BY tournament.team_size, team.team_name, team.team_logo, customer.customer_username, customer.customer_profile_pic, customer.customer_tag, competitor.competitor_number, competitor.competitor_seed, competitor.competitor_standing;
 
-SELECT CASE WHEN tournament.team_size > 1 THEN team.team_name || ',;!;,' || team.team_logo ELSE customer.customer_username || ',;!;,' || customer.customer_profile_pic || ',;!;,' || customer.customer_tag END AS info, competitor.competitor_number, competitor.competitor_seed FROM competitor JOIN competes ON competitor.event_name = competes.event_name AND competitor.event_start_date = competes.event_start_date AND competitor.event_location = competes.event_location AND competitor.tournament_name = competes.tournament_name AND competes.round_of = $5 JOIN tournament ON competitor.event_name = tournament.event_name AND competitor.event_start_date = tournament.event_start_date AND competitor.event_location = tournament.event_location AND competitor.tournament_name = tournament.tournament_name JOIN is_a ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN customer ON customer.customer_username = is_a.customer_username LEFT OUTER JOIN competes_for ON competes_for.event_name = competitor.event_name AND competes_for.event_start_date = competitor.event_start_date AND competes_for.event_location = competitor.event_location AND competes_for.tournament_name = competitor.tournament_name AND competes_for.competitor_number = competitor.competitor_number LEFT OUTER JOIN team ON team.team_name = competes_for.team_name WHERE tournament.event_name = $1 AND tournament.event_start_date = $2 AND tournament.event_location = $3 AND tournament.tournament_name = $4 AND competitor.competitor_seed > 0 GROUP BY tournament.team_size, team.team_name, team.team_logo, customer.customer_username, customer.customer_profile_pic, customer.customer_tag, competitor.competitor_number, competitor.competitor_seed, competitor.competitor_standing
+SELECT CASE WHEN tournament.team_size > 1 THEN team.team_name || ',;!;,' || team.team_logo ELSE customer.customer_username || ',;!;,' || customer.customer_profile_pic || ',;!;,' || customer.customer_tag END AS info, competitor.competitor_number, competitor.competitor_seed FROM competitor JOIN competes ON competitor.event_name = competes.event_name AND competitor.event_start_date = competes.event_start_date AND competitor.event_location = competes.event_location AND competitor.tournament_name = competes.tournament_name AND competes.round_of = 'Winner' JOIN tournament ON competitor.event_name = tournament.event_name AND competitor.event_start_date = tournament.event_start_date AND competitor.event_location = tournament.event_location AND competitor.tournament_name = tournament.tournament_name JOIN is_a ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN customer ON customer.customer_username = is_a.customer_username LEFT OUTER JOIN competes_for ON competes_for.event_name = competitor.event_name AND competes_for.event_start_date = competitor.event_start_date AND competes_for.event_location = competitor.event_location AND competes_for.tournament_name = competitor.tournament_name AND competes_for.competitor_number = competitor.competitor_number LEFT OUTER JOIN team ON team.team_name = competes_for.team_name WHERE tournament.event_name = 'Event 01' AND tournament.event_start_date = '2015-03-25 09:00:00' AND tournament.event_location = 'miradero' AND tournament.tournament_name = 'Mortal Kombat X Qualifiers' AND competitor.competitor_seed > 0 GROUP BY tournament.team_size, team.team_name, team.team_logo, customer.customer_username, customer.customer_profile_pic, customer.customer_tag, competitor.competitor_number, competitor.competitor_seed;
 
 SELECT distinct competitor.competitor_number FROM competes NATURAL JOIN competitor WHERE event_name = 'Event 01' AND event_start_date = '2015-03-25 09:00:00' AND event_location = 'miradero' AND tournament_name = 'Mortal Kombat X Qualifiers' AND round_of = 'Winner';
 
@@ -301,6 +301,37 @@ SELECT every(round_completed) AS stage_completed, count(SELECT distinct competit
 http://127.0.0.1:5000/matchup/events/Input test/tournaments/Dota 2 scrub tier/standings?date=2015-04-27 22:00:00&location=UPR Mayaguez
 
 http://127.0.0.1:5000/matchup/events/Event 01/tournaments/Mortal Kombat X Qualifiers/standings?date=2015-03-25 09:00:00&location=miradero
+
+
+SELECT CASE WHEN tournament.team_size > 1 THEN team.team_name || ',;!;,' || team.team_logo ELSE customer.customer_username || ',;!;,' || customer.customer_profile_pic || ',;!;,' || customer.customer_tag END AS info, competitor.competitor_number, competitor.competitor_seed FROM competitor JOIN competes ON competitor.event_name = competes.event_name AND competitor.event_start_date = competes.event_start_date AND competitor.event_location = competes.event_location AND competitor.tournament_name = competes.tournament_name AND competes.round_of = $5 JOIN tournament ON competitor.event_name = tournament.event_name AND competitor.event_start_date = tournament.event_start_date AND competitor.event_location = tournament.event_location AND competitor.tournament_name = tournament.tournament_name JOIN is_a ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN customer ON customer.customer_username = is_a.customer_username LEFT OUTER JOIN competes_for ON competes_for.event_name = competitor.event_name AND competes_for.event_start_date = competitor.event_start_date AND competes_for.event_location = competitor.event_location AND competes_for.tournament_name = competitor.tournament_name AND competes_for.competitor_number = competitor.competitor_number LEFT OUTER JOIN team ON team.team_name = competes_for.team_name WHERE tournament.event_name = $1 AND tournament.event_start_date = $2 AND tournament.event_location = $3 AND tournament.tournament_name = $4 AND competitor.competitor_seed > 0 GROUP BY tournament.team_size, team.team_name, team.team_logo, customer.customer_username, customer.customer_profile_pic, customer.customer_tag, competitor.competitor_number, competitor.competitor_seed;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
