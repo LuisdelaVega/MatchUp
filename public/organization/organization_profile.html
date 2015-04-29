@@ -19,7 +19,7 @@
 	</div>
 </div>
 
-<div class="widget-box box-margin" ng-if="sponsors.lenght >0">
+<div class="widget-box box-margin" ng-if="sponsors.length >0">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary"> Sponsors</h3>
 	</div>
@@ -40,10 +40,10 @@
 </div>
 
 <!-- Events widget -->
-<div class="widget-box box-margin" ng-if="events.lenght >0">
+<div class="widget-box box-margin" ng-if="events.length >0">
 	<div class="widget-header bordered-bottom bordered-themesecondary">
 		<h3 class="widget-title themesecondary">Events</h3>
-		<a class="widget-more" ng-if="events.lenght >4" ui-sref="app.organizationEvents({organizationName: organization.organization_name})"> See More<i class="fa fa-arrow-circle-o-right panel-padding"></i> </a>
+		<a class="widget-more" ng-if="events.length >4" ui-sref="app.organizationEvents({organizationName: organization.organization_name})"> See More<i class="fa fa-arrow-circle-o-right panel-padding"></i> </a>
 	</div>
 	<!--Widget Header-->
 	<div class="widget-body">

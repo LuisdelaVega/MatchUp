@@ -58,7 +58,7 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 		for (var i = 0; i < $scope.tournamentsInfo.length; i++) {
 			competitorsGets.push($http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $scope.tournamentsInfo[i].tournament_name + '/competitors?date=' + $stateParams.date + '&location=' + $stateParams.location))
 		}
-		
+
 		$q.all(competitorsGets).then(function (results) {
 			$scope.competitorsResult = results;
 			console.log($scope.competitorsResult);
@@ -189,7 +189,10 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 		//getr all reviews
 	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/reviews?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data) {
 		$scope.reviews = data;
-
+		$scope.hasReview = false;
+		angular.forEach($scope.reviews, function (review) {
+			$scope.hasReview = (review.customer_username == $scope.me);
+		});
 	}).error(function (err) {
 		console.log(err);
 	});
@@ -292,23 +295,16 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 
 	$scope.deleteReview = function () {
 		//REST DELETE REQUEST
+		$http.delete($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/reviews/' + $scope.me + '?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data) {
+			$scope.hasReview = false;
+			$scope.reviews.splice($scope.reviewIndex, 1);
+			$('#deleteReviewModal').modal("hide");
+			$scope.newReview = {};
 
-		$http.get($rootScope.baseURL + '/matchup/profile').success(function (data) {}).success(function (data) {
-			$scope.user = data;
-			$http.delete($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/reviews/' + $scope.user.customer_username + '?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data) {
-				$scope.reviews.splice($scope.reviewIndex, 1);
-				$('#deleteReviewModal').modal("hide");
-				$scope.newReview = {};
-
-			}).error(function (err) {
-				console.log(err);
-				alert("Review was not deleted, error ocurred");
-			});
 		}).error(function (err) {
 			console.log(err);
 			alert("Review was not deleted, error ocurred");
 		});
-
 	};
 
 });

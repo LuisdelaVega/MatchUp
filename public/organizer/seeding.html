@@ -1,9 +1,8 @@
 <div class="row">
 	<div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
-
 		<div class="list-group">
-			<!-- <a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="tournament in tournaments" ng-click="getSeedingInfo($index)"> -->
-			<a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="tournament in tournaments" ng-click="getTournament($index)"> <h4 class="list-group-item-heading">{{tournament.tournament_name}}</h4> </a>
+			<a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="tournament in tournaments" ng-click="getTournament($index)">
+				<h4 class="list-group-item-heading">{{tournament.tournament_name}}</h4> </a>
 		</div>
 	</div>
 	<div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
@@ -13,79 +12,61 @@
 			</legend>
 			<div class="row">
 				<!-- IF the tournament is not team based  -->
-				<div class="col-md-6 col-md-offset-3" ng-if="!teamBased">
-					<table class="table table-hover noselect" as-sortable="sortableOptions" ng-model="competitors" is-disabled="seedingCreated" ng-change="sdf()">
-						<thead>
-							<tr>
-								<th>Seed</th>
-								<th>Tag</th>
-								<th>User Name</th>
-							</tr>
-						</thead>
-						<tbody ng-repeat="competitor in competitors" as-sortable-item class="as-sortable-item">
-							<tr as-sortable-item-handle class="as-sortable-item-handle">
-								<td style="width:30%">{{$index + 1}}</td>
-								<td data-ng-bind="competitor.customer_tag"></td>
-								<td data-ng-bind="competitor.customer_username"></td>
-
-							</tr>
-						</tbody>
-					</table>
-					<div class="btn-group btn-group-justified box-margin" role="group">
-						<div class="btn-group" role="group" ng-if="!bracket" >
-							<button class="btn btn-primary" ng-click="saveSeeding()" >
-								Save Seeding
-							</button>
-						</div>
-						<div class="btn-group " role="group" ng-if="!bracket" >
-							<button class="btn btn-success" ng-click="createBracket()">
-								Create Bracket
-							</button>
-						</div>
-						<div class="btn-group" role="group" ng-if="bracket" >
-							<button class="btn btn-danger" ng-click="deleteBracket()">
-								Delete Bracket
-							</button>
-						</div>
+				<div class="col-md-6 col-md-offset-3">
+					<div ng-if="!teamBased">
+						<table class="table table-hover noselect" as-sortable="sortableOptions" ng-model="competitors" is-disabled="seedingCreated" ng-if="competitors.length">
+							<thead>
+								<tr>
+									<th>Seed</th>
+									<th>Tag</th>
+									<th>User Name</th>
+								</tr>
+							</thead>
+							<tbody ng-repeat="competitor in competitors" as-sortable-item class="as-sortable-item">
+								<tr as-sortable-item-handle class="as-sortable-item-handle">
+									<td style="width:30%">{{$index + 1}}</td>
+									<td data-ng-bind="competitor.customer_tag"></td>
+									<td data-ng-bind="competitor.customer_username"></td>
+								</tr>
+							</tbody>
+						</table>
 					</div>
+					<div ng-if="teamBased">
+						<table class="table table-hover noselect" as-sortable="sortableOptions" ng-model="competitors" is-disabled="seedingCreated" ng-if="competitors.length">
+							<thead>
+								<tr>
+									<th>Seed</th>
+									<th>Team Name</th>
+								</tr>
+							</thead>
+							<tbody ng-repeat="competitor in competitors" as-sortable-item class="as-sortable-item">
+								<tr as-sortable-item-handle class="as-sortable-item-handle">
+									<td style="width:30%">{{$index + 1}}</td>
+									<td data-ng-bind="competitor.team_name"></td>
 
-				</div>
-				<!-- IF the tournament is team based  -->
-				<div class="col-md-6 col-md-offset-3" ng-if="teamBased">
-					<table class="table table-hover noselect" as-sortable="sortableOptions" ng-model="competitors" is-disabled="seedingCreated" ng-change="sdf()">
-						<thead>
-							<tr>
-								<th>Seed</th>
-								<th>Team Name</th>
-							</tr>
-						</thead>
-						<tbody ng-repeat="competitor in competitors" as-sortable-item class="as-sortable-item">
-							<tr as-sortable-item-handle class="as-sortable-item-handle">
-								<td style="width:30%">{{$index + 1}}</td>
-								<td data-ng-bind="competitor.team_name"></td>
-
-							</tr>
-						</tbody>
-					</table>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<p class="lead" ng-if="competitors.length<=2">Three competitors must be signed up to start the tournament</p>
 					<div class="btn-group btn-group-justified box-margin" role="group">
-						<div class="btn-group" role="group" ng-if="!bracket" >
-							<button class="btn btn-primary" ng-click="saveSeeding()" >
+						<div class="btn-group" role="group" ng-if="!bracket">
+							<button class="btn btn-primary" ng-click="saveSeeding()" ng-disabled="competitors.length<=2">
 								Save Seeding
 							</button>
 						</div>
-						<div class="btn-group " role="group" ng-if="!bracket" >
-							<button class="btn btn-success" ng-click="createBracket()">
+						<div class="btn-group " role="group" ng-if="!bracket">
+							<button class="btn btn-success" ng-click="createBracket()" ng-disabled="competitors.length<=2">
 								Create Bracket
 							</button>
 						</div>
-						<div class="btn-group" role="group" ng-if="bracket" >
+						<div class="btn-group" role="group" ng-if="bracket">
 							<button class="btn btn-danger" ng-click="deleteBracket()">
 								Delete Bracket
 							</button>
 						</div>
 					</div>
 				</div>
-
 			</div>
 		</div>
 

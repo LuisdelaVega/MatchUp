@@ -233,7 +233,14 @@ myApp.controller("ReportsController", function ($scope, $http, $window, $rootSco
 	$scope.index
 
 	$scope.reportModal = function (index) {
+		
 		$scope.index = index;
+		
+		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName +'/tournaments/' + $scope.reports[$scope.index].tournament_name + '/rounds/' + $scope.reports[$scope.index].round_number + '/matches/' + $scope.reports[$scope.index].match_number + '?round_of=' + $scope.reports[$scope.index].round_of + '&date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function (data, status) {
+			$scope.matchInfo = data;
+			console.log(data);
+		});
+		
 		$('#reportModal').modal('show');
 	};
 
@@ -245,7 +252,7 @@ myApp.controller("ReportsController", function ($scope, $http, $window, $rootSco
 		else if ($scope.reports[$scope.index].report_status == "Attending")
 			tempStatus = "Resolved";
 
-		$http.put($rootScope.baseURL + '/matchup/events/' + $scope.reports[$scope.index].event_name + '/tournaments/' + $scope.reports[$scope.index].tournament_name + '/rounds/' + $scope.reports[$scope.index].round_number + '/matches/' + $scope.reports[$scope.index].match_number + '/' + $scope.reports[$scope.index].set_seq + '/' + $scope.reports[$scope.index].report_number + '?date=' + $scope.reports[$scope.index].report_date + '&location=' + $scope.reports[$scope.index].event_location + '&round_of=' + $scope.reports[$scope.index].round_of, {
+		$http.put($rootScope.baseURL + '/matchup/events/' + $scope.reports[$scope.index].event_name + '/tournaments/' + $scope.reports[$scope.index].tournament_name + '/rounds/' + $scope.reports[$scope.index].round_number + '/matches/' + $scope.reports[$scope.index].match_number + '/' + $scope.reports[$scope.index].set_seq + '/' + $scope.reports[$scope.index].report_number + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&round_of=' + $scope.reports[$scope.index].round_of, {
 			"status": tempStatus
 		}).success(function (data) {
 			$scope.reports[$scope.index].report_status = tempStatus;
@@ -259,21 +266,21 @@ myApp.controller("ReportsController", function ($scope, $http, $window, $rootSco
 
 });
 
-myApp.controller("StationController", function($scope, $http, $window, $rootScope, $state, $stateParams, $rootScope) {
+myApp.controller("StationController", function ($scope, $http, $window, $rootScope, $state, $stateParams, $rootScope) {
 
 	$scope.stations = [];
 
-	$scope.showEventStations = function() {
+	$scope.showEventStations = function () {
 
 		//get all stations for this event
-		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/stations?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/stations?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function (data) {
 			console.log("Event Stations");
 			console.log(data);
 			$scope.allStations = data;
 			$scope.stations = data;
 			$scope.index = 0;
 
-		}).error(function(err) {
+		}).error(function (err) {
 			console.log(err);
 		});
 
@@ -281,21 +288,21 @@ myApp.controller("StationController", function($scope, $http, $window, $rootScop
 	$scope.showEventStations();
 
 	//get all tournaments for this event
-	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function (data) {
 		console.log("Event Tournaments");
 		console.log(data);
 		$scope.tournaments = data;
 
 		$scope.tournaments.unshift({
-			"tournament_name" : "All Stations"
+			"tournament_name": "All Stations"
 		});
 
-	}).error(function(err) {
+	}).error(function (err) {
 		console.log(err);
 	});
 
 	// Index to show active item in list of tournament
-	$scope.getTournamentStation = function(index) {
+	$scope.getTournamentStation = function (index) {
 		$scope.index = index;
 		if (index == 0) {
 			$scope.showEventStations();
@@ -303,19 +310,19 @@ myApp.controller("StationController", function($scope, $http, $window, $rootScop
 		}
 
 		//get all stations for this tournament
-		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[index].tournament_name + '/stations?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[index].tournament_name + '/stations?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function (data) {
 			console.log("Event Tournaments");
 			console.log(data);
 			$scope.stations = data;
 
-		}).error(function(err) {
+		}).error(function (err) {
 			console.log(err);
 		});
 
 	};
 
 	// Edit a single station
-	$scope.editStationModal = function(index) {
+	$scope.editStationModal = function (index) {
 
 		// Index to save the current station selected
 		$scope.stationIndex = index;
@@ -324,21 +331,21 @@ myApp.controller("StationController", function($scope, $http, $window, $rootScop
 		//	for(j=1; j < $scope.tournaments.length-1; j++){
 		var j = 1;
 
-		angular.forEach($scope.tournaments, function(tournament) {
-			$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + tournament.tournament_name + '/stations?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+		angular.forEach($scope.tournaments, function (tournament) {
+			$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + tournament.tournament_name + '/stations?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function (data) {
 				$scope.stationsOfTournament = data;
 
-				angular.forEach($scope.stationsOfTournament, function(tournamentStation) {
+				angular.forEach($scope.stationsOfTournament, function (tournamentStation) {
 					if ($scope.stations[index].station_number == tournamentStation.station_number) {
 						$scope.stationInUse.push({
-							"name" : tournament.tournament_name
+							"name": tournament.tournament_name
 						});
 						return;
 					}
 
 				});
 
-			}).error(function(err) {
+			}).error(function (err) {
 				console.log(err);
 			});
 
@@ -362,14 +369,14 @@ myApp.controller("StationController", function($scope, $http, $window, $rootScop
 	};
 
 	// Link a existing station to a tournament
-	$scope.linkStation = function(index) {
+	$scope.linkStation = function (index) {
 		// Get all stations
 
 		// Array to save available stations
 		$scope.availableStations = [];
 		// Remove stations in current tournament from the array of all stations
-		for ( i = 0; i < $scope.allStations.length; i++) {
-			for ( j = 0; j < $scope.stations.length; j++) {
+		for (i = 0; i < $scope.allStations.length; i++) {
+			for (j = 0; j < $scope.stations.length; j++) {
 				// If found jump to next station in allStations
 				if ($scope.allStations[i].station_number == $scope.stations[j].station_number) {
 					break;
@@ -394,31 +401,31 @@ myApp.controller("StationController", function($scope, $http, $window, $rootScop
 
 	// Radio button model
 	$scope.selected = {
-		station : null
+		station: null
 	};
 	// Attach station to a tournament
-	$scope.attatch = function() {
+	$scope.attatch = function () {
 		if ($scope.selected.station) {
-			$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&station=' + angular.fromJson($scope.selected.station).station_number).success(function(data) {
+			$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&station=' + angular.fromJson($scope.selected.station).station_number).success(function (data) {
 				$scope.stations.push(angular.fromJson($scope.selected.station));
 				$('#linkStation').modal("hide");
 				$scope.selected.station = null;
-			}).error(function(err) {
+			}).error(function (err) {
 				console.log(err);
 			});
 		}
 	};
 
 	// Add a new station to the event attatch to the selected tournament
-	$scope.addStation = function() {
+	$scope.addStation = function () {
 
-		$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/stations?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+		$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/stations?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function (data) {
 			console.log(data);
 
 			$scope.allStations.push({
-				"station_number" : data.number,
-				"station_in_use" : false,
-				"stream_link" : null
+				"station_number": data.number,
+				"station_in_use": false,
+				"stream_link": null
 			});
 
 			// //add current station to tour
@@ -430,13 +437,13 @@ myApp.controller("StationController", function($scope, $http, $window, $rootScop
 			// });
 			// }
 
-		}).error(function(err) {
+		}).error(function (err) {
 			console.log(err);
 		});
 
 	};
 
-	$scope.editStream = function() {
+	$scope.editStream = function () {
 		// Get input value and overwrite station stream link
 		console.log(!$scope.newStream);
 		if (!$scope.newStream) {
@@ -444,8 +451,8 @@ myApp.controller("StationController", function($scope, $http, $window, $rootScop
 			return;
 		}
 		$http.put($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/stations/' + $scope.stations[$scope.stationIndex].station_number + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation, {
-			"stream" : $scope.newStream
-		}).success(function(data) {
+			"stream": $scope.newStream
+		}).success(function (data) {
 			if ($scope.index > 0)
 				$scope.stations[$scope.stationIndex].stream_link = $scope.newStream;
 			else
@@ -454,21 +461,21 @@ myApp.controller("StationController", function($scope, $http, $window, $rootScop
 			$scope.newStream = "";
 			$('#editStationModal').modal('hide');
 
-		}).error(function(err) {
+		}).error(function (err) {
 			console.log(err);
 		});
 
 	};
 
-	$scope.addStream = function() {
+	$scope.addStream = function () {
 		if (!$scope.newStream) {
 			alert("Please specify a link for streaming!");
 			return;
 		}
 		// Get input value and overwrite station stream link
 		$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/stations/' + $scope.stations[$scope.stationIndex].station_number + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation, {
-			"stream" : $scope.newStream
-		}).success(function(data) {
+			"stream": $scope.newStream
+		}).success(function (data) {
 			if ($scope.index > 0)
 				$scope.stations[$scope.stationIndex].stream_link = $scope.newStream;
 			else
@@ -477,29 +484,29 @@ myApp.controller("StationController", function($scope, $http, $window, $rootScop
 			$scope.newStream = "";
 			$('#editStationModal').modal('hide');
 
-		}).error(function(err) {
+		}).error(function (err) {
 			console.log(err);
 		});
 
 	};
 
 	// Remove station from tournament
-	$scope.removeStation = function() {
-		$http.delete($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '/stations?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&station=' + $scope.stations[$scope.stationIndex].station_number).success(function(data) {
+	$scope.removeStation = function () {
+		$http.delete($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '/stations?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&station=' + $scope.stations[$scope.stationIndex].station_number).success(function (data) {
 			$scope.stations.splice($scope.stationIndex, 1);
 			$('#editStationModal').modal('hide');
-		}).error(function(err) {
+		}).error(function (err) {
 			console.log(err);
 		});
 	};
 
 	// Delete station from tournament
-	$scope.deleteStation = function() {
-		$http.delete($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/stations?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&station=' + $scope.allStations[$scope.stationIndex].station_number).success(function(data) {
+	$scope.deleteStation = function () {
+		$http.delete($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/stations?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&station=' + $scope.allStations[$scope.stationIndex].station_number).success(function (data) {
 			$scope.allStations.splice($scope.stationIndex, 1);
 			$('#editStationModal').modal('hide');
 
-		}).error(function(err) {
+		}).error(function (err) {
 			console.log(err);
 		});
 
@@ -519,6 +526,8 @@ myApp.controller("editEventController", function ($scope, $http, $window, $rootS
 			$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/specfees?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function (data) {
 
 				$scope.spectatorFees = data;
+				for (var i = 0; i < $scope.spectatorFees.length; i++)
+					$scope.spectatorFees[i].sold = parseInt($scope.spectatorFees[i].sold);
 
 				$scope.newFee = {};
 
@@ -554,14 +563,18 @@ myApp.controller("editEventController", function ($scope, $http, $window, $rootS
 		console.log(status);
 	});
 
-	$scope.deleteFeeConfirmation = function (fee) {
+	$scope.deleteFeeConfirmation = function (index) {
 		$('#deleteModal').modal('show');
-		$scope.deleteFee = fee;
+		$scope.deleteFeeIndex = index;
 	};
 
 	$scope.removeFee = function () {
-		$http.delete($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/specfees/' + $scope.deleteFee + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function (data) {
-			$scope.spectatorFees.splice($scope.spectatorFees.indexOf($scope.deleteFee), 1);
+
+		$http.delete($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/specfees/' + $scope.spectatorFees[$scope.deleteFeeIndex].spec_fee_name + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function (data) {
+			if (!$scope.spectatorFees[$scope.deleteFeeIndex].sold)
+				$scope.spectatorFees.splice($scope.deleteFeeIndex, 1);
+			else
+				$scope.spectatorFees[$scope.deleteFeeIndex].spec_fee_amount_available = $scope.spectatorFees[$scope.deleteFeeIndex].sold;
 			$('#deleteModal').modal('hide');
 		}).error(function (data, err) {
 			console.log(err);
@@ -593,6 +606,7 @@ myApp.controller("editEventController", function ($scope, $http, $window, $rootS
 		};
 
 		$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/specfees?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation, fee).success(function (data) {
+			$scope.newFee.sold = 0;
 			$scope.spectatorFees.push($scope.newFee);
 			$scope.newFee = {};
 			$('#addFeeModal').modal('hide');
