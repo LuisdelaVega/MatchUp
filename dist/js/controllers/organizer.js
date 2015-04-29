@@ -233,14 +233,14 @@ myApp.controller("ReportsController", function ($scope, $http, $window, $rootSco
 	$scope.index
 
 	$scope.reportModal = function (index) {
-		
+
 		$scope.index = index;
-		
-		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName +'/tournaments/' + $scope.reports[$scope.index].tournament_name + '/rounds/' + $scope.reports[$scope.index].round_number + '/matches/' + $scope.reports[$scope.index].match_number + '?round_of=' + $scope.reports[$scope.index].round_of + '&date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function (data, status) {
+
+		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.reports[$scope.index].tournament_name + '/rounds/' + $scope.reports[$scope.index].round_number + '/matches/' + $scope.reports[$scope.index].match_number + '?round_of=' + $scope.reports[$scope.index].round_of + '&date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function (data, status) {
 			$scope.matchInfo = data;
 			console.log(data);
 		});
-		
+
 		$('#reportModal').modal('show');
 	};
 
@@ -513,7 +513,7 @@ myApp.controller("StationController", function ($scope, $http, $window, $rootSco
 	};
 });
 
-myApp.controller("editEventController", function ($scope, $http, $window, $rootScope, $state, $stateParams, $rootScope) {
+myApp.controller("editEventController", function ($scope, $http, $window, $rootScope, $state, $stateParams, $rootScope, $timeout) {
 
 	//Get the event details
 	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function (data) {
@@ -826,9 +826,12 @@ myApp.controller("editEventController", function ($scope, $http, $window, $rootS
 	$scope.deleteEvent = function () {
 		$http.delete($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function (data) {
 			$('#deleteEventModal').modal('hide');
-			$state.go("app.myEvents", {
-				"username": $window.sessionStorage.username,
-			});
+			$timeout(
+				function () {
+					$state.go("app.myEvents", {
+						"username": $window.sessionStorage.username,
+					});
+				}, 300);
 		}).error(function (err) {
 			console.log(err);
 		});

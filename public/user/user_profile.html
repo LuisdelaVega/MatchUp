@@ -11,7 +11,7 @@
 				<div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
 					<h3>{{profileData.customer_tag}}</h3>
 					<p class="info-paragraph">
-						{{profileData.customer_first_name}} {{profileData.customer_last_name}}({{profileData.customer_country}})
+						{{profileData.customer_first_name}} {{profileData.customer_last_name}} <span ng-if="profileData.customer_country">({{profileData.customer_country}})</span>
 					</p>
 					<h4>About</h4>
 					<p class="info-paragraph">

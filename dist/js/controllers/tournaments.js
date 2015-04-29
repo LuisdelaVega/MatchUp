@@ -50,18 +50,10 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 			$scope.competitorsTab = true;
 			getCompetitors();
 		} else {
-			// Tournament Started
-			//			if ($scope.tournament.tournament_completed) {
-			// Tournament ended, show standings
+			
 			$scope.standingsTab = true;
-			//				$scope.competitorsTab = false;
 			getStandings();
-			//			} else {
-			// Tournament ongoing, show competitors instead of standings
-			//				$scope.competitorsTab = true;
-			//				getCompetitors();
-			//			}
-			//			
+			
 			// Show rounds tab if single, double, or round robin
 			$scope.roundsTab = ($scope.tournament.tournament_format == 'Single Elimination' || $scope.tournament.tournament_format == 'Double Elimination' || $scope.tournament.tournament_format == 'Round Robin');
 
@@ -121,8 +113,12 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 
 	var getStandings = function () {
 		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/standings?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data) {
-			if (data.finalStage)
-				$scope.standings = data.finalStage.standings;
+			if (data.finalStage){
+				if(data.finalStage.standings)
+					$scope.standings = data.finalStage.standings;
+				else
+					$scope.onGoingStanding = data.finalStage
+			}
 			if ($scope.tournament.tournament_type == 'Two Stage')
 				$scope.groups = data.groupStage.groups;
 		});
@@ -156,19 +152,6 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 			$scope.matchInfo = data;
 			$scope.matchInfo.round = round;
 			$scope.matchInfo.match = match;
-//			console.log(groupNumber);
-//			console.log(round_of);
-//			console.log(round);
-//			console.log(match);
-//			console.log($scope.tournamentInfo.groupStage.groups[groupNumber-1].rounds[round - 1].matches[match - 1])
-//			if(round_of == 'Winner')
-//				$scope.matchInfo.details = $scope.tournamentInfo.finalStage.winnerRounds[round - 1].matches[match - 1];
-//			else if(round_of == 'Loser')
-//				$scope.matchInfo.details = $scope.tournamentInfo.finalStage.loserRounds[round - 1].matches[match - 1];
-//			else
-//				// AQUI HAY UNA ASUM
-//				$scope.matchInfo.details = $scope.tournamentInfo.groupStage.groups[groupNumber].rounds[round - 1].matches[match - 1];
-			
 			if ($scope.matchInfo.score_type == 'Points') {
 				$scope.matchInfo.players[0].score = 0;
 				$scope.matchInfo.players[1].score = 0;
@@ -276,30 +259,60 @@ function displayBracket($scope) {
 			// Check where that player is in the newly pushed matches which are in correct order
 			// of the bracket
 			// Check last match push if its completed
-			if (rounds[0][rounds[0].length - 1]) {
-				if (rounds[0][rounds[0].length - 1].match_completed) {
-					// Current match player[0] == last pushed match.player 0 OR player[0] == last pushed player 1
-					// This will check for the match child who is currently in the bottom
-					if (rounds[1][j].players[0].customer_username == rounds[0][rounds[0].length - 1].players[0].customer_username || rounds[1][j].players[0].customer_username == rounds[0][rounds[0].length - 1].players[1].customer_username) {
-						// Check if players exist
-						if (rounds[1][j].players[0])
-							rounds[1][j].players[0].position = "bottom";
-						if (rounds[1][j].players[1])
-							rounds[1][j].players[1].position = "top";
-						// Got both players in the right position. Go to next iteration
-						found = true;
+			if ($scope.tournament.team_size == 1) {
+				if (rounds[0][rounds[0].length - 1]) {
+					if (rounds[0][rounds[0].length - 1].match_completed) {
+						// Current match player[0] == last pushed match.player 0 OR player[0] == last pushed player 1
+						// This will check for the match child who is currently in the bottom
+						if (rounds[1][j].players[0].customer_username == rounds[0][rounds[0].length - 1].players[0].customer_username || rounds[1][j].players[0].customer_username == rounds[0][rounds[0].length - 1].players[1].customer_username) {
+							// Check if players exist
+							if (rounds[1][j].players[0])
+								rounds[1][j].players[0].position = "bottom";
+							if (rounds[1][j].players[1])
+								rounds[1][j].players[1].position = "top";
+							// Got both players in the right position. Go to next iteration
+							found = true;
+						}
 					}
 				}
-			}
-			// Check for null
-			if (rounds[0][rounds[0].length - 2]) {
-				// This will check for the match child who is currently in the top
-				if (rounds[0][rounds[0].length - 2].completed && !found) {
-					if (rounds[1][j].players[0].customer_username == rounds[0][rounds[0].length - 2].players[0].customer_username || rounds[1][j].players[0].customer_username == rounds[0][rounds[0].length - 2].players[1].customer_username) {
-						if (rounds[1][j].players[0])
-							rounds[1][j].players[0].position = "top";
-						if (rounds[1][j].players[1])
-							rounds[1][j].players[1].position = "bottom";
+				// Check for null
+				if (rounds[0][rounds[0].length - 2]) {
+					// This will check for the match child who is currently in the top
+					if (rounds[0][rounds[0].length - 2].completed && !found) {
+						if (rounds[1][j].players[0].customer_username == rounds[0][rounds[0].length - 2].players[0].customer_username || rounds[1][j].players[0].customer_username == rounds[0][rounds[0].length - 2].players[1].customer_username) {
+							if (rounds[1][j].players[0])
+								rounds[1][j].players[0].position = "top";
+							if (rounds[1][j].players[1])
+								rounds[1][j].players[1].position = "bottom";
+						}
+					}
+				}
+			} else {
+				if (rounds[0][rounds[0].length - 1]) {
+					if (rounds[0][rounds[0].length - 1].match_completed) {
+						// Current match player[0] == last pushed match.player 0 OR player[0] == last pushed player 1
+						// This will check for the match child who is currently in the bottom
+						if (rounds[1][j].players[0].team_name == rounds[0][rounds[0].length - 1].players[0].team_name || rounds[1][j].players[0].team_name == rounds[0][rounds[0].length - 1].players[1].team_name) {
+							// Check if players exist
+							if (rounds[1][j].players[0])
+								rounds[1][j].players[0].position = "bottom";
+							if (rounds[1][j].players[1])
+								rounds[1][j].players[1].position = "top";
+							// Got both players in the right position. Go to next iteration
+							found = true;
+						}
+					}
+				}
+				// Check for null
+				if (rounds[0][rounds[0].length - 2]) {
+					// This will check for the match child who is currently in the top
+					if (rounds[0][rounds[0].length - 2].completed && !found) {
+						if (rounds[1][j].players[0].team_name == rounds[0][rounds[0].length - 2].players[0].team_name || rounds[1][j].players[0].team_name == rounds[0][rounds[0].length - 2].players[1].team_name) {
+							if (rounds[1][j].players[0])
+								rounds[1][j].players[0].position = "top";
+							if (rounds[1][j].players[1])
+								rounds[1][j].players[1].position = "bottom";
+						}
 					}
 				}
 			}
@@ -581,19 +594,19 @@ function displayBracket($scope) {
 
 
 		var bracketHeight = $scope.rounds[0].length * 96 + 18 + 39 + 20;
-		
+
 		if (extraRound)
 		// If the round has a extra final round sum a marron amount
 			bracketHeight += 90;
 
 		var bracketHeight = $scope.rounds[0].length * 96 + 18 + 39 + 20;
-		
+
 		// Hardcoded no se que pueda pasar. Es para calcular el height si el bracket es de tres personas
 		// el length == 2 es por el bye del primer round
-		if($scope.rounds[0].length == 2 && $scope.rounds[1].length == 1){
+		if ($scope.rounds[0].length == 2 && $scope.rounds[1].length == 1) {
 			bracketHeight += 150;
 		}
-		
+
 		$scope.bracketHeight = {
 			"height": bracketHeight + 'px',
 		}
@@ -2043,13 +2056,13 @@ myApp.controller('bracketController', ['$scope', function ($scope) {
 		}
 
 		var bracketHeight = $scope.rounds[0].length * 96 + 18 + 39 + 20;
-		
+
 		// Hardcoded no se que pueda pasar. Es para calcular el height si el bracket es de tres personas
 		// el length == 2 es por el bye del primer round
-		if($scope.rounds[0].length == 2 && $scope.rounds[1].length == 1){
+		if ($scope.rounds[0].length == 2 && $scope.rounds[1].length == 1) {
 			bracketHeight += 200;
 		}
-		
+
 		$scope.bracketHeight = {
 			"height": bracketHeight + 'px',
 		}

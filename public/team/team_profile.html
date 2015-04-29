@@ -79,7 +79,7 @@
 							<li class="ticket-item" ng-click="goToUser(member.customer_username)">
 								<div class="ticket-user">
 									<img ng-src="{{member.customer_profile_pic}}" class="user-avatar">
-									<span class="user-name">{{member.customer_first_name}} {{member.customer_last_name}} </span>
+									<span class="user-name"><span class="fa fa-star fa-6" ng-if="member.is_captain">&nbsp;</span>{{member.customer_first_name}} {{member.customer_last_name}} </span>
 								</div>
 							</li>
 						</div>
