@@ -1333,8 +1333,8 @@ function getStandingsForFinalStage(req, res, client, done, log, standings) {
 							};
 						}
 
-						for (var i = 0; i < standings.finalStage.standings.length; i++) {
-							if (standings.finalStage.standings[row.standing - 1].competitor_number == temp.competitor_number) {
+						for (var i = 0; i < standings.finalStage.standings[row.standing - 1].length; i++) {
+							if (standings.finalStage.standings[row.standing - 1][i].competitor_number == temp.competitor_number) {
 								repeated = true;
 							}
 						}
@@ -1419,8 +1419,8 @@ function getStandingsForFinalStage(req, res, client, done, log, standings) {
 							};
 						}
 
-						for (var i = 0; i < standings.finalStage.standings.length; i++) {
-							if (standings.finalStage.standings[row.standing - 1].competitor_number == temp.competitor_number) {
+						for (var i = 0; i < standings.finalStage.standings[row.standing - 1].length; i++) {
+							if (standings.finalStage.standings[row.standing - 1][i].competitor_number == temp.competitor_number) {
 								repeated = true;
 							}
 						}
