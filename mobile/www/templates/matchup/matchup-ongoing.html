@@ -12,21 +12,25 @@
             </div>
             <div class="row">
                 <div class="col .col-33 absolute-center">
-                    <img class="img-circular large player-1" ng-src="{{players[0].customer_profile_pic}}">
+                    <img class="img-circular large player-1" ng-if="matchupInfo.team_size == 1" ng-src="{{players[0].customer_profile_pic}}">
+                    <img class="img-circular large player-1" ng-if="matchupInfo.team_size > 1" ng-src="{{players[0].team_logo}}">
                 </div>
                 <div class="col .col-33 absolute-center">
                     <h2>{{players[0].score}}-{{players[1].score}}</h2>
                 </div>
                 <div class="col .col-33 absolute-center">
-                    <img class="img-circular large player-2" ng-src="{{players[1].customer_profile_pic}}">
+                    <img class="img-circular large player-2" ng-if="matchupInfo.team_size == 1" ng-src="{{players[1].customer_profile_pic}}">
+                    <img class="img-circular large player-2" ng-if="matchupInfo.team_size > 1" ng-src="{{players[1].team_logo}}">
                 </div>
             </div>
             <div class="row">
-                <div class="col col-33 absolute-center">{{ players[0].customer_tag }}</div>
+                <div class="col col-33 absolute-center" ng-if="matchupInfo.team_size == 1">{{ players[0].customer_tag }}</div>
+                <div class="col col-33 absolute-center" ng-if="matchupInfo.team_size > 1">{{ players[0].team_name }}</div>
                 <div class="col col-33 absolute-center">
                     <p>Best of {{ matchInfo.sets.length }}</p>
                 </div>
-                <div class="col col-33 absolute-center">{{ players[1].customer_tag }}</div>
+                <div class="col col-33 absolute-center" ng-if="matchupInfo.team_size == 1">{{ players[1].customer_tag }}</div>
+                <div class="col col-33 absolute-center" ng-if="matchupInfo.team_size > 1">{{ players[1].team_name }}</div>
             </div>
             <div class="center-text padding-bottom">
                 <span ng-repeat="set in sets">
@@ -66,7 +70,7 @@
                         <button class="button button-block button-positive" ng-click="submitScore()">Submit</button>
                     </div>
                     <div class="col">
-                        <button class="button button-block button-assertive">Report</button>
+                        <button class="button button-block button-assertive" ng-click="goToReport()">Report</button>
                     </div>
                 </div>
             </div>

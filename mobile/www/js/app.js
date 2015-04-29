@@ -421,7 +421,8 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     })
         .state('app.report', {
         url: "/report",
-        templateUrl: "templates/matchup/report.html"
+        templateUrl: "templates/matchup/report.html",
+        controller: "reportController"
     })
 
     //================================================================================

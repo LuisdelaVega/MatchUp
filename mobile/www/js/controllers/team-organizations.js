@@ -3,7 +3,7 @@ var myApp = angular.module('team-organizations',[]);
 // Popup for adding a team member, change id to index when using ng-repeat
 myApp.controller("addTeamMemberController", ['$scope', '$ionicPopup', '$http', '$window', '$stateParams', '$state', function ($scope, $ionicPopup, $http, $window, $stateParams, $state) {
     //Confirm dialogue asking whether the user would like to add specified user to the team
-    $scope.showConfirm = function (name) {
+    $scope.showConfirm = function (name, username) {
         var confirmPopup = $ionicPopup.confirm({
             title: 'Remove Member',
             template: 'Are you sure you want to add ' + name + ''
@@ -17,7 +17,7 @@ myApp.controller("addTeamMemberController", ['$scope', '$ionicPopup', '$http', '
                     }
                 };
 
-                $http.post('http://matchup.neptunolabs.com/matchup/teams/'+$stateParams.teamname+'/members?username='+name+'', {}, config).success(function(data, status, headers, config) {
+                $http.post('http://matchup.neptunolabs.com/matchup/teams/'+$stateParams.teamname+'/members?username='+username+'', {}, config).success(function(data, status, headers, config) {
 
                     console.log("successfully added"+name);
 
@@ -74,7 +74,7 @@ myApp.controller("addTeamMemberController", ['$scope', '$ionicPopup', '$http', '
 // Popup for removing a team member, change id to index when using ng-repeat
 myApp.controller("removeTeamMemberController", ['$scope', '$ionicPopup', '$http', '$window', '$stateParams', '$state', function ($scope, $ionicPopup, $http, $window, $stateParams, $state) {
     // A confirm dialog
-    $scope.showConfirm = function (name) {
+    $scope.showConfirm = function (name, username) {
         var confirmPopup = $ionicPopup.confirm({
             title: 'Remove Member',
             template: 'Are you sure you want to remove ' + name + ''
@@ -88,7 +88,7 @@ myApp.controller("removeTeamMemberController", ['$scope', '$ionicPopup', '$http'
                     }
                 };
 
-                $http.delete('http://matchup.neptunolabs.com/matchup/teams/'+$stateParams.teamname+'/members?username='+name+'', config).success(function(data, status, headers, config) {
+                $http.delete('http://matchup.neptunolabs.com/matchup/teams/'+$stateParams.teamname+'/members?username='+username+'', config).success(function(data, status, headers, config) {
 
                     console.log("Succesfully remove"+name);
 
@@ -168,7 +168,7 @@ myApp.controller('teamController', function ($scope, $ionicPopover, $state, $ion
         $scope.closePopover();
         var confirmPopup = $ionicPopup.confirm({
             title: 'Delete Team',
-            template: 'Are you sure you want to delete the team'
+            template: 'Are you sure you want to delete the team?'
         });
         confirmPopup.then(function (res) {
             if (res) {
@@ -176,6 +176,90 @@ myApp.controller('teamController', function ($scope, $ionicPopover, $state, $ion
             } else {
 
             }
+        });
+    };
+
+    $scope.leaveTeamPopup = function () {
+        $scope.closePopover();
+        var confirmPopup = $ionicPopup.confirm({
+            title: 'Delete Team',
+            template: 'Are you sure you want to leave the team?'
+        });
+        confirmPopup.then(function (res) {
+            if (res) {
+
+                $scope.popover.hide();
+
+                if($scope.loggedInUserIsCaptain){
+
+                    var config = {
+                        headers: {
+                            'Authorization': "Bearer "+ $window.sessionStorage.token
+                        }
+                    };
+
+                    $http.get('http://136.145.116.232/matchup/teams/'+$stateParams.teamname+'/members', config).
+                    success(function(data, status, headers, config) {
+
+                        var players = angular.fromJson(data);
+                        var captainCount = 0;
+
+                        angular.forEach(players, function(player) {
+                            if(player.is_captain == true)
+                                captainCount++;
+                        });
+
+                        if(captainCount == 1){
+                            var alertPopup = $ionicPopup.alert({
+                                title: 'Leave Team',
+                                template: 'You can\'t leave the team captainless!'
+                            });
+                        }
+                        else{
+
+                            $http.delete('http://matchup.neptunolabs.com/matchup/teams/'+$stateParams.teamname+'/members?username='+$window.sessionStorage.username+'', config).success(function(data, status, headers, config) {
+
+                                var alertPopup = $ionicPopup.alert({
+                                    title: 'Leave Team',
+                                    template: 'You have been successfully removed from the team.'
+                                });
+                                alertPopup.then(function(res) {
+                                    $state.go('app.home');
+                                });
+
+                            }).
+                            error(function(data, status, headers, config) {
+                                console.log("error getting team info");    
+                            });
+                        }
+
+                    }).
+                    error(function(data, status, headers, config) {
+                        console.log("error getting team info");    
+                    });
+
+                }
+                else{
+
+                    $http.delete('http://matchup.neptunolabs.com/matchup/teams/'+$stateParams.teamname+'/members?username='+$window.sessionStorage.username+'', config).success(function(data, status, headers, config) {
+
+                        var alertPopup = $ionicPopup.alert({
+                            title: 'Leave Team',
+                            template: 'You have been successfully removed from the team.'
+                        });
+                        alertPopup.then(function(res) {
+                            $state.go('app.home');
+                        });
+
+                    }).
+                    error(function(data, status, headers, config) {
+                        console.log("error getting team info");    
+                    });
+
+                }
+
+            }
+
         });
     };
 
@@ -188,6 +272,7 @@ myApp.controller('teamController', function ($scope, $ionicPopover, $state, $ion
     $scope.$on('$ionicView.enter', function () {
         //Synchronously makes server calls
         //Obtain general team information
+        $scope.loggedInUserIsCaptain = false;
         $http.get('http://136.145.116.232/matchup/teams/'+$stateParams.teamname+'', config).
         success(function(data, status, headers, config) {
 
@@ -207,7 +292,8 @@ myApp.controller('teamController', function ($scope, $ionicPopover, $state, $ion
                 //Iterate over all players and checking if the username is found in the list of players
                 angular.forEach($scope.players, function(player) {
                     if(player.customer_username == $window.sessionStorage.username)
-                        $scope.loggedInUserIsMember = true;
+                        if(player.is_captain == true)
+                            $scope.loggedInUserIsCaptain = true;
                 });
             }).
             error(function(data, status, headers, config) {
@@ -219,7 +305,7 @@ myApp.controller('teamController', function ($scope, $ionicPopover, $state, $ion
             success(function(data, status, headers, config) {
 
                 console.log(data);
-                
+
             }).
             error(function(data, status, headers, config) {
                 console.log("error getting team info");    
@@ -610,6 +696,7 @@ myApp.controller('organizationController', function ($scope, $ionicPopover, $sta
     };
 
     $scope.$on('$ionicView.enter', function () {
+        $scope.loggedInUserIsOwner = false;
         //Synchronously make server calls to lessen server load
         //Get organization information
         $http.get('http://136.145.116.232/matchup/organizations/'+$stateParams.organizationname+'', config).
@@ -628,6 +715,14 @@ myApp.controller('organizationController', function ($scope, $ionicPopover, $sta
                 success(function(data, status, headers, config) {
 
                     $scope.members = angular.fromJson(data);
+
+                    angular.forEach($scope.members, function(member){
+
+                        if($window.sessionStorage.username == member.customer_username)
+                            if(member.customer_username.is_owner == true)
+                                $scope.loggedInUserIsOwner = true;
+
+                    });
 
                 }).
                 error(function(data, status, headers, config) {

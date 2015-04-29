@@ -5,9 +5,11 @@
             <a class="item item-avatar" ng-repeat="matchup in matchups" ng-click="goToMatchupOngoing(matchup)">
                 <img ng-if="matchup.team_size == 1" ng-src="{{ matchup.details[0].customer_profile_pic }}">
                 <img ng-if="matchup.team_size > 1" ng-src="{{matchup.details[0].team_logo }}">
-                <h2 ng-if="matchup.team_size == 1">Scheduled to play against {{matchup.details[0].customer_tag}}</h2>
-                <h2 ng-if="matchup.team_size > 1">Scheduled to play against {{matchup.details[0].team_name}}</h2>
-                <p ng-if="matchup.station_number != null">Station: {{ matchup.station_number }}</p>
+                <h2 ng-if="matchup.team_size == 1 && matchup.station_number != null">Scheduled to play against {{matchup.details[0].customer_tag}} in Station {{ matchup.station_number }}</h2>
+                <h2 ng-if="matchup.team_size == 1 && matchup.station_number == null">Scheduled to play against {{matchup.details[0].customer_tag}}</h2>
+                <h2 ng-if="matchup.team_size > 1 && matchup.station_number == null">Scheduled to play against {{matchup.details[0].team_name}}</h2>
+                <h2 ng-if="matchup.team_size > 1 && matchup.station_number != null">Scheduled to play against {{matchup.details[0].team_name}} in Station {{ matchup.station_number }}</h2>
+                <p>{{matchup.tournament_name}} @ {{matchup.event_name}} </p>
             </a>          
         </div>
 

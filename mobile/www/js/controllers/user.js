@@ -523,57 +523,61 @@ myApp.controller('profileMatchupsController', ['$scope', '$http', '$stateParams'
             }
         };
 
-        $http.get('http://136.145.116.232/matchup/profile/'+customerUsername+'/matchups?state=Past', config).success(function (data){
+        $http.get('http://matchup.neptunolabs.com/matchup/profile/'+$window.sessionStorage.username+'/teams', config).success(function (data) {
 
-            $scope.matchups = data;
+            var myTeams = data;
 
-            $scope.loggedInUser = [ ];
-            $scope.otherUser = [ ];
+            $http.get('http://matchup.neptunolabs.com/matchup/profile/matchups?state=Past', config).success(function (data) {
 
-            angular.forEach($scope.matchups, function(matchup){
+                $scope.matchups = angular.fromJson(data);
+                $scope.loggedInUser = [ ];
+                $scope.otherUser = [ ];
 
-                if(matchup.team_size == 1){
-                    if(matchup.details[0].customer_username == $window.sessionStorage.username){
-                        $scope.loggedInUser.push(matchup.details[0]);
-                        $scope.otherUser.push(matchup.details[1]);
+                angular.forEach($scope.matchups, function(matchup){
+
+                    if(matchup.team_size == 1){
+                        if(matchup.details[0].customer_username == $window.sessionStorage.username){
+                            $scope.loggedInUser.push(matchup.details[0]);
+                            $scope.otherUser.push(matchup.details[1]);
+                        }
+                        else{
+                            $scope.loggedInUser.push(matchup.details[1]);
+                            $scope.otherUser.push(matchup.details[0]);
+                        }
                     }
                     else{
-                        $scope.loggedInUser.push(matchup.details[1]);
-                        $scope.otherUser.push(matchup.details[0]);
-                    }
-                }
-                else{
-                    $http.get('http://136.145.116.232/matchup/teams/'+matchup.details[0].team_name+'/members', config).success(function (data){
 
-                        var members = data;
+                        var foundTeam = false;
+                        angular.forEach(myTeams, function(team){
 
-                        angular.forEach(members, function(member){
+                            if(matchup.details[0].team_name == team.team_name){
 
-                            if(member.customer_username == $window.sessionStorage.username){
+                                foundTeam = true;
 
                                 $scope.loggedInUser.push(matchup.details[0]);
                                 $scope.otherUser.push(matchup.details[1]);
-
-                            }
-
-                            else{
-
-                                $scope.loggedInUser.push(matchup.details[1]);
-                                $scope.otherUser.push(matchup.details[0]);
-
                             }
 
                         });
 
-                    }).error(function (err) {
-                        console.log(err);
+                        if(!foundTeam){
 
-                    });
-                }
+                            $scope.loggedInUser.push(matchup.details[1]);
+                            $scope.otherUser.push(matchup.details[0]);
+
+                        }
+
+                    }
+                });
+
+            }).error(function (err) {
+                console.log(err);
+
             });
 
         }).error(function (err) {
             console.log(err);
+
         });
 
     });

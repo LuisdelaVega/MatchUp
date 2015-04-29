@@ -1,11 +1,14 @@
 <ion-popover-view class="fit-team-popover">
     <ion-pane>
         <div class="list">
-            <a class="item" ng-click="goToEditTeam()">
+            <a class="item" ng-click="goToEditTeam()" ng-if="loggedInUserIsCaptain">
               Edit Team Info
             </a>
-            <a class="item" ng-click="deleteTeamPopup()">
+            <a class="item" ng-click="deleteTeamPopup()" ng-if="loggedInUserIsCaptain">
               Delete Team
+            </a>
+            <a class="item" ng-click="leaveTeamPopup()">
+              Leave Team
             </a>
         </div>
     </ion-pane>

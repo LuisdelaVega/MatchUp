@@ -65,10 +65,7 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
             var startDate = new Date($scope.eventInfo.event_registration_deadline);
 
             //isOngoing is true if startdate is equal to or greater than the current start date
-            if(startDate > now_utc)
-                $scope.isOngoing = false;
-            else
-                $scope.isOngoing = true;
+            $scope.isOngoing = startDate < now_utc;
 
             //If user came from a premium event sharedDataService is used to find what tournament is to be displayed.
             if($scope.eventInfo.host != null){
@@ -112,23 +109,28 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
                 $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments?date='+$stateParams.date+'&location='+$stateParams.location+'', config).success(function(data, status, headers, config) {
 
                     var tournamentJSON = angular.fromJson(data);
-                    $scope.currentTournament = tournamentJSON[0]; //Position 0 contains the only tournament of the regular event
 
-                    if($scope.currentTournament.team_size > 1)
-                        $scope.requiresTeam = true;
-                    else
-                        $scope.requiresTeam = false;
+                    $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+tournamentJSON[0].tournament_name+'?date='+$stateParams.date+'&location='+$stateParams.location+'', config).success(function(data, status, headers, config) {
 
-                    //Get tournament rounds 
-                    $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+$scope.currentTournament.tournament_name+'/rounds?date='+$stateParams.date+'&location='+$stateParams.location+'', config).success(function(data, status, headers, config) {
 
-                        $scope.roundInfo = data;  
-                        $scope.selectedRound = $scope.roundInfo.finalStage.winnerRounds[0];
+                        $scope.currentTournament = data;
+                        
+                        $scope.requiresTeam = $scope.currentTournament.team_size > 1;
+                        $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+$scope.currentTournament.tournament_name+'/rounds?date='+$stateParams.date+'&location='+$stateParams.location+'', config).success(function(data, status, headers, config) {
 
-                        if($scope.currentTournament.tournament_format == "Double Elimination")
-                            $scope.selectedType.type = 'Winner\'s Bracket'; 
-                        else if($scope.currentTournament.tournament_format == "Single Elimination")
-                            $scope.selectedType.type = 'Bracket'; 
+
+                            $scope.roundInfo = data;  
+                            $scope.selectedRound = $scope.roundInfo.finalStage.winnerRounds[0];
+
+                            if($scope.currentTournament.tournament_format == "Double Elimination")
+                                $scope.selectedType.type = 'Winner\'s Bracket'; 
+                            else if($scope.currentTournament.tournament_format == "Single Elimination")
+                                $scope.selectedType.type = 'Bracket'; 
+
+                        }).
+                        error(function(data, status, headers, config) {
+                            console.log("error in regularEventController");
+                        });
 
                     }).
                     error(function(data, status, headers, config) {
@@ -222,16 +224,18 @@ myApp.controller('teamSignUpController', ['$scope', '$http', '$ionicPopup', '$st
                 'Authorization': "Bearer "+ $window.sessionStorage.token
             }
         };
-        
+
         console.log($scope.checkedMembers);
         console.log('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+$stateParams.tournament+'/register?date='+$stateParams.date+'&location='+$stateParams.location+'');
         $http.post('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+$stateParams.tournament+'/register?date='+$stateParams.date+'&location='+$stateParams.location+'', {
-            
-            "team": $stateParams.tournament,
+
+            "team": $scope.selectedTeam.team.team_name,
             "players": $scope.checkedMembers
-            
+
         }, config).success(function(data) {
-            
+
+            console.log($scope.selectedTeam);
+
             console.log("signed up team");
 
 

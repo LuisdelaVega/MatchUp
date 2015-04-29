@@ -6,10 +6,14 @@
     </ion-nav-buttons>
     <ion-content class="padding">
         <label class="item item-radio" ng-repeat="spectatorFee in spectatorFees">
-            <input type="radio" ng-model="spectator.Fee" name="group" value="{{ spectatorFee.spec_fee_name }}">
+            <input type="radio" ng-if="spectatorFee.spec_fee_amount_available - spectatorFee.sold > 0" ng-model="spectator.Fee" name="group" value="{{ spectatorFee.spec_fee_name }}">
+            <input type="radio" ng-if="spectatorFee.spec_fee_amount_available - spectatorFee.sold <= 0" ng-model="spectator.Fee" name="group" value="{{ spectatorFee.spec_fee_name }}"  disabled>
             <div class="item-content">
                 {{ spectatorFee.spec_fee_name }} (${{ spectatorFee.spec_fee_amount }}) <br>
                 <small> {{ spectatorFee.spec_fee_description }} </small>
+                <br>
+                <small style="color: rgb(102, 221, 51);" ng-if="spectatorFee.spec_fee_amount_available - spectatorFee.sold > 0">Available Tickets: {{ spectatorFee.spec_fee_amount_available - spectatorFee.sold}}</small>
+                <small style="color: rgb(255, 102, 102);" ng-if="spectatorFee.spec_fee_amount_available - spectatorFee.sold <= 0">Available Tickets: 0</small>
             </div>
             <i class="radio-icon ion-checkmark"></i>
         </label>

@@ -168,6 +168,7 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
         $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/specfees?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
         success(function(data, status, headers, config) {
 
+            console.log('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/specfees?date='+$stateParams.date+'&location='+$stateParams.location+'');
             $scope.spectatorFees = data;
 
         }).
@@ -228,11 +229,8 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 
             $scope.eventInfo = angular.fromJson(data);
             var startDate = new Date($scope.eventInfo.event_start_date);
-
-            if(startDate > now_utc)
-                $scope.isOngoing = false;
-            else
-                $scope.isOngoing = true;
+            
+            $scope.isOngoing = startDate < now_utc;
 
             $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
             success(function(data, status, headers, config) {

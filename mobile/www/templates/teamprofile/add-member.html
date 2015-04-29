@@ -12,7 +12,7 @@
             </label>
         </div>
         <div class="list list-inset" ng-repeat="user in users">
-            <a class="item item-avatar" ng-click="showConfirm(user.customer_tag)">
+            <a class="item item-avatar" ng-click="showConfirm(user.customer_tag, user.customer_username)">
                 <img ng-src="{{ user.customer_profile_pic }}">
                 <h2>{{ user.customer_tag }}</h2>
                 <p>{{ user.customer_country }}</p>
