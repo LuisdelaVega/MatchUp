@@ -2,17 +2,38 @@
 	<h1 style="display:inline">Browse Events</h1>
 	<div class="btn-group pull-right" style="padding-right:60px">
 		<div class="btn-group">
-			<a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-     			Event Type: {{filterBy}}<span class="caret"></span>
-      		</a>
+			<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false"> State {{state}}<span class="caret"></span> </a>
 			<ul class="dropdown-menu">
-				<li><a ng-click="filter('All')">All</a>
+				<li>
+					<a ng-click="filter(filterBy, 'All')">All</a>
 				</li>
-				<li><a ng-click="filter('local')">Local</a>
+				<li>
+					<a ng-click="filter(filterBy, 'upcoming')">Upcoming</a>
 				</li>
-				<li><a ng-click="filter('regional')">Regional</a>
+				<li>
+					<a ng-click="filter(filterBy, 'live')">Live</a>
 				</li>
-				<li><a ng-click="filter('national')">National</a>
+				<li>
+					<a ng-click="filter(filterBy, 'past')">Past</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="btn-group pull-right" style="padding-right:60px">
+		<div class="btn-group">
+			<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false"> Event Type: {{filterBy}}<span class="caret"></span> </a>
+			<ul class="dropdown-menu">
+				<li>
+					<a ng-click="filter('All', state)">All</a>
+				</li>
+				<li>
+					<a ng-click="filter('local', state)">Local</a>
+				</li>
+				<li>
+					<a ng-click="filter('regional', state)">Regional</a>
+				</li>
+				<li>
+					<a ng-click="filter('national', state)">National</a>
 				</li>
 			</ul>
 		</div>
@@ -31,35 +52,6 @@
 <div class="tab-content panel-padding">
 	<div class="tab-pane fade in active" id="premium">
 		<div class="row">
-			<div class="col-lg-6 col-md-12 col-sm-12" ng-repeat="hosted in hostedLiveEvents">
-				<div class="panel panel-default cursor" ng-click="goToEvent(hosted.event_name,  hosted.event_start_date, hosted.event_location)">
-					<!---TODO: change to ngclick go to event and params-->
-					<div class="panel-body">
-						<img style="width:100%;" ng-src="{{hosted.event_banner}}">
-						<!--TODO change to banner-->
-					</div>
-					<div class="panel-footer">
-						<div class="row">
-							<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-								<img class="event-organizer-thumbnail  center-block" ng-src="{{hosted.organization_logo}}">
-							</div>
-							<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9">
-								<h3 class="event-footer-title">{{hosted.event_name}}</h3>
-								<p>
-									{{hosted.event_start_date | date: 'medium'}}
-								</p>
-								<p>
-									{{hosted.event_location}}
-								</p>
-								<p>
-									Hosted by {{hosted.organization_name}}
-									<!--TODO get who hosted-->
-								</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
 			<div class="col-lg-6 col-md-12 col-sm-12" ng-repeat="hosted in hostedEvents">
 				<div class="panel panel-default cursor" ng-click="goToEvent(hosted.event_name,  hosted.event_start_date, hosted.event_location)">
 					<!---TODO: change to ngclick go to event and params-->
@@ -101,7 +93,8 @@
 							<h3 class="event-footer-title">{{regular.event_name}}</h3>
 							<p>
 								{{regular.event_start_date | date: 'medium'}}
-								<br> {{regular.event_location}}
+								<br>
+								{{regular.event_location}}
 							</p>
 						</div>
 					</div>
@@ -115,7 +108,8 @@
 							<h3 class="event-footer-title">{{regular.event_name}}</h3>
 							<p>
 								{{regular.event_start_date | date: 'medium'}}
-								<br> {{regular.event_location}}
+								<br>
+								{{regular.event_location}}
 							</p>
 						</div>
 					</div>
