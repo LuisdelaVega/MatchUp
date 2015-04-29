@@ -147,6 +147,11 @@
 	background-color: #B52A2C;
 }
 
+.pending {
+	border-color: #b5b52a;
+	background-color: #b5b52a;
+}
+
 .large {
 	height: 10vh;
 	width: 10vh;

@@ -297,22 +297,25 @@
 	<div class="tab-pane fade" id="standings" ng-if="standingsTab">
 		<div class="panel-padding">
 			<div class="row">
-				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-10 col-md-offset-0 col-lg-offset-1">
-					<div class="page-header" ng-if="tournament.tournament_type == 'Two Stage'">
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 col-md-offset-0 col-lg-offset-2">
+					<div class="page-header" ng-if="tournament.tournament_type == 'Two Stage' && standings">
 						<h1>Final Stage</h1>
 					</div>
-					<table class="table table-striped">
+					<table class="table table-striped" ng-if="standings">
 						<thead>
 							<tr>
-								<th style="text-align:center">Standing</th>
+								<th style="text-align:center" ng-if="tournament.tournament_completed">Standing</th>
+								<th style="text-align:center">Seed</th>
 								<th>Competitor</th>
 								<th>Match History</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr ng-repeat="standing in standings">
-								<td width="10%" style="text-align:center" rowspan="{{standing.lenght}}" ng-if="$first" ng-repeat-start="competitor in standing">{{competitor.standing | ordinal}}</td>
-								<td id="competitor-name" ng-click="goToUser(competitor.customer_username)">{{competitor.customer_tag}}</td>
+								<td width="10%" style="text-align:center" rowspan="{{standing.lenght}}" ng-if="$first && tournament.tournament_completed" ng-repeat-start="competitor in standing">{{competitor.standing | ordinal}}</td>
+								<td width="5%" style="text-align:center">{{competitor.competitor_seed}}</td>
+								<td id="competitor-name" ng-click="goToUser(competitor.customer_username)" ng-if="competitor.customer_tag">{{competitor.customer_tag}}</td>
+								<td id="competitor-name" ng-click="goToTeamsProfile(competitor.team_name)" ng-if="competitor.team_name">{{competitor.team_name}}</td>
 								<td ng-repeat-end>
 									<span ng-repeat="match in competitor.match_history">
 									<span ng-if="match.win" class="match-square player-1" ng-click="getTournamentMatch(match.round_number,match.match_number,match.round_of)">
@@ -320,6 +323,9 @@
 									</span>
 									<span ng-if="!match.win" class="match-square player-2" ng-click="getTournamentMatch(match.round_number,match.match_number,match.round_of)">
 										L
+									</span>
+									<span ng-if="match.win == null" class="match-square pending" ng-click="getTournamentMatch(match.round_number,match.match_number,match.round_of)">
+										P
 									</span>
 									</span>
 								</td>
@@ -329,7 +335,7 @@
 				</div>
 			</div>
 			<div class="row" ng-if="tournament.tournament_type == 'Two Stage'">
-				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-10 col-md-offset-0 col-lg-offset-1">
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8 col-md-offset-0 col-lg-offset-2">
 					<div class="page-header">
 						<h1>Group Stage</h1>
 					</div>
@@ -338,26 +344,35 @@
 						<table class="table table-striped">
 							<thead>
 								<tr>
-									<th style="text-align:center">Standing</th>
+									<th style="text-align:center" ng-if="standings">Standing</th>
+									<th style="text-align:center">Seed</th>
 									<th>Competitor</th>
-									<th>Wins-Losses</th>
+									<th style="text-align:center" ng-if="standings">Wins-Losses</th>
+
 									<th>Match History</th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr ng-repeat="competitor in group">
-									<td width="10%" style="text-align:center">{{competitor.standing | ordinal}}
+									<td width="10%" style="text-align:center" ng-if="standings">{{competitor.standing | ordinal}}
 									</td>
-									<td id="competitor-name" ng-click="goToUser(competitor.customer_username)">{{competitor.customer_tag}} <span class="text-success" ng-if="competitor.advanced">(Advancing)</span>
+									<td width="5%" style="text-align:center">{{competitor.competitor_seed}}</td>
+
+									<td id="competitor-name" ng-click="goToUser(competitor.customer_username)" ng-if="competitor.customer_tag">{{competitor.customer_tag}} <span class="text-success" ng-if="competitor.advanced">(Advancing)</span>
 									</td>
-									<td width="15%">{{competitor.wins}} - {{competitor.loses}}</td>
+									<td id="competitor-name" ng-click="goToTeamsProfile(competitor.team_name)" ng-if="competitor.team_name">{{competitor.team_name}} <span class="text-success" ng-if="competitor.advanced">(Advancing)</span>
+									</td>
+									<td width="15%" style="text-align:center" ng-if="standings">{{competitor.wins}} - {{competitor.loses}}</td>
 									<td>
 										<span ng-repeat="match in competitor.match_history">
 									<span ng-if="match.win" class="match-square player-1" ng-click="getTournamentMatch(match.round_number,match.match_number,match.round_of)">
 										W
 									</span>
-										<span ng-if="!match.win" class="match-square player-2" ng-click="getTournamentMatch(match.round_number,match.match_number,match.round_of)">
+										<span ng-if="match.win == false" class="match-square player-2" ng-click="getTournamentMatch(match.round_number,match.match_number,match.round_of)">
 										L
+									</span>
+										<span ng-if="match.win == null" class="match-square pending" ng-click="getTournamentMatch(match.round_number,match.match_number,match.round_of)">
+										P
 									</span>
 										</span>
 									</td>
@@ -411,7 +426,7 @@
 			</div>
 			<div class="row">
 				<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" ng-repeat="match in selectedGroup.rounds[selectedGroupRound.round_number-1].matches  | filter:groupRoundQuery">
-					<div class="box box-margin cursor" ng-click="getTournamentMatch(selectedRound.round_number,match.match_number,'Group')">
+					<div class="box box-margin cursor" ng-click="getTournamentMatch(selectedGroupRound.round_number,match.match_number,'Group')">
 						<h4 align="center">Match {{match.match_number}}<span ng-if="match.station_number"> (Station {{match.station_number}})</span></h4>
 						<div ng-if="tournament.team_size == 1">
 							<div class="row" align="center">
@@ -421,7 +436,7 @@
 								</div>
 								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 									<h1 style="text-align:center">
-							{{match.players[0].score}}-{{match.players[1].score}}</h1>
+							{{match.players[0].score * 1}}-{{match.players[1].score * 1}}</h1>
 								</div>
 								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 									<img ng-if="match.players[1].customer_profile_pic" class="img-circular player-2 large center-block" ng-src="{{match.players[1].customer_profile_pic}}" />
@@ -448,7 +463,7 @@
 								</div>
 								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 									<h1 style="text-align:center">
-							{{match.players[0].score}}-{{match.players[1].score}}</h1>
+							{{match.players[0].score * 1}}-{{match.players[1].score * 1}}</h1>
 								</div>
 								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 									<img ng-if="match.players[1].team_logo" class="img-circular player-2 large center-block" ng-src="{{match.players[1].team_logo}}" />
@@ -530,7 +545,7 @@
 								</div>
 								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 									<h1 style="text-align:center">
-							{{match.players[0].score}}-{{match.players[1].score}}</h1>
+							{{match.players[0].score * 1}}-{{match.players[1].score * 1}}</h1>
 								</div>
 								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 									<img ng-if="match.players[1].customer_profile_pic" class="img-circular player-2 large center-block" ng-src="{{match.players[1].customer_profile_pic}}" />
@@ -557,7 +572,7 @@
 								</div>
 								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 									<h1 style="text-align:center">
-							{{match.players[0].score}}-{{match.players[1].score}}</h1>
+							{{match.players[0].score * 1}}-{{match.players[1].score * 1}}</h1>
 								</div>
 								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 									<img ng-if="match.players[1].team_logo" class="img-circular player-2 large center-block" ng-src="{{match.players[1].team_logo}}" />
@@ -606,7 +621,7 @@
 				</div>
 			</div>
 			<div class="box box-margin" ng-if="tournament.tournament_format == 'Double Elimination'">
-				<h3 class="page-header">Loser Bracket</h3>
+				<h3 class="page-header">Losers Bracket</h3>
 				<div class="overflow-container" ng-style="loserBracketHeight">
 					<div class="overflow noselect">
 						<div class="tournament">
@@ -786,7 +801,8 @@
 				</button>
 				<h4 class="modal-title">Round {{matchInfo.round}} Match {{matchInfo.match}}
 				<br>
-				<small ng-if="matchInfo.details.station_number">Station {{matchInfo.details.station_number}}</small></h4>
+				<small ng-if="matchInfo.station_number">Station {{matchInfo.station_number}}</small>				
+				<small ng-if="matchInfo.stream_link">Stream <a ng-href="{{matchInfo.stream_link}}"><br>{{matchInfo.stream_link}}</a></small></h4>
 			</div>
 			<div class="modal-body">
 				<div ng-if="tournament.team_size == 1">
@@ -796,7 +812,7 @@
 							<i ng-if="!matchInfo.players[0].customer_profile_pic" class="fa fa-question-circle fa-5x"></i>
 						</div>
 						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
-							<h1 style="text-align:center">{{matchInfo.players[0].score}}-{{matchInfo.players[1].score}}</h1>
+							<h1 style="text-align:center">{{matchInfo.players[0].score * 1}}-{{matchInfo.players[1].score * 1}}</h1>
 						</div>
 						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 							<img ng-if="matchInfo.players[1].customer_profile_pic" class="img-circular player-2 large center-block" ng-src="{{matchInfo.players[1].customer_profile_pic}}" />
@@ -818,7 +834,6 @@
 						<span ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number && set.scores[1].competitor_number">
 					<div class="set-circular set-margin" ng-class="set.scores[0].score > set.scores[1].score ? 'player-1' : 'player-2'"></div>
 					</span>
-
 					</div>
 					<div class="row" ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number && set.scores[1].competitor_number && matchInfo.score_type == 'Points'">
 						<hr>
@@ -828,7 +843,7 @@
 						</div>
 						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 							<h1 style="text-align:center">
-							{{set.scores[0].score}}-{{set.scores[1].score}}</h1>
+							{{set.scores[0].score * 1}}-{{set.scores[1].score * 1}}</h1>
 						</div>
 						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 							<img class="img-circular player-2 large center-block" ng-src="{{matchInfo.players[1].customer_profile_pic}}" />
@@ -843,7 +858,7 @@
 						</div>
 						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 							<h1 style="text-align:center">
-							{{matchInfo.players[0].score}}-{{matchInfo.players[1].score}}</h1>
+							{{matchInfo.players[0].score * 1}}-{{matchInfo.players[1].score * 1}}</h1>
 						</div>
 						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 							<img ng-if="matchInfo.players[1].team_logo" class="img-circular player-2 large center-block" ng-src="{{matchInfo.players[1].team_logo}}" />
@@ -874,7 +889,7 @@
 							</div>
 							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 								<h1 style="text-align:center">
-							{{set.scores[0].score}}-{{set.scores[1].score}}</h1>
+							{{set.scores[0].score * 1}}-{{set.scores[1].score * 1}}</h1>
 							</div>
 							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 								<img class="img-circular player-2 large center-block" ng-src="{{matchInfo.players[1].team_logo}}" />

@@ -173,11 +173,12 @@
 			<legend>Spectator Fees</legend>
 			<div class="list-group">
 				<div class="list-group-item clearfix" ng-repeat="fee in spectatorFees">
-					<span class="pull-right"><a class="btn btn-sm btn-danger" ng-click="deleteFeeConfirmation(fee.spec_fee_name)"><span class="fa fa-times"></span>
+					<span class="pull-right" ng-if="fee.spec_fee_amount_available != fee.sold"><a class="btn btn-sm btn-danger" ng-click="deleteFeeConfirmation($index)"><span class="fa fa-times"></span>
 					</a>
 					</span>
 					<p class="lead event-footer-title">{{fee.spec_fee_name}}</p>Price ${{fee.spec_fee_amount}}
-					<br>Amount {{fee.spec_fee_amount_available}}
+					<br>Amount: {{fee.spec_fee_amount_available}}
+					<br>Sold: {{fee.sold}}
 					<br>{{fee.spec_fee_description}}
 				</div>
 			</div>
@@ -295,14 +296,17 @@
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
 					</button>
-					<h4 class="modal-title">Delete</h4>
+					<h4 class="modal-title" ng-if="!spectatorFees[deleteFeeIndex].sold">Delete Fee</h4>
+					<h4 class="modal-title" ng-if="spectatorFees[deleteFeeIndex].sold">Reset ticket availability</h4>
 				</div>
 				<div class="modal-body">
-					<p class="lead">Are you sure you want to delete this item?</p>
+					<p class="lead" ng-if="!spectatorFees[deleteFeeIndex].sold">Are you sure you want to delete this fee?</p>
+					<p class="lead" ng-if="spectatorFees[deleteFeeIndex].sold">The fee has already sold {{spectatorFees[deleteFeeIndex].sold}} ticket(s). Because of this you can not delete the ticket only reset the amount of tickets available to the number of sold tickets. Do you want to set the ticket amount to {{spectatorFees[deleteFeeIndex].sold}}?</p>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-					<button type="button" class="btn btn-primary" ng-click="removeFee()">Delete</button>
+					<button type="button" class="btn btn-primary" ng-click="removeFee()" ng-if="!spectatorFees[deleteFeeIndex].sold">Delete</button>
+					<button type="button" class="btn btn-primary" ng-click="removeFee()" ng-if="spectatorFees[deleteFeeIndex].sold">Okay</button>
 				</div>
 			</div>
 			<!-- /.modal-content -->

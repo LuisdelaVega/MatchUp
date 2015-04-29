@@ -1,26 +1,31 @@
 <div class="page-header">
 	<h1>Reports</h1>
 </div>
+
 <div class="row">
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding" ng-if="!reports.length">
+		<p class="lead" >No reports at the moment :)</p>
+	</div>
 	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 custom-padding" ng-repeat="report in reports">
 		<div class="box cursor" ng-click="reportModal($index)">
 			<div class="media">
-				<div class="media-left" ng-if="report.report_image">
+				<div class="media-left" ng-if="report.report_image != 'null'">
 					<img class="media-object match-avatar" ng-src="{{report.report_image}}">
 				</div>
 				<div class="media-body">
 					<div class="row">
 						<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
 							<h4>{{report.report_type}} Report</h4>
-							<p>
-								{{report.tournament_name}}
-								<br> {{report.round_of}}'s Round {{report.round_number}}
+							<p class="lead" style="margin-bottom:0px">{{report.tournament_name}}</p>
+							<p>	
+								{{report.round_of}}'s Round {{report.round_number}}
 								<br> Match {{report.match_number}}&nbsp; Set {{report.set_seq}}
-								<br> Station Number {{report.station_number}}
+								<span ng-if="report.station_number"><br> Station Number {{report.station_number}}</span>
 								<br> {{report.report_date | date:'medium'}}
+								<br>
 							</p>
 						</div>
-						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
 							<div class="report-status">
 								<div ng-switch on="report.report_status">
 									<div ng-switch-when="Resolved">
@@ -55,6 +60,9 @@
 					Station {{reports[index].station_number}}
 					<br> Round {{reports[index].round_number}}
 					<br> {{reports[index].report_date | date:'medium'}}
+					<br>
+					<span ng-if="matchInfo.players[0].customer_tag">Competitors: {{matchInfo.players[0].customer_tag}} VS {{matchInfo.players[1].customer_tag}}</span>
+					<span ng-if="matchInfo.players[0].team_name">Competitors: {{matchInfo.players[0].team_name}} VS {{matchInfo.players[1].team_name}}</span>
 				</p>
 				<div ng-switch on="reports[index].report_status">
 					<div ng-switch-when="Resolved">
@@ -71,13 +79,13 @@
 			<div class="modal-body">
 				<div class="row">
 					<div class="col-md-8 col-md-offset-2">
-						<a class="thumbnail" ng-href="{{reports[index].report_image}}"> <img ng-src="{{reports[index].report_image}}">
+						<a class="thumbnail" ng-if="reports[index].report_image != 'null'" ng-href="{{reports[index].report_image}}"> <img ng-src="{{reports[index].report_image}}">
 							</a>
 					</div>
 				</div>
+				<h4>Description: </h4>
 				<p>
-					<br />
-					<h4>Description: </h4> {{reports[index].report_description}}
+					 {{reports[index].report_description}}
 				</p>
 			</div>
 			<div class="modal-footer">

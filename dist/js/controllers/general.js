@@ -178,6 +178,7 @@ function ($scope, $window, $http, $state, AuthenticationService, $rootScope, Mat
 				$scope.matchInfo.date = date;
 				$scope.matchInfo.match = match;
 				$scope.matchInfo.station_number = station;
+				console.log($scope.matchInfo)
 				if ($scope.matchInfo.score_type == 'Points') {
 					$scope.matchInfo.players[0].score = 0;
 					$scope.matchInfo.players[1].score = 0;

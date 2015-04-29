@@ -43,7 +43,7 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 	});
 
 	var initDateAndTabs = function () {
-		
+
 		// Check tournament status
 		if ($scope.tournament.tournament_completed === null) {
 			// if null tournament has not started
@@ -51,27 +51,24 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 			getCompetitors();
 		} else {
 			// Tournament Started
-			if ($scope.tournament.tournament_completed) {
-				// Tournament ended, show standings
-				$scope.standingsTab = true;
-				$scope.competitorsTab = false;
-				getStandings();
-			} else {
-				// Tournament ongoing, show competitors instead of standings
-				$scope.competitorsTab = true;
-				$scope.standingsTab = true;
-				getStandings();
-				getCompetitors();
-			}
-			
+			//			if ($scope.tournament.tournament_completed) {
+			// Tournament ended, show standings
+			$scope.standingsTab = true;
+			//				$scope.competitorsTab = false;
+			getStandings();
+			//			} else {
+			// Tournament ongoing, show competitors instead of standings
+			//				$scope.competitorsTab = true;
+			//				getCompetitors();
+			//			}
+			//			
 			// Show rounds tab if single, double, or round robin
 			$scope.roundsTab = ($scope.tournament.tournament_format == 'Single Elimination' || $scope.tournament.tournament_format == 'Double Elimination' || $scope.tournament.tournament_format == 'Round Robin');
-			
-			// Show groupstage tab if Two stage
-			$scope.groupStageTab = $scope.tournament.tournament_type == 'Two Stage';	
 
+			// Show groupstage tab if Two stage
+			$scope.groupStageTab = $scope.tournament.tournament_type == 'Two Stage';
 			getRounds();
-			
+
 			$scope.bracketTypes = ['Winner', 'Loser'];
 			$scope.bracket = 'Winner';
 		}
@@ -124,9 +121,9 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 
 	var getStandings = function () {
 		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/standings?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data) {
-			console.log(data);
-			$scope.standings = data.finalStage.standings;
-			if($scope.tournament.tournament_type == 'Two Stage')
+			if (data.finalStage)
+				$scope.standings = data.finalStage.standings;
+			if ($scope.tournament.tournament_type == 'Two Stage')
 				$scope.groups = data.groupStage.groups;
 		});
 	}
@@ -144,18 +141,12 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 	};
 
 	$scope.bracketChange = function (bracket) {
-		//testing.....
-		console.log('enter');
- 		if (bracket == 'Winner') {
+		if (bracket == 'Winner') {
 			$scope.bracketType = $scope.tournamentInfo.finalStage.winnerRounds;
 			$scope.selectedRound = $scope.tournamentInfo.finalStage.winnerRounds[0];
-			console.log('winner');
-
 		} else {
-			console.log("Loser");
 			$scope.bracketType = $scope.tournamentInfo.finalStage.loserRounds;
 			$scope.selectedRound = $scope.tournamentInfo.finalStage.loserRounds[0];
-
 		}
 	};
 
@@ -165,7 +156,19 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 			$scope.matchInfo = data;
 			$scope.matchInfo.round = round;
 			$scope.matchInfo.match = match;
-			$scope.matchInfo.details = $scope.bracketType[round - 1].matches[match - 1];
+//			console.log(groupNumber);
+//			console.log(round_of);
+//			console.log(round);
+//			console.log(match);
+//			console.log($scope.tournamentInfo.groupStage.groups[groupNumber-1].rounds[round - 1].matches[match - 1])
+//			if(round_of == 'Winner')
+//				$scope.matchInfo.details = $scope.tournamentInfo.finalStage.winnerRounds[round - 1].matches[match - 1];
+//			else if(round_of == 'Loser')
+//				$scope.matchInfo.details = $scope.tournamentInfo.finalStage.loserRounds[round - 1].matches[match - 1];
+//			else
+//				// AQUI HAY UNA ASUM
+//				$scope.matchInfo.details = $scope.tournamentInfo.groupStage.groups[groupNumber].rounds[round - 1].matches[match - 1];
+			
 			if ($scope.matchInfo.score_type == 'Points') {
 				$scope.matchInfo.players[0].score = 0;
 				$scope.matchInfo.players[1].score = 0;
@@ -578,9 +581,19 @@ function displayBracket($scope) {
 
 
 		var bracketHeight = $scope.rounds[0].length * 96 + 18 + 39 + 20;
+		
 		if (extraRound)
 		// If the round has a extra final round sum a marron amount
 			bracketHeight += 90;
+
+		var bracketHeight = $scope.rounds[0].length * 96 + 18 + 39 + 20;
+		
+		// Hardcoded no se que pueda pasar. Es para calcular el height si el bracket es de tres personas
+		// el length == 2 es por el bye del primer round
+		if($scope.rounds[0].length == 2 && $scope.rounds[1].length == 1){
+			bracketHeight += 150;
+		}
+		
 		$scope.bracketHeight = {
 			"height": bracketHeight + 'px',
 		}
@@ -595,6 +608,22 @@ function displayBracket($scope) {
 		$scope.loserRounds.push([]);
 		$scope.loserRounds[0].push(losersRound[losersRound.length - 1].matches[0]);
 		$scope.loserRounds[0][0].extra = true;
+
+		// Calculate height of loser bracket
+		var loserBracketHeight = $scope.loserRounds[0].length * 96 + 18 + 39 + 20;
+
+
+		if (losersRound.length == 1) {
+			loserBracketHeight += 200;
+			$scope.loserBracketHeight = {
+				"height": loserBracketHeight + 'px',
+			}
+			return;
+		}
+
+		$scope.loserBracketHeight = {
+			"height": loserBracketHeight + 'px',
+		}
 
 		// Start iterating from the last round till the round 2
 		for (var i = losersRound.length - 1; i > 1; i--) {
@@ -695,835 +724,1049 @@ function displayBracket($scope) {
 myApp.controller('bracketController', ['$scope', function ($scope) {
 
 	var checkNamePostions = function checkNamePosition(j, rounds) {
-		// Check if the current match of the current round has players
-		if (rounds[1][j].players.length != 0) {
-			var found = false;
-			// Check where that player is in the newly pushed matches which are in correct order
-			// of the bracket
-			// Check last match push if its completed
-			if (rounds[0][rounds[0].length - 1].match_completed) {
-				// Current match player[0] == last pushed match.player 0 OR player[0] == last pushed player 1
-				// This will check for the match child who is currently in the bottom
-				if (rounds[1][j].players[0].customer_username == rounds[0][rounds[0].length - 1].players[0].customer_username || rounds[1][j].players[0].customer_username == rounds[0][rounds[0].length - 1].players[1].customer_username) {
-					// Check if players exist
-					if (rounds[1][j].players[0])
-						rounds[1][j].players[0].position = "bottom";
-					if (rounds[1][j].players[1])
-						rounds[1][j].players[1].position = "top";
-					// Got both players in the right position. Go to next iteration
-					found = true;
-				}
-			}
-			// Check for null
-			if (rounds[0][rounds[0].length - 2]) {
-				// This will check for the match child who is currently in the top
-				if (rounds[0][rounds[0].length - 2].completed && !found) {
-					if (rounds[1][j].players[0].customer_username == rounds[0][rounds[0].length - 2].players[0].customer_username || rounds[1][j].players[0].customer_username == rounds[0][rounds[0].length - 2].players[1].customer_username) {
+			// Check if the current match of the current round has players
+			if (rounds[1][j].players.length != 0) {
+				var found = false;
+				// Check where that player is in the newly pushed matches which are in correct order
+				// of the bracket
+				// Check last match push if its completed
+				if (rounds[0][rounds[0].length - 1].match_completed) {
+					// Current match player[0] == last pushed match.player 0 OR player[0] == last pushed player 1
+					// This will check for the match child who is currently in the bottom
+					if (rounds[1][j].players[0].customer_username == rounds[0][rounds[0].length - 1].players[0].customer_username || rounds[1][j].players[0].customer_username == rounds[0][rounds[0].length - 1].players[1].customer_username) {
+						// Check if players exist
 						if (rounds[1][j].players[0])
-							rounds[1][j].players[0].position = "top";
+							rounds[1][j].players[0].position = "bottom";
 						if (rounds[1][j].players[1])
-							rounds[1][j].players[1].position = "bottom";
+							rounds[1][j].players[1].position = "top";
+						// Got both players in the right position. Go to next iteration
+						found = true;
+					}
+				}
+				// Check for null
+				if (rounds[0][rounds[0].length - 2]) {
+					// This will check for the match child who is currently in the top
+					if (rounds[0][rounds[0].length - 2].completed && !found) {
+						if (rounds[1][j].players[0].customer_username == rounds[0][rounds[0].length - 2].players[0].customer_username || rounds[1][j].players[0].customer_username == rounds[0][rounds[0].length - 2].players[1].customer_username) {
+							if (rounds[1][j].players[0])
+								rounds[1][j].players[0].position = "top";
+							if (rounds[1][j].players[1])
+								rounds[1][j].players[1].position = "bottom";
+						}
 					}
 				}
 			}
 		}
-	}
+		//	var tournamentData = {
+		//		"finalStage": {
+		//			"winnerRounds": [{
+		//				"round_number": 1,
+		//				"matches": [{
+		//					"match_number": 1,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Alicia",
+		//						"customer_tag": "Alicia",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "0"
+		//					}, {
+		//						"customer_username": "Lexter",
+		//						"customer_tag": "Lexter",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+		//						"score": "2"
+		//					}]
+		//				}, {
+		//					"match_number": 2,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Pablo",
+		//						"customer_tag": "Pablo",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "1"
+		//					}, {
+		//						"customer_username": "Luis",
+		//						"customer_tag": "Luis",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+		//						"score": "2"
+		//					}]
+		//				}, {
+		//					"match_number": 3,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Wesley",
+		//						"customer_tag": "Wesley",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Nayda",
+		//						"customer_tag": "Nayda",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+		//						"score": "0"
+		//					}]
+		//				}, {
+		//					"match_number": 4,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Amir",
+		//						"customer_tag": "Amir",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Fernando",
+		//						"customer_tag": "Fernando",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+		//						"score": "0"
+		//					}]
+		//				}, {
+		//					"match_number": 5,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Tavarez",
+		//						"customer_tag": "Tavarez",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Couvi",
+		//						"customer_tag": "Couvi",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+		//						"score": "0"
+		//					}]
+		//				}, {
+		//					"match_number": 6,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Sam",
+		//						"customer_tag": "Sam",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Badillo",
+		//						"customer_tag": "Badillo",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+		//						"score": "0"
+		//					}]
+		//				}, {
+		//					"match_number": 7,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Rapol",
+		//						"customer_tag": "Rapol",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "1"
+		//					}, {
+		//						"customer_username": "Final Boss",
+		//						"customer_tag": "Final Boss",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+		//						"score": "2"
+		//					}]
+		//				}, {
+		//					"match_number": 8,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Enrique",
+		//						"customer_tag": "Enrique",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "1"
+		//					}, {
+		//						"customer_username": "Snow",
+		//						"customer_tag": "Snow",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+		//						"score": "2"
+		//					}]
+		//				}, {
+		//					"match_number": 9,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Juan",
+		//						"customer_tag": "Juan",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Pedro",
+		//						"customer_tag": "Pedro",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+		//						"score": "1"
+		//					}]
+		//				}]
+		//			}, {
+		//				"round_number": 2,
+		//				"matches": [{
+		//					"match_number": 1,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Leo",
+		//						"customer_tag": "Leo",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Juan",
+		//						"customer_tag": "Juan",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+		//						"score": "1"
+		//					}]
+		//				}, {
+		//					"match_number": 2,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Maria",
+		//						"customer_tag": "Maria",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/rafa.jpg",
+		//						"score": "1"
+		//					}, {
+		//						"customer_username": "Snow",
+		//						"customer_tag": "Snow",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+		//						"score": "2"
+		//					}]
+		//				}, {
+		//					"match_number": 3,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Fwosh",
+		//						"customer_tag": "Fwosh",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+		//						"score": "1"
+		//					}, {
+		//						"customer_username": "Final Boss",
+		//						"customer_tag": "Final Boss",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "2"
+		//					}]
+		//				}, {
+		//					"match_number": 4,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Ramon",
+		//						"customer_tag": "Ramon",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+		//						"score": "1"
+		//					}, {
+		//						"customer_username": "Sam",
+		//						"customer_tag": "Sam",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "2"
+		//					}]
+		//				}, {
+		//					"match_number": 5,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Rick",
+		//						"customer_tag": "Rick",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+		//						"score": "1"
+		//					}, {
+		//						"customer_username": "Tavarez",
+		//						"customer_tag": "Tavarez",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "2"
+		//					}]
+		//				}, {
+		//					"match_number": 6,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Oscar",
+		//						"customer_tag": "Oscar",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+		//						"score": "0"
+		//					}, {
+		//						"customer_username": "Amir",
+		//						"customer_tag": "Amir",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "2"
+		//					}]
+		//				}, {
+		//					"match_number": 7,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Angel",
+		//						"customer_tag": "Angel",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+		//						"score": "0"
+		//					}, {
+		//						"customer_username": "Wesley",
+		//						"customer_tag": "Wesley",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "2"
+		//					}]
+		//				}, {
+		//					"match_number": 8,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Lexter",
+		//						"customer_tag": "Lexter",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Luis",
+		//						"customer_tag": "Luis",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "1"
+		//					}]
+		//				}]
+		//			}, {
+		//				"round_number": 3,
+		//				"matches": [{
+		//					"match_number": 1,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Leo",
+		//						"customer_tag": "Leo",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Tavarez",
+		//						"customer_tag": "Tavarez",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "1"
+		//					}]
+		//				}, {
+		//					"match_number": 2,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Wesley",
+		//						"customer_tag": "Wesley",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Snow",
+		//						"customer_tag": "Snow",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "1"
+		//					}]
+		//				}, {
+		//					"match_number": 3,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Final Boss",
+		//						"customer_tag": "Final Boss",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Amir",
+		//						"customer_tag": "Amir",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "1"
+		//					}]
+		//				}, {
+		//					"match_number": 4,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Tavarez",
+		//						"customer_tag": "Tavarez",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Sam",
+		//						"customer_tag": "Sam",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "1"
+		//					}]
+		//				}]
+		//
+		//			}, {
+		//				"round_number": 4,
+		//				"matches": [{
+		//					"match_number": 1,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Leo",
+		//						"customer_tag": "Leo",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Tavarez",
+		//						"customer_tag": "Tavarez",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "1"
+		//					}]
+		//				}, {
+		//					"match_number": 2,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Wesley",
+		//						"customer_tag": "Wesley",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+		//						"score": "0"
+		//					}, {
+		//						"customer_username": "Final Boss",
+		//						"customer_tag": "Final Boss",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "2"
+		//					}]
+		//				}]
+		//			}, {
+		//				"round_number": 5,
+		//				"matches": [{
+		//					"match_number": 1,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Leo",
+		//						"customer_tag": "Leo",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+		//						"score": "1"
+		//					}, {
+		//						"customer_username": "Final Boss",
+		//						"customer_tag": "Final Boss",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "2"
+		//					}]
+		//				}]
+		//			}, {
+		//				"round_number": 6,
+		//				"matches": [{
+		//					"match_number": 1,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Final Boss",
+		//						"customer_tag": "Final Boss",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Amir",
+		//						"customer_tag": "Amir",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+		//						"score": "1"
+		//					}]
+		//				}]
+		//			}],
+		//			"loserRounds": [{
+		//				"round_number": 1,
+		//				"matches": [{
+		//					"match_number": 1,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Pedro",
+		//						"customer_tag": "Pedro",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "0"
+		//					}, {
+		//						"customer_username": "Enrique",
+		//						"customer_tag": "Enrique",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/rafa.jpg",
+		//						"score": "2"
+		//					}]
+		//				}]
+		//			}, {
+		//				"round_number": 2,
+		//				"matches": [{
+		//					"match_number": 1,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Juan",
+		//						"customer_tag": "Juan",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Enrique",
+		//						"customer_tag": "Enrique",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "1"
+		//					}]
+		//				}, {
+		//					"match_number": 2,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Maria",
+		//						"customer_tag": "Maria",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Rick",
+		//						"customer_tag": "Rick",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "1"
+		//					}]
+		//				}, {
+		//					"match_number": 3,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Ramon",
+		//						"customer_tag": "Ramon",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+		//						"score": "1"
+		//					}, {
+		//						"customer_username": "Luis",
+		//						"customer_tag": "Luis",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "2"
+		//					}]
+		//				}, {
+		//					"match_number": 4,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Oscar",
+		//						"customer_tag": "Oscar",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Fwosh",
+		//						"customer_tag": "Fwosh",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "1"
+		//					}]
+		//				}, {
+		//					"match_number": 5,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Nayda",
+		//						"customer_tag": "Nayda",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Angel",
+		//						"customer_tag": "Angel",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "1"
+		//					}]
+		//				}, {
+		//					"match_number": 6,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Alicia",
+		//						"customer_tag": "Alicia",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Pablo",
+		//						"customer_tag": "Pablo",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "1"
+		//					}]
+		//				}, {
+		//					"match_number": 7,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Couvi",
+		//						"customer_tag": "Couvi",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+		//						"score": "0"
+		//					}, {
+		//						"customer_username": "Fernando",
+		//						"customer_tag": "Fernando",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "2"
+		//					}]
+		//				}, {
+		//					"match_number": 8,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Rapol",
+		//						"customer_tag": "Rapol",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Badillo",
+		//						"customer_tag": "Badillo",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "1"
+		//					}]
+		//				}]
+		//			}, {
+		//				"round_number": 3,
+		//				"matches": [{
+		//					"match_number": 1,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Juan",
+		//						"customer_tag": "Juan",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Rapol",
+		//						"customer_tag": "Rapol",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "0"
+		//					}]
+		//				}, {
+		//					"match_number": 2,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Fernando",
+		//						"customer_tag": "Fernando",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Maria",
+		//						"customer_tag": "Maria",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "0"
+		//					}]
+		//				}, {
+		//					"match_number": 3,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Luis",
+		//						"customer_tag": "Luis",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "1"
+		//					}, {
+		//						"customer_username": "Alicia",
+		//						"customer_tag": "Alicia",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "2"
+		//					}]
+		//				}, {
+		//					"match_number": 4,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Oscar",
+		//						"customer_tag": "Oscar",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "1"
+		//					}, {
+		//						"customer_username": "Nayda",
+		//						"customer_tag": "Nayda",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "2"
+		//					}]
+		//				}]
+		//			}, {
+		//				"round_number": 4,
+		//				"matches": [{
+		//					"match_number": 1,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Juan",
+		//						"customer_tag": "Juan",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "1"
+		//					}, {
+		//						"customer_username": "Lexter",
+		//						"customer_tag": "Lexter",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "2"
+		//					}]
+		//				}, {
+		//					"match_number": 2,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Snow",
+		//						"customer_tag": "Snow",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Fernando",
+		//						"customer_tag": "Fernando",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "1"
+		//					}]
+		//				}, {
+		//					"match_number": 3,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Amir",
+		//						"customer_tag": "Amir",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Alicia",
+		//						"customer_tag": "Alicia",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "1"
+		//					}]
+		//				}, {
+		//					"match_number": 4,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Sam",
+		//						"customer_tag": "Sam",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Nayda",
+		//						"customer_tag": "Nayda",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "1"
+		//					}]
+		//				}]
+		//			}, {
+		//				"round_number": 5,
+		//				"matches": [{
+		//					"match_number": 1,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Sam",
+		//						"customer_tag": "Sam",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "1"
+		//					}, {
+		//						"customer_username": "Lexter",
+		//						"customer_tag": "Lexter",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "2"
+		//					}]
+		//				}, {
+		//					"match_number": 2,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Snow",
+		//						"customer_tag": "Snow",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "0"
+		//					}, {
+		//						"customer_username": "Amir",
+		//						"customer_tag": "Amir",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "2"
+		//					}]
+		//				}]
+		//			}, {
+		//				"round_number": 6,
+		//				"matches": [{
+		//					"match_number": 1,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Tavarez",
+		//						"customer_tag": "Tavarez",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "1"
+		//					}, {
+		//						"customer_username": "Lexter",
+		//						"customer_tag": "Lexter",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "2"
+		//					}]
+		//				}, {
+		//					"match_number": 2,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Amir",
+		//						"customer_tag": "Amir",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Wesley",
+		//						"customer_tag": "Wesley",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "1"
+		//					}]
+		//				}]
+		//			}, {
+		//				"round_number": 7,
+		//				"matches": [{
+		//					"match_number": 1,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Amir",
+		//						"customer_tag": "Amir",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Lexter",
+		//						"customer_tag": "Lexter",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "0"
+		//					}]
+		//				}]
+		//			}, {
+		//				"round_number": 8,
+		//				"matches": [{
+		//					"match_number": 1,
+		//					"match_completed": true,
+		//					"players": [{
+		//						"customer_username": "Amir",
+		//						"customer_tag": "Amir",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//						"score": "2"
+		//					}, {
+		//						"customer_username": "Leo",
+		//						"customer_tag": "Leo",
+		//						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//						"score": "0"
+		//					}]
+		//				}]
+		//			}]
+		//		},
+		//		"groupStage": {
+		//			"groups": [{
+		//				"group_number": 1,
+		//				"rounds": [{
+		//					"round_number": 1,
+		//					"matches": [{
+		//						"match_number": 1,
+		//						"match_completed": true,
+		//						"players": [{
+		//							"customer_username": "papaluisre",
+		//							"customer_tag": "FZN.PaPa",
+		//							"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+		//							"score": "2"
+		//						}, {
+		//							"customer_username": "rapol",
+		//							"customer_tag": "rapol",
+		//							"customer_profile_pic": "http://neptunolabs.com/images/rafa.jpg",
+		//							"score": "0"
+		//						}]
+		//					}]
+		//				}, {
+		//					"round_number": 2,
+		//					"matches": [{
+		//						"match_number": 1,
+		//						"match_completed": true,
+		//						"players": [{
+		//							"customer_username": "rapol",
+		//							"customer_tag": "rapol",
+		//							"customer_profile_pic": "http://neptunolabs.com/images/rafa.jpg",
+		//							"score": "1"
+		//						}, {
+		//							"customer_username": "samdlt",
+		//							"customer_tag": "samdlt",
+		//							"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//							"score": "2"
+		//						}]
+		//					}]
+		//				}, {
+		//					"round_number": 3,
+		//					"matches": [{
+		//						"match_number": 1,
+		//						"match_completed": true,
+		//						"players": [{
+		//							"customer_username": "papaluisre",
+		//							"customer_tag": "FZN.PaPa",
+		//							"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+		//							"score": "1"
+		//						}, {
+		//							"customer_username": "samdlt",
+		//							"customer_tag": "samdlt",
+		//							"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+		//							"score": "2"
+		//						}]
+		//					}]
+		//				}]
+		//			}, {
+		//				"group_number": 2,
+		//				"rounds": [{
+		//					"round_number": 1,
+		//					"matches": [{
+		//						"match_number": 2,
+		//						"match_completed": true,
+		//						"players": [{
+		//							"customer_username": "ollidab",
+		//							"customer_tag": "ollidab",
+		//							"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+		//							"score": "1"
+		//						}, {
+		//							"customer_username": "jems9102",
+		//							"customer_tag": "jems9102",
+		//							"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+		//							"score": "2"
+		//						}]
+		//					}]
+		//				}]
+		//			}]
+		//		}
+		//	}
+
 	var tournamentData = {
 		"finalStage": {
-			"winnerRounds": [{
-				"round_number": 1,
-				"matches": [{
-					"match_number": 1,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Alicia",
-						"customer_tag": "Alicia",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "0"
-					}, {
-						"customer_username": "Lexter",
-						"customer_tag": "Lexter",
-						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
-						"score": "2"
-					}]
-				}, {
-					"match_number": 2,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Pablo",
-						"customer_tag": "Pablo",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "1"
-					}, {
-						"customer_username": "Luis",
-						"customer_tag": "Luis",
-						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
-						"score": "2"
-					}]
-				}, {
-					"match_number": 3,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Wesley",
-						"customer_tag": "Wesley",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Nayda",
-						"customer_tag": "Nayda",
-						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
-						"score": "0"
-					}]
-				}, {
-					"match_number": 4,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Amir",
-						"customer_tag": "Amir",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Fernando",
-						"customer_tag": "Fernando",
-						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
-						"score": "0"
-					}]
-				}, {
-					"match_number": 5,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Tavarez",
-						"customer_tag": "Tavarez",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Couvi",
-						"customer_tag": "Couvi",
-						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
-						"score": "0"
-					}]
-				}, {
-					"match_number": 6,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Sam",
-						"customer_tag": "Sam",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Badillo",
-						"customer_tag": "Badillo",
-						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
-						"score": "0"
-					}]
-				}, {
-					"match_number": 7,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Rapol",
-						"customer_tag": "Rapol",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "1"
-					}, {
-						"customer_username": "Final Boss",
-						"customer_tag": "Final Boss",
-						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
-						"score": "2"
-					}]
-				}, {
-					"match_number": 8,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Enrique",
-						"customer_tag": "Enrique",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "1"
-					}, {
-						"customer_username": "Snow",
-						"customer_tag": "Snow",
-						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
-						"score": "2"
-					}]
-				}, {
-					"match_number": 9,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Juan",
-						"customer_tag": "Juan",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Pedro",
-						"customer_tag": "Pedro",
-						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
-						"score": "1"
-					}]
-				}]
-			}, {
-				"round_number": 2,
-				"matches": [{
-					"match_number": 1,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Leo",
-						"customer_tag": "Leo",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Juan",
-						"customer_tag": "Juan",
-						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
-						"score": "1"
-					}]
-				}, {
-					"match_number": 2,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Maria",
-						"customer_tag": "Maria",
-						"customer_profile_pic": "http://neptunolabs.com/images/rafa.jpg",
-						"score": "1"
-					}, {
-						"customer_username": "Snow",
-						"customer_tag": "Snow",
-						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
-						"score": "2"
-					}]
-				}, {
-					"match_number": 3,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Fwosh",
-						"customer_tag": "Fwosh",
-						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
-						"score": "1"
-					}, {
-						"customer_username": "Final Boss",
-						"customer_tag": "Final Boss",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "2"
-					}]
-				}, {
-					"match_number": 4,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Ramon",
-						"customer_tag": "Ramon",
-						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
-						"score": "1"
-					}, {
-						"customer_username": "Sam",
-						"customer_tag": "Sam",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "2"
-					}]
-				}, {
-					"match_number": 5,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Rick",
-						"customer_tag": "Rick",
-						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
-						"score": "1"
-					}, {
-						"customer_username": "Tavarez",
-						"customer_tag": "Tavarez",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "2"
-					}]
-				}, {
-					"match_number": 6,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Oscar",
-						"customer_tag": "Oscar",
-						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
-						"score": "0"
-					}, {
-						"customer_username": "Amir",
-						"customer_tag": "Amir",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "2"
-					}]
-				}, {
-					"match_number": 7,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Angel",
-						"customer_tag": "Angel",
-						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
-						"score": "0"
-					}, {
-						"customer_username": "Wesley",
-						"customer_tag": "Wesley",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "2"
-					}]
-				}, {
-					"match_number": 8,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Lexter",
-						"customer_tag": "Lexter",
-						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Luis",
-						"customer_tag": "Luis",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "1"
-					}]
-				}]
-			}, {
-				"round_number": 3,
-				"matches": [{
-					"match_number": 1,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Leo",
-						"customer_tag": "Leo",
-						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Tavarez",
-						"customer_tag": "Tavarez",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "1"
-					}]
-				}, {
-					"match_number": 2,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Wesley",
-						"customer_tag": "Wesley",
-						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Snow",
-						"customer_tag": "Snow",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "1"
-					}]
-				}, {
-					"match_number": 3,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Final Boss",
-						"customer_tag": "Final Boss",
-						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Amir",
-						"customer_tag": "Amir",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "1"
-					}]
-				}, {
-					"match_number": 4,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Tavarez",
-						"customer_tag": "Tavarez",
-						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Sam",
-						"customer_tag": "Sam",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "1"
-					}]
-				}]
+			"winnerRounds": [
+				{
+					"round_number": 1,
+					"matches": [
+						{
+							"match_number": 1,
+							"match_completed": true,
+							"players": [
+								{
+									"customer_username": "jems9102",
+									"customer_tag": "jems9102",
+									"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+									"score": "0"
+              },
+								{
+									"customer_username": "ollidab",
+									"customer_tag": "ollidab",
+									"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+									"score": "2"
+              }
+            ]
+          }
+        ]
+      },
+				{
+					"round_number": 2,
+					"matches": [
+						{
+							"match_number": 1,
+							"match_completed": false,
+							"players": [
+								{
+									"customer_username": "samdlt",
+									"customer_tag": "samdlt",
+									"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+									"score": "2"
+              },
+								{
+									"customer_username": "ollidab",
+									"customer_tag": "ollidab",
+									"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+									"score": "0"
+              }
+            ]
+          }
+        ]
+      },
+				{
+					"round_number": 3,
+					"matches": [
+						{
+							"match_number": 1,
+							"match_completed": false,
+							"players": [
+								{
+									"customer_username": "papaluisre",
+									"customer_tag": "FZN.PaPa",
+									"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+									"score": null
+              },
 
-			}, {
-				"round_number": 4,
-				"matches": [{
-					"match_number": 1,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Leo",
-						"customer_tag": "Leo",
-						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Tavarez",
-						"customer_tag": "Tavarez",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "1"
-					}]
-				}, {
-					"match_number": 2,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Wesley",
-						"customer_tag": "Wesley",
-						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
-						"score": "0"
-					}, {
-						"customer_username": "Final Boss",
-						"customer_tag": "Final Boss",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "2"
-					}]
-				}]
-			}, {
-				"round_number": 5,
-				"matches": [{
-					"match_number": 1,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Leo",
-						"customer_tag": "Leo",
-						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
-						"score": "1"
-					}, {
-						"customer_username": "Final Boss",
-						"customer_tag": "Final Boss",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "2"
-					}]
-				}]
-			}, {
-				"round_number": 6,
-				"matches": [{
-					"match_number": 1,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Final Boss",
-						"customer_tag": "Final Boss",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Amir",
-						"customer_tag": "Amir",
-						"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
-						"score": "1"
-					}]
-				}]
-			}],
-			"loserRounds": [{
-				"round_number": 1,
-				"matches": [{
-					"match_number": 1,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Pedro",
-						"customer_tag": "Pedro",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "0"
-					}, {
-						"customer_username": "Enrique",
-						"customer_tag": "Enrique",
-						"customer_profile_pic": "http://neptunolabs.com/images/rafa.jpg",
-						"score": "2"
-					}]
-				}]
-			}, {
-				"round_number": 2,
-				"matches": [{
-					"match_number": 1,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Juan",
-						"customer_tag": "Juan",
-						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Enrique",
-						"customer_tag": "Enrique",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "1"
-					}]
-				}, {
-					"match_number": 2,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Maria",
-						"customer_tag": "Maria",
-						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Rick",
-						"customer_tag": "Rick",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "1"
-					}]
-				}, {
-					"match_number": 3,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Ramon",
-						"customer_tag": "Ramon",
-						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
-						"score": "1"
-					}, {
-						"customer_username": "Luis",
-						"customer_tag": "Luis",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "2"
-					}]
-				}, {
-					"match_number": 4,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Oscar",
-						"customer_tag": "Oscar",
-						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Fwosh",
-						"customer_tag": "Fwosh",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "1"
-					}]
-				}, {
-					"match_number": 5,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Nayda",
-						"customer_tag": "Nayda",
-						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Angel",
-						"customer_tag": "Angel",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "1"
-					}]
-				}, {
-					"match_number": 6,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Alicia",
-						"customer_tag": "Alicia",
-						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Pablo",
-						"customer_tag": "Pablo",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "1"
-					}]
-				}, {
-					"match_number": 7,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Couvi",
-						"customer_tag": "Couvi",
-						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
-						"score": "0"
-					}, {
-						"customer_username": "Fernando",
-						"customer_tag": "Fernando",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "2"
-					}]
-				}, {
-					"match_number": 8,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Rapol",
-						"customer_tag": "Rapol",
-						"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Badillo",
-						"customer_tag": "Badillo",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "1"
-					}]
-				}]
-			}, {
-				"round_number": 3,
-				"matches": [{
-					"match_number": 1,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Juan",
-						"customer_tag": "Juan",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Rapol",
-						"customer_tag": "Rapol",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "0"
-					}]
-				}, {
-					"match_number": 2,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Fernando",
-						"customer_tag": "Fernando",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Maria",
-						"customer_tag": "Maria",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "0"
-					}]
-				}, {
-					"match_number": 3,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Luis",
-						"customer_tag": "Luis",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "1"
-					}, {
-						"customer_username": "Alicia",
-						"customer_tag": "Alicia",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "2"
-					}]
-				}, {
-					"match_number": 4,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Oscar",
-						"customer_tag": "Oscar",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "1"
-					}, {
-						"customer_username": "Nayda",
-						"customer_tag": "Nayda",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "2"
-					}]
-				}]
-			}, {
-				"round_number": 4,
-				"matches": [{
-					"match_number": 1,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Juan",
-						"customer_tag": "Juan",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "1"
-					}, {
-						"customer_username": "Lexter",
-						"customer_tag": "Lexter",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "2"
-					}]
-				}, {
-					"match_number": 2,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Snow",
-						"customer_tag": "Snow",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Fernando",
-						"customer_tag": "Fernando",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "1"
-					}]
-				}, {
-					"match_number": 3,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Amir",
-						"customer_tag": "Amir",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Alicia",
-						"customer_tag": "Alicia",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "1"
-					}]
-				}, {
-					"match_number": 4,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Sam",
-						"customer_tag": "Sam",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Nayda",
-						"customer_tag": "Nayda",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "1"
-					}]
-				}]
-			}, {
-				"round_number": 5,
-				"matches": [{
-					"match_number": 1,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Sam",
-						"customer_tag": "Sam",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "1"
-					}, {
-						"customer_username": "Lexter",
-						"customer_tag": "Lexter",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "2"
-					}]
-				}, {
-					"match_number": 2,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Snow",
-						"customer_tag": "Snow",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "0"
-					}, {
-						"customer_username": "Amir",
-						"customer_tag": "Amir",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "2"
-					}]
-				}]
-			}, {
-				"round_number": 6,
-				"matches": [{
-					"match_number": 1,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Tavarez",
-						"customer_tag": "Tavarez",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "1"
-					}, {
-						"customer_username": "Lexter",
-						"customer_tag": "Lexter",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "2"
-					}]
-				}, {
-					"match_number": 2,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Amir",
-						"customer_tag": "Amir",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Wesley",
-						"customer_tag": "Wesley",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "1"
-					}]
-				}]
-			}, {
-				"round_number": 7,
-				"matches": [{
-					"match_number": 1,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Amir",
-						"customer_tag": "Amir",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Lexter",
-						"customer_tag": "Lexter",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "0"
-					}]
-				}]
-			}, {
-				"round_number": 8,
-				"matches": [{
-					"match_number": 1,
-					"match_completed": true,
-					"players": [{
-						"customer_username": "Amir",
-						"customer_tag": "Amir",
-						"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-						"score": "2"
-					}, {
-						"customer_username": "Leo",
-						"customer_tag": "Leo",
-						"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-						"score": "0"
-					}]
-				}]
-			}]
+            ]
+          }
+        ]
+      },
+				{
+					"round_number": 4,
+					"matches": [
+						{
+							"match_number": 1,
+							"match_completed": false,
+							"players": [
+
+            ]
+          }
+        ]
+      }
+    ],
+			"loserRounds": [
+				{
+					"round_number": 1,
+					"matches": [
+						{
+							"match_number": 1,
+							"match_completed": true,
+							"players": [
+								{
+									"customer_username": "jems9102",
+									"customer_tag": "jems9102",
+									"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+									"score": "2"
+              },
+								{
+									"customer_username": "rapol",
+									"customer_tag": "rapol",
+									"customer_profile_pic": "http://neptunolabs.com/images/rafa.jpg",
+									"score": "0"
+              }
+            ]
+          }
+        ]
+      }
+    ]
 		},
 		"groupStage": {
-			"groups": [{
-				"group_number": 1,
-				"rounds": [{
-					"round_number": 1,
-					"matches": [{
-						"match_number": 1,
-						"match_completed": true,
-						"players": [{
-							"customer_username": "papaluisre",
-							"customer_tag": "FZN.PaPa",
-							"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
-							"score": "2"
-						}, {
-							"customer_username": "rapol",
-							"customer_tag": "rapol",
-							"customer_profile_pic": "http://neptunolabs.com/images/rafa.jpg",
-							"score": "0"
-						}]
-					}]
-				}, {
-					"round_number": 2,
-					"matches": [{
-						"match_number": 1,
-						"match_completed": true,
-						"players": [{
-							"customer_username": "rapol",
-							"customer_tag": "rapol",
-							"customer_profile_pic": "http://neptunolabs.com/images/rafa.jpg",
-							"score": "1"
-						}, {
-							"customer_username": "samdlt",
-							"customer_tag": "samdlt",
-							"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-							"score": "2"
-						}]
-					}]
-				}, {
-					"round_number": 3,
-					"matches": [{
-						"match_number": 1,
-						"match_completed": true,
-						"players": [{
-							"customer_username": "papaluisre",
-							"customer_tag": "FZN.PaPa",
-							"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
-							"score": "1"
-						}, {
-							"customer_username": "samdlt",
-							"customer_tag": "samdlt",
-							"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
-							"score": "2"
-						}]
-					}]
-				}]
-			}, {
-				"group_number": 2,
-				"rounds": [{
-					"round_number": 1,
-					"matches": [{
-						"match_number": 2,
-						"match_completed": true,
-						"players": [{
-							"customer_username": "ollidab",
-							"customer_tag": "ollidab",
-							"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
-							"score": "1"
-						}, {
-							"customer_username": "jems9102",
-							"customer_tag": "jems9102",
-							"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
-							"score": "2"
-						}]
-					}]
-				}]
-			}]
+			"groups": [
+				{
+					"group_number": 1,
+					"rounds": [
+						{
+							"round_number": 1,
+							"matches": [
+								{
+									"match_number": 1,
+									"match_completed": true,
+									"players": [
+										{
+											"customer_username": "papaluisre",
+											"customer_tag": "FZN.PaPa",
+											"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+											"score": "2"
+                  },
+										{
+											"customer_username": "rapol",
+											"customer_tag": "rapol",
+											"customer_profile_pic": "http://neptunolabs.com/images/rafa.jpg",
+											"score": "0"
+                  }
+                ]
+              }
+            ]
+          },
+						{
+							"round_number": 2,
+							"matches": [
+								{
+									"match_number": 1,
+									"match_completed": true,
+									"players": [
+										{
+											"customer_username": "rapol",
+											"customer_tag": "rapol",
+											"customer_profile_pic": "http://neptunolabs.com/images/rafa.jpg",
+											"score": "1"
+                  },
+										{
+											"customer_username": "samdlt",
+											"customer_tag": "samdlt",
+											"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+											"score": "2"
+                  }
+                ]
+              }
+            ]
+          },
+						{
+							"round_number": 3,
+							"matches": [
+								{
+									"match_number": 1,
+									"match_completed": true,
+									"players": [
+										{
+											"customer_username": "papaluisre",
+											"customer_tag": "FZN.PaPa",
+											"customer_profile_pic": "http://neptunolabs.com/images/luis.jpg",
+											"score": "1"
+                  },
+										{
+											"customer_username": "samdlt",
+											"customer_tag": "samdlt",
+											"customer_profile_pic": "http://neptunolabs.com/images/sam.jpg",
+											"score": "2"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+				{
+					"group_number": 2,
+					"rounds": [
+						{
+							"round_number": 1,
+							"matches": [
+								{
+									"match_number": 2,
+									"match_completed": true,
+									"players": [
+										{
+											"customer_username": "ollidab",
+											"customer_tag": "ollidab",
+											"customer_profile_pic": "http://neptunolabs.com/images/badillo.jpg",
+											"score": "1"
+                  },
+										{
+											"customer_username": "jems9102",
+											"customer_tag": "jems9102",
+											"customer_profile_pic": "http://neptunolabs.com/images/juan.jpg",
+											"score": "2"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
 		}
 	}
 
@@ -1800,6 +2043,13 @@ myApp.controller('bracketController', ['$scope', function ($scope) {
 		}
 
 		var bracketHeight = $scope.rounds[0].length * 96 + 18 + 39 + 20;
+		
+		// Hardcoded no se que pueda pasar. Es para calcular el height si el bracket es de tres personas
+		// el length == 2 es por el bye del primer round
+		if($scope.rounds[0].length == 2 && $scope.rounds[1].length == 1){
+			bracketHeight += 200;
+		}
+		
 		$scope.bracketHeight = {
 			"height": bracketHeight + 'px',
 		}
@@ -1814,6 +2064,22 @@ myApp.controller('bracketController', ['$scope', function ($scope) {
 		$scope.loserRounds.push([]);
 		$scope.loserRounds[0].push(losersRound[losersRound.length - 1].matches[0]);
 		$scope.loserRounds[0][0].extra = true;
+
+		// Calculate height of loser bracket
+		var loserBracketHeight = $scope.loserRounds[0].length * 96 + 18 + 39 + 20;
+
+
+		if (losersRound.length == 1) {
+			loserBracketHeight += 200;
+			$scope.loserBracketHeight = {
+				"height": loserBracketHeight + 'px',
+			}
+			return;
+		}
+
+		$scope.loserBracketHeight = {
+			"height": loserBracketHeight + 'px',
+		}
 
 		// Start iterating from the last round till the round 2
 		for (var i = losersRound.length - 1; i > 1; i--) {
@@ -1899,11 +2165,6 @@ myApp.controller('bracketController', ['$scope', function ($scope) {
 				$scope.loserRounds[0][firstRoundIndex + 1] = losersRound[0].matches[$scope.loserRounds[1][curMatch].childMatches[1]];
 			}
 			firstRoundIndex += 2;
-		}
-
-		var loserBracketHeight = $scope.loserRounds[0].length * 96 + 18 + 39 + 20;
-		$scope.loserBracketHeight = {
-			"height": loserBracketHeight + 'px',
 		}
 	}
 }]);
