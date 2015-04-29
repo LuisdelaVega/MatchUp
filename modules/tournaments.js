@@ -1319,14 +1319,16 @@ function getStandingsForFinalStage(req, res, client, done, log, standings) {
 							temp = {
 								team_name: info_array[0],
 								team_logo: info_array[1],
-								competitor_number: parseInt(row.competitor_number)
+								competitor_number: parseInt(row.competitor_number),
+								competitor_seed: parseInt(row.competitor_seed)
 							};
 						} else {
 							temp = {
 								customer_username: info_array[0],
 								customer_profile_pic: info_array[1],
 								customer_tag: info_array[2],
-								competitor_number: parseInt(row.competitor_number)
+								competitor_number: parseInt(row.competitor_number),
+								competitor_seed: parseInt(row.competitor_seed)
 							};
 						}
 
@@ -1411,6 +1413,7 @@ function getStandingsForFinalStage(req, res, client, done, log, standings) {
 								customer_profile_pic: info_array[1],
 								customer_tag: info_array[2],
 								competitor_number: parseInt(row.competitor_number),
+								competitor_seed: parseInt(row.competitor_seed),
 								standing: row.standing
 							};
 						}
@@ -1525,7 +1528,8 @@ var getStandings = function(req, res, pg, conString, log) {
 										team_name: info_array[0],
 										team_logo: info_array[1],
 										group_number: row.group_number,
-										competitor_number: parseInt(row.competitor_number)
+										competitor_number: parseInt(row.competitor_number),
+										competitor_seed: parseInt(row.competitor_seed)
 									};
 								} else {
 									temp = {
@@ -1533,7 +1537,8 @@ var getStandings = function(req, res, pg, conString, log) {
 										customer_profile_pic: info_array[1],
 										customer_tag: info_array[2],
 										group_number: row.group_number,
-										competitor_number: parseInt(row.competitor_number)
+										competitor_number: parseInt(row.competitor_number),
+										competitor_seed: parseInt(row.competitor_seed)
 									};
 								}
 
@@ -1580,6 +1585,7 @@ var getStandings = function(req, res, pg, conString, log) {
 										team_logo: info_array[1],
 										group_number: row.group_number,
 										competitor_number: parseInt(row.competitor_number),
+										competitor_seed: parseInt(row.competitor_seed),
 										wins: row.wins,
 										loses: row.loses,
 										standing: row.standing,
@@ -1592,6 +1598,7 @@ var getStandings = function(req, res, pg, conString, log) {
 										customer_tag: info_array[2],
 										group_number: row.group_number,
 										competitor_number: parseInt(row.competitor_number),
+										competitor_seed: parseInt(row.competitor_seed),
 										wins: row.wins,
 										loses: row.loses,
 										standing: row.standing,
