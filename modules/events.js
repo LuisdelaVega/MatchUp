@@ -1177,6 +1177,7 @@ var submitScore = function(req, res, pg, conString, log) {
                                                         query.on("row", function(row, result) {
                                                             //console.log(row);
                                                             //console.log(!isNaN(row.score), ((details.round_best_of + 1) / row.score) == row.score);
+                                                            //TODO This will explode when Points instead of Match
                                                             if (!isNaN(row.score) && ((details.round_best_of + 1) / row.score) == row.score) {
                                                                 // Update set_completed for other the rest of the sets
                                                                 for (var i = 0; i < (details.round_best_of - row.score); i++) {
