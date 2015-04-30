@@ -102,7 +102,7 @@
                         </select>
                     </label>
 
-                    <div ng-if="(selectedType.type == 'Bracket' || selectedType.type == 'Winner\'s Bracket' || selectedType.type == 'Loser\'s Bracket' || selectedType.type == 'Group Stage') && selectedRound.round.matches.length > 0" ng-repeat="match in selectedRound.round.matches">
+                    <div ng-if="(selectedType.type == 'Bracket' || selectedType.type == 'Winner\'s Bracket' || selectedType.type == 'Loser\'s Bracket' || selectedType.type == 'Group Stage') && hasMatches(selectedRound.round.matches)" ng-repeat="match in selectedRound.round.matches">
                         <div class="row" >
                             <div class="col .col-33 absolute-center" ng-if="match.players[0].competitor_number != null && !requiresTeam">
                                 <img class="img-circular large player-1" ng-src="{{ match.players[0].customer_profile_pic }}" ng-if="match.players.length >= 1">
@@ -121,7 +121,7 @@
                                 <img class="img-circular large player-2" ng-src="{{ match.players[1].team_logo }}" ng-if="match.players.length > 1">
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col .col-33 absolute-center" ng-if="match.players[0].competitor_number != null && !requiresTeam">
                                 <p ng-if="match.players.length >= 1 && !requiresTeam"> {{ match.players[0].customer_tag }}</p>

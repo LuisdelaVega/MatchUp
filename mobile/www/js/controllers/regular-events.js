@@ -149,6 +149,23 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
         });
     });
 
+    $scope.hasMatches = function (matches) {
+
+        var matchesCount = 0;
+
+        angular.forEach(matches, function(match){
+
+            if(match.players[0].competitor_number != null){
+
+                matchesCount++;
+
+            }    
+        });
+
+        return matchesCount != 0;
+
+    };
+
 }]);
 
 myApp.controller('teamSignUpController', ['$scope', '$http', '$ionicPopup', '$stateParams', '$window', 'sharedDataService', function ($scope, $http, $ionicPopup, $stateParams, $window, sharedDataService) {
