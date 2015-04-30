@@ -80,8 +80,10 @@
 							<lable>Start Date</lable>
 							<a class="dropdown-toggle" id="dropdown1" role="button" data-toggle="dropdown">
 								<div class="input-group">
-									<input type="text" class="form-control" data-ng-model="event.start_date" readonly><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+									<input type="text" class="form-control" value="{{event.start_date | date: 'EEEE, MMMM d, h:mm a'}}" readonly>
+									<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
 								</div>
+
 							</a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
 								<datetimepicker data-ng-model="event.start_date" data-datetimepicker-config="{ dropdownSelector: '#dropdown1' }" />
@@ -93,7 +95,8 @@
 							<lable>End Date</lable>
 							<a class="dropdown-toggle" id="dropdown2" role="button" data-toggle="dropdown">
 								<div class="input-group">
-									<input type="text" class="form-control" data-ng-model="event.end_date" readonly><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+									<input type="text" class="form-control" value="{{event.end_date | date: 'EEEE, MMMM d, h:mm a'}}" readonly>
+									<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
 								</div>
 							</a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
@@ -108,7 +111,8 @@
 							<lable>Registration Deadline</lable>
 							<a class="dropdown-toggle" id="dropdown3" role="button" data-toggle="dropdown">
 								<div class="input-group">
-									<input type="text" class="form-control" data-ng-model="event.registration_deadline" readonly><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+									<input type="text" class="form-control" value="{{event.registration_deadline | date: 'EEEE, MMMM d, h:mm a'}}" readonly>
+									<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
 								</div>
 							</a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
@@ -243,11 +247,21 @@
 				</div>
 				<div class="row">
 					<div class="col-xs-12 col-md-6 col-lg-6">
+						<div class="well well-sm box-margin">
+							<p><b>Event Dates</b>
+								<br> Start date: {{event.start_date | date:'medium'}}
+								<br> End date: {{event.end_date | date:'medium'}}
+								<br> Registration deadline: {{event.registration_deadline | date:'medium'}}
+							</p>
+						</div>
+					</div>
+					<div class="col-xs-12 col-md-6 col-lg-6">
 						<div class="dropdown">
 							<lable>Start Date</lable>
 							<a class="dropdown-toggle" id="dropdown4" role="button" data-toggle="dropdown">
 								<div class="input-group">
-									<input type="text" class="form-control" data-ng-model="tournament.start_date" readonly><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+									<input type="text" class="form-control" value="{{tournament.start_date | date: 'EEEE, MMMM d, h:mm a'}}" readonly>
+									<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
 								</div>
 							</a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
@@ -255,12 +269,13 @@
 							</ul>
 						</div>
 					</div>
-					<div class="col-xs-12 col-md-6 col-lg-6">
+					<div class="col-xs-12 col-md-6 col-lg-6 clear-fix">
 						<div class="dropdown">
 							<lable>Check In Deadline</lable>
 							<a class="dropdown-toggle" id="dropdown5" role="button" data-toggle="dropdown">
 								<div class="input-group">
-									<input type="text" class="form-control" data-ng-model="tournament.deadline" readonly><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+									<input type="text" class="form-control" value="{{tournament.deadline | date: 'EEEE, MMMM d, h:mm a'}}" readonly>
+									<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
 								</div>
 							</a>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
@@ -283,7 +298,7 @@
 							</div>
 						</div>
 						<div class="col-xs-12 col-md-4 col-lg-4">
-							<label>Seed Money: </label>
+							<label> Money: </label>
 							<div class="form-group input-group">
 								<span class="input-group-addon">$</span>
 								<input type="text" class="form-control" ng-model="tournament.seed_money" valid-decimal>

@@ -7,14 +7,14 @@
 		<a data-target="#live" data-toggle="tab">Live</a>
 	</li>
 	<li>
-		<a data-target="#history" data-toggle="tab">History</a>
+		<a data-target="#history" data-toggle="tab">Past</a>
 	</li>
 </ul>
 <!-- Tab panes -->
 <div class="tab-content panel-padding">
 	<div class="tab-pane fade in active" id="upcoming">
 		<div class="row">
-			<div class="col-lg-6 col-md-12 col-sm-12" ng-repeat = "event in upcoming">
+			<div class="col-lg-6 col-md-12 col-sm-12" ng-repeat="event in upcoming">
 				<div class="panel panel-default cursor" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)">
 					<div class="panel-body">
 						<img style="width:100%;" ng-src="{{event.event_banner}}">
@@ -37,12 +37,17 @@
 					</div>
 				</div>
 			</div>
-
+			<div class="col-md-6 col-md-offset-3" style="margin-top:35vh" ng-if="!upcoming.length">
+				<div style="text-align:center">
+					<i class="fa fa-meh-o fa-5x"></i>
+					<h3 class="info-title">You do not have any events upcoming</h3>
+				</div>
+			</div>
 		</div>
 	</div>
 	<div class="tab-pane fade" id="live">
 		<div class="row">
-			<div class="col-lg-6 col-md-12 col-sm-12" ng-repeat = "event in live">
+			<div class="col-lg-6 col-md-12 col-sm-12" ng-repeat="event in live">
 				<div class="panel panel-default cursor" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)">
 					<div class="panel-body">
 						<img style="width:100%;" ng-src="{{event.event_banner}}">
@@ -65,12 +70,17 @@
 					</div>
 				</div>
 			</div>
-
+			<div class="col-md-6 col-md-offset-3" style="margin-top:35vh" ng-if="!live.length">
+				<div style="text-align:center">
+					<i class="fa fa-meh-o fa-5x"></i>
+					<h3 class="info-title">None of your events are live</h3>
+				</div>
+			</div>
 		</div>
 	</div>
 	<div class="tab-pane fade" id="history">
 		<div class="row">
-			<div class="col-lg-6 col-md-12 col-sm-12" ng-repeat = "event in history">
+			<div class="col-lg-6 col-md-12 col-sm-12" ng-repeat="event in history">
 				<div class="panel panel-default cursor" ng-click="goToEvent(event.event_name,  event.event_start_date, event.event_location)">
 					<div class="panel-body">
 						<img style="width:100%;" ng-src="{{event.event_banner}}">
@@ -93,10 +103,15 @@
 					</div>
 				</div>
 			</div>
-
+			<div class="col-md-6 col-md-offset-3" style="margin-top:35vh" ng-if="!history.length">
+				<div style="text-align:center">
+					<i class="fa fa-meh-o fa-5x"></i>
+					<h3 class="info-title">You do not have any past events</h3>
+				</div>
+			</div>
 		</div>
 
-		
+
 	</div>
 
 </div>

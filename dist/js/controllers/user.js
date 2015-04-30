@@ -188,26 +188,37 @@ function ($scope, $http, $stateParams, $window, $state, $rootScope) {
 }]);
 
 //Controller used to display the end users subscription and acces the profiles of thoses he is subscribed to
-myApp.controller('mySubcriptionsController', ['$scope', '$http', '$stateParams', '$window', '$state', '$rootScope',
-function ($scope, $http, $stateParams, $window, $state, $rootScope) {
+myApp.controller('mySubcriptionsController', ['$scope', '$http', '$stateParams', '$state', '$rootScope',
+function ($scope, $http, $stateParams, $state, $rootScope) {
 
-		$scope.customerUsername = $window.sessionStorage.username;
-		$scope.somebio = "I need to put some bio here, I know";
+		$scope.subMatches = [];
+		$scope.matches = [];
+		$scope.subIndex = 0;
 
-		$http.get($rootScope.baseURL + '/matchup/profile/' + $scope.customerUsername + '/subscriptions').success(function (data) {
-
-			$scope.subscriptions = angular.fromJson(data);
-
-		}).error(function (data, status) {
-
-			if (status == 404 || status == 401 || status == 400)
-				$state.go("" + status);
+		$http.get($rootScope.baseURL + '/matchup/profile/' + $scope.me + '/subscriptions').success(function (data) {
+			$scope.subscriptions = data;
+			$scope.getSubMatches(0);
 		});
+
+		$scope.getSubMatches = function (index) {
+			$scope.subIndex = index;
+			// MATCHUPS
+			$http.get($rootScope.baseURL + '/matchup/profile/' + $scope.subscriptions[index].customer_username + '/matchups?state=Past').success(function (data) {
+				$scope.matches = data;
+			});
+		}
 
 		$scope.unsubscribe = function (user, index) {
 			//unsubscribe
 			$http.delete($rootScope.baseURL + '/matchup/profile/' + user).success(function (data) {
 				$scope.subscriptions.splice(index, 1);
+				if($scope.subscriptions.length){
+					$scope.subIndex = index;
+					$scope.getSubMatches(index);
+				}
+				else{
+					$scope.matches = [];
+				}
 
 			}).error(function (data, status) {
 				console.log(status);

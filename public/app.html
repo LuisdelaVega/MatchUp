@@ -90,10 +90,10 @@
 	<!-- /.navbar-top-links -->
 
 	<div class="navbar-default sidebar" role="navigation" style="margin-top:10px">
-		<div class="sidebar-nav navbar-collapse">
+		<div class="sidebar-nav navbar-collapse" style="max-height:100vh;overflow-y:auto">
 			<img style="width:100%; max-width:180px; display: block;
     margin: 0 auto;" align="middle" src="http://neptunolabs.com/images/matchup-logo.png">
-			<ul class="nav" id="side-menu" style="margin-top:15px">
+			<ul class="nav" id="side-menu">
 				<li class="sidebar-search">
 					<form ng-submit="goToSearch(query)">
 						<div class="input-group custom-search-form">
@@ -139,7 +139,7 @@
 					<a ui-sref="app.genres" class="sidebar-a"><i class="fa fa-th-large fa-fw"></i> Genres</a>
 				</li>
 				<li>
-					<a ui-sref="app.userMatchups({username: me})" class="sidebar-a"><i class="fa fa-calendar-o fa-fw"></i> My MatchUps</a>
+					<a ui-sref="app.userMatchups({username: me})" class="sidebar-a"><i class="fa fa-trophy fa-fw"></i> My MatchUps</a>
 				</li>
 				<li>
 					<a ui-sref="app.userTeams({username: me})" class="sidebar-a"><i class="fa fa-group fa-fw"></i> My Teams</a>
@@ -148,10 +148,10 @@
 					<a ui-sref="app.userOrganizations({username: me})" class="sidebar-a"><i class="fa fa-group fa-fw"></i> My Organizations</a>
 				</li>
 				<li>
-					<a ui-sref="app.subcriptions" class="sidebar-a"><i class="fa fa-list-alt fa-fw"></i> Subscribed</a>
+					<a ui-sref="app.subcriptions" class="sidebar-a"><i class="fa fa-star fa-fw"></i> Subscriptions</a>
 				</li>
 				<li>
-					<a ng-click="logout()" class="sidebar-a"><i class="fa fa-list-alt fa-sign-out"></i> Logout</a>
+					<a ng-click="logout()" class="sidebar-a"><i class="fa fa-list-alt fa-sign-out fa-fw"></i> Logout</a>
 				</li>
 			</ul>
 		</div>

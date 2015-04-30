@@ -1,16 +1,17 @@
-<div class="page-header">
-	<h1>Subscriptions</h1>
-</div>
-<div class="row">
-	<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 custom-padding" ng-repeat="sub in subscriptions">
-		<div class="box">
+<div class="row custom-padding">
+	<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+		<div class="page-header">
+			<h1>Subscriptions</h1>
+		</div>
+		<div class="box box-margin" ng-repeat="sub in subscriptions">
 			<div class="media">
 				<div class="media-left media-middle">
 					<a ng-click="goToUser(sub.customer_username)"> <img class="media-object match-avatar" ng-src="{{sub.customer_profile_pic}}"> </a>
 				</div>
-				<div class="media-body">
+				<div class="media-body" ng-click="getSubMatches($index)">
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-					<span class="pull-right"><a class="btn btn-sm btn-primary" ng-click="unsubscribe(sub.customer_username, $index)"><span class="fa fa-user"></span> </a> </span>
+						<span class="pull-right"><a class="btn btn-sm btn-primary" ng-click="unsubscribe(sub.customer_username, $index)"><span class="fa fa-user"></span> </a>
+						</span>
 						<h3>{{sub.customer_tag}}</h3>
 						<p class="info-paragraph">
 							{{sub.customer_first_name}} {{sub.customer_last_name}}
@@ -20,5 +21,81 @@
 			</div>
 		</div>
 	</div>
+	<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" ng-if="subscriptions.length">
+		<div class="page-header">
+			<h1>{{subscriptions[subIndex].customer_tag}}'s Matches</h1>
+		</div>
+		<div style="text-align:center" ng-if="!matches.length">
+			<h3 class="info-title">{{subscriptions[subIndex].customer_tag}} has no matchups</h3>
+		</div>
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-repeat="match in matches">
+			<div class="box cursor box-margin" ng-click="getMatch(match.event_name,match.tournament_name,match.round_number,match.match_number,match.round_of,match.event_start_date,match.event_location,match.station_number)">
+				<h4 class="modal-title" align="center">{{match.event_name}}</h4>
+				<p align="center">
+					{{match.tournament_name}}
+					<br>
+					<small>{{match.round_of}} Round {{match.round_number}}, Match {{match.match_number}}<span ng-if="match.station_number">, Station {{match.station_number}}</span></small>
+				</p>
+				<div ng-if="match.details[0].customer_tag">
+					<div class="row" align="center">
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<img class="img-circular player-1 large center-block" ng-src="{{match.details[0].customer_profile_pic}}" />
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<h1 style="text-align:center">
+							{{match.details[0].score}}-{{match.details[1].score}}</h1>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<img class="img-circular player-2 large center-block" ng-src="{{match.details[1].customer_profile_pic}}" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<h3 style="text-align:center">{{match.details[0].customer_tag}}</h3>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<h4 style="text-align:center"></h4>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<h3 style="text-align:center">{{match.details[1].customer_tag}}</h3>
+						</div>
+					</div>
+				</div>
+				<div ng-if="match.details[0].team_name">
+					<div class="row" align="center">
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
 
+							<img class="img-circular player-1 large center-block" ng-src="{{match.details[0].team_logo}}" />
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<h1 style="text-align:center">
+							{{match.details[0].score}}-{{match.details[1].score}}</h1>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<img class="img-circular player-2 large center-block" ng-src="{{match.details[1].team_logo}}" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<h3 style="text-align:center">{{match.details[0].team_name}}</h3>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<h4 style="text-align:center"></h4>
+						</div>
+						<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+							<h3 style="text-align:center">{{match.details[1].team_name}}</h3>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-if="!subscriptions.length">
+	<div class="col-md-6 col-md-offset-3" style="margin-top:35vh">
+		<div style="text-align:center">
+			<h3 class="info-title">Subscribe to players to follow them in their matchups</h3>
+		</div>
+	</div>
 </div>

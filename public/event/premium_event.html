@@ -105,21 +105,25 @@
 						</div>
 					</div>
 				</div>
-				<div class="btn-group btn-group-justified box-margin" role="group">
-					<div class="btn-group" role="group" ng-if="eventInfo.is_spectator">
-						<button type="button" class="btn btn-default" ng-click="goToMeetupList(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location)">
-							MeetUp
-						</button>
-					</div>
-					<div class="btn-group" role="group" ng-if="!finished && !eventInfo.is_organizer && !eventInfo.is_spectator">
-						<button type="button" class="btn btn-success" ng-click="getFees()">
-							Sign Up
-						</button>
-					</div>
-					<div class="btn-group" role="group" ng-if="eventInfo.is_organizer && !finished">
-						<button type="button" class="btn btn-primary" ui-sref="app.eventSettings({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location })">
-							Settings
-						</button>
+				<div class="row">
+					<div class="col-xs-12 col-md-8 col-lg-6 col-lg-offset-3 col-md-offset-2">
+						<div class="btn-group btn-group-justified box-margin" role="group">
+							<div class="btn-group" role="group" ng-if="eventInfo.is_spectator">
+								<button type="button" class="btn btn-default" ng-click="goToMeetupList(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location)">
+									MeetUp
+								</button>
+							</div>
+							<div class="btn-group" role="group" ng-if="!finished && !eventInfo.is_organizer && !eventInfo.is_spectator">
+								<button type="button" class="btn btn-success" ng-click="getFees()">
+									Spectator Sign Up
+								</button>
+							</div>
+							<div class="btn-group" role="group" ng-if="eventInfo.is_organizer && !finished">
+								<button type="button" class="btn btn-primary" ui-sref="app.eventSettings({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location })">
+									Settings
+								</button>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
