@@ -2539,10 +2539,13 @@ var editBestOf = function(req, res, pg, conString, log) {
 				var round = {};
 				round.best_of = parseInt(result.rows[0].round_best_of);
 				round.matches = parseInt(result.rows[0].matches);
-				if (isNaN(req.body.best_of) || req.body.best_of <= 0) {
+				if (isNaN(req.body.best_of) || req.body.best_of <= 0 || req.body.best_of % 2 == 0) {
 					client.query("ROLLBACK");
 					done();
-					res.status(400).send("Invalid payload");
+					res.status(400).json({
+						best_of_value_less_than_or_equal_to_0 : req.body.best_of <= 0,
+						best_of_value_is_even : req.body.best_of % 2 == 0
+					});
 					log.info({
 						res: res
 					}, 'done response');
