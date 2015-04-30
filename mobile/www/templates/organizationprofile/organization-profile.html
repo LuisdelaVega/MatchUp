@@ -55,8 +55,8 @@
                     </button>
                 </div>
             </a>
-            <a class="item item-icon-left dark" ng-click="goToOrganizationMembers()">
-                <i class="icon ion-android-arrow-forward"></i> See More
+            <a class="item item-icon-left dark" ng-click="goToOrganizationMembers()" ng-if="loggedInUserIsOwner">
+                Edit Members
             </a>
         </div>
     </ion-content>

@@ -19,10 +19,10 @@
                     <div class="center-text">
                         <h1 class="h1-username">{{ currentTournament.tournament_name }}</h1>
                     </div>
-<!--
-                    <div class="center-text">
-                        <h2 class="h1-username">{{ eventInfo.event_name }}</h2>
-                    </div>
+                    <!--
+<div class="center-text">
+<h2 class="h1-username">{{ eventInfo.event_name }}</h2>
+</div>
 -->
                     <div class="center-text">
                         <h2 class="h1-username">Registration Deadline: </h2>
@@ -102,13 +102,14 @@
                         </select>
                     </label>
 
-                    <div ng-if="selectedType.type == 'Bracket' || selectedType.type == 'Winner\'s Bracket' || selectedType.type == 'Loser\'s Bracket' || selectedType.type == 'Group Stage'" ng-repeat="match in selectedRound.round.matches">
+                    <div ng-if="(selectedType.type == 'Bracket' || selectedType.type == 'Winner\'s Bracket' || selectedType.type == 'Loser\'s Bracket' || selectedType.type == 'Group Stage') && selectedRound.round.matches.length > 0" ng-repeat="match in selectedRound.round.matches">
                         <div class="row" >
                             <div class="col .col-33 absolute-center" ng-if="match.players[0].competitor_number != null && !requiresTeam">
                                 <img class="img-circular large player-1" ng-src="{{ match.players[0].customer_profile_pic }}" ng-if="match.players.length >= 1">
                             </div>
                             <div class="col .col-33 absolute-center" ng-if="match.players[0].competitor_number != null && requiresTeam">
                                 <img class="img-circular large player-1" ng-src="{{ match.players[0].team_logo }}" ng-if="match.players.length >= 1">
+
                             </div>
                             <div class="col .col-33 absolute-center" ng-if="match.players.length > 1">
                                 <h2>{{ match.players[0].score }} - {{ match.players[1].score }}</h2>
@@ -118,6 +119,21 @@
                             </div>
                             <div class="col .col-33 absolute-center" ng-if="requiresTeam">
                                 <img class="img-circular large player-2" ng-src="{{ match.players[1].team_logo }}" ng-if="match.players.length > 1">
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col .col-33 absolute-center" ng-if="match.players[0].competitor_number != null && !requiresTeam">
+                                <p ng-if="match.players.length >= 1 && !requiresTeam"> {{ match.players[0].customer_tag }}</p>
+                                <p ng-if="match.players.length >= 1 && requiresTeam"> {{ match.players[0].team_name }}</p>
+                            </div>
+                            <div class="col .col-33 absolute-center">
+
+                            </div>
+
+                            <div class="col .col-33 absolute-center">
+                                <p ng-if="match.players.length > 1 && !requiresTeam"> {{ match.players[1].customer_tag }}</p>
+                                <p ng-if="match.players.length > 1 && requiresTeam"> {{ match.players[0].team_name }}</p>
                             </div>
                         </div>
                     </div>
@@ -133,11 +149,11 @@
                 </div>
             </div>
 
-            <button class="button" ng-if="!isOngoing && !requiresTeam && !currentTournament.is_competitor" ng-click="showConfirm()" style="width: 100vw">
+            <button class="button button-positive" ng-if="!isOngoing && !requiresTeam && !currentTournament.is_competitor" ng-click="showConfirm()" style="width: 100vw">
                 Sign Up
             </button>
 
-            <button class="button" ng-if="!isOngoing && requiresTeam && !currentTournament.is_competitor"  ui-sref="app.teamsignup({eventname: eventInfo.event_name, date: eventInfo.event_start_date, location: eventInfo.event_location, tournament: currentTournament.tournament_name})" style="width: 100vw">
+            <button class="button button-positive" ng-if="!isOngoing && requiresTeam && !currentTournament.is_competitor"  ui-sref="app.teamsignup({eventname: eventInfo.event_name, date: eventInfo.event_start_date, location: eventInfo.event_location, tournament: currentTournament.tournament_name})" style="width: 100vw">
                 Sign Up
             </button>
         </div>

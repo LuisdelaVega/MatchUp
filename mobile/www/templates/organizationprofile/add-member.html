@@ -1,5 +1,5 @@
 <ion-view view-title="Add Member">
-   <ion-nav-buttons side="left">
+    <ion-nav-buttons side="left">
         <button class="button button-icon" ng-click="returnToOrganizationMembers()">
             <i class="icon ion-ios-arrow-back"></i>
         </button>
@@ -11,10 +11,18 @@
                 <input ng-model="query" ng-change="search(query)" type="text" placeholder="Search" />
             </label>
         </div>
+        <ul class="list">
+            <li class="item item-checkbox">
+                <label class="checkbox">
+                    <input type="checkbox" ng-model="add.owner" ng-init="false">
+                </label>
+                Add as owner
+            </li>
+        </ul>
         <div class="list list-inset" ng-repeat="user in users">
-            <a class="item item-avatar" ng-click="showConfirm(user.customer_tag)">
+            <a class="item item-avatar" ng-click="showConfirm(user.customer_tag, user.customer_username)">
                 <img ng-src="{{ user.customer_profile_pic }}">
-                <h2>{{ user.customer_tag }} {{ user.customer_username }}</h2>
+                <h2>{{ user.customer_tag }}</h2>
                 <p>{{ user.customer_country }}</p>
             </a>
         </div>

@@ -1,21 +1,15 @@
-<ion-popover-view class="fit-events-popover">
-    <ion-header-bar class="bar-dark">
-        <h2 class="title">Category</h2>
-    </ion-header-bar>
-    <ion-content>
+<ion-popover-view class="fit-team-popover">
+    <ion-pane>
         <div class="list">
-           <a class="item">
-              All
+            <a class="item" ng-click="goToEditOrganization()">
+              Upcoming
             </a>
-            <a class="item">
-              Local
+            <a class="item" ng-click="deleteOrganizationPopup()">
+              Past
             </a>
-            <a class="item">
-              Regional
-            </a>
-            <a class="item">
-              National
+            <a class="item" ng-click="deleteOrganizationPopup()">
+              Live
             </a>
         </div>
-    </ion-content>
+    </ion-pane>
 </ion-popover-view>

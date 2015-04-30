@@ -114,7 +114,7 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
 
 
                         $scope.currentTournament = data;
-                        
+
                         $scope.requiresTeam = $scope.currentTournament.team_size > 1;
                         $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+$scope.currentTournament.tournament_name+'/rounds?date='+$stateParams.date+'&location='+$stateParams.location+'', config).success(function(data, status, headers, config) {
 
@@ -224,9 +224,6 @@ myApp.controller('teamSignUpController', ['$scope', '$http', '$ionicPopup', '$st
                 'Authorization': "Bearer "+ $window.sessionStorage.token
             }
         };
-
-        console.log($scope.checkedMembers);
-        console.log('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+$stateParams.tournament+'/register?date='+$stateParams.date+'&location='+$stateParams.location+'');
         $http.post('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+$stateParams.tournament+'/register?date='+$stateParams.date+'&location='+$stateParams.location+'', {
 
             "team": $scope.selectedTeam.team.team_name,
@@ -234,10 +231,13 @@ myApp.controller('teamSignUpController', ['$scope', '$http', '$ionicPopup', '$st
 
         }, config).success(function(data) {
 
-            console.log($scope.selectedTeam);
+            var confirmPopup = $ionicPopup.alert({
+                title: 'Team Sign Up',
+                template: 'You have succesfully signed up '+$scope.selectedTeam.team.team_name+' in '+$stateParams.tournament+'!'
+            });
+            confirmPopup.then(function (res) {
 
-            console.log("signed up team");
-
+            });
 
         }).
         error(function(data, status, headers, config) {

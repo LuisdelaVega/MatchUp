@@ -811,11 +811,10 @@ myApp.controller('notificationsController', ['$scope', '$http', '$state', 'share
 
 }]);
 
-myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'sharedDataService', '$window', '$timeout', function ($scope, $http, $state, sharedDataService, $window, $timeout) {
+myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'sharedDataService', '$window', '$timeout', '$ionicPopup', function ($scope, $http, $state, sharedDataService, $window, $timeout, $ionicPopup) {
 
     $scope.$on('$ionicView.enter', function () {
         $scope.matchupInfo = sharedDataService.get();
-        console.log($scope.matchupInfo);
 
         $scope.scoreInput = [ ];
 
@@ -846,6 +845,10 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
             });
 
             $scope.matchInfo = data;
+
+            if($scope.matchInfo.score_type == "Points"){
+                $scope.scoreInput.score = 0;
+            }
 
             var sets = data.sets;
 
@@ -908,23 +911,96 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
 
                 }, config).success(function (data) {   
 
-                    console.log("submitted score");
+                    var confirmPopup = $ionicPopup.alert({
+                        title: 'Submit Score',
+                        template: 'You have succesfully submitted your score for set '+$scope.currentSet+' with a Win.'
+                    });
+                    confirmPopup.then(function (res) {
 
-                }).error(function (err) {
-                    console.log(err);
+                    });
+
+                }).error(function (data, status, header, config) {
+
+
+                    if(status == 403){
+
+                        var confirmPopup = $ionicPopup.alert({
+                            title: 'Submit Score',
+                            template: 'You already submitted a score for this set!'
+                        });
+                        confirmPopup.then(function (res) {
+
+                        });
+
+                    }
+
+                    else if(status == 409){
+
+                        var confirmPopup = $ionicPopup.alert({
+                            title: 'Submit Score',
+                            template: 'There is conflict in the scores. If any issues arise please submit a report.'
+                        });
+                        confirmPopup.then(function (res) {
+
+                        });
+
+                    }
+
+
                 });
             }
 
-            else{
+            else if( $scope.scoreInput.score == 'Lose' ){
                 $http.put('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'/'+$scope.currentSet+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'', {
                     "score": 0
 
                 }, config).success(function (data) {   
 
-                    console.log("submitted score");
+                    var confirmPopup = $ionicPopup.alert({
+                        title: 'Submit Score',
+                        template: 'You have succesfully submitted your score for set '+$scope.currentSet+' with a Lose.'
+                    });
+                    confirmPopup.then(function (res) {
 
-                }).error(function (err) {
-                    console.log(err);
+                    });
+
+                }).error(function (data, status, header, config) {
+
+
+                    if(status == 403){
+                        var confirmPopup = $ionicPopup.alert({
+                            title: 'Submit Score',
+                            template: 'You already submitted a score for this set!'
+                        });
+                        confirmPopup.then(function (res) {
+
+                        });
+                    }
+
+                    else if(status == 409){
+
+                        var confirmPopup = $ionicPopup.alert({
+                            title: 'Submit Score',
+                            template: 'There is conflict in the scores. If any issues arise please submit a report.'
+                        });
+                        confirmPopup.then(function (res) {
+
+                        });
+
+                    }
+
+                });
+
+            }
+
+            else{
+
+                var confirmPopup = $ionicPopup.alert({
+                    title: 'Submit Score',
+                    template: 'You didn\'t select Win or Lose!'
+                });
+                confirmPopup.then(function (res) {
+
                 });
 
             }
@@ -937,10 +1013,39 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
 
             }, config).success(function (data) {   
 
-                console.log("submitted score");
+                var confirmPopup = $ionicPopup.alert({
+                    title: 'Submit Score',
+                    template: 'You have succesfully submitted your score for set '+$scope.currentSet+' with a score of'+$scope.scoreInput.score+'.'
+                });
+                confirmPopup.then(function (res) {
 
-            }).error(function (err) {
-                console.log(err);
+                });
+
+            }).error(function (data, status, header, config) {
+
+
+                if(status == 403){
+                    var confirmPopup = $ionicPopup.alert({
+                        title: 'Submit Score',
+                        template: 'You already submitted a score for this set!'
+                    });
+                    confirmPopup.then(function (res) {
+
+                    });
+                }
+
+                else if(status == 409){
+
+                    var confirmPopup = $ionicPopup.alert({
+                        title: 'Submit Score',
+                        template: 'There is conflict in the scores. If any issues arise please submit a report.'
+                    });
+                    confirmPopup.then(function (res) {
+
+                    });
+
+                }
+
             });
 
         }

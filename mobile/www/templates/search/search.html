@@ -11,7 +11,7 @@
     </ion-nav-buttons>
     <ion-content>
         <div class="list">
-            <a class="item item-divider " href="#/app/searchgeneral/Live">
+            <a class="item item-divider " href="#/app/searchgeneral/Live" ng-if="liveEvents.length > 0">
                 Live
             </a>
             <a class="item item-avatar" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="event in liveEvents | limitTo: 3">
@@ -21,7 +21,7 @@
                 <p>{{event.event_start_date | date: 'medium'}}</p>
             </a>
 
-            <a class="item item-divider " href="#/app/searchgeneral/Past">
+            <a class="item item-divider " href="#/app/searchgeneral/Past" ng-if="pastEvents.length > 0">
                 Past              
             </a>
             <a class="item item-avatar" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="event in pastEvents | limitTo: 3">
@@ -31,7 +31,7 @@
                 <p>{{event.event_start_date | date: 'medium'}}</p>
             </a>
 
-            <a class="item item-divider" href="#/app/searchgeneral/Premium">
+            <a class="item item-divider" href="#/app/searchgeneral/Premium" ng-if="premiumEvents.length > 0">
                 Premium            
             </a>
             <a class="item item-avatar" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="event in premiumEvents | limitTo: 3">
@@ -41,7 +41,7 @@
                 <p>{{event.event_start_date | date: 'medium'}}</p>
             </a>
 
-            <a class="item item-divider " href="#/app/searchgeneral/Regular">
+            <a class="item item-divider " href="#/app/searchgeneral/Regular" ng-if="regularEvents.length > 0">
                 Regular               
             </a>
             <a class="item item-avatar" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="event in regularEvents | limitTo: 3">
@@ -51,7 +51,7 @@
                 <p>{{event.event_start_date | date: 'medium'}}</p>
             </a>
 
-            <a class="item item-divider " href="#/app/searchgeneral/Users">
+            <a class="item item-divider " href="#/app/searchgeneral/Users" ng-if="users.length > 0">
                 Users               
             </a>
             <a class="item item-avatar" ng-click="goToUserProfile(user.customer_username)" ng-repeat="user in users | limitTo: 3">
@@ -60,7 +60,7 @@
                 <p>{{ user.customer_country }}</p>
             </a>
 
-            <a class="item item-divider " href="#/app/searchgeneral/Teams">
+            <a class="item item-divider " href="#/app/searchgeneral/Teams" ng-if="teams.length > 0">
                 Teams                
             </a>
             <a class="item item-avatar" ng-click="goToTeamProfile(team.team_name)" ng-repeat="team in teams | limitTo: 3">
@@ -68,7 +68,7 @@
                 <h2>{{ team.team_name }}</h2>
             </a>
 
-            <a class="item item-divider " href="#/app/searchgeneral/Organizations">
+            <a class="item item-divider " href="#/app/searchgeneral/Organizations" ng-if="organizations.length > 0">
                 Organizations               
             </a>
             <a class="item item-avatar" ng-click="goToOrganizationProfile(organization.organization_name)" ng-repeat="organization in organizations | limitTo: 3">
@@ -76,7 +76,7 @@
                 <h2>{{ organization.organization_name }}</h2>
             </a>
             
-            <a class="item item-divider" href="#/app/searchgeneral/Games">
+            <a class="item item-divider" href="#/app/searchgeneral/Games" ng-if="games.length > 0">
                 Games         
             </a>
             
@@ -85,7 +85,7 @@
                 <h2>{{ game.game_name }}</h2>
             </a>
 
-            <a class="item item-divider " href="#/app/searchgenres">
+            <a class="item item-divider " href="#/app/searchgenres" ng-if="genres.length > 0">
                 Genres
             </a>
             <a class="item item-avatar" href="#/app/genre/upcoming" ng-repeat="genre in genres | limitTo: 3">

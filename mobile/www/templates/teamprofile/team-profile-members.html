@@ -18,7 +18,7 @@
                 <h2>{{player.customer_tag}}</h2>
                 <p>{{player.customer_first_name}} {{player.customer_last_name}}</p>
                 <div class="buttons">
-                    <button class="button button-energized">
+                    <button class="button button-energized" ng-click="makeCaptain(player.customer_username)" ng-if="!player.is_captain">
                         <i class="icon ion-android-star-outline"></i>
                     </button>
                     <button class="button button-assertive" ng-click="showConfirm(player.customer_tag, player.customer_username)">
