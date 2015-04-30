@@ -1,17 +1,27 @@
 <ion-view view-title="Events">
-    <ion-nav-buttons side="left">
-        <button class="button button-icon button-clear ion-navicon" menu-toggle="left">
-        </button>
-<!--        <a class="button icon-right ion-android-arrow-dropdown button-clear" ng-click="popover.show($event)">All</a>-->
-    </ion-nav-buttons>
-    <ion-nav-buttons side="right">
-        <button class="button button-icon ion-android-alert">
-        </button>
-        <button class="button button-icon">
-            <i class="ion-android-more-vertical"></i>
-        </button>
-    </ion-nav-buttons>
-    <ion-content>
+    <ion-content class="padding">
+        <label class="item item-input item-select">
+            <div class="input-label">
+                Event State
+            </div>
+            <select ng-model="event.state" ng-change="callEvents()">
+                <option value="All">All</option>
+                <option value="upcoming">Upcoming</option>
+                <option value="live">Live</option>
+                <option value="past">Past</option>
+            </select>
+        </label>
+        <label class="item item-input item-select">
+            <div class="input-label">
+                Event Type
+            </div>
+            <select ng-model="event.type" ng-change="callEvents()">
+                <option value="All">All</option>
+                <option value="local">Local</option>
+                <option value="regional">Regional</option>
+                <option value="national">National</option>
+            </select>
+        </label>
         <div class="list-inset">
             <a class="item item-thumbnail-left" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="event in regularEvents">
                 <img ng-src="{{ event.event_logo }}">

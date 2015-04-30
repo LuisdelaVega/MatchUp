@@ -5,7 +5,7 @@ myApp.controller('EventController', function ($scope, $ionicPopover, $http, shar
 
     //goToEvent requires the event name, date and location to access the specific event that is to be transitioned to.
     $scope.goToEvent = function(eventName, date, location){
-    
+
         eventName = eventName.replace(" ", "%20"); //Replaces all space with %20.
         var params = [eventName, date, location];
 
@@ -20,7 +20,7 @@ myApp.controller('EventController', function ($scope, $ionicPopover, $http, shar
         success(function(data, status, headers, config) {
 
             var eventData = angular.fromJson(data);
-            
+
             var isHosted = eventData.host; //Server returns organization that is hosting the event. If the event does not have a host than the value returned is null.
 
             sharedDataService.set(params);
@@ -45,42 +45,107 @@ myApp.controller('EventController', function ($scope, $ionicPopover, $http, shar
 
 myApp.controller('PremiumEventController', function ($scope, $http, $window) {
 
-    var config = {
-        headers: {
-            'Authorization': "Bearer "+ $window.sessionStorage.token
-        }
-    };
+    $scope.$on('$ionicView.enter', function () {
 
-    //Obtains hosted events from the server to populate the view.
-    $http.get('http://matchup.neptunolabs.com/matchup/events?type=hosted', config).
-    success(function(data, status, headers, config) {
+        $scope.event = { };
+        $scope.event.state = "upcoming";
+        $scope.event.type = "All";
 
-        $scope.hostedEvents = angular.fromJson(data);
-
-    }).
-    error(function(data, status, headers, config) {
-        console.log("error in PremiumEventController");
+        $scope.callEvents();
     });
+
+    $scope.callEvents = function(){
+
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+
+        if($scope.event.state == "All"){
+            $scope.event.stateString = "";
+        }
+        else{
+            $scope.event.stateString ="state="+$scope.event.state;  
+        }
+
+        if($scope.event.type == "All"){
+            $scope.event.typeString = "";
+        }
+        else{
+            if($scope.event.stateString != "All"){
+                $scope.event.typeString = "&magnitude="+$scope.event.type;
+            }
+            else{
+                $scope.event.typeString = "magnitude="+$scope.event.type;
+            }
+        }
+
+        //Obtains hosted events from the server to populate the view.
+        $http.get('http://matchup.neptunolabs.com/matchup/events?type=hosted&'+ $scope.event.stateString+ $scope.event.typeString+'', config).
+        success(function(data, status, headers, config) {
+
+            $scope.hostedEvents = angular.fromJson(data);
+
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in PremiumEventController");
+        });
+    }
 
 });
 
 myApp.controller('RegularEventController', function ($scope, $http, $window) {
 
-    var config = {
-        headers: {
-            'Authorization': "Bearer "+ $window.sessionStorage.token
-        }
-    };
 
-    //Obtains regular events from the server to populate the view.
-    $http.get('http://matchup.neptunolabs.com/matchup/events?type=regular', config).
-    success(function(data, status, headers, config) {
+    $scope.$on('$ionicView.enter', function () {
 
-        $scope.regularEvents = angular.fromJson(data);
+        $scope.event = { };
+        $scope.event.state = "upcoming";
+        $scope.event.type = "All";
 
-    }).
-    error(function(data, status, headers, config) {
-        console.log("error in RegularEventController");
+        $scope.callEvents();
     });
+
+    $scope.callEvents = function(){
+
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+        if($scope.event.state == "All"){
+            $scope.event.stateString = "";
+        }
+        else{
+            $scope.event.stateString ="state="+$scope.event.state;  
+        }
+
+        if($scope.event.type == "All"){
+            $scope.event.typeString = "";
+        }
+        else{
+            if($scope.event.stateString != "All"){
+                $scope.event.typeString = "&magnitude="+$scope.event.type;
+            }
+            else{
+                $scope.event.typeString = "magnitude="+$scope.event.type;
+            }
+        }
+
+        //Obtains regular events from the server to populate the view.
+        $http.get('http://matchup.neptunolabs.com/matchup/events?type=regular&'+ $scope.event.stateString+ $scope.event.typeString+'', config).
+        success(function(data, status, headers, config) {
+
+            $scope.regularEvents = angular.fromJson(data);
+
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in RegularEventController");
+        });
+        
+    }
 
 });

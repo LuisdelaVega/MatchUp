@@ -16,9 +16,9 @@
             <a class="item center-item item-avatar item-button-right" ng-repeat="member in members">
                 <img ng-src="{{member.customer_profile_pic}}">
                 <h2>{{member.customer_tag}}</h2>
-                <p>T{{member.customer_first_name}} {{member.customer_last_name}}</p>
+                <p>{{member.customer_first_name}} {{member.customer_last_name}}</p>
                 <div class="buttons">
-                    <button class="button button-energized">
+                    <button class="button button-energized" ng-click="makeOwner(member.customer_username, member.customer_tag)" ng-if="!member.is_owner">
                         <i class="icon ion-briefcase"></i>
                     </button>
                     <button class="button button-assertive" ng-click="showConfirm(member.customer_username)">
