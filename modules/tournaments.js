@@ -1895,7 +1895,7 @@ var getRounds = function(req, res, pg, conString, log) {
 						for (var i = 0; i < tournament.groupStage.groups.length; i++) {
 							console.log("Group:");
 							console.log(tournament.groupStage.groups[i]);
-							for (var j = 0; j < tournament.groupStage.groups[i].rounds.lenght; j++) {
+							for (var j = 0; j < tournament.groupStage.groups[i].rounds.length; j++) {
 								console.log("Round:");
 								console.log(tournament.groupStage.groups[i].rounds[j]);
 								var newArray = [];
