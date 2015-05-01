@@ -1891,12 +1891,29 @@ var getRounds = function(req, res, pg, conString, log) {
 				query.on("end", function (result) {
 					// Calling clean takes care of the null values that happen in groups other than Group 1 because this group is the only one whose matches start from 1 (match_number)
 					if (tournament.groupStage) {
+						console.log("Here!");
 						for (var i = 0; i < tournament.groupStage.groups.length; i++) {
 							for (var j = 0; j < tournament.groupStage.groups[i].rounds.lenght; j++) {
-								tournament.groupStage.groups[i].rounds[j].matches.clean(null);
+								var newArray = [];
+								for (var k = 0; tournament.groupStage.groups[i].rounds[j].matches.length; k++) {
+									if (tournament.groupStage.groups[i].rounds[j].matches[k]) {
+										newArray.push(tournament.groupStage.groups[i].rounds[j].matches[k]);
+									}
+								}
+								tournament.groupStage.groups[i].rounds[j].matches = newArray;
+
+								//tournament.groupStage.groups[i].rounds[j].matches.clean(null);
+								//tournament.groupStage.groups[i].rounds[j].matches.clean(undefined);
 							}
 						}
 					}
+
+					for(var i = 0; i < actual.length; i++){
+						if (actual[i]){
+							newArray.push(actual[i]);
+						}
+					}
+
 					done();
 					res.status(200).send(tournament);
 					log.info({
