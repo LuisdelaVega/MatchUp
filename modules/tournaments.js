@@ -858,8 +858,7 @@ function doubleEliminationBracket(bracket, tournament) {
 	}
 	var j = 1;
 	var count = 0;
-	if (loserRounds[1].amountOfMatches != 1 || bracket.numOfPlayers > 4) {
-		console.log("4 people bracket. YES!");
+	if (bracket.numOfPlayers > 4) {
 		do {
 			i++;
 			loserRounds[i] = {};
@@ -1172,7 +1171,7 @@ function doubleEliminationBracket(bracket, tournament) {
 				}
 				//console.log(((j + loserRounds[2].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches));
 				// bracket.winnerRounds[i].matches[j].loserGoesTo = loserRounds[temp].matches[Math.floor(((j + loserRounds[2].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].match_number;
-				if (loserRounds[1].amountOfMatches != 1 || bracket.numOfPlayers > 4) {
+				if (bracket.numOfPlayers > 4) {
 					bracket.winnerRounds[i].matches[j].loserGoesTo = {};
 					bracket.winnerRounds[i].matches[j].loserGoesTo.event_name = loserRounds[temp].matches[Math.floor(((j + loserRounds[2].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].event_name;
 					bracket.winnerRounds[i].matches[j].loserGoesTo.event_start_date = loserRounds[temp].matches[Math.floor(((j + loserRounds[2].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].event_start_date;
