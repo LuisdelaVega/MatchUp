@@ -1786,8 +1786,8 @@ function getNewScores(req, res, client, done, log, newScores, player, details, i
                     newScores.playersToRemoveFromWinners.push(newScores.players[0].competitor_number);
                 }
                 client.query({
-                    text : "UPDATE submits SET score = $10 WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-                    values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.body.players[0].competitor_number, req.body.players[0].score]
+                    text : "UPDATE submits SET (score, points) = ($10, $11) WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+                    values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.body.players[0].competitor_number, (parseInt(req.body.players[0].score) > parseInt(req.body.players[1].score) ? 1 : 0), req.body.players[0].score]
                 }, function(err, result) {
                     if (err) {
                         client.query("ROLLBACK");
@@ -1800,8 +1800,8 @@ function getNewScores(req, res, client, done, log, newScores, player, details, i
                         }, 'done response');
                     } else {
                         client.query({
-                            text : "UPDATE submits SET score = $10 WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-                            values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.body.players[1].competitor_number, req.body.players[1].score]
+                            text : "UPDATE submits SET (score, points) = ($10, $11) WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+                            values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.body.players[1].competitor_number, (parseInt(req.body.players[1].score) > parseInt(req.body.players[0].score) ? 1 : 0), req.body.players[1].score]
                         }, function(err, result) {
                             if (err) {
                                 client.query("ROLLBACK");
@@ -1825,8 +1825,8 @@ function getNewScores(req, res, client, done, log, newScores, player, details, i
                     newScores.playersToRemoveFromWinners.push(newScores.players[1].competitor_number);
                 }
                 client.query({
-                    text : "UPDATE submits SET score = $10 WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-                    values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.body.players[0].competitor_number, req.body.players[0].score]
+                    text : "UPDATE submits SET (score, points) = ($10, $11) WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+                    values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.body.players[0].competitor_number, (parseInt(req.body.players[0].score) > parseInt(req.body.players[1].score) ? 1 : 0), req.body.players[0].score]
                 }, function(err, result) {
                     if (err) {
                         client.query("ROLLBACK");
@@ -1839,8 +1839,8 @@ function getNewScores(req, res, client, done, log, newScores, player, details, i
                         }, 'done response');
                     } else {
                         client.query({
-                            text : "UPDATE submits SET score = $10 WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-                            values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.body.players[1].competitor_number, req.body.players[1].score]
+                            text : "UPDATE submits SET (score, points) = ($10, $11) WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+                            values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.body.players[1].competitor_number, (parseInt(req.body.players[1].score) > parseInt(req.body.players[0].score) ? 1 : 0), req.body.players[1].score]
                         }, function(err, result) {
                             if (err) {
                                 client.query("ROLLBACK");
@@ -1860,8 +1860,8 @@ function getNewScores(req, res, client, done, log, newScores, player, details, i
             } else {
                 // Just update the score as if the match the match wasn't completed because this means that the winner of this match was is still the winner after the change to the score
                 client.query({
-                    text : "UPDATE submits SET score = $10 WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-                    values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.body.players[0].competitor_number, req.body.players[0].score]
+                    text : "UPDATE submits SET (score, points) = ($10, $11) WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+                    values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.body.players[0].competitor_number, (parseInt(req.body.players[0].score) > parseInt(req.body.players[1].score) ? 1 : 0), req.body.players[0].score]
                 }, function(err, result) {
                     if (err) {
                         client.query("ROLLBACK");
@@ -1874,8 +1874,8 @@ function getNewScores(req, res, client, done, log, newScores, player, details, i
                         }, 'done response');
                     } else {
                         client.query({
-                            text : "UPDATE submits SET score = $10 WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-                            values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.body.players[1].competitor_number, req.body.players[1].score]
+                            text : "UPDATE submits SET (score, points) = ($10, $11) WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+                            values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.body.players[1].competitor_number, (parseInt(req.body.players[1].score) > parseInt(req.body.players[0].score) ? 1 : 0), req.body.players[1].score]
                         }, function(err, result) {
                             if (err) {
                                 client.query("ROLLBACK");
@@ -1934,14 +1934,15 @@ var changeScore = function(req, res, pg, conString, log) {
         query.on("end", function(result) {
             if (result.rows.length) {
                 var details = result.rows[0];
-                if (!req.body.players || !req.body.players[0] || !req.body.players[1] || isNaN(req.body.players[0].competitor_number) || isNaN(req.body.players[1].competitor_number) || isNaN(req.body.players[0].score) || isNaN(req.body.players[1].score)) {
+                if (!req.body.players || !req.body.players[0] || !req.body.players[1] || isNaN(req.body.players[0].competitor_number) || isNaN(req.body.players[1].competitor_number) || isNaN(req.body.players[0].score) || isNaN(req.body.players[1].score) || parseInt(req.body.players[0].score) == parseInt(req.body.players[1].score)) {
                     client.query("ROLLBACK");
                     done();
                     res.status(400).json({
                         missing_players_array : !req.body.players,
                         missing_players : !req.body.players[0] || !req.body.players[1],
                         missing_competitor_numbers : !req.body.players[0].competitor_number || !req.body.players[1].competitor_number,
-                        missing_scores : !req.body.players[0].score || !req.body.players[1].score
+                        missing_scores : !req.body.players[0].score || !req.body.players[1].score,
+                        equal_scores : parseInt(req.body.players[0].score) == parseInt(req.body.players[1].score)
                     });
                     log.info({
                         res : res
@@ -1961,8 +1962,8 @@ var changeScore = function(req, res, pg, conString, log) {
                     if (!details.match_completed || req.query.round_of === "Group" || req.query.round_of === "Round Robin") {
                         // Just update the score value for each player in the specified set and respond
                         client.query({
-                            text : "UPDATE submits SET score = $10 WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-                            values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, parseInt(req.body.players[0].competitor_number), parseInt(req.body.players[0].score)]
+                            text : "UPDATE submits SET (score, points) = ($10, $11) WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+                            values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, parseInt(req.body.players[0].competitor_number), (parseInt(req.body.players[0].score) > parseInt(req.body.players[1].score) ? 1 : 0), parseInt(req.body.players[0].score)]
                         }, function(err, result) {
                             if (err) {
                                 client.query("ROLLBACK");
@@ -1973,8 +1974,8 @@ var changeScore = function(req, res, pg, conString, log) {
                                 }, 'done response');
                             } else {
                                 client.query({
-                                    text : "UPDATE submits SET score = $10 WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-                                    values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.body.players[1].competitor_number, req.body.players[1].score]
+                                    text : "UPDATE submits SET (score, points) = ($10, $11) WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+                                    values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.body.players[1].competitor_number, (parseInt(req.body.players[1].score) > parseInt(req.body.players[0].score) ? 1 : 0), req.body.players[1].score]
                                 }, function(err, result) {
                                     if (err) {
                                         client.query("ROLLBACK");
@@ -2002,7 +2003,7 @@ var changeScore = function(req, res, pg, conString, log) {
                         for (var i = 0; i < req.body.players.length; i++) {
                             newScores.players[i] = {
                                 competitor_number : parseInt(req.body.players[i].competitor_number),
-                                newScore : parseInt(req.body.players[i].score)
+                                newScore : (parseInt(req.body.players[i%2].score) > parseInt(req.body.players[(i+1)%2].score) ? 1 : 0)
                             };
                             getNewScores(req, res, client, done, log, newScores, newScores.players[i], details, i, req.body.players.length-1);
                         }
