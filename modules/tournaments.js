@@ -1908,12 +1908,6 @@ var getRounds = function(req, res, pg, conString, log) {
 						}
 					}
 
-					for(var i = 0; i < actual.length; i++){
-						if (actual[i]){
-							newArray.push(actual[i]);
-						}
-					}
-
 					done();
 					res.status(200).send(tournament);
 					log.info({
