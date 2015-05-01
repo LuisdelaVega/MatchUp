@@ -461,9 +461,12 @@ function assignStationsForFinalStage(tournament, station) {
 }
 
 function generateGroupStage(groupStage, players, tournament, station, assignStations, round_of) {
+	console.log("Number of groups in the Group Stage");
 	groupStage.numOfGroups = Math.ceil(players.length / tournament.number_of_people_per_group);
+	console.log(groupStage.numOfGroups);
 	groupStage.groups = [];
 
+	console.log("Creating the Groups for the Group Stage");
 	// Create the Groups
 	for (var k = 0; k < groupStage.numOfGroups; k++) {
 		groupStage.groups[k] = {};
@@ -482,9 +485,11 @@ function generateGroupStage(groupStage, players, tournament, station, assignStat
 		groupStage.groups[k].numOfRounds = (!(groupStage.groups[k].players.length % 2)) ? (groupStage.groups[k].players.length - 1) : groupStage.groups[k].players.length;
 		groupStage.groups[k].numOfMatchesPerRound = Math.floor(groupStage.groups[k].players.length / 2);
 		groupStage.groups[k].numOfWinners = ((groupStage.groups[k].players.length < tournament.amount_of_winners_per_group) ? groupStage.groups[k].players.length : tournament.amount_of_winners_per_group);
+		console.log(groupStage.groups[k]);
 	}
 
 	for (var i = 0; i < groupStage.numOfGroups; i++) {
+		console.log("\nCreating the Rounds for Group " + groupStage.groups[i].group_number);
 		groupStage.groups[i].rounds = [];
 		// Create the Rounds and Matches that each group will play
 		for (var j = 0; j < groupStage.groups[i].numOfRounds; j++) {
@@ -500,6 +505,8 @@ function generateGroupStage(groupStage, players, tournament, station, assignStat
 			groupStage.groups[i].rounds[j].round_completed = false;
 			groupStage.groups[i].rounds[j].round_best_of = 3;
 			groupStage.groups[i].rounds[j].matches = [];
+			console.log("Created Round " + groupStage.groups[i].rounds[j].round_number);
+			console.log("Creating the Matches for the Round");
 			for (var k = 0; k < groupStage.groups[i].numOfMatchesPerRound; k++) {
 				groupStage.groups[i].rounds[j].matches[k] = {};
 				groupStage.groups[i].rounds[j].matches[k].event_name = tournament.event_name;
@@ -512,19 +519,23 @@ function generateGroupStage(groupStage, players, tournament, station, assignStat
 				groupStage.groups[i].rounds[j].matches[k].is_favourite = false;
 				groupStage.groups[i].rounds[j].matches[k].match_completed = false;
 				groupStage.groups[i].rounds[j].matches[k].players = [];
+				console.log("Created Match " + groupStage.groups[i].rounds[j].matches[k].match_number);
 			}
+			console.log("Number of players in this Group: " + groupStage.groups[i].players.length);
 			if (!(groupStage.groups[i].players.length % 2)) {
+				console.log("Number of players in this Group is an even number");
 				var count = 0;
 				for (var l = 0; l < groupStage.groups[i].numOfMatchesPerRound * 2; l++) {
 					if (!l) {
 						// groupStage.groups[i].rounds[j].matches[l].player1 = groupStage.groups[i].players[l];
 						(groupStage.groups[i].players[l] instanceof String ? 'Do nothing' : groupStage.groups[i].rounds[j].matches[l].players.push(groupStage.groups[i].players[l]));
+						console.log("For match: " + l);
 					} else if (l < groupStage.groups[i].numOfMatchesPerRound) {
 						// groupStage.groups[i].rounds[j].matches[l].player1 = groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)];
 						(groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)] instanceof String ? 'Do nothing' : groupStage.groups[i].rounds[j].matches[l].players.push(groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)]));
 					} else {
 						// groupStage.groups[i].rounds[j].matches[(groupStage.groups[i].numOfMatchesPerRound * 2) - l - 1].player2 = groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)];
-						(groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)] instanceof String ? 'Do nothing' : groupStage.groups[i].rounds[j].matches[(groupStage.groups[i].numOfMatchesPerRound * 2) - l - 1].players.push(groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)]));
+						(groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)] instanceof String ? 'Do nothing' : groupStage.groups[i].rounds[j].matches[(groupStage.groups[i].numOfMatchesPerRound * 2) - l - 1].players.push(groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count + 1) % groupStage.groups[i].players.length)]));
 					}
 				}
 			} else {
