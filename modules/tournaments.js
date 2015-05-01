@@ -1893,7 +1893,7 @@ var getRounds = function(req, res, pg, conString, log) {
 					if (tournament.groupStage) {
 						for (var i = 0; i < tournament.groupStage.groups.length; i++) {
 							for (var j = 0; j < tournament.groupStage.groups[i].rounds.lenght; j++) {
-								tournament.groupStage.groups[i].rounds[j].matches.clean(undefined);
+								tournament.groupStage.groups[i].rounds[j].matches.clean(null);
 							}
 						}
 					}
