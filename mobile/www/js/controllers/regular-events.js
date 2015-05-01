@@ -165,6 +165,15 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
         return matchesCount != 0;
 
     };
+    
+    $scope.checkNull = function (score) {
+
+        if(score == null)
+            return 0;
+        else
+            return score;
+
+    };
 
 }]);
 

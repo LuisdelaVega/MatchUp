@@ -1,11 +1,4 @@
 <ion-view view-title="Profile">
-    <ion-nav-buttons side="right">
-        <button class="button button-icon ion-android-alert">
-        </button>
-        <button class="button button-icon">
-            <i class="ion-android-more-vertical"></i>
-        </button>
-    </ion-nav-buttons>
     <ion-content>
         <div class="crop-banner">
             <img class="crop-image" ng-src="{{ eventInfo.event_banner }}">
@@ -19,11 +12,6 @@
                     <div class="center-text">
                         <h1 class="h1-username">{{ currentTournament.tournament_name }}</h1>
                     </div>
-                    <!--
-<div class="center-text">
-<h2 class="h1-username">{{ eventInfo.event_name }}</h2>
-</div>
--->
                     <div class="center-text">
                         <h2 class="h1-username">Registration Deadline: </h2>
                         <h2 >{{ eventInfo.event_registration_deadline | date: 'medium' }}</h2>
@@ -56,23 +44,23 @@
                         </div>
 
                         <select ng-model="selectedType.type" ng-if="currentTournament.tournament_type == 'Two Stage' && currentTournament.tournament_format == 'Double Elimination'">
-                            <option>Group Stage<option>
+                            <option selected>Group Stage<option>
                             <option>Winner's Bracket</option>
                             <option>Loser's Bracket</option>
                         </select>
 
                         <select ng-model="selectedType.type" ng-if="currentTournament.tournament_type == 'Single Stage' && currentTournament.tournament_format == 'Double Elimination'">
-                            <option>Winner's Bracket</option>
+                            <option selected>Winner's Bracket</option>
                             <option>Loser's Bracket</option>
                         </select>
 
                         <select ng-model="selectedType.type" ng-if="currentTournament.tournament_type == 'Two Stage' && currentTournament.tournament_format == 'Round Robin'">
-                            <option>Group Stage<option>
+                            <option selected>Group Stage<option>
                             <option>Round Robin</option>
                         </select>
 
                         <select ng-model="selectedType.type" ng-if="currentTournament.tournament_type == 'Two Stage' && currentTournament.tournament_format == 'Single Elimination'">
-                            <option>Group Stage<option>
+                            <option selected>Group Stage<option>
                             <option>Bracket</option>
                         </select>
                     </label>
@@ -82,7 +70,7 @@
                             Group
                         </div>
 
-                        <select ng-model="selectedGroup.group" ng-options="group.group_number for group in roundInfo.groupStage.groups">
+                        <select ng-model="selectedGroup.group" ng-options="group.group_number for group in roundInfo.groupStage.groups" ng-init="selectedGroup.group = roundInfo.groupStage.groups[0]">
                         </select>
 
                     </label>
@@ -92,13 +80,13 @@
                             Round
                         </div>
 
-                        <select ng-if="selectedType.type == 'Bracket' || selectedType.type == 'Winner\'s Bracket'" ng-model="selectedRound.round" ng-options="round.round_number for round in roundInfo.finalStage.winnerRounds">
+                        <select ng-if="selectedType.type == 'Bracket' || selectedType.type == 'Winner\'s Bracket'" ng-model="selectedRound.round" ng-options="round.round_number for round in roundInfo.finalStage.winnerRounds" ng-init="selectedRound.round = roundInfo.finalStage.winnerRounds[0]">
                         </select>
-                        <select ng-if="selectedType.type == 'Loser\'s Bracket'" ng-model="selectedRound.round" ng-options="round.round_number for round in roundInfo.finalStage.loserRounds">
+                        <select ng-if="selectedType.type == 'Loser\'s Bracket'" ng-model="selectedRound.round" ng-options="round.round_number for round in roundInfo.finalStage.loserRounds" ng-init="selectedRound.round = roundInfo.finalStage.loserRounds[0]">
                         </select>
-                        <select ng-if="selectedType.type == 'Group Stage'" ng-model="selectedRound.round" ng-options="round.round_number for round in roundInfo.groupStage.groups[selectedGroup.group.group_number - 1].rounds">
+                        <select ng-if="selectedType.type == 'Group Stage'" ng-model="selectedRound.round" ng-options="round.round_number for round in roundInfo.groupStage.groups[selectedGroup.group.group_number - 1].rounds" ng-init="selectedRound.round = roundInfo.groupStage.groups[selectedGroup.group.group_number - 1].rounds[0]">
                         </select>
-                        <select ng-if="selectedType.type == 'Round Robin'" ng-model="selectedRound.round" ng-options="round.round_number for round in roundInfo.finalStage.winnerRounds">
+                        <select ng-if="selectedType.type == 'Round Robin'" ng-model="selectedRound.round" ng-options="round.round_number for round in roundInfo.finalStage.winnerRounds" ng-init="selectedRound.round = roundInfo.finalStage.winnerRounds[0]">
                         </select>
                     </label>
 
@@ -112,7 +100,7 @@
 
                             </div>
                             <div class="col .col-33 absolute-center" ng-if="match.players.length > 1">
-                                <h2>{{ match.players[0].score }} - {{ match.players[1].score }}</h2>
+                                <h2>{{ checkNull(match.players[0].score) }} - {{ checkNull(match.players[1].score) }}</h2>
                             </div>
                             <div class="col .col-33 absolute-center" ng-if="!requiresTeam">
                                 <img class="img-circular large player-2" ng-src="{{ match.players[1].customer_profile_pic }}" ng-if="match.players.length > 1">
@@ -137,6 +125,18 @@
                             </div>
                         </div>
                     </div>
+
+                    <div ng-if="!hasMatches(selectedRound.round.matches)">
+
+                        <p style="padding: 7px 10px 7px 0px;
+                                  text-align: center;
+                                  margin-top: 10px;
+                                  color: #444;
+                                  font-size: 16px;">
+                            There are no matches here yet!</p>
+
+                    </div>
+
                 </div>
             </div>
 
