@@ -1900,7 +1900,7 @@ var getRounds = function(req, res, pg, conString, log) {
 								console.log(tournament.groupStage.groups[i].rounds[j]);
 								var newArray = [];
 								console.log("Amount of matches: " + tournament.groupStage.groups[i].rounds[j].matches.length);
-								for (var k = 0; tournament.groupStage.groups[i].rounds[j].matches.length; k++) {
+								for (var k = 0; k < tournament.groupStage.groups[i].rounds[j].matches.length; k++) {
 									console.log("Match:");
 									console.log(tournament.groupStage.groups[i].rounds[j].matches[k]);
 									if (tournament.groupStage.groups[i].rounds[j].matches[k]) {
