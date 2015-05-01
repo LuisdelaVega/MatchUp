@@ -279,6 +279,16 @@ var createTournament = function(req, res, pg, conString, log) {
 
 								// console.log(tournament.bracket.players);
 								tournament.bracket.numOfPlayers = tournament.bracket.players.length;
+								// New
+								if (tournament.bracket.numOfPlayers < 4) {
+									client.query("ROLLBACK");
+									done();
+									res.status(403).send("The bracket must contain at least 4 players");
+									log.info({
+										res : res
+									}, 'done response');
+									return 0;
+								}
 								generateBracket(tournament.bracket, tournament.bracket.players, tournament, station, assignStationsForFinalStage);
 							} else {
 								tournament.group = {};
@@ -296,6 +306,16 @@ var createTournament = function(req, res, pg, conString, log) {
 							if (tournament.tournament_format === "Single Elimination" || tournament.tournament_format === "Double Elimination") {
 								tournament.bracket = {};
 								tournament.bracket.numOfPlayers = tournament.players.length;
+								// New
+								if (tournament.bracket.numOfPlayers < 4) {
+									client.query("ROLLBACK");
+									done();
+									res.status(403).send("The bracket must contain at least 4 players");
+									log.info({
+										res : res
+									}, 'done response');
+									return 0;
+								}
 								generateBracket(tournament.bracket, tournament.players, tournament, station, assignStationsForFinalStage);
 							} else {
 								tournament.group = {};
@@ -753,7 +773,7 @@ function singleEliminationBracket(bracket, players, tournament) {
 	}
 }
 
-//TODO Hard code for up to 4 players
+//TODO Hard code for 4+ players
 function doubleEliminationBracket(bracket, tournament) {
 	// Add the final Round to the Winner bracket
 	bracket.winnerRounds[bracket.numOfWinnerRounds] = {};
@@ -818,7 +838,7 @@ function doubleEliminationBracket(bracket, tournament) {
 
 	// Calculate loser rounds matches
 	i = 0;
-	if (bracket.winnerRounds[0].amountOfMatches > bracket.winnerRounds[1].amountOfMatches) {
+	if (bracket.winnerRounds[0].amountOfMatches > bracket.winnerRounds[1].amountOfMatches) { // Maybe check for byes here
 		loserRounds[1] = {};
 		loserRounds[1].event_name = tournament.event_name;
 		loserRounds[1].event_start_date = tournament.event_start_date;
@@ -838,28 +858,31 @@ function doubleEliminationBracket(bracket, tournament) {
 	}
 	var j = 1;
 	var count = 0;
-	do {
-		i++;
-		loserRounds[i] = {};
-		loserRounds[i].event_name = tournament.event_name;
-		loserRounds[i].event_start_date = tournament.event_start_date;
-		loserRounds[i].event_location = tournament.event_location;
-		loserRounds[i].tournament_name = tournament.tournament_name;
-		loserRounds[i].round_number = (i + 1);
-		loserRounds[i].round_of = "Loser";
-		loserRounds[i].round_start_date = tournament.tournament_start_date;
-		loserRounds[i].round_pause = true;
-		loserRounds[i].round_completed = false;
-		loserRounds[i].round_best_of = 3;
-		//console.log(loserRounds[i].name);
-		loserRounds[i].amountOfMatches = (bracket.winnerRounds[j].amountOfMatches) / 2;
-		//console.log("Amount of matches: " + loserRounds[i].amountOfMatches);
-		bracket.numOfLoserRounds++;
-		count++;
-		if (!(count % 2)) {
-			j++;
-		}
-	} while(loserRounds[i].amountOfMatches > 1);
+	// Trying something here
+	if (loserRounds[i].amountOfMatches == 1) { // This is new
+		do {
+			i++;
+			loserRounds[i] = {};
+			loserRounds[i].event_name = tournament.event_name;
+			loserRounds[i].event_start_date = tournament.event_start_date;
+			loserRounds[i].event_location = tournament.event_location;
+			loserRounds[i].tournament_name = tournament.tournament_name;
+			loserRounds[i].round_number = (i + 1);
+			loserRounds[i].round_of = "Loser";
+			loserRounds[i].round_start_date = tournament.tournament_start_date;
+			loserRounds[i].round_pause = true;
+			loserRounds[i].round_completed = false;
+			loserRounds[i].round_best_of = 3;
+			//console.log(loserRounds[i].name);
+			loserRounds[i].amountOfMatches = (bracket.winnerRounds[j].amountOfMatches) / 2;
+			//console.log("Amount of matches: " + loserRounds[i].amountOfMatches);
+			bracket.numOfLoserRounds++;
+			count++;
+			if (!(count % 2)) {
+				j++;
+			}
+		} while (loserRounds[i].amountOfMatches > 1);
+	}
 	i++;
 	loserRounds[i] = {};
 	loserRounds[i].event_name = tournament.event_name;
@@ -1866,10 +1889,14 @@ var getRounds = function(req, res, pg, conString, log) {
 					}, 'done response');
 				});
 				query.on("end", function (result) {
-					//TODO elimina los nulos aqui!
-					//if (tournament.groupStage) {
-					//
-					//}
+					// Calling clean takes care of the null values that happen in groups other than Group 1 because this group is the only one whose matches start from 1 (match_number)
+					if (tournament.groupStage) {
+						for (var i = 0; i < tournament.groupStage.groups.length; i++) {
+							for (var j = 0; j < tournament.groupStage.groups[i].rounds.lenght; j++) {
+								tournament.groupStage.groups[i].rounds[j].matches.clean(undefined);
+							}
+						}
+					}
 					done();
 					res.status(200).send(tournament);
 					log.info({
