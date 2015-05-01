@@ -1897,6 +1897,7 @@ var getRounds = function(req, res, pg, conString, log) {
 								var newArray = [];
 								for (var k = 0; tournament.groupStage.groups[i].rounds[j].matches.length; k++) {
 									if (tournament.groupStage.groups[i].rounds[j].matches[k]) {
+										console.log(tournament.groupStage.groups[i].rounds[j].matches[k]);
 										newArray.push(tournament.groupStage.groups[i].rounds[j].matches[k]);
 									}
 								}
