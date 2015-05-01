@@ -1893,11 +1893,13 @@ var getRounds = function(req, res, pg, conString, log) {
 					if (tournament.groupStage) {
 						console.log("Here!");
 						for (var i = 0; i < tournament.groupStage.groups.length; i++) {
+							console.log(tournament.groupStage.groups[i]);
 							for (var j = 0; j < tournament.groupStage.groups[i].rounds.lenght; j++) {
+								console.log(tournament.groupStage.groups[i].rounds[j]);
 								var newArray = [];
 								for (var k = 0; tournament.groupStage.groups[i].rounds[j].matches.length; k++) {
+									console.log(tournament.groupStage.groups[i].rounds[j].matches[k]);
 									if (tournament.groupStage.groups[i].rounds[j].matches[k]) {
-										console.log(tournament.groupStage.groups[i].rounds[j].matches[k]);
 										newArray.push(tournament.groupStage.groups[i].rounds[j].matches[k]);
 									}
 								}
