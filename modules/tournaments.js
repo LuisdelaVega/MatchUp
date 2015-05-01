@@ -858,8 +858,8 @@ function doubleEliminationBracket(bracket, tournament) {
 	}
 	var j = 1;
 	var count = 0;
-	// Trying something here
-	if (loserRounds[i].amountOfMatches == 1) { // This is new
+	if (loserRounds[1].amountOfMatches != 1) {
+		console.log("4 people bracket. YES!");
 		do {
 			i++;
 			loserRounds[i] = {};
@@ -882,24 +882,23 @@ function doubleEliminationBracket(bracket, tournament) {
 				j++;
 			}
 		} while (loserRounds[i].amountOfMatches > 1);
+		i++;
+		loserRounds[i] = {};
+		loserRounds[i].event_name = tournament.event_name;
+		loserRounds[i].event_start_date = tournament.event_start_date;
+		loserRounds[i].event_location = tournament.event_location;
+		loserRounds[i].tournament_name = tournament.tournament_name;
+		loserRounds[i].round_number = (i + 1);
+		loserRounds[i].round_of = "Loser";
+		loserRounds[i].round_start_date = tournament.tournament_start_date;
+		loserRounds[i].round_pause = true;
+		loserRounds[i].round_completed = false;
+		loserRounds[i].round_best_of = 3;
+		//console.log(loserRounds[i].name);
+		loserRounds[i].amountOfMatches = 1;
+		//console.log("Amount of matches: " + loserRounds[i].amountOfMatches);
+		bracket.numOfLoserRounds++;
 	}
-	i++;
-	loserRounds[i] = {};
-	loserRounds[i].event_name = tournament.event_name;
-	loserRounds[i].event_start_date = tournament.event_start_date;
-	loserRounds[i].event_location = tournament.event_location;
-	loserRounds[i].tournament_name = tournament.tournament_name;
-	loserRounds[i].round_number = (i + 1);
-	loserRounds[i].round_of = "Loser";
-	loserRounds[i].round_start_date = tournament.tournament_start_date;
-	loserRounds[i].round_pause = true;
-	loserRounds[i].round_completed = false;
-	loserRounds[i].round_best_of = 3;
-	//console.log(loserRounds[i].name);
-	loserRounds[i].amountOfMatches = 1;
-	//console.log("Amount of matches: " + loserRounds[i].amountOfMatches);
-	bracket.numOfLoserRounds++;
-
 	// Create the Matches for the Loser Rounds
 	for ( i = 0; i < bracket.numOfLoserRounds; i++) {
 		loserRounds[i].matches = [];
@@ -1681,16 +1680,6 @@ var getStandings = function(req, res, pg, conString, log) {
 	});
 };
 
-Array.prototype.clean = function(deleteValue) {
-	for (var i = 0; i < this.length; i++) {
-		if (this[i] == deleteValue) {
-			this.splice(i, 1);
-			i--;
-		}
-	}
-	return this;
-};
-
 var getRounds = function(req, res, pg, conString, log) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
@@ -1789,7 +1778,6 @@ var getRounds = function(req, res, pg, conString, log) {
 						if (!repeated) {
 							tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number].players.push(temp);
 						}
-						//tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches.clean(undefined);
 					} else if (row.round_of === "Winner") {
 						if (!tournament.finalStage.winnerRounds[row.round_number-1]) {
 							tournament.finalStage.winnerRounds[row.round_number-1] = {};
@@ -1818,7 +1806,6 @@ var getRounds = function(req, res, pg, conString, log) {
 						if (!repeated) {
 							tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1].players.push(temp);
 						}
-						//tournament.finalStage.winnerRounds[row.round_number-1].matches.clean(undefined);
 					} else if (row.round_of === "Loser") {
 						if (!tournament.finalStage.loserRounds[row.round_number-1]) {
 							tournament.finalStage.loserRounds[row.round_number-1] = {};
@@ -1847,7 +1834,6 @@ var getRounds = function(req, res, pg, conString, log) {
 						if (!repeated) {
 							tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1].players.push(temp);
 						}
-						//tournament.finalStage.loserRounds[row.round_number-1].matches.clean(undefined);
 					} else {
 						if (!tournament.finalStage.roundRobinRounds[row.round_number-1]) {
 							tournament.finalStage.roundRobinRounds[row.round_number-1] = {};
@@ -1876,7 +1862,6 @@ var getRounds = function(req, res, pg, conString, log) {
 						if (!repeated) {
 							tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1].players.push(temp);
 						}
-						//tournament.finalStage.roundRobinRounds[row.round_number-1].matches.clean(undefined);
 					}
 				});
 				query.on('error', function (error) {
@@ -1889,28 +1874,17 @@ var getRounds = function(req, res, pg, conString, log) {
 					}, 'done response');
 				});
 				query.on("end", function (result) {
-					// Calling clean takes care of the null values that happen in groups other than Group 1 because this group is the only one whose matches start from 1 (match_number)
+					// This takes care of the null values that happen in groups other than Group 1 because this group is the only one whose matches start from 1 (match_number)
 					if (tournament.groupStage) {
-						console.log("Here!");
 						for (var i = 0; i < tournament.groupStage.groups.length; i++) {
-							console.log("Group:");
-							console.log(tournament.groupStage.groups[i]);
 							for (var j = 0; j < tournament.groupStage.groups[i].rounds.length; j++) {
-								console.log("Round:");
-								console.log(tournament.groupStage.groups[i].rounds[j]);
 								var newArray = [];
-								console.log("Amount of matches: " + tournament.groupStage.groups[i].rounds[j].matches.length);
 								for (var k = 0; k < tournament.groupStage.groups[i].rounds[j].matches.length; k++) {
-									console.log("Match:");
-									console.log(tournament.groupStage.groups[i].rounds[j].matches[k]);
 									if (tournament.groupStage.groups[i].rounds[j].matches[k]) {
 										newArray.push(tournament.groupStage.groups[i].rounds[j].matches[k]);
 									}
 								}
 								tournament.groupStage.groups[i].rounds[j].matches = newArray;
-
-								//tournament.groupStage.groups[i].rounds[j].matches.clean(null);
-								//tournament.groupStage.groups[i].rounds[j].matches.clean(undefined);
 							}
 						}
 					}
