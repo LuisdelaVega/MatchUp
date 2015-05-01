@@ -1766,7 +1766,7 @@ var getRounds = function(req, res, pg, conString, log) {
 						if (!repeated) {
 							tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches[row.match_number-row.group_number].players.push(temp);
 						}
-						tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches.clean(undefined);
+						//tournament.groupStage.groups[row.group_number-1].rounds[row.round_number-1].matches.clean(undefined);
 					} else if (row.round_of === "Winner") {
 						if (!tournament.finalStage.winnerRounds[row.round_number-1]) {
 							tournament.finalStage.winnerRounds[row.round_number-1] = {};
@@ -1795,7 +1795,7 @@ var getRounds = function(req, res, pg, conString, log) {
 						if (!repeated) {
 							tournament.finalStage.winnerRounds[row.round_number-1].matches[row.match_number-1].players.push(temp);
 						}
-						tournament.finalStage.winnerRounds[row.round_number-1].matches.clean(undefined);
+						//tournament.finalStage.winnerRounds[row.round_number-1].matches.clean(undefined);
 					} else if (row.round_of === "Loser") {
 						if (!tournament.finalStage.loserRounds[row.round_number-1]) {
 							tournament.finalStage.loserRounds[row.round_number-1] = {};
@@ -1824,7 +1824,7 @@ var getRounds = function(req, res, pg, conString, log) {
 						if (!repeated) {
 							tournament.finalStage.loserRounds[row.round_number-1].matches[row.match_number-1].players.push(temp);
 						}
-						tournament.finalStage.loserRounds[row.round_number-1].matches.clean(undefined);
+						//tournament.finalStage.loserRounds[row.round_number-1].matches.clean(undefined);
 					} else {
 						if (!tournament.finalStage.roundRobinRounds[row.round_number-1]) {
 							tournament.finalStage.roundRobinRounds[row.round_number-1] = {};
@@ -1853,7 +1853,7 @@ var getRounds = function(req, res, pg, conString, log) {
 						if (!repeated) {
 							tournament.finalStage.roundRobinRounds[row.round_number-1].matches[row.match_number-1].players.push(temp);
 						}
-						tournament.finalStage.roundRobinRounds[row.round_number-1].matches.clean(undefined);
+						//tournament.finalStage.roundRobinRounds[row.round_number-1].matches.clean(undefined);
 					}
 				});
 				query.on('error', function (error) {
@@ -1866,6 +1866,10 @@ var getRounds = function(req, res, pg, conString, log) {
 					}, 'done response');
 				});
 				query.on("end", function (result) {
+					//TODO elimina los nulos aqui!
+					//if (tournament.groupStage) {
+					//
+					//}
 					done();
 					res.status(200).send(tournament);
 					log.info({
