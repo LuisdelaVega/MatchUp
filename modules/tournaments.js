@@ -1519,7 +1519,7 @@ var getStandings = function(req, res, pg, conString, log) {
 				var standings = {};
 				if (result.rows[0].tournament_type == "Two Stage") {
 					var query = client.query({
-						text: 'SELECT group_number, (SELECT every(round_completed), team_size FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_of = $5) AS stage_completed FROM "group" NATURAL JOIN tournament WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4',
+						text: 'SELECT group_number, team_size, (SELECT every(round_completed) FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_of = $5) AS stage_completed FROM "group" NATURAL JOIN tournament WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4',
 						values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Group"]
 					});
 					query.on("row", function (row, result) {
