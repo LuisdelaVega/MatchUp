@@ -760,7 +760,7 @@ function updateCompetitor(req, res, log, client, done, competitor, isWinner, det
                                     });
                                 }
                             });
-                        } else {
+                        } else if (isWinner) {
                             blahblah(req, res, log, client, done, competitor, details);
                         }
                     });
