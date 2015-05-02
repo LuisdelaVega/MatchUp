@@ -1,11 +1,4 @@
 <ion-view view-title="Profile">
-    <ion-nav-buttons side="right">
-        <button class="button button-icon ion-android-alert">
-        </button>
-        <button class="button button-icon" ng-click="popover.show($event)">
-            <i class="ion-android-more-vertical"></i>
-        </button>
-    </ion-nav-buttons>
     <ion-content>
         <div class="list list-inset">
             <a class="item item-thumbnail-left" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="event in eventsData">

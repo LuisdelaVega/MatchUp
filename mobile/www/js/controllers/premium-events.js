@@ -3,30 +3,42 @@ var myApp = angular.module('premium-events',[]);
 
 myApp.controller('ratingsController', ['$scope', '$http', '$stateParams', '$window', '$state', function ($scope, $http, $stateParams, $window, $state) {
 
-    var config = {
-        headers: {
-            'Authorization': "Bearer "+ $window.sessionStorage.token
-        }
-    };
+    $scope.$on('$ionicView.enter', function () {
 
-    //get the reviews from all values found in the server
-    $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/reviews?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
-    success(function(data, status, headers, config) {
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
 
-        $scope.reviews = angular.fromJson(data);
+        //get the reviews from all values found in the server
+        $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/reviews?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
+        success(function(data, status, headers, config) {
 
-    }).
-    error(function(data, status, headers, config) {
-        console.log("error in eventPremiumSummaryController");
+            $scope.reviews = angular.fromJson(data);
+
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in eventPremiumSummaryController");
+        });
+
+        $scope.goToEvent = function(){
+            $state.go("app.eventpremium", {
+                eventname: $stateParams.eventname,
+                date: $stateParams.date,
+                location: $stateParams.location
+            });
+        }; 
+
     });
 
-    $scope.goToEvent = function(){
-        $state.go("app.eventpremium", {
+    $scope.goToWriteReview = function(){
+        $state.go("app.writereview", {
             eventname: $stateParams.eventname,
             date: $stateParams.date,
             location: $stateParams.location
         });
-    }; 
+    };
 
 }]);
 
@@ -36,6 +48,7 @@ myApp.controller('writeReviewRatingsController', ['$scope', '$http', function ($
     // Default rate and max variables. Editable by user.
     $scope.rate = 3;
     $scope.max = 5;
+
 
 }]);
 
@@ -229,7 +242,7 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 
             $scope.eventInfo = angular.fromJson(data);
             var startDate = new Date($scope.eventInfo.event_start_date);
-            
+
             $scope.isOngoing = startDate < now_utc;
 
             $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
@@ -362,14 +375,11 @@ myApp.controller('meetupController', function ($scope, $state, $http, $statePara
 
 myApp.controller('writeReviewController', function ($scope, $state, $http, $stateParams, sharedDataService) {
 
-    var params = sharedDataService.get();
-
     $scope.goToSummaryFromReview = function (eventName) {
-
-        $state.go("app.eventpremium", {
-            eventname: params[0],
-            date: params[1],
-            location: params[2]
+        $state.go("app.review", {
+            eventname: $stateParams.eventname,
+            date: $stateParams.date,
+            location: $stateParams.location
         })
 
     }

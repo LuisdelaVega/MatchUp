@@ -1,10 +1,8 @@
 <ion-view view-title="Popular Games">
     <ion-content>
-        <div class="pad-sides" masonry="{columnWidth: 60}">
+        <div masonry>
             <div class="masonry-brick" ng-repeat="game in popularGames">
-                <a ng-click="goToGameProfile(game.game_name, game.game_image)">
-                    <img ng-src="{{ game.game_image }}" class="game-cover" style="width: 45vw; height: 45vh">
-                </a>
+                    <img ng-src="{{ game.game_image }}" ng-click="goToGameProfile(game.game_name, game.game_image)">
             </div>
         </div>
         <ion-infinite-scroll ng-if="allGamesIsEmpty()"

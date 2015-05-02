@@ -557,10 +557,10 @@ myApp.controller('sidebarController', ['$scope', '$http', '$state', 'sharedDataS
 
             $scope.notifications = angular.fromJson(data).length;
 
-            $timeout( function(){ $scope.pollNotifications(); }, 3000);
+            $timeout( function(){ $scope.pollNotifications(); }, 30000);
         }).error(function (err) {
             console.log(err);
-            $timeout( function(){ $scope.pollNotifications(); }, 3000);
+            $timeout( function(){ $scope.pollNotifications(); }, 30000);
         });
     };
 
@@ -901,12 +901,12 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
                 $scope.matchCompleted = true;              
             }
             else{
-                $timeout( function(){ $scope.pollServer(); }, 3000);
+                $timeout( function(){ $scope.pollServer(); }, 10000);
             }
 
         }).error(function (err) {
             console.log(err);
-            $timeout( function(){ $scope.pollServer(); }, 3000);
+            $timeout( function(){ $scope.pollServer(); }, 10000);
         });
     }
 
@@ -980,7 +980,6 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
                     });
 
                 }).error(function (data, status, header, config) {
-
 
                     if(status == 403){
                         var confirmPopup = $ionicPopup.alert({

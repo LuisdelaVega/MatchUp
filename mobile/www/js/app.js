@@ -430,7 +430,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     //================================================================================
 
         .state('app.writereview', {
-        url: "/writereview",
+        url: "/writereview/:eventname/:date/:location",
         templateUrl: "templates/premiumEvent/writereview.html",
         controller: "writeReviewController"
     })
