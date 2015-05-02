@@ -929,7 +929,7 @@ function is_set(req, res, client, done, log, round_number, round_of, match_numbe
             log.info({
                 res : res
             }, 'done response');
-        } else if (index == length) {
+        } else if (index == length && station_number) {
             console.log("Assigning station " + station_number);
             // Assign the same station to the extra match (No reason for them to move since they are playing each other again)
             client.query({
@@ -954,6 +954,13 @@ function is_set(req, res, client, done, log, round_number, round_of, match_numbe
                     }, 'done response');
                 }
             });
+        } else if (index == length) {
+            client.query("COMMIT");
+            done();
+            res.status(201).send("Score submitted");
+            log.info({
+                res : res
+            }, 'done response');
         }
     });
 }
