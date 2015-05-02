@@ -1,7 +1,6 @@
 <div class="box">
 	<div class="page-header" ng-if="isUser">
-		<a class="btn btn-primary pull-right" ui-sref="app.requestOrganizationStatus({user: customerUsername})" role="button" ng-if="organizationRequests.length">View Organization Requests</a>
-		<a class="btn btn-primary pull-right" ui-sref="app.requestOrganization({user: customerUsername})" role="button" ng-if="!organizationRequests.length">Request Organization</a>
+		<a class="btn btn-primary pull-right" ui-sref="app.requestOrganization({user: customerUsername})" role="button" ng-if="organizations.length">Request Organization</a>
 		<h1>My Organizations</h1>
 	</div>
 	<div class="page-header" ng-if="!isUser">
@@ -10,18 +9,64 @@
 	<div class="row">
 		<div class="col-lg-3 col-md-3 col-sm-4 col-xs-6" ng-repeat="org in organizationsData">
 			<a class="thumbnail" ng-click="goToOrganizationProfile(org.organization_name)"> <img ng-src="{{org.organization_cover_photo}}" alt="{{org.organization_name}}">
-				<hr class="hr-custom-padding">
-				<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-						overflow: hidden;">
-					<p class="thumbnail-title" align="center" ui-sref="app.organizationProfile">
-						{{org.organization_name}}
-					</p>
-				</div>
-			</a>
+			<hr class="hr-custom-padding">
+			<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
+			overflow: hidden;">
+				<p class="thumbnail-title" align="center">
+					{{org.organization_name}}
+				</p>
+			</div> </a>
 		</div>
-		<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-if="!organizationsData.length">
+		<div class="col-lg-3 col-md-3 col-sm-4 col-xs-6" ng-if="!organizationsData.length">
 			<!-- TODO add info on what is an org -->
-			<p class="lead">Currently you do not belong to an organization. Create an organization by requesting one to be able to host events with multiple tournaments and fees.</p>
+			<h4>You currently don't have an organization. Organizations are for.............</h4>
 		</div>
+
+	</div>
+</div>
+
+<div class="box box-margin"  ng-if="isUser">
+	<div class="page-header">
+		<h1>My Organization Requests</h1>
+	</div>
+
+	<div class="row">
+		<div class="col-lg-12 col-md-12 col-sm-12">
+			<table class="table table-hover table-striped">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Organization Name</th>
+						<th>Description</th>
+						<th>Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="organization in organizations">
+						<td>{{$index +1}}</td>
+						<td>{{organization.request_organization_name}}</td>
+						<td>{{organization.request_description}}</td>
+						<td ng-switch on="organization.request_status">
+						<div ng-switch-when="Accepted">
+							<span style="text-align:center; color: green">Resolved</span>
+						</div>
+						<div ng-switch-when="Declined">
+							<span style="text-align:center; color: red">Declined</span>
+						</div>
+						<div ng-switch-when="Pending">
+							<span style="text-align:center; color: orange">Pending</span>
+						</div>
+						<div ng-switch-default>
+							<span>Received</span>
+						</div></td>
+					</tr>
+				</tbody>
+			</table>
+
+		</div>
+		<div class="col-lg-3 col-md-3 col-sm-4 col-xs-6" ng-if="!organizations.length">
+			<h4>You currently don't have any organization requests.</h4>
+		</div>
+
 	</div>
 </div>

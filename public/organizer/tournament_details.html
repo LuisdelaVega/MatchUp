@@ -26,16 +26,20 @@
 			</div>
 			<div class="list-group text-center">
 				<span class="input-group-btn">
-					<button class="btn btn-default">
+					<button class="btn btn-default" ng-click="pauseToggle()" ng-if="selectedRound.round_pause">
+						Un-pause Round
+					</button>
+					<button class="btn btn-default" ng-click="pauseToggle()" ng-if="!selectedRound.round_pause">
 						Pause Round
 					</button>
-					<button class="btn btn-primary">
+					<button class="btn btn-primary" ng-click="changeBestOfPrompt()">
 						Change Best Of
 					</button></span>
 			</div>
 			<div class="list-group">
 				<!-- <a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="tournament in tournaments" ng-click="getSeedingInfo($index)"> -->
-				<a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="round in rounds" ng-click="getRoundMatches(round, $index)"> <h4 class="list-group-item-heading">Round {{round.round_number}}</h4> </a>
+				<a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="round in rounds" ng-click="getRoundMatches(round, $index)"> <h4 class="list-group-item-heading">Round {{round.round_number}}
+				&nbsp; <small ng-if="round.round_pause">(Paused) </small><small ng-if="!round.round_pause">(Un-Paused) </small></h4> </a>
 			</div>
 		</div>
 		<div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
@@ -53,54 +57,287 @@
 								<th>Station</th>
 							</tr>
 						</thead>
-						<tbody>
-							<tr ng-repeat="match in selectedRound.matches">
+						<tbody ng-if="tournament.team_size == 1">
+
+							<tr ng-click="getTournamentMatch(match.match_number)" ng-repeat="match in selectedRound.matches">
+								<td><i class="fa fa-star" ng-if="match.is_favourite" ng-click="favoriteMatchToggle()"></i> &nbsp; {{match.match_number}} </td>
+								<td ng-if="match.players[0].customer_tag">{{match.players[0].customer_tag}}</td>
+								<td ng-if="match.players[1].customer_tag">{{match.players[1].customer_tag}}</td>
+
+								<td ng-if="!match.players[0].customer_tag">None</td>
+								<td ng-if="!match.players[1].customer_tag">None</td>
+
+								<td ng-if="!(match.players[0].score + match.players[1].score)">No Score</td>
+								<td ng-if="match.players[0].score + match.players[1].score">{{match.players[0].score || "0"}}-{{match.players[1].score || "0"}}</td>
+
+								<td ng-if="match.station_number">Station {{match.station_number}}</td>
+								<td ng-if="!match.station_number">None Assigned</td>
+
+							</tr>
+						</tbody>
+						<tbody ng-if="tournament.team_size > 1">
+
+							<tr ng-click="getTournamentMatch(match.match_number)" ng-repeat="match in selectedRound.matches">
 								<td>{{match.match_number}}</td>
-								<td>{{match.players[0].customer_tag}}</td>
-								<td>{{match.players[1].customer_tag}}</td>
-								<td>{{match.players[0].score}}-{{match.players[1].score}}</td>
+								<td ng-if="match.players[0].team_name">{{match.players[0].team_name}}</td>
+								<td ng-if="match.players[1].team_name">{{match.players[1].team_name}}</td>
+
+								<td ng-if="!match.players[0].team_name">None</td>
+								<td ng-if="!match.players[1].team_name">None</td>
+
+								<td ng-if="!(match.players[0].score + match.players[1].score)">No Score</td>
+								<td ng-if="match.players[0].score + match.players[1].score">{{match.players[0].score || "0"}}-{{match.players[1].score || "0"}}</td>
+
 								<td ng-if="match.station_number">Station {{match.station_number}}</td>
 								<td ng-if="!match.station_number">None Assigned</td>
 
 							</tr>
 						</tbody>
 					</table>
-					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-repeat="match in selectedRound.matches" ng-if="">
-						<div class="box cursor box-margin" ng-click="">
-
-							<div class="row" align="center">
-								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
-									<img class="img-circular player-1 large center-block" ng-src="{{match.players[0].customer_profile_pic}}">
-								</div>
-								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
-									<h2 style="text-align:center"> Station {{match.station_number}}</br>
-									{{match.players[0].score}}-{{match.players[1].score}}</h2>
-								</div>
-								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
-									<img class="img-circular player-2 large center-block" ng-src="{{match.players[1].customer_profile_pic}}">
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
-									<h3 style="text-align:center" class="ng-binding">{{match.players[0].customer_tag}}</h3>
-								</div>
-								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
-									<h4 style="text-align:center"></h4>
-								</div>
-								<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
-									<h3 style="text-align:center" class="ng-binding">{{match.players[1].customer_tag}}</h3>
-								</div>
-							</div>
-
-						</div>
-
-					</div>
-
 				</div>
 			</div>
 
 		</div>
 	</div>
-	<div class="row">
 
+	<div class="modal fade" id="changeBestOfPrompt" tabindex="-1" role="dialog" aria-labelledby="changeBestOfPrompt" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">Choose the amount of sets</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal">
+						<div class="form-group">
+							<label class="col-sm-2 control-label">Best of</label>
+							<div class="col-sm-10">
+								<input type="number" class="form-control" ng-model="bestOf">
+							</div>
+						</div>
+
+					</form>
+
+					<h4 ng-if="bestOf%2" style="text-align:center;">To win a match players will need to win {{bestOf/2| number:0}} out of {{bestOf}} rounds.</h4>
+					<h4 ng-if="!(bestOf%2) && bestOf" style="text-align:center; color: red">The entered value must be an odd number.</h4>
+					<!-- <h4 ng-if="bestOf = 'e'" style="text-align:center; color: red"></h4> -->
+
+					<!-- <h4 ng-if="!isInt(bestOf) && bestOf" style="text-align:center; color: red">The entered value must be an integer number.</h4> -->
+
+					<h4 ng-if="bestOf ==0" style="text-align:center; color: red">You must have at least one set</h4>
+					<h4 ng-if="bestOf< 0" style="text-align:center; color: red">You cannot have a negative amount of set</h4>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">
+						Cancel
+					</button>
+					<button type="button" class="btn btn-primary" ng-click="changeBestOf()">
+						Change Best of
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- modal matchup-->
+	<div class="modal fade" id="tournamentMatchupModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+
+					<h4 class="modal-title">Round {{matchInfo.round}} Match {{matchInfo.match}}
+					<br>
+					<h5>Favorite: <i class="fa fa-star" ng-if="matchInfo.is_favourite" ng-click="favoriteMatchToggle()"></i><i class="fa fa-star-o" ng-if="!matchInfo.is_favourite" ng-click="favoriteMatchToggle()"></i></h5><small ng-if="matchInfo.station_number">Station {{matchInfo.station_number}}</small><small ng-if="matchInfo.stream_link">Stream <a ng-href="{{matchInfo.stream_link}}">
+						<br>
+						{{matchInfo.stream_link}}</a></small></h4>
+				</div>
+				<div class="modal-body">
+					<div align="center" >
+						<button type="button" class="btn btn-primary" ng-click="changeStationPrompt()">
+							Change Station
+						</button>
+						<button type="button" class="btn btn-primary" ng-click="favoriteMatchToggle(matchInfo.match)" ng-if="!matchInfo.is_favourite"> 
+							Mark as Favorite
+						</button>
+						<button type="button" class="btn btn-primary" ng-click="favoriteMatchToggle(matchInfo.match)" ng-if="matchInfo.is_favourite"> 
+							Un-mark as favorite
+						</button>
+					</div>
+
+					<hr>
+				</div>
+
+				<div class="modal-body">
+
+					<!-- NO TEAMS -->
+					<div ng-if="tournament.team_size == 1">
+						<div class="row" align="center">
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+								<img ng-if="matchInfo.players[0].customer_profile_pic" class="img-circular player-1 large center-block" ng-src="{{matchInfo.players[0].customer_profile_pic}}" />
+								<i ng-if="!matchInfo.players[0].customer_profile_pic" class="fa fa-question-circle fa-5x"></i>
+
+							</div>
+							<!-- SCORE -->
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+								<h1 style="text-align:center">{{matchInfo.players[0].score || "0"}}-{{matchInfo.players[1].score || "0"}}</h1>
+							</div>
+							<div class="col-xs-4 col-sm-4 col-md-8 col-lg-4 ">
+								<img ng-if="matchInfo.players[1].customer_profile_pic" class="img-circular player-2 large center-block" ng-src="{{matchInfo.players[1].customer_profile_pic}}" />
+								<i ng-if="!matchInfo.players[1].customer_profile_pic" class="fa fa-question-circle fa-5x"></i>
+
+							</div>
+						</div>
+
+						<!-- COMPETITOR INFO -->
+						<div class="row">
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+								<h3 style="text-align:center">{{matchInfo.players[0].customer_tag}}</h3>
+
+							</div>
+							<div class="col-xs-4 col-sm-2 col-md-4 col-lg-4">
+								<h4 style="text-align:center">Best of {{matchInfo.sets.length}}</h4>
+							</div>
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+								<h3 style="text-align:center">{{matchInfo.players[1].customer_tag}}</h3>
+
+							</div>
+						</div>
+
+						<!-- SET INFO -->
+						<div style="text-align: center">
+							<span ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number && set.scores[1].competitor_number"> <div class="set-circular set-margin" ng-class="set.scores[0].score > set.scores[1].score ? 'player-1' : 'player-2'"></div> </span>
+						</div>
+						<div class="row" align="center">
+							<hr>
+							<table class="table table-hover table-striped">
+								<thead>
+									<tr>
+										<th></th>
+										<th>
+										<div align="center">
+											{{matchInfo.players[0].customer_tag}}
+										</div></th>
+										<th>
+										<div align="center">
+											{{matchInfo.players[1].customer_tag}}
+										</div></th>
+
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number && set.scores[1].competitor_number">
+										<td  style="width: 30%">
+										<p style="text-align: center">
+											Set &nbsp; {{$index +1}}
+										</p></td>
+										<td>
+										<div align="center">
+											<input type="text" class="form-control" ng-model="set.scores[0].score" valid-input input-pattern="[^0-9]+" style="width: 25%" >
+										</div></td>
+										<td>
+										<div align="center">
+											<input type="text" class="form-control" ng-model="set.scores[1].score" valid-input input-pattern="[^0-9]+" style="width: 25%">
+										</div></td>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						 
+						</div>
+					</div>
+
+					<!--TEAMS-->
+					<div ng-if="tournament.team_size > 1">
+						<div class="row" align="center">
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+								<img ng-if="matchInfo.players[0].team_logo" class="img-circular player-1 large center-block" ng-src="{{matchInfo.players[0].team_logo}}" />
+								<i ng-if="!matchInfo.players[0].team_logo" class="fa fa-question-circle fa-5x"></i>
+
+							</div>
+							<!-- SCORE -->
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+								<h1 style="text-align:center">{{matchInfo.players[0].score || "0"}}-{{matchInfo.players[1].score || "0"}}</h1>
+							</div>
+							<div class="col-xs-4 col-sm-4 col-md-8 col-lg-4 ">
+								<img ng-if="matchInfo.players[1].team_logo" class="img-circular player-2 large center-block" ng-src="{{matchInfo.players[1].team_logo}}" />
+								<i ng-if="!matchInfo.players[1].team_logo" class="fa fa-question-circle fa-5x"></i>
+
+							</div>
+						</div>
+
+						<!-- COMPETITOR INFO -->
+						<div class="row">
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+								<h3 style="text-align:center">{{matchInfo.players[0].team_name}}</h3>
+
+							</div>
+							<div class="col-xs-4 col-sm-2 col-md-4 col-lg-4">
+								<h4 style="text-align:center">Best of {{matchInfo.sets.length}}</h4>
+							</div>
+							<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 ">
+								<h3 style="text-align:center">{{matchInfo.players[1].team_name}}</h3>
+
+							</div>
+						</div>
+
+						<!-- SET INFO -->
+						<div style="text-align: center">
+							<span ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number && set.scores[1].competitor_number"> <div class="set-circular set-margin" ng-class="set.scores[0].score > set.scores[1].score ? 'player-1' : 'player-2'"></div> </span>
+						</div>
+						<div class="row" align="center" ng-if="matchInfo.sets[0].scores.length>1">
+							<hr>
+							<table class="table table-hover table-striped">
+								<thead>
+									<tr>
+										<th></th>
+										<th>
+										<div align="center">
+											{{matchInfo.players[0].team_name}}
+										</div></th>
+										<th>
+										<div align="center">
+											{{matchInfo.players[1].team_name}}
+										</div></th>
+
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number && set.scores[1].competitor_number">
+										<td  style="width: 30%">
+										<p style="text-align: center">
+											Set &nbsp; {{$index +1}}
+										</p></td>
+										<td>
+										<div align="center">
+											<input type="text" class="form-control" ng-model="set.scores[0].score" valid-input input-pattern="[^0-9]+" style="width: 25%" >
+										</div></td>
+										<td>
+										<div align="center">
+											<input type="text" class="form-control" ng-model="set.scores[1].score" valid-input input-pattern="[^0-9]+" style="width: 25%">
+										</div></td>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						
+						</div>
+					</div>
+
+				</div>
+				<div class="modal-footer" ng-if="matchInfo.sets[0].scores.length>1">
+						<div align="center">
+								<button type="button" class="btn btn-primary" ng-click="changeScore()">
+									Change Score
+								</button>
+							</div>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
 	</div>
