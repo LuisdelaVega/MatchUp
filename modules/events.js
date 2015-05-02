@@ -1137,7 +1137,7 @@ var submitScore = function(req, res, pg, conString, log) {
                                     } else {
                                         if (parseInt(result.rows[0].points) > parseInt(req.body.score)){
                                             client.query({
-                                                text : "UPDATE submits SET score = $10 WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+                                                text : "UPDATE submits SET score = $10 WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
                                                 values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, result.rows[0].competitor_number, 1]
                                             }, function(err, result) {
                                                 if (err) {
