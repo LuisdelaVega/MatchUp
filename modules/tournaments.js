@@ -1118,6 +1118,7 @@ function doubleEliminationBracket(bracket, tournament) {
 		}
 	}
 
+	var fix = 0;
 	// Create the Linked Lists
 	// Winner rounds - Loser goes to
 	if (bracket.byes/* && bracket.winnerRounds[0].amountOfMatches > loserRounds[0].amountOfMatches*/) {
@@ -1171,7 +1172,7 @@ function doubleEliminationBracket(bracket, tournament) {
 				}
 				//console.log(((j + loserRounds[2].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches));
 				// bracket.winnerRounds[i].matches[j].loserGoesTo = loserRounds[temp].matches[Math.floor(((j + loserRounds[2].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].match_number;
-				//if (bracket.numOfPlayers > 4) {
+				if (bracket.numOfPlayers > 4 || fix < 1) {
 					bracket.winnerRounds[i].matches[j].loserGoesTo = {};
 					bracket.winnerRounds[i].matches[j].loserGoesTo.event_name = loserRounds[temp].matches[Math.floor(((j + loserRounds[(bracket.numOfPlayers > 4 ? 2 : 1)].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].event_name;
 					bracket.winnerRounds[i].matches[j].loserGoesTo.event_start_date = loserRounds[temp].matches[Math.floor(((j + loserRounds[(bracket.numOfPlayers > 4 ? 2 : 1)].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].event_start_date;
@@ -1183,7 +1184,8 @@ function doubleEliminationBracket(bracket, tournament) {
 					bracket.winnerRounds[i].matches[j].loserGoesTo.future_round_number = loserRounds[temp].matches[Math.floor(((j + loserRounds[(bracket.numOfPlayers > 4 ? 2 : 1)].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].round_number;
 					bracket.winnerRounds[i].matches[j].loserGoesTo.future_round_of = loserRounds[temp].matches[Math.floor(((j + loserRounds[(bracket.numOfPlayers > 4 ? 2 : 1)].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].round_of;
 					bracket.winnerRounds[i].matches[j].loserGoesTo.future_match = loserRounds[temp].matches[Math.floor(((j + loserRounds[(bracket.numOfPlayers > 4 ? 2 : 1)].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].match_number;
-				//}
+					fix++;
+				}
 			}
 		}
 		temp++;
