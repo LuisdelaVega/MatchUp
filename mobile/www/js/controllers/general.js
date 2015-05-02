@@ -478,27 +478,42 @@ myApp.controller('createAccountController', ['$scope', '$http', '$state', 'share
 
     $scope.createAccount = function () {
 
-        $http.post('http://136.145.116.232/create/account', {
-            "username": $scope.newAccount.username,
-            "email": $scope.newAccount.email,
-            "first_name": $scope.newAccount.firstName,
-            "last_name": $scope.newAccount.lastName,
-            "tag": $scope.newAccount.tag,
-            "password": $scope.newAccount.password
-        }).success(function (data) {
+        if($scope.newAccount.password == $scope.newAccount.passwordConfirm){
 
-            var alertPopup = $ionicPopup.alert({
+            $http.post('http://136.145.116.232/create/account', {
+                "username": $scope.newAccount.username,
+                "email": $scope.newAccount.email,
+                "first_name": $scope.newAccount.firstName,
+                "last_name": $scope.newAccount.lastName,
+                "tag": $scope.newAccount.tag,
+                "password": $scope.newAccount.password
+            }).success(function (data) {
+
+                var alertPopup = $ionicPopup.alert({
+                    title: 'Account Creation',
+                    template: 'Successfully created account! \n Username: '+$scope.newAccount.username+''
+                });
+                alertPopup.then(function(res) {
+                    $state.go('login');
+                });
+
+            }).error(function (err) {
+                console.log("error in createAccountController");
+            });
+        }
+
+        else{
+
+            var confirmPopup = $ionicPopup.alert({
                 title: 'Account Creation',
-                template: 'Successfully created account! \n Username: '+$scope.newAccount.username+''
+                template: 'The password fields are different!'
             });
-            alertPopup.then(function(res) {
-                $state.go('login');
+            confirmPopup.then(function (res) {
+
             });
 
-        }).error(function (err) {
-            console.log("error in createAccountController");
-        });
-    };
+        }
+    }
 
 }]);
 
