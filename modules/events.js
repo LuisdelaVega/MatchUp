@@ -443,6 +443,7 @@ function blahblah(req, res, log, client, done, competitor, details) {
                                             if (result.rows[0].matches_lost == result.rows[1].matches_lost && details.tournament_format === "Double Elimination") {
                                                 var competitorInfo = result.rows;
                                                 // Create the extra round
+                                                console.log("Creating the extra round");
                                                 client.query({
                                                     text : "INSERT INTO round (event_name, event_start_date, event_location, tournament_name, round_number, round_of, round_start_date, round_pause, round_completed, round_best_of) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
                                                     values : [req.params.event, req.query.date, req.query.location, req.params.tournament, (parseInt(req.params.round)+1), "Winner", (new Date()).toUTCString(), false, false, details.round_best_of]
@@ -456,6 +457,7 @@ function blahblah(req, res, log, client, done, competitor, details) {
                                                             res: res
                                                         }, 'done response');
                                                     } else {
+                                                        console.log("Creating the extra match");
                                                         // Create the extra match
                                                         client.query({
                                                             text : "INSERT INTO match (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, is_favourite, match_completed) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)",
@@ -470,6 +472,7 @@ function blahblah(req, res, log, client, done, competitor, details) {
                                                                     res: res
                                                                 }, 'done response');
                                                             } else {
+                                                                console.log("Assigning competitor: " + competitorInfo[0].competitor_number + " to the new match");
                                                                 // Assign one of the players to the extra match
                                                                 client.query({
                                                                     text : "INSERT INTO competes (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, competitor_number) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
@@ -484,6 +487,7 @@ function blahblah(req, res, log, client, done, competitor, details) {
                                                                             res: res
                                                                         }, 'done response');
                                                                     } else {
+                                                                        console.log("Assigning competitor: " + competitorInfo[1].competitor_number + " to the new match");
                                                                         // Assign the other player to the extra match
                                                                         client.query({
                                                                             text : "INSERT INTO competes (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, competitor_number) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
@@ -498,8 +502,9 @@ function blahblah(req, res, log, client, done, competitor, details) {
                                                                                     res: res
                                                                                 }, 'done response');
                                                                             } else {
+                                                                                console.log("Creating " + parseInt(details.round_best_of) + " sets for the new match");
                                                                                 // Assign the sets to the extra match
-                                                                                for (var i = 0; i < details.round_best_of; i++) {
+                                                                                for (var i = 0; i < parseInt(details.round_best_of); i++) {
                                                                                     is_set(req, res, client, done, log, (parseInt(req.params.round)+1), "Winner", 1, (i+1), details.station_number, i, (parseInt(details.round_best_of) -1));
                                                                                 }
                                                                             }
@@ -907,6 +912,7 @@ function getNextPowerOf2(numOfPlayers) {
 }
 
 function is_set(req, res, client, done, log, round_number, round_of, match_number, set_seq, station_number, index, length) {
+    console.log("Creating set " + set_seq);
     client.query({
         text : "INSERT INTO is_set (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
         values : [req.params.event, req.query.date, req.query.location, req.params.tournament, round_number, round_of, match_number, set_seq]
@@ -920,6 +926,7 @@ function is_set(req, res, client, done, log, round_number, round_of, match_numbe
                 res : res
             }, 'done response');
         } else if (index == length) {
+            console.log("Assigning station " + station_number);
             // Assign the same station to the extra match (No reason for them to move since they are playing each other again)
             client.query({
                 text : "INSERT INTO is_played_in (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, station_number) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
@@ -934,6 +941,7 @@ function is_set(req, res, client, done, log, round_number, round_of, match_numbe
                         res: res
                     }, 'done response');
                 } else {
+                    console.log("BYE!");
                     client.query("COMMIT");
                     done();
                     res.status(201).send("Score submitted");

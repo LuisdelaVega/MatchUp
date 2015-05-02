@@ -279,7 +279,6 @@ var createTournament = function(req, res, pg, conString, log) {
 
 								// console.log(tournament.bracket.players);
 								tournament.bracket.numOfPlayers = tournament.bracket.players.length;
-								// New
 								if (tournament.bracket.numOfPlayers < 4) {
 									client.query("ROLLBACK");
 									done();
@@ -306,7 +305,6 @@ var createTournament = function(req, res, pg, conString, log) {
 							if (tournament.tournament_format === "Single Elimination" || tournament.tournament_format === "Double Elimination") {
 								tournament.bracket = {};
 								tournament.bracket.numOfPlayers = tournament.players.length;
-								// New
 								if (tournament.bracket.numOfPlayers < 4) {
 									client.query("ROLLBACK");
 									done();

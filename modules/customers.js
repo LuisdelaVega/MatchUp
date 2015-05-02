@@ -74,9 +74,9 @@ function getDetailsForMatchup(res, log, client, done, matchup, index, length, my
 		if (index == length) {
 			done();
 			res.status(200).send(myMatchups);
-			log.info({
-				res : res
-			}, 'done response');
+			//log.info({
+			//	res : res
+			//}, 'done response');
 		}
 	});
 }
@@ -117,9 +117,9 @@ var getMatchups = function(req, res, pg, conString, log) {
 			} else {
 				done();
 				res.status(200).send([]);
-				log.info({
-					res : res
-				}, 'done response');
+				//log.info({
+				//	res : res
+				//}, 'done response');
 			}
 		});
 	});
@@ -161,9 +161,9 @@ var getMatchupsForUser = function(req, res, pg, conString, log) {
 			} else {
 				done();
 				res.status(200).send([]);
-				log.info({
-					res : res
-				}, 'done response');
+				//log.info({
+				//	res : res
+				//}, 'done response');
 			}
 		});
 	});
