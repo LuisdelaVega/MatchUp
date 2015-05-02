@@ -1607,7 +1607,7 @@ var getStandings = function(req, res, pg, conString, log) {
 							}
 							var query = client.query({
 								text: queryText,
-								values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Group", ",;!;,", "Winner", "Round Robin"]
+								values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Group", ",;!;,"]
 							});
 							query.on("row", function (row, result) {
 								var repeated = false;
