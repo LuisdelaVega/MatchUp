@@ -328,7 +328,16 @@ E-Sports PR               | http://esportspr.com/wp-content/uploads/2014/05/Espo
 
 
 
-
+{
+"players": [{
+	"competitor_number": 4,
+	"score": 1
+},
+{
+	"competitor_number": 5,
+	"score": 0
+}]
+}
 
 
 

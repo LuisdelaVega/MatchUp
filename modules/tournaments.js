@@ -279,6 +279,16 @@ var createTournament = function(req, res, pg, conString, log) {
 
 								// console.log(tournament.bracket.players);
 								tournament.bracket.numOfPlayers = tournament.bracket.players.length;
+								// New
+								if (tournament.bracket.numOfPlayers < 4) {
+									client.query("ROLLBACK");
+									done();
+									res.status(403).send("The bracket must contain at least 4 players");
+									log.info({
+										res : res
+									}, 'done response');
+									return 0;
+								}
 								generateBracket(tournament.bracket, tournament.bracket.players, tournament, station, assignStationsForFinalStage);
 							} else {
 								tournament.group = {};
@@ -296,6 +306,16 @@ var createTournament = function(req, res, pg, conString, log) {
 							if (tournament.tournament_format === "Single Elimination" || tournament.tournament_format === "Double Elimination") {
 								tournament.bracket = {};
 								tournament.bracket.numOfPlayers = tournament.players.length;
+								// New
+								if (tournament.bracket.numOfPlayers < 4) {
+									client.query("ROLLBACK");
+									done();
+									res.status(403).send("The bracket must contain at least 4 players");
+									log.info({
+										res : res
+									}, 'done response');
+									return 0;
+								}
 								generateBracket(tournament.bracket, tournament.players, tournament, station, assignStationsForFinalStage);
 							} else {
 								tournament.group = {};
@@ -461,9 +481,12 @@ function assignStationsForFinalStage(tournament, station) {
 }
 
 function generateGroupStage(groupStage, players, tournament, station, assignStations, round_of) {
+	console.log("Number of groups in the Group Stage");
 	groupStage.numOfGroups = Math.ceil(players.length / tournament.number_of_people_per_group);
+	console.log(groupStage.numOfGroups);
 	groupStage.groups = [];
 
+	console.log("Creating the Groups for the Group Stage");
 	// Create the Groups
 	for (var k = 0; k < groupStage.numOfGroups; k++) {
 		groupStage.groups[k] = {};
@@ -482,9 +505,11 @@ function generateGroupStage(groupStage, players, tournament, station, assignStat
 		groupStage.groups[k].numOfRounds = (!(groupStage.groups[k].players.length % 2)) ? (groupStage.groups[k].players.length - 1) : groupStage.groups[k].players.length;
 		groupStage.groups[k].numOfMatchesPerRound = Math.floor(groupStage.groups[k].players.length / 2);
 		groupStage.groups[k].numOfWinners = ((groupStage.groups[k].players.length < tournament.amount_of_winners_per_group) ? groupStage.groups[k].players.length : tournament.amount_of_winners_per_group);
+		console.log(groupStage.groups[k]);
 	}
 
 	for (var i = 0; i < groupStage.numOfGroups; i++) {
+		console.log("\nCreating the Rounds for Group " + groupStage.groups[i].group_number);
 		groupStage.groups[i].rounds = [];
 		// Create the Rounds and Matches that each group will play
 		for (var j = 0; j < groupStage.groups[i].numOfRounds; j++) {
@@ -500,6 +525,8 @@ function generateGroupStage(groupStage, players, tournament, station, assignStat
 			groupStage.groups[i].rounds[j].round_completed = false;
 			groupStage.groups[i].rounds[j].round_best_of = 3;
 			groupStage.groups[i].rounds[j].matches = [];
+			console.log("Created Round " + groupStage.groups[i].rounds[j].round_number);
+			console.log("Creating the Matches for the Round");
 			for (var k = 0; k < groupStage.groups[i].numOfMatchesPerRound; k++) {
 				groupStage.groups[i].rounds[j].matches[k] = {};
 				groupStage.groups[i].rounds[j].matches[k].event_name = tournament.event_name;
@@ -512,8 +539,11 @@ function generateGroupStage(groupStage, players, tournament, station, assignStat
 				groupStage.groups[i].rounds[j].matches[k].is_favourite = false;
 				groupStage.groups[i].rounds[j].matches[k].match_completed = false;
 				groupStage.groups[i].rounds[j].matches[k].players = [];
+				console.log("Created Match " + groupStage.groups[i].rounds[j].matches[k].match_number);
 			}
+			console.log("Number of players in this Group: " + groupStage.groups[i].players.length);
 			if (!(groupStage.groups[i].players.length % 2)) {
+				console.log("Number of players in this Group is an even number");
 				var count = 0;
 				for (var l = 0; l < groupStage.groups[i].numOfMatchesPerRound * 2; l++) {
 					if (!l) {
@@ -521,10 +551,10 @@ function generateGroupStage(groupStage, players, tournament, station, assignStat
 						(groupStage.groups[i].players[l] instanceof String ? 'Do nothing' : groupStage.groups[i].rounds[j].matches[l].players.push(groupStage.groups[i].players[l]));
 					} else if (l < groupStage.groups[i].numOfMatchesPerRound) {
 						// groupStage.groups[i].rounds[j].matches[l].player1 = groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)];
-						(groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)] instanceof String ? 'Do nothing' : groupStage.groups[i].rounds[j].matches[l].players.push(groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)]));
+						(groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + count + 1) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)] instanceof String ? 'Do nothing' : groupStage.groups[i].rounds[j].matches[l].players.push(groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)]));
 					} else {
 						// groupStage.groups[i].rounds[j].matches[(groupStage.groups[i].numOfMatchesPerRound * 2) - l - 1].player2 = groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)];
-						(groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)] instanceof String ? 'Do nothing' : groupStage.groups[i].rounds[j].matches[(groupStage.groups[i].numOfMatchesPerRound * 2) - l - 1].players.push(groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)]));
+						(groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + count + 1) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)] instanceof String ? 'Do nothing' : groupStage.groups[i].rounds[j].matches[(groupStage.groups[i].numOfMatchesPerRound * 2) - l - 1].players.push(groupStage.groups[i].players[(!((j + l) % groupStage.groups[i].players.length) ? (j + l + ++count) % groupStage.groups[i].players.length : (j + l + count) % groupStage.groups[i].players.length)]));
 					}
 				}
 			} else {
@@ -743,7 +773,7 @@ function singleEliminationBracket(bracket, players, tournament) {
 	}
 }
 
-//TODO Hard code for 2 and 3 players
+//TODO Hard code for 4+ players
 function doubleEliminationBracket(bracket, tournament) {
 	// Add the final Round to the Winner bracket
 	bracket.winnerRounds[bracket.numOfWinnerRounds] = {};
@@ -808,7 +838,7 @@ function doubleEliminationBracket(bracket, tournament) {
 
 	// Calculate loser rounds matches
 	i = 0;
-	if (bracket.winnerRounds[0].amountOfMatches > bracket.winnerRounds[1].amountOfMatches) {
+	if (bracket.winnerRounds[0].amountOfMatches > bracket.winnerRounds[1].amountOfMatches) { // Maybe check for byes here
 		loserRounds[1] = {};
 		loserRounds[1].event_name = tournament.event_name;
 		loserRounds[1].event_start_date = tournament.event_start_date;
@@ -828,7 +858,29 @@ function doubleEliminationBracket(bracket, tournament) {
 	}
 	var j = 1;
 	var count = 0;
-	do {
+	if (bracket.numOfPlayers > 4) {
+		do {
+			i++;
+			loserRounds[i] = {};
+			loserRounds[i].event_name = tournament.event_name;
+			loserRounds[i].event_start_date = tournament.event_start_date;
+			loserRounds[i].event_location = tournament.event_location;
+			loserRounds[i].tournament_name = tournament.tournament_name;
+			loserRounds[i].round_number = (i + 1);
+			loserRounds[i].round_of = "Loser";
+			loserRounds[i].round_start_date = tournament.tournament_start_date;
+			loserRounds[i].round_pause = true;
+			loserRounds[i].round_completed = false;
+			loserRounds[i].round_best_of = 3;
+			//console.log(loserRounds[i].name);
+			loserRounds[i].amountOfMatches = (bracket.winnerRounds[j].amountOfMatches) / 2;
+			//console.log("Amount of matches: " + loserRounds[i].amountOfMatches);
+			bracket.numOfLoserRounds++;
+			count++;
+			if (!(count % 2)) {
+				j++;
+			}
+		} while (loserRounds[i].amountOfMatches > 1);
 		i++;
 		loserRounds[i] = {};
 		loserRounds[i].event_name = tournament.event_name;
@@ -842,31 +894,10 @@ function doubleEliminationBracket(bracket, tournament) {
 		loserRounds[i].round_completed = false;
 		loserRounds[i].round_best_of = 3;
 		//console.log(loserRounds[i].name);
-		loserRounds[i].amountOfMatches = (bracket.winnerRounds[j].amountOfMatches) / 2;
+		loserRounds[i].amountOfMatches = 1;
 		//console.log("Amount of matches: " + loserRounds[i].amountOfMatches);
 		bracket.numOfLoserRounds++;
-		count++;
-		if (!(count % 2)) {
-			j++;
-		}
-	} while(loserRounds[i].amountOfMatches > 1);
-	i++;
-	loserRounds[i] = {};
-	loserRounds[i].event_name = tournament.event_name;
-	loserRounds[i].event_start_date = tournament.event_start_date;
-	loserRounds[i].event_location = tournament.event_location;
-	loserRounds[i].tournament_name = tournament.tournament_name;
-	loserRounds[i].round_number = (i + 1);
-	loserRounds[i].round_of = "Loser";
-	loserRounds[i].round_start_date = tournament.tournament_start_date;
-	loserRounds[i].round_pause = true;
-	loserRounds[i].round_completed = false;
-	loserRounds[i].round_best_of = 3;
-	//console.log(loserRounds[i].name);
-	loserRounds[i].amountOfMatches = 1;
-	//console.log("Amount of matches: " + loserRounds[i].amountOfMatches);
-	bracket.numOfLoserRounds++;
-
+	}
 	// Create the Matches for the Loser Rounds
 	for ( i = 0; i < bracket.numOfLoserRounds; i++) {
 		loserRounds[i].matches = [];
@@ -1140,19 +1171,19 @@ function doubleEliminationBracket(bracket, tournament) {
 				}
 				//console.log(((j + loserRounds[2].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches));
 				// bracket.winnerRounds[i].matches[j].loserGoesTo = loserRounds[temp].matches[Math.floor(((j + loserRounds[2].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].match_number;
-
-				bracket.winnerRounds[i].matches[j].loserGoesTo = {};
-				bracket.winnerRounds[i].matches[j].loserGoesTo.event_name = loserRounds[temp].matches[Math.floor(((j + loserRounds[2].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].event_name;
-				bracket.winnerRounds[i].matches[j].loserGoesTo.event_start_date = loserRounds[temp].matches[Math.floor(((j + loserRounds[2].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].event_start_date;
-				bracket.winnerRounds[i].matches[j].loserGoesTo.event_location = loserRounds[temp].matches[Math.floor(((j + loserRounds[2].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].event_location;
-				bracket.winnerRounds[i].matches[j].loserGoesTo.tournament_name = loserRounds[temp].matches[Math.floor(((j + loserRounds[2].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].tournament_name;
-				bracket.winnerRounds[i].matches[j].loserGoesTo.past_round_number = bracket.winnerRounds[i].matches[j].round_number;
-				bracket.winnerRounds[i].matches[j].loserGoesTo.past_round_of = bracket.winnerRounds[i].matches[j].round_of;
-				bracket.winnerRounds[i].matches[j].loserGoesTo.past_match = bracket.winnerRounds[i].matches[j].match_number;
-				bracket.winnerRounds[i].matches[j].loserGoesTo.future_round_number = loserRounds[temp].matches[Math.floor(((j + loserRounds[2].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].round_number;
-				bracket.winnerRounds[i].matches[j].loserGoesTo.future_round_of = loserRounds[temp].matches[Math.floor(((j + loserRounds[2].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].round_of;
-				bracket.winnerRounds[i].matches[j].loserGoesTo.future_match = loserRounds[temp].matches[Math.floor(((j + loserRounds[2].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].match_number;
-
+				//if (bracket.numOfPlayers > 4) {
+					bracket.winnerRounds[i].matches[j].loserGoesTo = {};
+					bracket.winnerRounds[i].matches[j].loserGoesTo.event_name = loserRounds[temp].matches[Math.floor(((j + loserRounds[(bracket.numOfPlayers > 4 ? 2 : 1)].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].event_name;
+					bracket.winnerRounds[i].matches[j].loserGoesTo.event_start_date = loserRounds[temp].matches[Math.floor(((j + loserRounds[(bracket.numOfPlayers > 4 ? 2 : 1)].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].event_start_date;
+					bracket.winnerRounds[i].matches[j].loserGoesTo.event_location = loserRounds[temp].matches[Math.floor(((j + loserRounds[(bracket.numOfPlayers > 4 ? 2 : 1)].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].event_location;
+					bracket.winnerRounds[i].matches[j].loserGoesTo.tournament_name = loserRounds[temp].matches[Math.floor(((j + loserRounds[(bracket.numOfPlayers > 4 ? 2 : 1)].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].tournament_name;
+					bracket.winnerRounds[i].matches[j].loserGoesTo.past_round_number = bracket.winnerRounds[i].matches[j].round_number;
+					bracket.winnerRounds[i].matches[j].loserGoesTo.past_round_of = bracket.winnerRounds[i].matches[j].round_of;
+					bracket.winnerRounds[i].matches[j].loserGoesTo.past_match = bracket.winnerRounds[i].matches[j].match_number;
+					bracket.winnerRounds[i].matches[j].loserGoesTo.future_round_number = loserRounds[temp].matches[Math.floor(((j + loserRounds[(bracket.numOfPlayers > 4 ? 2 : 1)].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].round_number;
+					bracket.winnerRounds[i].matches[j].loserGoesTo.future_round_of = loserRounds[temp].matches[Math.floor(((j + loserRounds[(bracket.numOfPlayers > 4 ? 2 : 1)].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].round_of;
+					bracket.winnerRounds[i].matches[j].loserGoesTo.future_match = loserRounds[temp].matches[Math.floor(((j + loserRounds[(bracket.numOfPlayers > 4 ? 2 : 1)].amountOfMatches / 2/* + 2*/) % loserRounds[temp].amountOfMatches))].match_number;
+				//}
 			}
 		}
 		temp++;
@@ -1303,7 +1334,7 @@ function getStandingsForFinalStage(req, res, client, done, log, standings) {
 					standings.finalStage = [];
 					console.log("F O R S E N B O Y S");
 					var query = client.query({
-						text: "SELECT CASE WHEN tournament.team_size > 1 THEN team.team_name || ',;!;,' || team.team_logo ELSE customer.customer_username || ',;!;,' || customer.customer_profile_pic || ',;!;,' || customer.customer_tag END AS info, competitor.competitor_number, competitor.competitor_seed FROM competitor JOIN competes ON competitor.event_name = competes.event_name AND competitor.event_start_date = competes.event_start_date AND competitor.event_location = competes.event_location AND competitor.tournament_name = competes.tournament_name AND competes.round_of = $5 JOIN tournament ON competitor.event_name = tournament.event_name AND competitor.event_start_date = tournament.event_start_date AND competitor.event_location = tournament.event_location AND competitor.tournament_name = tournament.tournament_name JOIN is_a ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN customer ON customer.customer_username = is_a.customer_username LEFT OUTER JOIN competes_for ON competes_for.event_name = competitor.event_name AND competes_for.event_start_date = competitor.event_start_date AND competes_for.event_location = competitor.event_location AND competes_for.tournament_name = competitor.tournament_name AND competes_for.competitor_number = competitor.competitor_number LEFT OUTER JOIN team ON team.team_name = competes_for.team_name WHERE tournament.event_name = $1 AND tournament.event_start_date = $2 AND tournament.event_location = $3 AND tournament.tournament_name = $4 AND competitor.competitor_seed > 0 GROUP BY tournament.team_size, team.team_name, team.team_logo, customer.customer_username, customer.customer_profile_pic, customer.customer_tag, competitor.competitor_number, competitor.competitor_seed",
+						text: "SELECT CASE WHEN tournament.team_size > 1 THEN team.team_name || ',;!;,' || team.team_logo ELSE customer.customer_username || ',;!;,' || customer.customer_profile_pic || ',;!;,' || customer.customer_tag END AS info, competitor.competitor_number, competitor.competitor_seed FROM competitor JOIN competes ON competitor.event_name = competes.event_name AND competitor.event_start_date = competes.event_start_date AND competitor.event_location = competes.event_location AND competitor.tournament_name = competes.tournament_name AND competes.round_of = $5 JOIN tournament ON competitor.event_name = tournament.event_name AND competitor.event_start_date = tournament.event_start_date AND competitor.event_location = tournament.event_location AND competitor.tournament_name = tournament.tournament_name JOIN is_a ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number JOIN customer ON customer.customer_username = is_a.customer_username LEFT OUTER JOIN competes_for ON competes_for.event_name = competitor.event_name AND competes_for.event_start_date = competitor.event_start_date AND competes_for.event_location = competitor.event_location AND competes_for.tournament_name = competitor.tournament_name AND competes_for.competitor_number = competitor.competitor_number LEFT OUTER JOIN team ON team.team_name = competes_for.team_name WHERE tournament.event_name = $1 AND tournament.event_start_date = $2 AND tournament.event_location = $3 AND tournament.tournament_name = $4 AND competitor.competitor_seed > 0 AND competes.round_of = $5 GROUP BY tournament.team_size, team.team_name, team.team_logo, customer.customer_username, customer.customer_profile_pic, customer.customer_tag, competitor.competitor_number, competitor.competitor_seed",
 						values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Winner"]
 					});
 					query.on("row", function (row, result) {
@@ -1842,6 +1873,21 @@ var getRounds = function(req, res, pg, conString, log) {
 					}, 'done response');
 				});
 				query.on("end", function (result) {
+					// This takes care of the null values that happen in groups other than Group 1 because this group is the only one whose matches start from 1 (match_number)
+					if (tournament.groupStage) {
+						for (var i = 0; i < tournament.groupStage.groups.length; i++) {
+							for (var j = 0; j < tournament.groupStage.groups[i].rounds.length; j++) {
+								var newArray = [];
+								for (var k = 0; k < tournament.groupStage.groups[i].rounds[j].matches.length; k++) {
+									if (tournament.groupStage.groups[i].rounds[j].matches[k]) {
+										newArray.push(tournament.groupStage.groups[i].rounds[j].matches[k]);
+									}
+								}
+								tournament.groupStage.groups[i].rounds[j].matches = newArray;
+							}
+						}
+					}
+
 					done();
 					res.status(200).send(tournament);
 					log.info({
