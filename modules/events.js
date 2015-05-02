@@ -211,6 +211,7 @@ var getEvent = function(req, res, pg, conString, log) {
 };
 
 function blahblah(req, res, log, client, done, competitor, details) {
+    console.log("Hello from blahblah");
     // Update match completed
     client.query({
         text : "UPDATE match SET match_completed = true WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6 AND match_number = $7",
@@ -440,6 +441,7 @@ function blahblah(req, res, log, client, done, competitor, details) {
                                              *
                                              * If both players have a different of matches lost, this means that we have a winner and a loser. and can proceed to calculate the standings
                                              */
+                                            console.log("After looking for the finalists of the Winners Bracket");
                                             if (result.rows[0].matches_lost == result.rows[1].matches_lost && details.tournament_format === "Double Elimination") {
                                                 var competitorInfo = result.rows;
                                                 // Create the extra round
@@ -659,16 +661,16 @@ function blahblah(req, res, log, client, done, competitor, details) {
 
 function updateCompetitor(req, res, log, client, done, competitor, isWinner, details) {
     var queryText = "";
-    console.log("Hello:");
-    console.log(competitor);
-    console.log(isWinner);
+    //console.log("Hello:");
+    //console.log(competitor);
+    //console.log(isWinner);
     if (isWinner) {
         queryText = "UPDATE competitor SET matches_won = matches_won + 1 WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_number = $5";
     } else {
         queryText = "UPDATE competitor SET matches_lost = matches_lost + 1 WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_number = $5";
     }
 
-    console.log(queryText);
+    //console.log(queryText);
     client.query({
         text : queryText,
         values : [req.params.event, req.query.date, req.query.location, req.params.tournament, competitor.competitor_number]
@@ -682,7 +684,7 @@ function updateCompetitor(req, res, log, client, done, competitor, isWinner, det
                 res : res
             }, 'done response');
         } else {
-            console.log("Hello again");
+            //console.log("Hello again");
             // Assign each competitor to their next match
             if (req.query.round_of != "Group" && req.query.round_of != "Round Robin") {
                 if (req.query.round_of != "Loser" || isWinner) {
