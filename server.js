@@ -1029,9 +1029,9 @@ app.route('/matchup/profile').get(function(req, res) {
  * [GET] Get a list of your upcoming or past matches
  */
 app.route('/matchup/profile/matchups').get(function(req, res) {
-	log.info({
-		req : req
-	}, 'start request');
+	//log.info({
+	//	req : req
+	//}, 'start request');
 	customers.getMatchups(req, res, pg, conString, log);
 });
 
@@ -1044,9 +1044,9 @@ app.route('/matchup/profile/matchups').get(function(req, res) {
  * [GET] Get a list of your upcoming or past matches
  */
 app.route('/matchup/profile/:username/matchups').get(function(req, res) {
-	log.info({
-		req : req
-	}, 'start request');
+	//log.info({
+	//	req : req
+	//}, 'start request');
 	customers.getMatchupsForUser(req, res, pg, conString, log);
 });
 
