@@ -1634,8 +1634,8 @@ var getStandings = function(req, res, pg, conString, log) {
 									};
 								}
 
-								for (var i = 0; i < standings.groupStage.groups.length; i++) {
-									if (standings.groupStage.groups[row.group_number - 1].competitor_number == temp.competitor_number) {
+								for (var i = 0; i < standings.groupStage.groups[row.group_number - 1].length; i++) {
+									if (standings.groupStage.groups[row.group_number - 1][i].competitor_number == temp.competitor_number) {
 										repeated = true;
 									}
 								}
