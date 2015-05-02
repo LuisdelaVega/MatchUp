@@ -43,6 +43,7 @@ myApp.controller('eventSettingsController', function ($scope, $state, $http, $st
 
 myApp.controller("SeedingController", function ($scope, $http, $window, $rootScope, $state, $stateParams) {
 	$scope.competitors = [];
+	$scope.twoStageCheck = false;
 
 	// Initiate Get from server and get tournaments in the event
 	//get all tournaments for this event
@@ -54,7 +55,6 @@ myApp.controller("SeedingController", function ($scope, $http, $window, $rootSco
 	}).then(function () {
 		$scope.index = 0;
 		$scope.getTournament(0);
-
 	});
 
 	$scope.getTournament = function (index) {
@@ -64,7 +64,14 @@ myApp.controller("SeedingController", function ($scope, $http, $window, $rootSco
 			$scope.competitors = data.competitors;
 			$scope.bracket = data.stages_created;
 			$scope.teamBased = data.team_size > 1;
-			console.log(data);
+
+			if ($scope.tournaments[index].tournament_type == 'Two Stage') {
+				var amountOfGroups = $scope.competitors.length / $scope.tournaments[index].number_of_people_per_group;
+				console.log(amountOfGroups)
+				var numberOfPeopleAdvancing = amountOfGroups * $scope.tournaments[index].amount_of_winners_per_group;
+				console.log(numberOfPeopleAdvancing)
+				$scope.twoStageCheck = (numberOfPeopleAdvancing < 4);
+			}
 
 		}).error(function (err) {
 			console.log(err);
@@ -73,10 +80,14 @@ myApp.controller("SeedingController", function ($scope, $http, $window, $rootSco
 	};
 
 	$scope.deleteBracket = function () {
-		$scope.index
-			//TODO call to delete bracket
-		console.log("Still testing, we need the current brackets!");
+		$http.delete($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '/create?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function (data) {
+			console.log(data);
+			$scope.bracket = false;
+			alert("Stages succesfully deleted for the following tournament: " + $scope.tournaments[$scope.index].tournament_name);
 
+		}).error(function (err) {
+			console.log(err);
+		});
 	};
 
 	$scope.createBracket = function () {
@@ -85,7 +96,7 @@ myApp.controller("SeedingController", function ($scope, $http, $window, $rootSco
 		$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '/create?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function (data) {
 			console.log(data);
 			$scope.bracket = true;
-			alert("Bracket succesfully created for the following tournament: " + $scope.tournaments[$scope.index].tournament_name);
+			alert("Stages succesfully created for the following tournament: " + $scope.tournaments[$scope.index].tournament_name);
 
 		}).error(function (err) {
 			console.log(err);

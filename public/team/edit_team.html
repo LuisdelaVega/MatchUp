@@ -105,7 +105,7 @@
 								<a class="btn btn-sm btn-danger pull-right" ng-click="deleteUserPrompt(member)" ng-if=" !member.is_captain && (currentUser.customer_username == member.customer_username || currentUser.is_captain)"><span class="fa fa-times"></span></a>
 								<a class="btn btn-sm btn-default pull-right second-button-ticket" ng-click="makeUserCaptainPrompt(member)" ng-if="!member.is_captain && currentUser.is_captain"><span class="fa fa-star"></span></a>
 								<img ng-src="{{member.customer_profile_pic}}" class="user-avatar">
-								<span class="user-name">{{member.customer_tag}} ({{member.customer_first_name}} {{member.customer_last_name}})</span>
+								<span class="user-name"><span class="fa fa-star fa-6" ng-if="member.is_captain">&nbsp;</span> {{member.customer_tag}} ({{member.customer_first_name}} {{member.customer_last_name}})</span>
 							</div>
 						</li>
 					</ul>

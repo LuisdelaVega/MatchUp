@@ -48,24 +48,27 @@
 							</tbody>
 						</table>
 					</div>
-					<p class="lead" ng-if="competitors.length<=2">Three competitors must be signed up to start the tournament</p>
-					<div class="btn-group btn-group-justified box-margin" role="group">
-						<div class="btn-group" role="group" ng-if="!bracket">
-							<button class="btn btn-primary" ng-click="saveSeeding()" ng-disabled="competitors.length<=2">
-								Save Seeding
-							</button>
-						</div>
-						<div class="btn-group " role="group" ng-if="!bracket">
-							<button class="btn btn-success" ng-click="createBracket()" ng-disabled="competitors.length<=2">
-								Create Bracket
-							</button>
-						</div>
-						<div class="btn-group" role="group" ng-if="bracket">
-							<button class="btn btn-danger" ng-click="deleteBracket()">
-								Delete Bracket
-							</button>
-						</div>
+					<p class="lead" ng-if="competitors.length<=3 && !twoStageCheck">Four competitors must be signed up to start the tournament</p>
+					<p class="lead" ng-if="twoStageCheck && !bracket">Final Round must have 4 or more competitors in the bracket</p>
+				</div>
+				<div class="col-md-8 col-md-offset-2">
+				<div class="btn-group btn-group-justified box-margin" role="group">
+					<div class="btn-group" role="group" ng-if="!bracket">
+						<button class="btn btn-primary" ng-click="saveSeeding()" ng-disabled="competitors.length<=3 || twoStageCheck">
+							Save Seeding
+						</button>
 					</div>
+					<div class="btn-group " role="group" ng-if="!bracket">
+						<button class="btn btn-success" ng-click="createBracket()" ng-disabled="competitors.length<=3 || twoStageCheck">
+							Create Stages
+						</button>
+					</div>
+					<div class="btn-group" role="group" ng-if="bracket">
+						<button class="btn btn-danger" ng-click="deleteBracket()">
+							Delete Stages
+						</button>
+					</div>
+				</div>
 				</div>
 			</div>
 		</div>

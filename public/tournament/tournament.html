@@ -306,7 +306,7 @@
 						<h1>Final Stage</h1>
 					</div>
 					<div class="page-header" ng-if="onGoingStanding">
-						<h1>Standing & Seed</h1>
+						<h1>Competitors</h1>
 					</div>
 					<table class="table table-striped" ng-if="standings">
 						<thead>
@@ -476,7 +476,7 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6" ng-repeat="match in selectedGroup.rounds[selectedGroupRound.round_number-1].matches  | filter:groupRoundQuery">
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6" ng-repeat="match in selectedGroup.rounds[selectedGroupRound.round_number-1].matches  | filter:groupRoundQuery" ng-if="match">
 					<div class="box box-margin cursor" ng-click="getTournamentMatch(selectedGroupRound.round_number,match.match_number,'Group')">
 						<h4 align="center">Match {{match.match_number}}<span ng-if="match.station_number"> (Station {{match.station_number}})</span></h4>
 						<div ng-if="tournament.team_size == 1">

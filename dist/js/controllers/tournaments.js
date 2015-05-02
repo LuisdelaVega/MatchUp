@@ -602,7 +602,7 @@ function displayBracket($scope) {
 		var bracketHeight = $scope.rounds[0].length * 96 + 18 + 39 + 20;
 
 		// Hardcoded no se que pueda pasar. Es para calcular el height si el bracket es de tres personas
-		// el length == 2 es por el bye del primer round
+		// el length == 2 es por el bye (invisible) del primer round
 		if ($scope.rounds[0].length == 2 && $scope.rounds[1].length == 1) {
 			bracketHeight += 150;
 		}
@@ -619,19 +619,23 @@ function displayBracket($scope) {
 
 		// Init rounds by pushing the first round
 		$scope.loserRounds.push([]);
-		$scope.loserRounds[0].push(losersRound[losersRound.length - 1].matches[0]);
-		$scope.loserRounds[0][0].extra = true;
+		
+		// Check edge case where only two rounds are present
+		if(losersRound.length == 2){
+			losersRound[1].matches[0].isLoser = true;
+			$scope.loserRounds[0].push(losersRound[1].matches[0]);
+		}	
+		else{
+			$scope.loserRounds[0].push(losersRound[losersRound.length - 1].matches[0]);
+			$scope.loserRounds[0][0].extra = true;	
+		}
 
 		// Calculate height of loser bracket
 		var loserBracketHeight = $scope.loserRounds[0].length * 96 + 18 + 39 + 20;
 
 
-		if (losersRound.length == 1) {
+		if ($scope.loserRounds[0].length == 1) {
 			loserBracketHeight += 200;
-			$scope.loserBracketHeight = {
-				"height": loserBracketHeight + 'px',
-			}
-			return;
 		}
 
 		$scope.loserBracketHeight = {
@@ -661,7 +665,6 @@ function displayBracket($scope) {
 					checkNamePostions(j, $scope.loserRounds);
 				}
 			}
-			//
 			else {
 				// Iterate through the matches of last round pushed to arrange the child matches
 				for (var j = 0; j < losersRound[i].matches.length; j++) {
@@ -727,10 +730,10 @@ function displayBracket($scope) {
 		}
 		// 90 es un marron
 		// lo demas lo calcule pero fui tan moron q no lo documente
-		var loserBracketHeight = $scope.loserRounds[0].length * 96 + 18 + 39 + 20 + 90;
-		$scope.loserBracketHeight = {
-			"height": loserBracketHeight + 'px',
-		}
+//		var loserBracketHeight = $scope.loserRounds[0].length * 96 + 18 + 39 + 20 + 90;
+//		$scope.loserBracketHeight = {
+//			"height": loserBracketHeight + 'px',
+//		}
 	}
 }
 

@@ -211,15 +211,23 @@ function ($scope, $http, $stateParams, $state, $rootScope) {
 		$scope.unsubscribe = function (user, index) {
 			//unsubscribe
 			$http.delete($rootScope.baseURL + '/matchup/profile/' + user).success(function (data) {
-				$scope.subscriptions.splice(index, 1);
-				if($scope.subscriptions.length){
-					$scope.subIndex = index;
-					$scope.getSubMatches(index);
-				}
-				else{
+				// Not deleting the first one
+				if ($scope.subscriptions.length > 1) {
+					// Deleting the last one
+					if ((index + 1) == $scope.subscriptions.length) {
+						$scope.subIndex = index - 1;
+						$scope.getSubMatches(index - 1);
+					} else {
+						// deleting someone in the middle
+						$scope.subIndex = index;
+						$scope.getSubMatches(index);
+					}
+				} 
+				// Deleting the first one
+				else {
 					$scope.matches = [];
 				}
-
+				$scope.subscriptions.splice(index, 1);
 			}).error(function (data, status) {
 				console.log(status);
 			});
