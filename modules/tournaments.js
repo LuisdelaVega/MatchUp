@@ -1473,7 +1473,7 @@ function getStandingsForFinalStage(req, res, client, done, log, standings) {
 					query.on("end", function (result) {
 						var newArray = [];
 						for (var i = 0; i < standings.finalStage.standings.length; i++) {
-							if (standings.finalStage.standings[i]) {
+							if (standings.finalStage.standings[i].length) {
 								newArray.push(standings.finalStage.standings[i]);
 							}
 						}
