@@ -1471,6 +1471,13 @@ function getStandingsForFinalStage(req, res, client, done, log, standings) {
 						}, 'done response');
 					});
 					query.on("end", function (result) {
+						var newArray = [];
+						for (var i = 0; i < standings.finalStage.standings.length; i++) {
+							if (standings.finalStage.standings[i]) {
+								newArray.push(standings.finalStage.standings[i]);
+							}
+						}
+						standings.finalStage.standings = newArray;
 						for (var i = 0; i < standings.finalStage.standings.length; i++) {
 							getMatchHistory(req, res, client, done, log, standings, standings.finalStage.standings[i], i, standings.finalStage.standings.length - 1);
 						}
