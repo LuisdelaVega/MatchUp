@@ -81,13 +81,13 @@ myApp.controller("SeedingController", function($scope, $http, $window, $rootScop
 			$scope.bracket = data.stages_created;
 			$scope.teamBased = data.team_size > 1;
 
-			if ($scope.tournaments[index].tournament_type == 'Two Stage') {
-				var amountOfGroups = $scope.competitors.length / $scope.tournaments[index].number_of_people_per_group;
-				console.log(amountOfGroups)
-				var numberOfPeopleAdvancing = amountOfGroups * $scope.tournaments[index].amount_of_winners_per_group;
-				console.log(numberOfPeopleAdvancing)
-				$scope.twoStageCheck = (numberOfPeopleAdvancing < 4);
-			}
+//			if ($scope.tournaments[index].tournament_type == 'Two Stage') {
+//				var amountOfGroups = $scope.competitors.length / $scope.tournaments[index].number_of_people_per_group;
+//				console.log(amountOfGroups)
+//				var numberOfPeopleAdvancing = amountOfGroups * $scope.tournaments[index].amount_of_winners_per_group;
+//				console.log(numberOfPeopleAdvancing)
+//				$scope.twoStageCheck = (numberOfPeopleAdvancing < 4);
+//			}
 
 		}).error(function(err) {
 			console.log(err);
