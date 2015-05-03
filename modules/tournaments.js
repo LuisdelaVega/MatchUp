@@ -1358,7 +1358,8 @@ function getStandingsForFinalStage(req, res, client, done, log, standings) {
 								competitor_seed: parseInt(row.competitor_seed)
 							};
 						}
-
+						console.log("On row");
+						console.log(standings.finalStage.length);
 						for (var i = 0; i < standings.finalStage.length; i++) {
 							if (standings.finalStage[i].competitor_number == temp.competitor_number) {
 								repeated = true;
@@ -1367,7 +1368,7 @@ function getStandingsForFinalStage(req, res, client, done, log, standings) {
 						if (!repeated) {
 							standings.finalStage.push(temp);
 						}
-
+						console.log(standings.finalStage);
 						//standings.finalStage.standings[row.standing - 1].push(temp);
 					});
 					query.on('error', function (error) {
@@ -1380,6 +1381,9 @@ function getStandingsForFinalStage(req, res, client, done, log, standings) {
 						}, 'done response');
 					});
 					query.on("end", function (result) {
+						console.log("On end");
+						console.log(standings.finalStage);
+						console.log(standings.finalStage.length);
 						for (var i = 0; i < standings.finalStage.length; i++) {
 							//getMatchHistory(req, res, client, done, log, standings, standings.finalStage.standings[i], i, standings.finalStage.standings.length - 1);
 							getMatchHistoryForPlayer(req, res, client, done, log, standings, standings.finalStage[i], i, standings.finalStage.length-1, true, true);

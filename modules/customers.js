@@ -835,7 +835,7 @@ var createTeam = function(req, res, pg, conString, log) {
 		query.on("end", function(result) {
 			if (!result.rows.length) {
 				client.query({
-					text : "INSERT INTO team (team_name, team_logo, team_bio, team_cover_photo, team_active) VALUES ($1, $2, $3, $4, TRUE)",
+					text : "INSERT INTO team (team_name, team_logo, team_bio, team_cover_photo, team_active) VALUES ('$1', $2, '$3', $4, TRUE)",
 					values : [req.body.name, // team_name
 						req.body.logo, // team_logo
 						req.body.bio, // team_bio
