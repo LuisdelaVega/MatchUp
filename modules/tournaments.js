@@ -2132,7 +2132,7 @@ var changeStation = function(req, res, pg, conString, log) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
 		}
-
+		console.log("Hello");
 		client.query("BEGIN");
 		var query = client.query({
 			text : "SELECT tournament_name FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
@@ -2181,12 +2181,14 @@ var changeStation = function(req, res, pg, conString, log) {
 					 */
 					if (result.rows.length) {
 						//Store the value for the station
+						console.log("The match already had a station with number: ");
 						var station = parseInt(result.rows[0].station_number);
+						console.log(station);
 						// The match already had a station
 						// Look for a match played in the provided station
 						var query = client.query({
-							text: "SELECT match_number FROM is_played_in NATURAL JOIN match NATURAL JOIN round NATURAL JOIN tournament WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6",
-							values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of]
+							text: "SELECT match_number FROM is_played_in NATURAL JOIN match NATURAL JOIN round NATURAL JOIN tournament WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6 AND station_number = $7",
+							values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.body.station]
 						});
 						query.on("row", function(row, result) {
 							result.addRow(row);
@@ -2203,11 +2205,13 @@ var changeStation = function(req, res, pg, conString, log) {
 						});
 						query.on("end", function(result) {
 							if (result.rows.length) {
+								console.log("A match played in this station was found. Match number: ");
 								var match = parseInt(result.rows[0].match_number);
+								console.log(match);
 								// There was a match, so let's switch
 								client.query({
 									text: "DELETE FROM is_played_in WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number) = ($1, $2, $3, $4, $5, $6, $7)",
-									values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match]
+									values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, match]
 								}, function (err, result) {
 									if (err) {
 										client.query("ROLLBACK");
@@ -2221,7 +2225,7 @@ var changeStation = function(req, res, pg, conString, log) {
 									} else {
 										client.query({
 											text: "INSERT INTO is_played_in (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, station_number) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
-											values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.body.station]
+											values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, match, station]
 										}, function (err, result) {
 											if (err) {
 												client.query("ROLLBACK");
@@ -2235,7 +2239,7 @@ var changeStation = function(req, res, pg, conString, log) {
 											} else {
 												client.query({
 													text: "DELETE FROM is_played_in WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number) = ($1, $2, $3, $4, $5, $6, $7)",
-													values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, match]
+													values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match]
 												}, function (err, result) {
 													if (err) {
 														client.query("ROLLBACK");
@@ -2249,7 +2253,7 @@ var changeStation = function(req, res, pg, conString, log) {
 													} else {
 														client.query({
 															text: "INSERT INTO is_played_in (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, station_number) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
-															values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, match, station]
+															values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.body.station]
 														}, function (err, result) {
 															if (err) {
 																client.query("ROLLBACK");
@@ -2276,6 +2280,7 @@ var changeStation = function(req, res, pg, conString, log) {
 									}
 								});
 							} else {
+								console.log("No matches are being played in the provided station");
 								// There wasn't a match, we just need to replace the currrent station with the provided one
 								client.query({
 									text: "DELETE FROM is_played_in WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number) = ($1, $2, $3, $4, $5, $6, $7)",
