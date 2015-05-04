@@ -1340,7 +1340,7 @@ app.get('/paypal_webhook', function(req, res) {
 	log.info({
 		req : req
 	}, 'start request');
-	res.status(200);
+	res.status(200).send('paypal');
 	log.info({
 		res : res
 	}, 'done response');
