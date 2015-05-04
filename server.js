@@ -141,8 +141,11 @@ function authenticate(req, res) {
 ///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
 //*\\\\\\\\\\* Paypal *//////////*/
 app.post('/paypal', function(req,res){
+	log.info({
+		req : req
+	}, 'start request');
 	console.log("IN PAYPAL !! req.body : "+req.body);
-	ipn.verify(req.body, function callback(err, msg) {
+	ipn.verify(req.body, {'allow_sandbox': true}, function callback(err, msg) {
 		if (err) {
 			console.log("Error:"+err);
 		} else {
@@ -155,6 +158,9 @@ app.post('/paypal', function(req,res){
 			}
 		}
 	});
+	log.info({
+		res : res
+	}, 'done response');
 });
 
 //*\\\\\\\\\\* API *//////////*/
