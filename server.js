@@ -42,6 +42,9 @@ var secret = '7h1s h6Re i5 th6 p6rf6c7 plac6 t0 m4kE 4 Nyx A5s4s51n j0k6!';
 // Most Valuable Player
 var app = express();
 
+// For paypal
+app.use(require('connect').bodyParser());
+
 // We are going to protect /matchup/ routes with JWT
 app.use('/matchup', expressJwt({
 	secret : secret
