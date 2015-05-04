@@ -381,11 +381,11 @@ row_number() OVER(ORDER BY (SELECT count((SELECT sum(submits.score) FROM submits
 
 CASE WHEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC, competitor.competitor_seed) % (tournament.number_of_people_per_group) = 0 THEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group + 1) ELSE row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((round.round_best_of/2)+1) DESC) % (tournament.number_of_people_per_group) END AS standing
 
+SELECT NOT (round_number IN (SELECT future_round_number FROM competitor_goes_to WHERE event_name = 'New 4 Double' AND event_start_date = '2015-05-02 20:30:00' AND event_location = 'Location' AND tournament_name = 'Teams')) AS extra_round FROM round WHERE event_name = 'New 4 Double' AND event_start_date = '2015-05-02 20:30:00' AND event_location = 'Location' AND tournament_name = 'Teams' AND round_number = 3;
+
+SELECT round_number IN (SELECT future_round_number FROM competitor_goes_to WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4) AS extra_round FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5
 
 
-SELECT round_number IN (SELECT future_round_number FROM competitor_goes_to WHERE event_name = 'New 4 Double' AND event_start_date = '2015-05-02 20:30:00' AND event_location = 'Location' AND tournament_name = 'Teams') FROM round WHERE event_name = 'New 4 Double' AND event_start_date = '2015-05-02 20:30:00' AND event_location = 'Location' AND tournament_name = 'Teams' AND round_number = 4;
-
-SELECT round_number IN (SELECT future_round_number FROM competitor_goes_to WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4) FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5
 
 
 
