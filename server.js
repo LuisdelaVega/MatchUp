@@ -1336,11 +1336,12 @@ app.route('/matchup/distributions').get(function(req, res) {
 });
 
 
-app.get('/paypal_webhook', function(req, res) {
+app.post('/paypal_webhook', function(req, res) {
 	log.info({
 		req : req
 	}, 'start request');
 	console.log("hellloo this is dog");
+	console.log(req.body);
 	res.status(200).send('paypal');
 	log.info({
 		res : res
