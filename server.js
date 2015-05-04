@@ -1335,6 +1335,17 @@ app.route('/matchup/distributions').get(function(req, res) {
 	tournaments.getPrizeDistributions(req, res, pg, conString, log);
 });
 
+
+app.get('/paypal_webhook', function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	res.status(200);
+	log.info({
+		res : res
+	}, 'done response');
+});
+
 ///////////////////////////////////////////////// SERVER LISTEN
 //var port = process.env.PORT || 5000;
 //app.listen(port, function() {
