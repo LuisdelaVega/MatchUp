@@ -4,9 +4,9 @@
 
 // Node modules
 var express = require('express');
-var fs = require('fs');
-var https = require('https');
-var ipn = require('paypal-ipn');
+//var fs = require('fs');
+//var https = require('https');
+//var ipn = require('paypal-ipn');
 var cors = require('cors');
 var jwt = require('jsonwebtoken');
 var expressJwt = require('express-jwt');
@@ -43,7 +43,7 @@ var secret = '7h1s h6Re i5 th6 p6rf6c7 plac6 t0 m4kE 4 Nyx A5s4s51n j0k6!';
 var app = express();
 
 // For paypal
-app.use(require('connect').bodyParser());
+//app.use(require('connect').bodyParser());
 
 // We are going to protect /matchup/ routes with JWT
 app.use('/matchup', expressJwt({
@@ -1377,11 +1377,11 @@ app.post('/paypal_webhook', function(req, res) {
 });
 
 ///////////////////////////////////////////////// SERVER LISTEN
-//var port = process.env.PORT || 5000;
-//app.listen(port, function() {
-//	console.log("Listening on port " + port);
-//});
-https.createServer({
-	key: fs.readFileSync('key.pem'),
-	cert: fs.readFileSync('cert.pem')
-}, app).listen(8443);
+var port = process.env.PORT || 5000;
+app.listen(port, function() {
+	console.log("Listening on port " + port);
+});
+//https.createServer({
+//	key: fs.readFileSync('key.pem'),
+//	cert: fs.readFileSync('cert.pem')
+//}, app).listen(8443);
