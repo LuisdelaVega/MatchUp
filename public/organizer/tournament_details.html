@@ -60,7 +60,7 @@
 						<tbody ng-if="tournament.team_size == 1">
 
 							<tr ng-click="getTournamentMatch(match.match_number)" ng-repeat="match in selectedRound.matches">
-								<td><i class="fa fa-star" ng-if="match.is_favourite" ng-click="favoriteMatchToggle()"></i> &nbsp; {{match.match_number}} </td>
+								<td><i class="fa fa-star" ng-if="match.is_favourite" ></i> &nbsp; {{match.match_number}} </td>
 								<td ng-if="match.players[0].customer_tag">{{match.players[0].customer_tag}}</td>
 								<td ng-if="match.players[1].customer_tag">{{match.players[1].customer_tag}}</td>
 
@@ -152,25 +152,27 @@
 
 					<h4 class="modal-title">Round {{matchInfo.round}} Match {{matchInfo.match}}
 					<br>
-					<h5>Favorite: <i class="fa fa-star" ng-if="matchInfo.is_favourite" ng-click="favoriteMatchToggle()"></i><i class="fa fa-star-o" ng-if="!matchInfo.is_favourite" ng-click="favoriteMatchToggle()"></i></h5><small ng-if="matchInfo.station_number">Station {{matchInfo.station_number}}</small><small ng-if="matchInfo.stream_link">Stream <a ng-href="{{matchInfo.stream_link}}">
-						<br>
-						{{matchInfo.stream_link}}</a></small></h4>
+					<h5>Favorite: <i class="fa fa-star" ng-if="matchInfo.is_favourite" ng-click="favoriteMatchToggle(matchInfo.match)"></i><i class="fa fa-star-o" ng-if="!matchInfo.is_favourite" ng-click="favoriteMatchToggle(matchInfo.match)"></i></h5>
+					<select ng-options="station.station_number as 'Station '+ station.station_number for station in stations" ng-model="matchInfo.station_number" ng-change="changeStation(matchInfo.station_number)"></select>
+					</br>
+					<p ng-if="matchInfo.stream_link">Stream <a ng-href="{{matchInfo.stream_link}}"> 
+						{{matchInfo.stream_link}}</a></p></h4>
 				</div>
-				<div class="modal-body">
+				<!-- <div class="modal-body">
 					<div align="center" >
 						<button type="button" class="btn btn-primary" ng-click="changeStationPrompt()">
 							Change Station
 						</button>
-						<button type="button" class="btn btn-primary" ng-click="favoriteMatchToggle(matchInfo.match)" ng-if="!matchInfo.is_favourite"> 
+						<button type="button" class="btn btn-primary" ng-click="favoriteMatchToggle(matchInfo.match)" ng-if="!matchInfo.is_favourite">
 							Mark as Favorite
 						</button>
-						<button type="button" class="btn btn-primary" ng-click="favoriteMatchToggle(matchInfo.match)" ng-if="matchInfo.is_favourite"> 
+						<button type="button" class="btn btn-primary" ng-click="favoriteMatchToggle(matchInfo.match)" ng-if="matchInfo.is_favourite">
 							Un-mark as favorite
 						</button>
 					</div>
 
 					<hr>
-				</div>
+				</div> -->
 
 				<div class="modal-body">
 
@@ -212,7 +214,7 @@
 						<div style="text-align: center">
 							<span ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number && set.scores[1].competitor_number"> <div class="set-circular set-margin" ng-class="set.scores[0].score > set.scores[1].score ? 'player-1' : 'player-2'"></div> </span>
 						</div>
-						<div class="row" align="center">
+						<div class="row" align="center" ng-if="matchInfo.players[0].score + matchInfo.players[1].score">
 							<hr>
 							<table class="table table-hover table-striped">
 								<thead>
@@ -247,7 +249,7 @@
 									</tr>
 								</tbody>
 							</table>
-						 
+
 						</div>
 					</div>
 
@@ -324,17 +326,17 @@
 									</tr>
 								</tbody>
 							</table>
-						
+
 						</div>
 					</div>
 
 				</div>
 				<div class="modal-footer" ng-if="matchInfo.sets[0].scores.length>1">
-						<div align="center">
-								<button type="button" class="btn btn-primary" ng-click="changeScore()">
-									Change Score
-								</button>
-							</div>
+					<div align="center">
+						<button type="button" class="btn btn-primary" ng-click="changeScore()">
+							Change Score
+						</button>
+					</div>
 				</div>
 			</div>
 			<!-- /.modal-content -->

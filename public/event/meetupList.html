@@ -11,22 +11,27 @@
 			<div class="widget-main no-padding">
 				<div class="tickets-container">
 					<div class="row" style="padding-left: 15px">
-						<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat = "meetup in meetupsInfo">
-							<a class="thumbnail" ng-click="goToMeetup(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location, meetup.meetup_start_date, meetup.meetup_location, meetup.customer_username)">
+						<div class="col-md-3 col-sm-4 col-xs-6" ng-repeat = "meetup in meetupsInfo" style="padding-bottom: 10px">
+
+ 							<div class="list-group-item">
+								<a class="btn btn-sm btn-danger pull-right" ng-click="deleteMeetup($index, meetup.customer_username, meetup.meetup_start_date, meetup.meetup_location)" ng-if="meetup.is_organizer"> <span class="fa fa-times"></span> </a>
+								<a class="btn btn-sm btn-primary second-button-ticket pull-right" ng-if="meetup.is_organizer" ui-sref="app.edit_meetup({eventName: eventInfo.event_name,eventDate: eventInfo.event_start_date,eventLocation: eventInfo.event_location, meetupDate: meetup.meetup_start_date, meetupLocation: meetup.meetup_location, customerUsername: meetup.customer_username })"> <span class="fa fa-gear"></span> </a>
 								<div class="caption" style="text-overflow: ellipsis;white-space: nowrap;
-											overflow: hidden;">
+								overflow: hidden;" ng-click="goToMeetup(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location, meetup.meetup_start_date, meetup.meetup_location, meetup.customer_username)">
 									<p class="thumbnail-title">
-                                        {{noMeetup}}
-                                        {{meetup.meetup_name}}
+										{{noMeetup}}
+										{{meetup.meetup_name}}
+
 									</p>
 									<p class="thumbnail-paragraph">
-                                        {{meetup.meetup_location}}
+										{{meetup.meetup_location}}
 									</p>
 									<p class="thumbnail-paragraph">
-                                        {{meetup.meetup_start_date | date:'medium'}}
+										{{meetup.meetup_start_date | date:'medium'}}
 									</p>
 								</div>
-							</a>
+							</div>
+
 						</div>
 					</div>
 				</div>

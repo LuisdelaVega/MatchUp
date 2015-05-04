@@ -64,20 +64,20 @@ myApp.controller('profileSummaryController', function($scope, $state, $http, $st
 	$scope.goToUserOrganizations = function(user) {
 		$state.go("app.userOrganizations", {
 			"username" : user
-		}) //
-	}
+		});
+	};
 	//function for going into a page that will display all the events the customer has created
 	$scope.goToUserEvents = function(user) {
 		$state.go("app.userOrganizations", {
 			"username" : user
-		}) //
-	}
+		});
+	};
 	//function for going into a page that will display the customers standings in different tournaments
 	$scope.goToUserStandings = function(user) {
 		$state.go("app.userOrganizations", {
 			"username" : user
-		}) //
-	}
+		});
+	};
 
 	$scope.gotToEditProfile = function() {
 		sharedDataService.set($scope.profileData);
@@ -254,7 +254,7 @@ function($scope, $http, $stateParams, $state, $rootScope) {
 		$http.get($rootScope.baseURL + '/matchup/profile/' + $scope.subscriptions[index].customer_username + '/matchups?state=Past').success(function(data) {
 			$scope.matches = data;
 		});
-	}
+	};
 
 	$scope.unsubscribe = function(user, index) {
 		//unsubscribe
@@ -315,10 +315,10 @@ function($scope, $http, $state, sharedDataService, $rootScope, $window) {
 					else
 						$scope.user.customer_profile_pic = link;
 				});
-			}
+			};
 			xhr.send(fd);
 
-		}
+		};
 		reader.readAsDataURL(photofile);
 	};
 
@@ -337,10 +337,10 @@ function($scope, $http, $state, sharedDataService, $rootScope, $window) {
 			$http.put($rootScope.baseURL + "/matchup/profile", profile).success(function() {
 				$state.go("app.userProfile", {
 					"username" : $window.sessionStorage.username
-				})
+				});
 			});
 		}
-	}
+	};
 }]);
 
 // REUSANDO este controller en my matchups y el see more en el profile

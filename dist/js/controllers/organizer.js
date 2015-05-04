@@ -81,13 +81,13 @@ myApp.controller("SeedingController", function($scope, $http, $window, $rootScop
 			$scope.bracket = data.stages_created;
 			$scope.teamBased = data.team_size > 1;
 
-//			if ($scope.tournaments[index].tournament_type == 'Two Stage') {
-//				var amountOfGroups = $scope.competitors.length / $scope.tournaments[index].number_of_people_per_group;
-//				console.log(amountOfGroups)
-//				var numberOfPeopleAdvancing = amountOfGroups * $scope.tournaments[index].amount_of_winners_per_group;
-//				console.log(numberOfPeopleAdvancing)
-//				$scope.twoStageCheck = (numberOfPeopleAdvancing < 4);
-//			}
+			//			if ($scope.tournaments[index].tournament_type == 'Two Stage') {
+			//				var amountOfGroups = $scope.competitors.length / $scope.tournaments[index].number_of_people_per_group;
+			//				console.log(amountOfGroups)
+			//				var numberOfPeopleAdvancing = amountOfGroups * $scope.tournaments[index].amount_of_winners_per_group;
+			//				console.log(numberOfPeopleAdvancing)
+			//				$scope.twoStageCheck = (numberOfPeopleAdvancing < 4);
+			//			}
 
 		}).error(function(err) {
 			console.log(err);
@@ -101,7 +101,7 @@ myApp.controller("SeedingController", function($scope, $http, $window, $rootScop
 	 *
 	 * A button to call this function will only be made available if the bracket has been created
 	 */
-	 
+
 	$scope.deleteBracket = function() {
 		$http.delete($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '/create?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
 			console.log(data);
@@ -1339,13 +1339,17 @@ myApp.controller("tournamentDetailsController", function($scope, $http, $window,
 	};
 
 	$scope.favoriteMatchToggle = function(match) {
-		$scope.getTournamentMatch($scope.matchInfo.match);
+		// $scope.getTournamentMatch($scope.matchInfo.match);
 		console.log("pauseToggle");
 		$http.put($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $stateParams.tournamentName + '/rounds/' + $scope.selectedRound.round_number + '/matches/' + match + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&round_of=' + $scope.roundOf).success(function(data) {
 			console.log("Togle Match");
 			$scope.matchInfo.is_favourite = !$scope.matchInfo.is_favourite;
+			$scope.selectedRound.matches[match - 1].is_favourite = !$scope.selectedRound.matches[match - 1].is_favourite;
+
 		}).error(function(err) {
 			console.log(err);
+		}).then(function() {
+			$scope.init();
 		});
 
 	};
@@ -1397,8 +1401,36 @@ myApp.controller("tournamentDetailsController", function($scope, $http, $window,
 
 	};
 
-	$scope.changeStationPrompt = function() {
-		console.log("Change Station")
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $stateParams.tournamentName + '/stations?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+		console.log("Event Tournaments");
+		console.log(data);
+		$scope.stations = data;
+
+	}).error(function(err) {
+		console.log(err);
+	});
+	$scope.changeStation = function(station) {
+
+		//get all stations for this tournament
+		///matchup/events/:event/tournaments/:tournament/rounds/:round/matches/:match
+
+		$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $stateParams.tournamentName + '/rounds/' + $scope.selectedRound.round_number + '/matches/' + $scope.matchInfo.match + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '&round_of=' + $scope.roundOf, {
+			"station" : parseInt(station)
+		}).success(function(data) {
+			console.log("Chaged to Station " + station);
+		}).error(function(err) {
+			console.log(err);
+		}).then(function() {
+			var temp = $scope.selectedRound.matches[$scope.matchInfo.match - 1].station_number;
+
+			for (var i = 0; i < $scope.selectedRound.matches.length; i++) {
+				if (($scope.selectedRound.matches[i].station_number == station) && (($scope.matchInfo.match - 1) != i)) {
+					$scope.selectedRound.matches[i].station_number = temp;
+				}
+			}
+			$scope.selectedRound.matches[$scope.matchInfo.match - 1].station_number = station;
+		});
+
 	};
 
 	$scope.getTournamentMatch = function(match) {
@@ -1472,7 +1504,6 @@ myApp.controller("tournamentDetailsController", function($scope, $http, $window,
 					console.log(newScore);
 
 					$http.put($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $stateParams.tournamentName + '/rounds/' + $scope.matchInfo.round + '/matches/' + $scope.matchInfo.match + '/' + setInfo.set_seq + '/change?round_of=' + $scope.matchInfo.round_of + '&date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation, newScore).success(function(data, status) {
-						alert("You have succesfully updated the scores.");
 						$scope.getTournamentMatch($scope.matchInfo.match);
 						$scope.init();
 					});
@@ -1481,6 +1512,7 @@ myApp.controller("tournamentDetailsController", function($scope, $http, $window,
 
 		});
 
+		alert("You have succesfully changed the scores for this match!");
 
 	};
 
