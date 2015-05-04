@@ -385,11 +385,106 @@ SELECT NOT (round_number IN (SELECT future_round_number FROM competitor_goes_to 
 
 SELECT round_number IN (SELECT future_round_number FROM competitor_goes_to WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4) AS extra_round FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5
 
+--
+SELECT round_number IN (SELECT future_round_number FROM competitor_goes_to WHERE event_name = 'New 4 Double' AND event_start_date = '2015-05-02 20:30:00' AND event_location = 'Location' AND tournament_name = 'Teams') AS extra_round FROM round WHERE event_name = 'New 4 Double' AND event_start_date = '2015-05-02 20:30:00' AND event_location = 'Location' AND tournament_name = 'Teams' AND round_number = 3;
 
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SELECT competes.competitor_number FROM competes WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND (competes.competitor_number NOT IN (SELECT competitor_number FROM competes JOIN competitor_goes_to ON competes.event_name = competitor_goes_to.event_name AND competes.event_start_date = competitor_goes_to.event_start_date AND competes.event_location = competitor_goes_to.event_location AND competes.tournament_name = competitor_goes_to.tournament_name AND competes.round_number = competitor_goes_to.future_round_number AND competes.round_of = competitor_goes_to.future_round_of AND competes.match_number = competitor_goes_to.future_match WHERE competitor_goes_to.is_winner AND competitor_goes_to.future_round_number = $7 AND competitor_goes_to.future_round_of = $8 AND competitor_goes_to.event_name = $1 AND competitor_goes_to.event_start_date = $2 AND competitor_goes_to.event_location = $3 AND competitor_goes_to.tournament_name = $4)) ORDER BY competes.round_number DESC, competes.match_number
+
+SELECT competes.competitor_number FROM competes WHERE competes.event_name = 'New 4 Double' AND competes.event_start_date = '2015-05-02 20:30:00' AND competes.event_location = 'Location' AND competes.tournament_name = 'Teams' AND competes.round_number = 1 AND competes.round_of = 'Loser' AND (competes.competitor_number NOT IN (SELECT competitor_number FROM competes JOIN competitor_goes_to ON competes.event_name = competitor_goes_to.event_name AND competes.event_start_date = competitor_goes_to.event_start_date AND competes.event_location = competitor_goes_to.event_location AND competes.tournament_name = competitor_goes_to.tournament_name AND competes.round_number = competitor_goes_to.future_round_number AND competes.round_of = competitor_goes_to.future_round_of AND competes.match_number = competitor_goes_to.future_match WHERE competitor_goes_to.is_winner AND competitor_goes_to.future_round_number = '2' AND competitor_goes_to.future_round_of = 'Loser' AND competitor_goes_to.event_name = 'New 4 Double' AND competitor_goes_to.event_start_date = '2015-05-02 20:30:00' AND competitor_goes_to.event_location = 'Location' AND competitor_goes_to.tournament_name = 'Teams')) ORDER BY competes.round_number DESC, competes.match_number
 
 
 
