@@ -1025,12 +1025,12 @@ function getLosers(req, res, client, done, log, tournament_format, rounds, where
         var round = parseInt(req.params.round);
         console.log("Is extra round?");
         console.log(result.rows[0].extra_round);
-        console.log(!(parseBool(result.rows[0].extra_round)));
+        //console.log(!(parseBool(result.rows[0].extra_round)));
         console.log(result.rows[0].extra_round === "true");
         console.log(result.rows[0].extra_round === "false");
         console.log("Round number:");
         console.log(round);
-        if (parseBool(result.rows[0].extra_round)) {
+        if (result.rows[0].extra_round) {
             console.log("Reducing round value by one");
             round--;
         }
