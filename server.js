@@ -6,6 +6,7 @@
 var express = require('express');
 var fs = require('fs');
 var https = require('https');
+var ipn = require('paypal-ipn');
 var cors = require('cors');
 var jwt = require('jsonwebtoken');
 var expressJwt = require('express-jwt');
@@ -57,7 +58,7 @@ app.use(function(err, req, res, next) {
 	}
 });
 
-// Allow Cross-origin resourse sharing
+// Allow Cross-origin resource sharing
 app.use(cors());
 
 // Serve the Website
@@ -138,6 +139,24 @@ function authenticate(req, res) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
+//*\\\\\\\\\\* Paypal *//////////*/
+app.post('/paypal', function(req,res){
+	console.log("IN PAYPAL !! req.body : "+req.body);
+	ipn.verify(req.body, function callback(err, msg) {
+		if (err) {
+			console.log("Error:"+err);
+		} else {
+			//Do stuff with original params here
+			console.log("req.body.payment_status :"+req.body.payment_status+" msg: "+msg);
+			res.end();
+			if (req.body.payment_status == 'Completed') {
+				//Payment has been confirmed as completed
+
+			}
+		}
+	});
+});
+
 //*\\\\\\\\\\* API *//////////*/
 /* /api
  *

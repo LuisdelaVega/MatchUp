@@ -13,7 +13,8 @@
     "jsonwebtoken": "*",
     "basic-auth": "*",
     "cors": "*",
-    "pg": "*"
+    "pg": "*",
+    "paypal-ipn": "*"
   },
   "author": "Luis de la Vega",
   "license": ""
