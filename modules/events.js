@@ -1006,7 +1006,7 @@ function getLosers(req, res, client, done, log, tournament_format, rounds, where
     console.log("Hello!");
     console.log(rounds.length);
     var query = client.query({
-        text: "SELECT round_number IN (SELECT future_round_number FROM competitor_goes_to WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4) AS extra_round FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5",
+        text: "SELECT NOT (round_number IN (SELECT future_round_number FROM competitor_goes_to WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4)) AS extra_round FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5",
         values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round]
     });
     query.on("row", function (row, result) {
