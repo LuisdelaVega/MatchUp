@@ -67,17 +67,19 @@
 								</div>
 								<div class="col-xs-12 col-md-6 col-lg-6">
 									<dt>
-										Location <span ng-if="eventInfo.event_is_online">(Online)</span>
+										Location
 									</dt>
 									<dd>
 										{{ eventInfo.event_location }}
 									</dd>
+									<span ng-if="!eventInfo.event_is_online">
 									<dt>
 										Venue
 									</dt>
 									<dd>
 										{{ eventInfo.event_venue }}
 									</dd>
+									</span>
 									<dt>
 										Event Type
 									</dt>

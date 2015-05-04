@@ -77,17 +77,29 @@ myApp.controller("SeedingController", function($scope, $http, $window, $rootScop
 		//get competitors for tournament $scope.tournaments[index].tournament_name
 		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '/competitors/checked?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
 			$scope.competitors = data.competitors;
+
+			$scope.seedingSaved = data.competitors.length > 0;
+
+			// Check if every player has a seed
+			for(var i = 0; i < data.competitors.length; i++){
+				// Seed = 0
+				if(!data.competitors[i].competitor_seed)
+					$scope.seedingSaved = false;
+			}
+
 			//Checking if the bracket has been created and whether the tournament is team based
 			$scope.bracket = data.stages_created;
 			$scope.teamBased = data.team_size > 1;
 
-			//			if ($scope.tournaments[index].tournament_type == 'Two Stage') {
-			//				var amountOfGroups = $scope.competitors.length / $scope.tournaments[index].number_of_people_per_group;
-			//				console.log(amountOfGroups)
-			//				var numberOfPeopleAdvancing = amountOfGroups * $scope.tournaments[index].amount_of_winners_per_group;
-			//				console.log(numberOfPeopleAdvancing)
-			//				$scope.twoStageCheck = (numberOfPeopleAdvancing < 4);
-			//			}
+			if ($scope.tournaments[index].tournament_type == 'Two Stage') {
+				var amountOfGroups = $scope.competitors.length / $scope.tournaments[index].number_of_people_per_group;
+				console.log(amountOfGroups)
+				var numberOfPeopleAdvancing = amountOfGroups * $scope.tournaments[index].amount_of_winners_per_group;
+				console.log(numberOfPeopleAdvancing)
+				$scope.twoStageCheck = (numberOfPeopleAdvancing < 4);
+			} else
+				$scope.twoStageCheck = false;
+
 
 		}).error(function(err) {
 			console.log(err);
