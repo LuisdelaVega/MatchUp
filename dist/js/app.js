@@ -311,11 +311,6 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			url: "/search/:type/:query",
 			templateUrl: "searchResults.html",
 			controller: "searchResultsController"
-		})
-		.state('app.bracket', {
-			url: "/bracket",
-			templateUrl: "tournament/bracket.html",
-			controller: "bracketController"
 		});
 
 	$httpProvider.interceptors.push(function ($q, $timeout, $injector) {
@@ -360,7 +355,7 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 
 myApp.run(function ($rootScope, $state, AuthenticationService, $window, acuteSelectService) {
 
-	$rootScope.baseURL = "http://136.145.116.232";
+	$rootScope.baseURL = "https://matchup.neptunolabs.com";
 	$rootScope.imgurKey = "6528448c258cff474ca9701c5bab6927";
 
 	// Set the template path for all instances for acute template

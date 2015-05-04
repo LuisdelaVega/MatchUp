@@ -76,8 +76,8 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 			return;
 		}
 		// Prompt the user to fill location and venue if the event is not online
-		if (!$scope.event.location || !$scope.event.venue) {
-			alert("Please fill out event location and venue");
+		if ((!$scope.event.location || !$scope.event.venue) && !$scope.event.is_online) {
+			alert("Please fill out event location and venue")
 			return;
 		}
 
@@ -251,6 +251,10 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 			$scope.event.deduction_fee = 0;
 			var tournamentArray = [];
 			tournamentArray.push(tournament);
+			if ($scope.event.is_online) {
+				$scope.event.location = "Online";
+				$scope.event.venue = "Online";
+			}
 			var request = {
 				"event" : $scope.event,
 				"tournament" : tournamentArray
@@ -329,6 +333,11 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 				selectedSponsors.push($scope.sponsors[i].sponsor_name);
 
 		var request = {};
+
+		if ($scope.event.is_online) {
+			$scope.event.location = "Online";
+			$scope.event.venue = "Online";
+		}
 
 		request.event = $scope.event;
 		request.tournament = $scope.tournaments;

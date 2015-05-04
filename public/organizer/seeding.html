@@ -61,7 +61,7 @@
 								Save Seeding
 							</button>
 						</div>
-						<div class="btn-group " role="group" ng-if="!bracket">
+						<div class="btn-group " role="group" ng-if="!bracket && seedingSaved">
 							<button class="btn btn-success" ng-click="createBracket()" ng-disabled="competitors.length<=3 || twoStageCheck">
 								Create Stages
 							</button>

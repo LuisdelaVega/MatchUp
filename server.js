@@ -1354,6 +1354,19 @@ app.route('/matchup/distributions').get(function(req, res) {
 	tournaments.getPrizeDistributions(req, res, pg, conString, log);
 });
 
+
+app.post('/paypal_webhook', function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	console.log("hellloo this is dog");
+	console.log(req.body);
+	res.status(200).send('paypal');
+	log.info({
+		res : res
+	}, 'done response');
+});
+
 ///////////////////////////////////////////////// SERVER LISTEN
 //var port = process.env.PORT || 5000;
 //app.listen(port, function() {

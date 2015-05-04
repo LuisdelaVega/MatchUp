@@ -137,13 +137,13 @@
 					<input type="checkbox" data-ng-model="eventData.event_is_online"> Online Event </label>
 			</div>
 			<div class="row">
-				<div class="col-xs-12 col-md-6 col-lg-6">
+				<div class="col-xs-12 col-md-6 col-lg-6" ng-if="!eventData.event_is_online">
 					<div class="form-group">
 						<label>Location: </label>
 						<input class="form-control" placeholder="Location" id="location" ng-model="eventData.event_location">
 					</div>
 				</div>
-				<div class="col-xs-12 col-md-6 col-lg-6">
+				<div class="col-xs-12 col-md-6 col-lg-6" ng-if="!eventData.event_is_online">
 					<div class="form-group">
 						<label>Venue: </label>
 						<input class="form-control" placeholder="Venue" id="venue" ng-model="eventData.event_venue">
