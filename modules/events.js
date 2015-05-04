@@ -1005,32 +1005,51 @@ function getLosers(req, res, client, done, log, tournament_format, rounds, where
     var standing = 3;
     console.log("Hello!");
     console.log(rounds.length);
-    for (var i = 0, index = 0; i < rounds.length; i++) {
-        console.log("Getting the losers from round: " + rounds[i].round_number + " of " + whereTheLosersAt);
-        var query = client.query({
-            text: "SELECT competes.competitor_number FROM competes WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND (competes.competitor_number NOT IN (SELECT competitor_number FROM competes JOIN competitor_goes_to ON competes.event_name = competitor_goes_to.event_name AND competes.event_start_date = competitor_goes_to.event_start_date AND competes.event_location = competitor_goes_to.event_location AND competes.tournament_name = competitor_goes_to.tournament_name AND competes.round_number = competitor_goes_to.future_round_number AND competes.round_of = competitor_goes_to.future_round_of AND competes.match_number = competitor_goes_to.future_match WHERE competitor_goes_to.is_winner AND competitor_goes_to.future_round_number = $7 AND competitor_goes_to.future_round_of = $8)) ORDER BY competes.round_number DESC, competes.match_number",
-            values: [req.params.event, req.query.date, req.query.location, req.params.tournament, rounds[i].round_number, whereTheLosersAt, ((tournament_format === "Double Elimination" && !i) ? req.params.round : (rounds[i].round_number+1)), ((tournament_format === "Double Elimination" && !i) ? "Winner" : whereTheLosersAt)]
-        });
-        query.on("row", function (row, result) {
-            result.addRow(row);
-        });
-        query.on('error', function (error) {
-            client.query("ROLLBACK");
-            done();
-            console.log(error);
-            res.status(500).send(error);
-            log.info({
-                res: res
-            }, 'done response');
-        });
-        query.on("end", function (result) {
-            updateStandingForListOfCompetitors(req, res, client, done, log, result.rows, standing, index++, (rounds.length-1));
-            console.log("Going to update the value for the standing currently at " + standing);
-            standing += result.rows.length;
-            console.log("Updated the value for the standing to " + standing);
-        });
-        console.log("i: "+i);
-    }
+    var query = client.query({
+        text: "SELECT round_number IN (SELECT future_round_number FROM competitor_goes_to WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4) AS extra_round FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5",
+        values: [req.params.event, req.query.date, req.query.location, req.params.tournament, rounds[i].round_number]
+    });
+    query.on("row", function (row, result) {
+        result.addRow(row);
+    });
+    query.on('error', function (error) {
+        client.query("ROLLBACK");
+        done();
+        console.log(error);
+        res.status(500).send(error);
+        log.info({
+            res: res
+        }, 'done response');
+    });
+    query.on("end", function (result) {
+        for (var i = 0, index = 0; i < rounds.length; i++) {
+            console.log("Getting the losers from round: " + rounds[i].round_number + " of " + whereTheLosersAt);
+            var query = client.query({
+                text: "SELECT competes.competitor_number FROM competes WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND (competes.competitor_number NOT IN (SELECT competitor_number FROM competes JOIN competitor_goes_to ON competes.event_name = competitor_goes_to.event_name AND competes.event_start_date = competitor_goes_to.event_start_date AND competes.event_location = competitor_goes_to.event_location AND competes.tournament_name = competitor_goes_to.tournament_name AND competes.round_number = competitor_goes_to.future_round_number AND competes.round_of = competitor_goes_to.future_round_of AND competes.match_number = competitor_goes_to.future_match WHERE competitor_goes_to.is_winner AND competitor_goes_to.future_round_number = $7 AND competitor_goes_to.future_round_of = $8)) ORDER BY competes.round_number DESC, competes.match_number",
+                values: [req.params.event, req.query.date, req.query.location, req.params.tournament, rounds[i].round_number, whereTheLosersAt, ((tournament_format === "Double Elimination" && !i) ? (result.rows[0].extra_round ? parseInt(req.params.round)-1 : req.params.round) : (rounds[i].round_number + 1)), ((tournament_format === "Double Elimination" && !i) ? "Winner" : whereTheLosersAt)]
+            });
+            query.on("row", function (row, result) {
+                result.addRow(row);
+            });
+            query.on('error', function (error) {
+                client.query("ROLLBACK");
+                done();
+                console.log(error);
+                res.status(500).send(error);
+                log.info({
+                    res: res
+                }, 'done response');
+            });
+            query.on("end", function (result) {
+                console.log(result.rows);
+                updateStandingForListOfCompetitors(req, res, client, done, log, result.rows, standing, index++, (rounds.length - 1));
+                console.log("Going to update the value for the standing currently at " + standing);
+                standing += result.rows.length;
+                console.log("Updated the value for the standing to " + standing);
+            });
+            console.log("i: " + i);
+        }
+    });
 }
 
 function checkForUpdate(req, res, client, done, log, players, index, length) {

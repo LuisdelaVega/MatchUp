@@ -383,6 +383,15 @@ CASE WHEN row_number() OVER(ORDER BY has_a.group_number, sum(submits.score)/((ro
 
 
 
+SELECT round_number IN (SELECT future_round_number FROM competitor_goes_to WHERE event_name = 'New 4 Double' AND event_start_date = '2015-05-02 20:30:00' AND event_location = 'Location' AND tournament_name = 'Teams') FROM round WHERE event_name = 'New 4 Double' AND event_start_date = '2015-05-02 20:30:00' AND event_location = 'Location' AND tournament_name = 'Teams' AND round_number = 4;
+
+SELECT round_number IN (SELECT future_round_number FROM competitor_goes_to WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4) FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5
+
+
+
+
+
+
 
 
 
