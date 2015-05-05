@@ -181,6 +181,7 @@ app.get('/initPaypal', function (req, res) {
 		},
 		"returnUrl": "https://matchup.neptunolabs.com/paypalSuccess",
 		"cancelUrl": "http://www.example.com/failure.html",
+		"ipnNotificationUrl": "https://matchup.neptunolabs.com/paypal",
 		"requestEnvelope": {
 			"errorLanguage": "en_US",
 			"detailLevel": "ReturnAll"
@@ -223,30 +224,36 @@ app.get('/paypalSuccess', function(req,res){
 
 	console.log(req.headers.referer);
 	console.log(req.headers.referer.split("=")[2]);
-	res.status(302).redirect('http://docs.neptunolabsmatchup.apiary.io');
-
-    //console.log(req.headers.referer);
-    //var payKey = req.headers.referer.split("=")[2];
-    //console.log(payKey);
-	//res.status(200).send('Congratulations here is your paykey: ' + payKey);
+	res.status(200).send('Congratulations here is your paykey: ' + payKey);
 	//res.status(302).redirect('https://matchup.neptunolabs.com/' + payKey + '/rapol');
 
-    //console.log("IN PAYPAL !! req.body : ");
-    //console.log(req.body);
-    //res.status(200).send('');
-    //ipn.verify(req.body, {'allow_sandbox': true}, function callback(err, msg) {
-    //    if (err) {
-    //        console.log("Error:" + err);
-    //    } else {
-    //        //Do stuff with original params here
-    //        console.log("req.body.payment_status :" + req.body.payment_status + " msg: " + msg);
-    //        //res.end();
-    //        if (req.body.payment_status == 'Completed') {
-    //            //Payment has been confirmed as completed
-    //
-    //        }
-    //    }
-    //});
+	log.info({
+		res : res
+	}, 'done response');
+});
+
+
+app.post('/paypal', function(req,res){
+	log.info({
+		req : req
+	}, 'start request');
+
+	console.log("IN PAYPAL !! req.body : ");
+	console.log(req.body);
+	res.status(200).send('');
+	ipn.verify(req.body, {'allow_sandbox': true}, function callback(err, msg) {
+	    if (err) {
+	        console.log("Error:" + err);
+	    } else {
+	        //Do stuff with original params here
+	        console.log("req.body.payment_status :" + req.body.payment_status + " msg: " + msg);
+	        //res.end();
+	        if (req.body.payment_status == 'Completed') {
+	            //Payment has been confirmed as completed
+
+	        }
+	    }
+	});
 	log.info({
 		res : res
 	}, 'done response');
