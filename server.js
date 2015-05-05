@@ -1380,9 +1380,9 @@ app.route('/paypal_webhook').post(function(req, res) {
 	log.info({
 		req : req
 	}, 'start request');
-	console.log("hellloo this is dog get");
-	console.log(req.body);
-	res.status(200).send('paypal');
+	console.log(req.headers.referer);
+	console.log(req.headers.referer.split("=")[2]);
+	res.status(302).redirect('http://docs.neptunolabsmatchup.apiary.io');
 	log.info({
 		res : res
 	}, 'done response');
