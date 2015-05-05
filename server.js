@@ -1378,9 +1378,9 @@ app.post('/paypal_webhook', function(req, res) {
 
 ///////////////////////////////////////////////// SERVER LISTEN
 var port = process.env.PORT || 5000;
-//app.listen(port, function() {
-//	console.log("Listening on port " + port);
-//});
+app.listen(port, function() {
+	console.log("Listening on port " + port);
+});
 https.createServer({
 	key: fs.readFileSync('key.pem'),
 	cert: fs.readFileSync('cert.pem')
