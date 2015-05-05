@@ -148,6 +148,81 @@ function authenticate(req, res) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
 //*\\\\\\\\\\* Paypal *//////////*/
+app.route('/paypal_webhook').post(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	console.log("hellloo this is dog");
+	console.log(req.body);
+	res.status(200).send('paypal');
+	log.info({
+		res : res
+	}, 'done response');
+}).get(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+
+	//Set up the request to paypal
+	var req_options = {
+		host: 'svcs.sandbox.paypal.com',
+		method: 'POST',
+		path: '/AdaptivePayments/Pay',
+		headers: {
+			'X-PAYPAL-SECURITY-USERID': PAYPAL_USERID,
+			'X-PAYPAL-SECURITY-PASSWORD': PAYPAL_PASSWORD,
+			'X-PAYPAL-SECURITY-SIGNATURE': PAYPAL_SIGNATURE,
+			'X-PAYPAL-REQUEST-DATA-FORMAT': PAYPAL_FORMAT,
+			'X-PAYPAL-RESPONSE-DATA-FORMAT': PAYPAL_FORMAT,
+			'X-PAYPAL-APPLICATION-ID': PAYPAL_APPID
+		}
+	};
+
+	var body = {
+		"actionType": "PAY",
+		"currencyCode": "USD",
+		"receiverList": {
+			"receiver": [
+				{
+					"amount": "10.00",
+					"email": "bigote@gmail.com"
+				}
+			]
+		},
+		"returnUrl": "http://matchup.neptunolabs.com/paypal",
+		"cancelUrl": "http://www.example.com/failure.html",
+		"requestEnvelope": {
+			"errorLanguage": "en_US",
+			"detailLevel": "ReturnAll"
+		}
+	};
+
+	var paypalReq = https.request(req_options, function paypal_request(paypalRes) {
+		var data = '';
+
+		paypalRes.on('data', function paypal_response(d) {
+			data+= d;
+		});
+
+		paypalRes.on('end', function response_end() {
+			var dataJSON = JSON.parse(data);
+			console.log(dataJSON);
+			console.log(dataJSON.payKey);
+			res.status(302).redirect('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + dataJSON.payKey);
+		});
+	});
+
+	//Add the post parameters to the request body
+	paypalReq.write(JSON.stringify(body));
+
+	//Request error
+	paypalReq.on('error', function (err) {
+		console.log('error requesting paypal');
+	});
+
+	paypalReq.end();
+});
+
 app.post('/paypal', function(req,res){
 	log.info({
 		req : req
@@ -1374,82 +1449,6 @@ app.route('/matchup/distributions').get(function(req, res) {
 		req : req
 	}, 'start request');
 	tournaments.getPrizeDistributions(req, res, pg, conString, log);
-});
-
-
-app.route('/paypal_webhook').post(function(req, res) {
-	log.info({
-		req : req
-	}, 'start request');
-	console.log("hellloo this is dog");
-	console.log(req.body);
-	res.status(200).send('paypal');
-	log.info({
-		res : res
-	}, 'done response');
-}).get(function(req, res) {
-	log.info({
-		req : req
-	}, 'start request');
-
-        //Set up the request to paypal
-        var req_options = {
-        host: 'svcs.sandbox.paypal.com',
-            method: 'POST',
-            path: '/AdaptivePayments/Pay',
-            headers: {
-                'X-PAYPAL-SECURITY-USERID': PAYPAL_USERID,
-                'X-PAYPAL-SECURITY-PASSWORD': PAYPAL_PASSWORD,
-                'X-PAYPAL-SECURITY-SIGNATURE': PAYPAL_SIGNATURE,
-                'X-PAYPAL-REQUEST-DATA-FORMAT': PAYPAL_FORMAT,
-                'X-PAYPAL-RESPONSE-DATA-FORMAT': PAYPAL_FORMAT,
-                'X-PAYPAL-APPLICATION-ID': PAYPAL_APPID
-            }
-        };
-
-        var body = {
-            "actionType": "PAY",
-            "currencyCode": "USD",
-            "receiverList": {
-                "receiver": [
-                    {
-                        "amount": "10.00",
-                        "email": "bigote@gmail.com"
-                    }
-                ]
-            },
-        "returnUrl": "http://matchup.neptunolabs.com/paypal",
-            "cancelUrl": "http://www.example.com/failure.html",
-            "requestEnvelope": {
-                "errorLanguage": "en_US",
-                "detailLevel": "ReturnAll"
-            }
-        };
-
-    var paypalReq = https.request(req_options, function paypal_request(paypalRes) {
-            var data = '';
-
-        paypalRes.on('data', function paypal_response(d) {
-                data+= d;
-            });
-
-        paypalRes.on('end', function response_end() {
-                var dataJSON = JSON.parse(data);
-                console.log(dataJSON);
-                console.log(dataJSON.payKey);
-                res.status(302).redirect('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + dataJSON.payKey);
-            });
-        });
-
-        //Add the post parameters to the request body
-    paypalReq.write(JSON.stringify(body));
-
-        //Request error
-    paypalReq.on('error', function (err) {
-            console.log('error requesting paypal');
-        });
-
-    paypalReq.end();
 });
 
 ///////////////////////////////////////////////// SERVER LISTEN
