@@ -4,8 +4,8 @@
 
 // Node modules
 var express = require('express');
-//var fs = require('fs');
-//var https = require('https');
+var fs = require('fs');
+var https = require('https');
 var ipn = require('paypal-ipn');
 var cors = require('cors');
 var jwt = require('jsonwebtoken');
@@ -1378,10 +1378,10 @@ app.post('/paypal_webhook', function(req, res) {
 
 ///////////////////////////////////////////////// SERVER LISTEN
 var port = process.env.PORT || 5000;
-app.listen(port, function() {
-	console.log("Listening on port " + port);
-});
-//https.createServer({
-//	key: fs.readFileSync('key.pem'),
-//	cert: fs.readFileSync('cert.pem')
-//}, app).listen(8443);
+//app.listen(port, function() {
+//	console.log("Listening on port " + port);
+//});
+https.createServer({
+	key: fs.readFileSync('key.pem'),
+	cert: fs.readFileSync('cert.pem')
+}, app).listen(8443);
