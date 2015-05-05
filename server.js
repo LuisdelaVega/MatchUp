@@ -1442,7 +1442,7 @@ app.route('/paypal_webhook').post(function(req, res) {
         });
 
         //Add the post parameters to the request body
-        req.write(body);
+    req.write(JSON.stringify(body));
 
         //Request error
         req.on('error', function(err) {
