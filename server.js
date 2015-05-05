@@ -179,7 +179,7 @@ app.get('/initPaypal', function (req, res) {
 				}
 			]
 		},
-		"returnUrl": "http://matchup.neptunolabs.com/paypalSuccess",
+		"returnUrl": "https://matchup.neptunolabs.com/paypalSuccess",
 		"cancelUrl": "http://www.example.com/failure.html",
 		"requestEnvelope": {
 			"errorLanguage": "en_US",
@@ -216,15 +216,19 @@ app.get('/initPaypal', function (req, res) {
 	paypalReq.end();
 });
 
-app.post('/paypalSuccess', function(req,res){
+app.get('/paypalSuccess', function(req,res){
 	log.info({
 		req : req
 	}, 'start request');
 
-    console.log(req.headers.referer);
-    var payKey = req.headers.referer.split("=")[2];
-    console.log(payKey);
-	res.status(200).send('Congratulations here is your paykey: ' + payKey);
+	console.log(req.headers.referer);
+	console.log(req.headers.referer.split("=")[2]);
+	res.status(302).redirect('http://docs.neptunolabsmatchup.apiary.io');
+
+    //console.log(req.headers.referer);
+    //var payKey = req.headers.referer.split("=")[2];
+    //console.log(payKey);
+	//res.status(200).send('Congratulations here is your paykey: ' + payKey);
 	//res.status(302).redirect('https://matchup.neptunolabs.com/' + payKey + '/rapol');
 
     //console.log("IN PAYPAL !! req.body : ");
