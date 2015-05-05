@@ -148,19 +148,9 @@ function authenticate(req, res) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
 //*\\\\\\\\\\* Paypal *//////////*/
-app.route('/paypal_webhook').post(function(req, res) {
+app.route('/paypal_webhook').post(function (req, res) {
 	log.info({
-		req : req
-	}, 'start request');
-	console.log("hellloo this is dog");
-	console.log(req.body);
-	res.status(200).send('paypal');
-	log.info({
-		res : res
-	}, 'done response');
-}).get(function(req, res) {
-	log.info({
-		req : req
+		req: req
 	}, 'start request');
 
 	//Set up the request to paypal
@@ -201,14 +191,17 @@ app.route('/paypal_webhook').post(function(req, res) {
 		var data = '';
 
 		paypalRes.on('data', function paypal_response(d) {
-			data+= d;
+			data += d;
 		});
 
 		paypalRes.on('end', function response_end() {
 			var dataJSON = JSON.parse(data);
 			console.log(dataJSON);
 			console.log(dataJSON.payKey);
-			res.status(302).redirect('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + dataJSON.payKey);
+			res.status(200).send(JSON.stringify(dataJSON));
+			log.info({
+				res: res
+			}, 'done response');
 		});
 	});
 
@@ -221,6 +214,19 @@ app.route('/paypal_webhook').post(function(req, res) {
 	});
 
 	paypalReq.end();
+
+
+	//log.info({
+	//    req: req
+	//}, 'start request');
+	//console.log("hellloo this is dog");
+	//console.log(req.body);
+	//res.status(200).send('paypal');
+	//log.info({
+	//    res: res
+	//}, 'done response');
+}).get(function (req, res) {
+
 });
 
 app.post('/paypal', function(req,res){
