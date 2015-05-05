@@ -1426,14 +1426,14 @@ app.route('/paypal_webhook').post(function(req, res) {
             }
         };
 
-        var req = https.request(req_options, function paypal_request(res) {
+    var req = https.request(req_options, function paypal_request(paypalRes) {
             var data = '';
 
-            res.on('data', function paypal_response(d) {
+        paypalRes.on('data', function paypal_response(d) {
                 data+= d;
             });
 
-            res.on('end', function response_end() {
+        paypalRes.on('end', function response_end() {
                 var dataJSON = JSON.parse(data);
                 console.log(dataJSON);
                 console.log(dataJSON.payKey);
