@@ -148,13 +148,14 @@ app.post('/paypal', function(req,res){
 		req : req
 	}, 'start request');
 	console.log("IN PAYPAL !! req.body : "+req.body);
+	res.send(200);
 	ipn.verify(req.body, {'allow_sandbox': true}, function callback(err, msg) {
 		if (err) {
 			console.log("Error:"+err);
 		} else {
 			//Do stuff with original params here
 			console.log("req.body.payment_status :"+req.body.payment_status+" msg: "+msg);
-			res.end();
+			//res.end();
 			if (req.body.payment_status == 'Completed') {
 				//Payment has been confirmed as completed
 
