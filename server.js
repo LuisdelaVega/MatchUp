@@ -148,7 +148,7 @@ function authenticate(req, res) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
 //*\\\\\\\\\\* Paypal *//////////*/
-app.route('/paypal_webhook').post(function (req, res) {
+app.get('/initPaypal', function (req, res) {
 	log.info({
 		req: req
 	}, 'start request');
@@ -179,7 +179,7 @@ app.route('/paypal_webhook').post(function (req, res) {
 				}
 			]
 		},
-		"returnUrl": "http://matchup.neptunolabs.com/paypal",
+		"returnUrl": "http://matchup.neptunolabs.com/paypalSuccess",
 		"cancelUrl": "http://www.example.com/failure.html",
 		"requestEnvelope": {
 			"errorLanguage": "en_US",
@@ -214,22 +214,9 @@ app.route('/paypal_webhook').post(function (req, res) {
 	});
 
 	paypalReq.end();
-
-
-	//log.info({
-	//    req: req
-	//}, 'start request');
-	//console.log("hellloo this is dog");
-	//console.log(req.body);
-	//res.status(200).send('paypal');
-	//log.info({
-	//    res: res
-	//}, 'done response');
-}).get(function (req, res) {
-
 });
 
-app.post('/paypal', function(req,res){
+app.get('/paypalSuccess', function(req,res){
 	log.info({
 		req : req
 	}, 'start request');
@@ -237,7 +224,8 @@ app.post('/paypal', function(req,res){
     console.log(req.headers.referer);
     var payKey = req.headers.referer.split("=")[2];
     console.log(payKey);
-    res.status(302).redirect('https://matchup.neptunolabs.com/' + payKey + '/rapol');
+	res.status(200).send('Congratulations here is your paykey: ' + payKey);
+	//res.status(302).redirect('https://matchup.neptunolabs.com/' + payKey + '/rapol');
 
     //console.log("IN PAYPAL !! req.body : ");
     //console.log(req.body);
