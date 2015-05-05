@@ -1394,7 +1394,7 @@ app.route('/paypal_webhook').post(function(req, res) {
 
         //Set up the request to paypal
         var req_options = {
-            host: 'https://svcs.sandbox.paypal.com',
+        host: 'svcs.sandbox.paypal.com',
             method: 'POST',
             path: '/AdaptivePayments/Pay',
             headers: {
