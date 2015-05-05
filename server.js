@@ -38,6 +38,11 @@ var organizations = require('./modules/organizations');
 // Global variables
 var conString = "pg://luis:portal1!@127.0.0.1:5432/matchupdb";
 var secret = '7h1s h6Re i5 th6 p6rf6c7 plac6 t0 m4kE 4 Nyx A5s4s51n j0k6!';
+var PAYPAL_USERID = 'neptunolabs-facilitator_api1.gmail.com';
+var PAYPAL_PASSWORD = 'XWBY9MS84HGAH5QD';
+var PAYPAL_SIGNATURE = 'AQU0e5vuZCvSg-XJploSa.sGUDlpADHudcLIG.989J8K1T5hwCU6BTLu';
+var PAYPAL_FORMAT = 'JSON';
+var PAYPAL_APPID = 'APP-80W284485P519543T';
 
 // Most Valuable Player
 var app = express();
@@ -1380,9 +1385,72 @@ app.route('/paypal_webhook').post(function(req, res) {
 	log.info({
 		req : req
 	}, 'start request');
+    if (req.headers.referer) {
 	console.log(req.headers.referer);
-	console.log(req.headers.referer.split("=")[2]);
-	res.status(302).redirect('http://docs.neptunolabsmatchup.apiary.io');
+        var payKey = req.headers.referer.split("=")[2];
+        console.log(payKey);
+        res.status(302).redirect('https://matchup.neptunolabs.com/' + payKey + '/rapol');
+    }
+    else {
+        //Set up the request to paypal
+        var req_options = {
+            host: 'https://svcs.sandbox.paypal.com',
+            method: 'POST',
+            path: '/AdaptivePayments/Pay',
+            headers: {
+                'X-PAYPAL-SECURITY-USERID': PAYPAL_USERID,
+                'X-PAYPAL-SECURITY-PASSWORD': PAYPAL_PASSWORD,
+                'X-PAYPAL-SECURITY-SIGNATURE': PAYPAL_SIGNATURE,
+                'X-PAYPAL-REQUEST-DATA-FORMAT': PAYPAL_FORMAT,
+                'X-PAYPAL-RESPONSE-DATA-FORMAT': PAYPAL_FORMAT,
+                'X-PAYPAL-APPLICATION-ID': PAYPAL_APPID
+            }
+        };
+
+        var body = {
+            "actionType": "PAY",
+            "currencyCode": "USD",
+            "receiverList": {
+                "receiver": [
+                    {
+                        "amount": "10.00",
+                        "email": "bigote@gmail.com"
+                    }
+                ]
+            },
+            "returnUrl": "http://matchup.neptunolabs.com/paypal_webhook",
+            "cancelUrl": "http://www.example.com/failure.html",
+            "requestEnvelope": {
+                "errorLanguage": "en_US",
+                "detailLevel": "ReturnAll"
+            }
+        };
+
+        var req = https.request(req_options, function paypal_request(res) {
+            var data = '';
+
+            res.on('data', function paypal_response(d) {
+                data+= d;
+            });
+
+            res.on('end', function response_end() {
+                var dataJSON = JSON.parse(data);
+                console.log(dataJSON);
+                console.log(dataJSON.payKey);
+                res.status(302).redirect('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + dataJSON.payKey);
+            });
+        });
+
+        //Add the post parameters to the request body
+        req.write(body);
+
+        //Request error
+        req.on('error', function(err) {
+            console.log('error requesting paypal');
+        });
+
+        req.end();
+    }
 	log.info({
 		res : res
 	}, 'done response');
