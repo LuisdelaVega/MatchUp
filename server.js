@@ -147,7 +147,8 @@ app.post('/paypal', function(req,res){
 	log.info({
 		req : req
 	}, 'start request');
-	console.log("IN PAYPAL !! req.body : "+req.body);
+	console.log("IN PAYPAL !! req.body : ");
+	console.log(req.body);
 	res.status(200).send('');
 	ipn.verify(req.body, {'allow_sandbox': true}, function callback(err, msg) {
 		if (err) {
