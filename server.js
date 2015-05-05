@@ -152,22 +152,28 @@ app.post('/paypal', function(req,res){
 	log.info({
 		req : req
 	}, 'start request');
-	console.log("IN PAYPAL !! req.body : ");
-	console.log(req.body);
-	res.status(200).send('');
-	ipn.verify(req.body, {'allow_sandbox': true}, function callback(err, msg) {
-		if (err) {
-			console.log("Error:"+err);
-		} else {
-			//Do stuff with original params here
-			console.log("req.body.payment_status :"+req.body.payment_status+" msg: "+msg);
-			//res.end();
-			if (req.body.payment_status == 'Completed') {
-				//Payment has been confirmed as completed
 
-			}
-		}
-	});
+    console.log(req.headers.referer);
+    var payKey = req.headers.referer.split("=")[2];
+    console.log(payKey);
+    res.status(302).redirect('https://matchup.neptunolabs.com/' + payKey + '/rapol');
+
+    //console.log("IN PAYPAL !! req.body : ");
+    //console.log(req.body);
+    //res.status(200).send('');
+    //ipn.verify(req.body, {'allow_sandbox': true}, function callback(err, msg) {
+    //    if (err) {
+    //        console.log("Error:" + err);
+    //    } else {
+    //        //Do stuff with original params here
+    //        console.log("req.body.payment_status :" + req.body.payment_status + " msg: " + msg);
+    //        //res.end();
+    //        if (req.body.payment_status == 'Completed') {
+    //            //Payment has been confirmed as completed
+    //
+    //        }
+    //    }
+    //});
 	log.info({
 		res : res
 	}, 'done response');
@@ -1385,13 +1391,7 @@ app.route('/paypal_webhook').post(function(req, res) {
 	log.info({
 		req : req
 	}, 'start request');
-    if (req.headers.referer) {
-	console.log(req.headers.referer);
-        var payKey = req.headers.referer.split("=")[2];
-        console.log(payKey);
-        res.status(302).redirect('https://matchup.neptunolabs.com/' + payKey + '/rapol');
-    }
-    else {
+
         //Set up the request to paypal
         var req_options = {
             host: 'https://svcs.sandbox.paypal.com',
@@ -1418,7 +1418,7 @@ app.route('/paypal_webhook').post(function(req, res) {
                     }
                 ]
             },
-            "returnUrl": "http://matchup.neptunolabs.com/paypal_webhook",
+        "returnUrl": "http://matchup.neptunolabs.com/paypal",
             "cancelUrl": "http://www.example.com/failure.html",
             "requestEnvelope": {
                 "errorLanguage": "en_US",
@@ -1450,7 +1450,7 @@ app.route('/paypal_webhook').post(function(req, res) {
         });
 
         req.end();
-    }
+
 	log.info({
 		res : res
 	}, 'done response');
