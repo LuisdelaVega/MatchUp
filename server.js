@@ -216,7 +216,7 @@ app.get('/initPaypal', function (req, res) {
 	paypalReq.end();
 });
 
-app.get('/paypalSuccess', function(req,res){
+app.post('/paypalSuccess', function(req,res){
 	log.info({
 		req : req
 	}, 'start request');
