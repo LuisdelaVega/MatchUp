@@ -1426,7 +1426,7 @@ app.route('/paypal_webhook').post(function(req, res) {
             }
         };
 
-    var req = https.request(req_options, function paypal_request(paypalRes) {
+    var paypalReq = https.request(req_options, function paypal_request(paypalRes) {
             var data = '';
 
         paypalRes.on('data', function paypal_response(d) {
@@ -1442,18 +1442,14 @@ app.route('/paypal_webhook').post(function(req, res) {
         });
 
         //Add the post parameters to the request body
-    req.write(JSON.stringify(body));
+    paypalReq.write(JSON.stringify(body));
 
         //Request error
-        req.on('error', function(err) {
+    paypalReq.on('error', function (err) {
             console.log('error requesting paypal');
         });
 
-        req.end();
-
-	log.info({
-		res : res
-	}, 'done response');
+    paypalReq.end();
 });
 
 ///////////////////////////////////////////////// SERVER LISTEN
