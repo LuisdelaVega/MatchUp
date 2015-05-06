@@ -84,13 +84,13 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 	$scope.payFee = function () {
 		$scope.paySelected = true;
 		if ($scope.selected.name) {
-			$http.post($rootScope.baseURL + '/matchup/events/' + $scope.eventInfo.event_name + '/specfees/' + $scope.selected.name + '?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (status, data) {
+			$http.post($rootScope.baseURL + '/matchup/events/' + $scope.eventInfo.event_name + '/specfees/' + $scope.selected.name + '?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data, status) {
 				$scope.eventInfo.is_spectator = true;
 				console.log(data);
 				$('#signUpModal').modal("hide");
 				$('#successModal').modal('show');
 				if (parseInt(status) == 200) {
-					console.log(200);
+					console.log(status);
 					localStorage.setItem('payKey', data.payKey);
 					window.location.href = 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey;
 				} else if (parseInt(status) == 201) {
