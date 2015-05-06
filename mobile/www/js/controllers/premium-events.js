@@ -2,16 +2,14 @@ var myApp = angular.module('premium-events',[]);
 
 myApp.run(function($rootScope, $cordovaInAppBrowser, $ionicPlatform){
 
-    $rootScope.$on('$cordovaInAppBrowser:loadstop', function(e, event){
+    $ionicPlatform.ready(function() {
+        $rootScope.$on('$cordovaInAppBrowser:loadstop', function(e, event){
 
-        if (event.url.match("/paypalSuccess")) {
-            $ionicPlatform.ready(function() {
+            if (event.url.match("/paypalSuccess")) {
                 $cordovaInAppBrowser.close();
-            });
-        }  
-
+            }  
+        });
     });
-
 });
 
 
