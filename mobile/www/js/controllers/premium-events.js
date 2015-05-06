@@ -12,7 +12,7 @@ myApp.run(function($rootScope, $cordovaInAppBrowser, $ionicPlatform){
         });
     }
     
-    else if(ionic.Platform.isAndroid();()){
+    else if(ionic.Platform.isAndroid()){
         $rootScope.$on('$cordovaInAppBrowser:loadstop', function(event){
             if (event.url.match("/paypalSuccess")) {
                 $ionicPlatform.ready(function() {
