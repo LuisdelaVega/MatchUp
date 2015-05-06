@@ -224,8 +224,8 @@ app.get('/paypalSuccess', function(req,res){
 
 	console.log(req.headers.referer);
 	var payKey = req.headers.referer.split("=")[2];
-	res.status(200).send('Congratulations here is your paykey: ' + payKey);
-	//res.status(302).redirect('https://matchup.neptunolabs.com/' + payKey + '/rapol');
+	//res.status(200).send('Congratulations here is your paykey: ' + payKey);
+	res.status(302).redirect('https://matchup.neptunolabs.com');
 
 	log.info({
 		res : res
