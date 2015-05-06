@@ -2778,8 +2778,8 @@ function competitor(req, pg, conString, payKey, tournament) {
 					console.log(err);
 				} else {
 					client.query({
-						text: "INSERT INTO competitor_pays (event_name, event_start_date, event_location, spec_fee_name, customer_username, competitor_paid, competitor_paykey) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-						values: [req.params.event, req.query.date, req.query.location, req.params.spec_fee, req.user.username, false, payKey]
+						text: "INSERT INTO competitor_pays (event_name, event_start_date, event_location, tournament_name, competitor_number, competitor_paid, competitor_paykey) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+						values: [req.params.event, req.query.date, req.query.location, req.params.tournament, nextCompetitor, false, payKey]
 					}, function (err, result) {
 						if (err) {
 							client.query("ROLLBACK");
