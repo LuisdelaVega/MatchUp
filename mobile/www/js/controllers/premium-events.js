@@ -200,15 +200,14 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
 
     });
 
-    if(ionic.Platform.isIOS()){
-        $rootScope.$on('$cordovaInAppBrowser:loadstop', function(e, event){
-            if (event.url.match("matchup.neptunolabs.com")) {
-                $ionicPlatform.ready(function() {
-                    $cordovaInAppBrowser.close();
-                });
-            }
-        });
-    }
+    $rootScope.$on('$cordovaInAppBrowser:loadstop', function(e, event){
+        if (event.url.match("matchup.neptunolabs.com")) {
+            $ionicPlatform.ready(function() {
+                $cordovaInAppBrowser.close();
+            });
+        }
+    });
+
     else if(ionic.Platform.isAndroid()){
         //ADD ANDROID LISTENER
     }
@@ -242,12 +241,9 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
 
             else if(ionic.Platform.isAndroid()){
                 $ionicPlatform.ready(function() {
-                    var ref = window.open('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey, '_blank', 'location=yes');
-
-                    ref.addEventListener('loadstop', function(event) { 
-
-                        ref.close();
-
+                    $cordovaInAppBrowser.open('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey, '_system', options).then(function () {
+                    }, function (error) {
+                        console.log("Error: " + error);
                     });
                 });
             }
