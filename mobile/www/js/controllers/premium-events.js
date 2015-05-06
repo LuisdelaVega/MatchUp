@@ -208,9 +208,9 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
         }
     });
 
-    else if(ionic.Platform.isAndroid()){
-        //ADD ANDROID LISTENER
-    }
+//    else if(ionic.Platform.isAndroid()){
+//        //ADD ANDROID LISTENER
+//    }
 
 
     $scope.signUpSpectator = function () {
