@@ -3329,18 +3329,15 @@ var getPayouts = function(req, res, pg, conString, log) {
 			return console.error('error fetching client from pool', err);
 		}
 
-		client.query("BEGIN");
 		var query = client.query({
-			text: "SELECT tournament_name FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
+			text: "SELECT team_size, prize_distribution.*, seed_money, event_deduction_fee, (SELECT count(*) FROM competitor_pays WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_paid) AS tickets_sold, competitor_fee FROM event NATURAL JOIN tournament NATURAL JOIN prize_distribution WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_fee > 0",
 			values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
 		});
 		query.on("row", function (row, result) {
 			result.addRow(row);
 		});
 		query.on('error', function (error) {
-			client.query("ROLLBACK");
 			done();
-			console.log("torunament.js - deleteStages");
 			console.log(error);
 			res.status(500).send(error);
 			log.info({
@@ -3349,66 +3346,70 @@ var getPayouts = function(req, res, pg, conString, log) {
 		});
 		query.on("end", function (result) {
 			if (result.rows.length) {
-				client.query({
-					text: "DELETE FROM round WHERE (event_name, event_start_date, event_location, tournament_name) = ($1, $2, $3, $4)",
-					values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
-				}, function (err, result) {
-					if (err) {
-						client.query("ROLLBACK");
+				var prizeDistribution = result.rows[0];
+				var limit = 0;
+				if (prizeDistribution.prize_distribution_name === "Standard") {
+					limit = 3;
+				} else if (prizeDistribution.prize_distribution_name === "First and Second") {
+					limit = 2;
+				} else if (prizeDistribution.prize_distribution_name === "Winner Takes All") {
+					limit = 1;
+				}
+
+				if (limit) {
+					var players = [];
+					var queryText = "";
+					if (prizeDistribution.team_size > 1) {
+						queryText = "SELECT competitor_number, competitor_standing, team_name, team_logo FROM competitor NATURAL JOIN competes_for NATURAL JOIN team WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_standing > 0 ORDER BY competitor_standing LIMIT $5";
+					} else {
+						queryText = "SELECT competitor_number, competitor_standing, customer_username, customer_profile_pic, customer_tag FROM competitor NATURAL JOIN is_a NATURAL JOIN customer WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_standing > 0 ORDER BY competitor_standing LIMIT $5";
+					}
+					var query = client.query({
+						text: queryText,
+						values: [req.params.event, req.query.date, req.query.location, req.params.tournament, limit]
+					});
+					query.on("row", function (row, result) {
+						players.push(row);
+					});
+					query.on('error', function (error) {
 						done();
-						console.log("torunament.js - deleteStages");
-						console.log(err);
-						res.status(500).send(err);
+						console.log(error);
+						res.status(500).send(error);
 						log.info({
 							res: res
 						}, 'done response');
-					} else {
-						client.query({
-							text: 'DELETE FROM "group" WHERE (event_name, event_start_date, event_location, tournament_name) = ($1, $2, $3, $4)',
-							values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
-						}, function (err, result) {
-							if (err) {
-								client.query("ROLLBACK");
-								done();
-								console.log("torunament.js - deleteStages");
-								console.log(err);
-								res.status(500).send(err);
-								log.info({
-									res: res
-								}, 'done response');
+					});
+					query.on("end", function (result) {
+						// No, it's not for drugs
+						var potMoney = parseInt(prizeDistribution.seed_money) + parseFloat(prizeDistribution.competitor_fee) * parseInt(prizeDistribution.tickets_sold) * parseInt(prizeDistribution.event_deduction_fee)/100;
+						for (var i = 0; i < players.length; i++) {
+							if (!i) {
+								players[0].amount = parseFloat((potMoney * parseInt(prizeDistribution.first)/100).toFixed(2));
+							} else if (i == 1) {
+								players[1].amount = parseFloat((potMoney * parseInt(prizeDistribution.second)/100).toFixed(2));
 							} else {
-								client.query({
-									text: 'UPDATE competitor SET (matches_won, matches_lost) = (0, 0) WHERE (event_name, event_start_date, event_location, tournament_name) = ($1, $2, $3, $4)',
-									values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
-								}, function (err, result) {
-									if (err) {
-										client.query("ROLLBACK");
-										done();
-										console.log("torunament.js - deleteStages");
-										console.log(err);
-										res.status(500).send(err);
-										log.info({
-											res: res
-										}, 'done response');
-									} else {
-										client.query("COMMIT");
-										done();
-										res.status(204).send("");
-										log.info({
-											res: res
-										}, 'done response');
-									}
-								});
+								players[2].amount = parseFloat((potMoney * parseInt(prizeDistribution.third)/100).toFixed(2));
 							}
-						});
-					}
-				});
+						}
+
+						done();
+						res.status(200).send(players);
+						log.info({
+							res: res
+						}, 'done response');
+					});
+				} else {
+					done();
+					res.status(200).send([]);
+					log.info({
+						res: res
+					}, 'done response');
+				}
 			} else {
-				client.query("ROLLBACK");
 				done();
-				res.status(404).send('Tournament was not found');
+				res.status(200).send([]);
 				log.info({
-					res : res
+					res: res
 				}, 'done response');
 			}
 		});
@@ -3430,3 +3431,4 @@ module.exports.editBestOf = editBestOf;
 module.exports.changeStation = changeStation;
 module.exports.changeTimeAndDateOfRound = changeTimeAndDateOfRound;
 module.exports.deleteStages = deleteStages;
+module.exports.getPayouts = getPayouts;

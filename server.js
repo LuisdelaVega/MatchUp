@@ -873,6 +873,23 @@ app.route('/matchup/events/:event/tournaments/:tournament/competitors').get(func
 	events.getCompetitors(req, res, pg, conString, log);
 });
 
+/* /matchup/events/:event/tournaments/:tournament/payouts?date=date&location=string
+ *
+ * [GET] Get the Winners that will have money thrown at their faces
+ * [POST] Throw your money at the faces of the Winners
+ */
+app.route('/matchup/events/:event/tournaments/:tournament/payouts').get(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	tournaments.getPayouts(req, res, pg, conString, log);
+}).post(function(req, res) {
+	log.info({
+		req : req
+	}, 'start request');
+	events.getCompetitors(req, res, pg, conString, log);
+});
+
 /* /matchup/events/:event/tournaments/:tournament/competitors/checked?date=date&location=string
  * TODO Update API
  *
