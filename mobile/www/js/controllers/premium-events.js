@@ -210,13 +210,7 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
         });
     }
     else if(ionic.Platform.isAndroid()){
-        $rootScope.$on('$cordovaInAppBrowser:loadstop', function(event){
-            if (event.url.match("matchup.neptunolabs.com")) {
-                $ionicPlatform.ready(function() {
-                    $cordovaInAppBrowser.close();
-                });
-            }
-        });
+        //ADD ANDROID LISTENER
     }
 
 
@@ -237,51 +231,33 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
         $http.get('http://136.145.116.232/initPaypal', config).success(function(data, status, headers, config){
 
 
-            $ionicPlatform.ready(function() {
-                $cordovaInAppBrowser.open('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey, '_blank', options).then(function () {
-                    console.log("InAppBrowser opened http://ngcordova.com successfully");
-                }, function (error) {
-                    console.log("Error: " + error);
+            if(ionic.Platform.isIOS()){
+                $ionicPlatform.ready(function() {
+                    $cordovaInAppBrowser.open('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey, '_blank', options).then(function () {
+                    }, function (error) {
+                        console.log("Error: " + error);
+                    });
                 });
-            });
+            }
 
-            //            $cordovaInAppBrowser.open('http://ngcordova.com', '_blank', options).then(function () {
-            //                console.log("InAppBrowser opened http://ngcordova.com successfully");
-            //            }, function (error) {
-            //                console.log("Error: " + error);
-            //            });
+            else if(ionic.Platform.isAndroid()){
+                $ionicPlatform.ready(function() {
+                    var ref = window.open('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey, '_blank', 'location=yes');
 
-            //            $rootScope.$on('$cordovaInAppBrowser:loadstop', function(e, event){
-            //
-            //                console.log("HELLO");
-            //                console.log(event);
-            //
-            //                if (event.url.match("/paypalSuccess")) {
-            //                    $cordovaInAppBrowser.close();
-            //                }   
-            //
-            //            });
+                    ref.addEventListener('loadstop', function(event) { 
 
-            // $cordovaInAppBrowser.close();
+                        ref.close();
+
+                    });
+                });
+            }
+
+
 
         }).
         error(function(data, status, headers, config) {
             console.log("error in regularEventController");
         });
-
-        //        $http.post('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/specfees/'+$scope.spectator.Fee+'?date='+$stateParams.date+'&location='+$stateParams.location+'', { }, config).
-        //        success(function(data, status, headers, config) {
-        //
-        //            $state.go("app.eventpremium", {
-        //                eventname: $stateParams.eventname,
-        //                date: $stateParams.date,
-        //                location: $stateParams.location
-        //            });
-        //
-        //        }).
-        //        error(function(data, status, headers, config) {
-        //            console.log("error in eventPremiumSummaryController");
-        //        });
 
     }
 
