@@ -201,7 +201,7 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
     });
 
     $rootScope.$on('$cordovaInAppBrowser:loadstop', function(e, event){
-        if (event.url.match("/paypalSuccess")) {
+        if (event.url.match("matchup.neptunolabs.com")) {
             $ionicPlatform.ready(function() {
                 $cordovaInAppBrowser.close();
             });
