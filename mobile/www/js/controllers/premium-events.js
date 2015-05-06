@@ -200,13 +200,24 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
 
     });
 
-    $rootScope.$on('$cordovaInAppBrowser:loadstop', function(e, event){
-        if (event.url.match("matchup.neptunolabs.com")) {
-            $ionicPlatform.ready(function() {
-                $cordovaInAppBrowser.close();
-            });
-        }
-    });
+    if(ionic.Platform.isIOS()){
+        $rootScope.$on('$cordovaInAppBrowser:loadstop', function(e, event){
+            if (event.url.match("matchup.neptunolabs.com")) {
+                $ionicPlatform.ready(function() {
+                    $cordovaInAppBrowser.close();
+                });
+            }
+        });
+    }
+    else if(ionic.Platform.isAndroid()){
+        $rootScope.$on('$cordovaInAppBrowser:loadstop', function(event){
+            if (event.url.match("matchup.neptunolabs.com")) {
+                $ionicPlatform.ready(function() {
+                    $cordovaInAppBrowser.close();
+                });
+            }
+        });
+    }
 
 
     $scope.signUpSpectator = function () {
