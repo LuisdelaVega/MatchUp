@@ -1,5 +1,15 @@
 var myApp = angular.module('premium-events',[]);
 
+//myApp.run(function($rootScope, $cordovaInAppBrowser, $ionicPlatform){
+//    $rootScope.$on('$cordovaInAppBrowser:loadstop', function(e, event){
+//        if (event.url.match("/paypalSuccess")) {
+//            $ionicPlatform.ready(function() {
+//                $cordovaInAppBrowser.close();
+//            });
+//        }
+//    });
+//});
+
 
 myApp.controller('ratingsController', ['$scope', '$http', '$stateParams', '$window', '$state', function ($scope, $http, $stateParams, $window, $state) {
 
@@ -158,7 +168,7 @@ myApp.controller('createMeetupController', function ($scope, $state, $http, $sta
 
 });
 
-myApp.controller('premiumSignUpController', function ($scope, $state, $http, $stateParams, sharedDataService, $window) {
+myApp.controller('premiumSignUpController', function ($scope, $state, $http, $stateParams, sharedDataService, $window, $cordovaInAppBrowser, $rootScope, $ionicPlatform) {
 
     $scope.returnToPremiumEvent = function () {
         $state.go("app.eventpremium", {
@@ -181,7 +191,6 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
         $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/specfees?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
         success(function(data, status, headers, config) {
 
-            console.log('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/specfees?date='+$stateParams.date+'&location='+$stateParams.location+'');
             $scope.spectatorFees = data;
 
         }).
@@ -191,6 +200,15 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
 
     });
 
+    $rootScope.$on('$cordovaInAppBrowser:loadstop', function(e, event){
+        if (event.url.match("matchup.neptunolabs.com")) {
+            $ionicPlatform.ready(function() {
+                $cordovaInAppBrowser.close();
+            });
+        }
+    });
+
+
     $scope.signUpSpectator = function () {
 
         var config = {
@@ -199,19 +217,60 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
             }
         };
 
-        $http.post('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/specfees/'+$scope.spectator.Fee+'?date='+$stateParams.date+'&location='+$stateParams.location+'', { }, config).
-        success(function(data, status, headers, config) {
+        var options = {
+            location: 'yes',
+            clearcache: 'yes',
+            toolbar: 'no'
+        };
 
-            $state.go("app.eventpremium", {
-                eventname: $stateParams.eventname,
-                date: $stateParams.date,
-                location: $stateParams.location
+        $http.get('http://136.145.116.232/initPaypal', config).success(function(data, status, headers, config){
+
+
+            $ionicPlatform.ready(function() {
+                $cordovaInAppBrowser.open('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey, '_blank', options).then(function () {
+                    console.log("InAppBrowser opened http://ngcordova.com successfully");
+                }, function (error) {
+                    console.log("Error: " + error);
+                });
             });
+
+            //            $cordovaInAppBrowser.open('http://ngcordova.com', '_blank', options).then(function () {
+            //                console.log("InAppBrowser opened http://ngcordova.com successfully");
+            //            }, function (error) {
+            //                console.log("Error: " + error);
+            //            });
+
+            //            $rootScope.$on('$cordovaInAppBrowser:loadstop', function(e, event){
+            //
+            //                console.log("HELLO");
+            //                console.log(event);
+            //
+            //                if (event.url.match("/paypalSuccess")) {
+            //                    $cordovaInAppBrowser.close();
+            //                }   
+            //
+            //            });
+
+            // $cordovaInAppBrowser.close();
 
         }).
         error(function(data, status, headers, config) {
-            console.log("error in eventPremiumSummaryController");
+            console.log("error in regularEventController");
         });
+
+        //        $http.post('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/specfees/'+$scope.spectator.Fee+'?date='+$stateParams.date+'&location='+$stateParams.location+'', { }, config).
+        //        success(function(data, status, headers, config) {
+        //
+        //            $state.go("app.eventpremium", {
+        //                eventname: $stateParams.eventname,
+        //                date: $stateParams.date,
+        //                location: $stateParams.location
+        //            });
+        //
+        //        }).
+        //        error(function(data, status, headers, config) {
+        //            console.log("error in eventPremiumSummaryController");
+        //        });
 
     }
 
@@ -243,7 +302,7 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
             $scope.eventInfo = angular.fromJson(data);
             var startDate = new Date($scope.eventInfo.event_start_date);
 
-            $scope.isOngoing = startDate < now_utc;
+            $scope.isOngoing = now_utc > startDate;
 
             $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
             success(function(data, status, headers, config) {
@@ -254,9 +313,6 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
                 success(function(data, status, headers, config) {
 
                     $scope.sponsors = angular.fromJson(data);
-
-                    console.log($http.pendingRequests);
-
 
                 }).
                 error(function(data, status, headers, config) {

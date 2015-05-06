@@ -1,9 +1,9 @@
 var myApp = angular.module('regular-events',[]);
 
-myApp.controller('REController', ['$scope', '$http', '$ionicPopup', '$stateParams', '$window', 'sharedDataService', function ($scope, $http, $ionicPopup, $stateParams, $window, sharedDataService) {
+myApp.controller('REController', ['$scope', '$http', '$ionicPopup', '$stateParams', '$window', 'sharedDataService', '$cordovaInAppBrowser', function ($scope, $http, $ionicPopup, $stateParams, $window, sharedDataService, $cordovaInAppBrowser) {
 
     //Create popup when user clicks the sign up button
-    $scope.showConfirm = function () {
+    $scope.signUpCompetitor = function () {
         var confirmPopup = $ionicPopup.confirm({
             title: 'Sign Up',
             template: 'Are you sure you want to sign up?'
@@ -11,24 +11,59 @@ myApp.controller('REController', ['$scope', '$http', '$ionicPopup', '$stateParam
         confirmPopup.then(function (res) {
             if (res) {
 
-                var selectedTournament = sharedDataService.get(); //Get info from sharedDataService
 
-                var config = {
-                    headers: {
-                        'Authorization': "Bearer "+ $window.sessionStorage.token
-                    }
-                };
+                if($scope.eventInfo.host == null){
+                    var selectedTournament = sharedDataService.get(); //Get info from sharedDataService
 
-                $http.post('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+selectedTournament+'/register?date='+$stateParams.date+'&location='+$stateParams.location+'', { }, config).success(function(data, status, headers, config) {
+                    var config = {
+                        headers: {
+                            'Authorization': "Bearer "+ $window.sessionStorage.token
+                        }
+                    };
 
-                    console.log("entered tournament");
+                    $http.post('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+selectedTournament+'/register?date='+$stateParams.date+'&location='+$stateParams.location+'', { }, config).success(function(data, status, headers, config) {
 
-                }).
-                error(function(data, status, headers, config) {
-                    console.log("error in regularEventController");
-                }); 
+                        console.log("entered tournament");
 
-            } else {
+                    }).
+                    error(function(data, status, headers, config) {
+                        console.log("error in regularEventController");
+                    }); 
+                }
+
+                else{
+
+                    var options = {
+                        location: 'yes',
+                        clearcache: 'yes',
+                        toolbar: 'no'
+                    };
+
+                    $http.get('http://136.145.116.232/initPaypal', config).success(function(data, status, headers, config){
+
+                        $cordovaInAppBrowser.open('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey, '_system', options)
+                            .then(function(event) {
+                            // success
+
+                        })
+                            .catch(function(event) {
+                            // error
+                        });
+
+                        // $cordovaInAppBrowser.close();
+
+                    }).
+                    error(function(data, status, headers, config) {
+                        console.log("error in regularEventController");
+                    }); 
+
+                }
+
+            } 
+
+            else {
+
+                //DO NOTHING
 
             }
         });
@@ -39,7 +74,7 @@ myApp.controller('REController', ['$scope', '$http', '$ionicPopup', '$stateParam
 //If premium event with multiple tournaments. tournament that is to be displayed has to be passed using SharedDataService
 myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', 'sharedDataService', '$window', function ($scope, $http, $stateParams, sharedDataService, $window) {
 
-    $scope.$on('$ionicView.enter', function () {
+    $scope.$on('$ionicView.beforeEnter', function () {
 
         $scope.selectedType = [ ];
         $scope.selectedRound = [ ];
@@ -54,8 +89,7 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
         var config = {
             headers: {
                 'Authorization': "Bearer "+ $window.sessionStorage.token
-            }
-        };
+            }};
 
         //Call to get event information. Passing through stateParams the event name, location and date.
         $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
@@ -64,8 +98,10 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
             $scope.eventInfo = angular.fromJson(data);
             var startDate = new Date($scope.eventInfo.event_registration_deadline);
 
+            startDate = startDate.setHours(startDate.getHours() - 4);
+
             //isOngoing is true if startdate is equal to or greater than the current start date
-            $scope.isOngoing = startDate < now_utc;
+            $scope.isOngoing = now_utc > startDate;
 
             //If user came from a premium event sharedDataService is used to find what tournament is to be displayed.
             if($scope.eventInfo.host != null){
@@ -75,6 +111,21 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
                 $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+selectedTournament+'?date='+$stateParams.date+'&location='+$stateParams.location+'', config).success(function(data, status, headers, config) {
 
                     $scope.currentTournament = angular.fromJson(data);
+
+
+                    $http.get('http://136.145.116.232/matchup/events/' + $stateParams.eventname + '/tournaments/' + selectedTournament + '/standings?date=' + $stateParams.date + '&location=' + $stateParams.location, config).success(function (data) {
+                        if (data.finalStage){
+                            if(data.finalStage.standings){
+                                $scope.standings = data.finalStage.standings;
+                            }
+                            else{
+                                $scope.onGoingStanding = data.finalStage
+                            }
+                            if ($scope.currentTournament.tournament_type == 'Two Stage'){
+                                $scope.groups = data.groupStage.groups;
+                            }
+                        }
+                    });
 
                     if($scope.currentTournament.team_size > 1)
                         $scope.requiresTeam = true;
@@ -114,6 +165,20 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
 
 
                         $scope.currentTournament = data;
+
+                        $http.get('http://136.145.116.232/matchup/events/' + $stateParams.eventname + '/tournaments/' + tournamentJSON[0].tournament_name + '/standings?date=' + $stateParams.date + '&location=' + $stateParams.location, config).success(function (data) {
+                            if (data.finalStage){
+                                if(data.finalStage.standings){
+                                    $scope.standings = data.finalStage.standings;
+                                }
+                                else{
+                                    $scope.onGoingStanding = data.finalStage
+                                }
+                                if ($scope.currentTournament.tournament_type == 'Two Stage'){
+                                    $scope.groups = data.groupStage.groups;
+                                }
+                            }
+                        });
 
                         $scope.requiresTeam = $scope.currentTournament.team_size > 1;
                         $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+$scope.currentTournament.tournament_name+'/rounds?date='+$stateParams.date+'&location='+$stateParams.location+'', config).success(function(data, status, headers, config) {
@@ -165,7 +230,7 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
         return matchesCount != 0;
 
     };
-    
+
     $scope.checkNull = function (score) {
 
         if(score == null)
@@ -177,7 +242,7 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
 
 }]);
 
-myApp.controller('teamSignUpController', ['$scope', '$http', '$ionicPopup', '$stateParams', '$window', 'sharedDataService', function ($scope, $http, $ionicPopup, $stateParams, $window, sharedDataService) {
+myApp.controller('teamSignUpController', ['$scope', '$http', '$ionicPopup', '$stateParams', '$window', 'sharedDataService', '$cordovaInAppBrowser', function ($scope, $http, $ionicPopup, $stateParams, $window, sharedDataService, $cordovaInAppBrowser) {
 
     $scope.$on('$ionicView.enter', function () {
 
@@ -250,27 +315,69 @@ myApp.controller('teamSignUpController', ['$scope', '$http', '$ionicPopup', '$st
                 'Authorization': "Bearer "+ $window.sessionStorage.token
             }
         };
-        $http.post('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+$stateParams.tournament+'/register?date='+$stateParams.date+'&location='+$stateParams.location+'', {
 
-            "team": $scope.selectedTeam.team.team_name,
-            "players": $scope.checkedMembers
 
-        }, config).success(function(data) {
+        $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'?date='+$stateParams.date+'&location='+$stateParams.location+'', config).success(function(data, status, headers, config) {
 
-            var confirmPopup = $ionicPopup.alert({
-                title: 'Team Sign Up',
-                template: 'You have succesfully signed up '+$scope.selectedTeam.team.team_name+' in '+$stateParams.tournament+'!'
+            var eventInfo = angular.fromJson(data);
+            
+            if(eventInfo.host == null){     
+
+            $http.post('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+$stateParams.tournament+'/register?date='+$stateParams.date+'&location='+$stateParams.location+'', {
+
+                "team": $scope.selectedTeam.team.team_name,
+                "players": $scope.checkedMembers
+
+            }, config).success(function(data) {
+
+                var confirmPopup = $ionicPopup.alert({
+                    title: 'Team Sign Up',
+                    template: 'You have succesfully signed up '+$scope.selectedTeam.team.team_name+' in '+$stateParams.tournament+'!'
+                });
+                confirmPopup.then(function (res) {
+
+                });
+
+            }).
+            error(function(data, status, headers, config) {
+                console.log("error in regularEventController");
             });
-            confirmPopup.then(function (res) {
+        }
 
+        else{
+
+            var options = {
+                location: 'yes',
+                clearcache: 'yes',
+                toolbar: 'no'
+            };
+
+            $http.get('http://136.145.116.232/initPaypal', config).success(function(data, status, headers, config){
+
+                $cordovaInAppBrowser.open('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey, '_system', options)
+                    .then(function(event) {
+                    // success
+
+                })
+                    .catch(function(event) {
+                    // error
+                });
+
+                // $cordovaInAppBrowser.close();
+
+
+            }).
+            error(function(data, status, headers, config) {
+                console.log("error in regularEventController");
             });
+
+
+        }
 
         }).
         error(function(data, status, headers, config) {
             console.log("error in regularEventController");
         });
-
-
 
     };
 

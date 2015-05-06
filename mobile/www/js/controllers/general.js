@@ -332,7 +332,10 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
 
 }]);
 
-myApp.controller('reportController', ['$scope', '$http', '$cordovaCamera', '$ionicPlatform', 'sharedDataService', '$state', '$window', function ($scope, $http, $cordovaCamera, $ionicPlatform, sharedDataService, $state, $window) {
+myApp.controller('reportController', ['$scope', '$http', '$cordovaCamera', '$ionicPlatform', 'sharedDataService', '$state', '$window', '$ionicLoading', function ($scope, $http, $cordovaCamera, $ionicPlatform, sharedDataService, $state, $window, $ionicLoading) {
+
+    $http.defaults.useXDomain = true;
+    $http.defaults.headers.common['Authorization'] = 'Client-ID 44f5a38fc083775';
 
     $scope.$on('$ionicView.enter', function () {
         //Used to determine whether camera is taken or not and display it if it is.
@@ -341,7 +344,6 @@ myApp.controller('reportController', ['$scope', '$http', '$cordovaCamera', '$ion
         $scope.report.type = "Missing Competitor";
         $scope.report.image = "";
         $scope.matchupInfo = sharedDataService.get();
-        console.log($scope.matchupInfo);
     });
 
     //Interacts with corresponding factory that calls on platform specific API (Android or iOS) to handle the taking of pictures
@@ -349,7 +351,8 @@ myApp.controller('reportController', ['$scope', '$http', '$cordovaCamera', '$ion
         var options = { 
             quality : 75, 
             destinationType : Camera.DestinationType.DATA_URL, 
-            sourceType : Camera.PictureSourceType.CAMERA, 
+            //sourceType : Camera.PictureSourceType.CAMERA, 
+            sourceType : Camera.PictureSourceType.PHOTOLIBRARY,
             allowEdit : true,
             encodingType: Camera.EncodingType.JPEG,
             targetWidth: 300,
@@ -362,7 +365,26 @@ myApp.controller('reportController', ['$scope', '$http', '$cordovaCamera', '$ion
             $cordovaCamera.getPicture(options).then(function(imageData) {
                 $scope.imageURL = "data:image/jpeg;base64,"+imageData;
                 $scope.picturetaken = true;
-                $scope.spectator.image = imageData;
+
+                $ionicLoading.show({
+                    template: 'loading'
+                });
+
+                //Call to upload image to imgur
+                $http.post('http://api.imgur.com/3/upload', {
+                    "image": imageData
+                }).success(function (data) {
+
+                    $ionicLoading.hide();
+                    $scope.report.image = data.data.link; //Here's the link
+
+                }).
+                error(function (err){
+                    console.log("error in editProfileController");
+                });
+
+
+
             }, function(err) {
                 // An error occured. Show a message to the user
             });
@@ -390,40 +412,44 @@ myApp.controller('reportController', ['$scope', '$http', '$cordovaCamera', '$ion
 
 myApp.controller('popularGameViewController', ['$scope', '$http', '$state', 'sharedDataService', '$window', function ($scope, $http, $state, sharedDataService, $window) {
 
-    var allGames = [ ]; //variable that is used to obtain all games as delivered by the server
-    $scope.popularGames = []; //stores what is to be displayed
+    $scope.$on('$ionicView.beforeEnter', function () {
 
-    var config = {
-        headers: {
-            'Authorization': "Bearer "+ $window.sessionStorage.token
-        }
-    };
+        $scope.allGames = [ ]; //variable that is used to obtain all games as delivered by the server
+        $scope.popularGames = []; //stores what is to be displayed
 
-    //Obtain popular games from the server
-    $http.get('http://matchup.neptunolabs.com/matchup/popular/games', config).
-    success(function(data, status, headers, config) {
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
 
-        allGames = angular.fromJson(data);
-        //Initial push of items to popularGames. Not all are pushed to ease load on mobile device not needing to render more than necessary
-        for(var i = 0; i <= 6; i++){
-            if(allGames.length > 0) //Only push if there is something to push onto popularGames
-                $scope.popularGames.push(allGames.shift());
-        }
-    }).
-    error(function(data, status, headers, config) {
-        console.log("error in popular games. popular game view");
+        //Obtain popular games from the server
+        $http.get('http://matchup.neptunolabs.com/matchup/popular/games', config).
+        success(function(data, status, headers, config) {
+
+            $scope.allGames = angular.fromJson(data);
+            //Initial push of items to popularGames. Not all are pushed to ease load on mobile device not needing to render more than necessary
+            for(var i = 0; i <= 6; i++){
+                if($scope.allGames.length > 0) //Only push if there is something to push onto popularGames
+                    $scope.popularGames.push($scope.allGames.shift());
+            }
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in popular games. popular game view");
+        });
+
     });
 
     //Function called by infinite scroll
     $scope.add = function () {
-        if(allGames.length > 0) //Only push if there is something to push onto popularGames
-            $scope.popularGames.push(allGames.shift());
+        if($scope.allGames.length > 0) //Only push if there is something to push onto popularGames
+            $scope.popularGames.push($scope.allGames.shift());
         $scope.$broadcast('scroll.infiniteScrollComplete'); //Broadcasts to infinite scroll that function has completed. 
     };
 
     //Used by ng-if and establishes if allGames is empty than no longer call infinite scroll function
     $scope.allGamesIsEmpty = function () {
-        return allGames.length > 0;    
+        return $scope.allGames.length > 0;    
     };
 
     $scope.goToGameProfile = function (gameName, gameImage) {
@@ -435,9 +461,9 @@ myApp.controller('popularGameViewController', ['$scope', '$http', '$state', 'sha
 
 }]);
 
-myApp.controller('loginController', ['$scope', '$http', '$state', 'sharedDataService', '$window', '$ionicPopup', function ($scope, $http, $state, sharedDataService, $window, $ionicPopup) {
-
-
+myApp.controller('loginController', ['$scope', '$http', '$state', 'sharedDataService', '$window', '$ionicPopup', '$rootScope', function ($scope, $http, $state, sharedDataService, $window, $ionicPopup, $rootScope) {
+    
+    $rootScope.baseURL = "http://matchup.neptunolabs.com";
 
     $scope.credentials = { }; //Tied to ng-model and stores user crdedentials. Username is stored in $scope.credentials.userEmail and password in $scope.credentials.userPassword
 
@@ -453,7 +479,7 @@ myApp.controller('loginController', ['$scope', '$http', '$state', 'sharedDataSer
         }; 
 
         //Server verifies credential. Credentials are passed through the header. If successful, server returns token
-        $http.post('http://136.145.116.232/login', {}, config).success(function (data) {
+        $http.post($rootScope.baseURL+'/login', {}, config).success(function (data) {
             var tokenObj = angular.fromJson(data);
             console.log(tokenObj);
             // save token in session
@@ -555,7 +581,24 @@ myApp.controller('sidebarController', ['$scope', '$http', '$state', 'sharedDataS
 
         $http.get('http://136.145.116.232/matchup/profile/matchups?state=Upcoming', config).success(function (data) {
 
-            $scope.notifications = angular.fromJson(data).length;
+            var matchups = angular.fromJson(data);
+            
+            $scope.notifications = 0;
+            
+            angular.forEach(matchups, function(matchup){
+               
+                if(matchup.team_size == 1){
+                    if(matchup.details[1].customer_username != null){
+                        $scope.notifications++;
+                    }
+                }
+                else if (matchup.team_size == 1){
+                    if(matchup.details[1].team_name != null){
+                        $scope.notifications++;
+                    }
+                }
+                
+            });
 
             $timeout( function(){ $scope.pollNotifications(); }, 30000);
         }).error(function (err) {
@@ -689,7 +732,6 @@ myApp.controller('matchupMatchController', ['$scope', '$http', '$state', 'shared
             $scope.players = data.players;
 
             $scope.matchInfo = data;
-            console.log($scope.matchInfo);
 
             var sets = data.sets;
 
@@ -764,49 +806,56 @@ myApp.controller('notificationsController', ['$scope', '$http', '$state', 'share
 
                 if(matchup.team_size == 1){
 
-                    if(matchup.details[0].customer_username == $window.sessionStorage.username){
+                    if(matchup.details[1].customer_username != null){
 
-                        var temp = matchup.details[0];
-                        matchup.details[0] = matchup.details[1];
-                        matchup.details[1] = temp;
-                        $scope.matchups.push(matchup);
+                        if(matchup.details[0].customer_username == $window.sessionStorage.username){
 
+                            var temp = matchup.details[0];
+                            matchup.details[0] = matchup.details[1];
+                            matchup.details[1] = temp;
+
+                            $scope.matchups.push(matchup);
+
+                        }
+                        else
+                            $scope.matchups.push(matchup);
                     }
-                    else
-                        $scope.matchups.push(matchup);
 
                 }
 
                 else {
 
-                    $http.get('http://136.145.116.232/matchup/teams/'+matchup.details[0].team_name+'/members', config).success(function (data){
+                    if(matchup.details[1].team_name != null){
 
-                        var members = data;
-                        var foundMember = false;
+                        $http.get('http://136.145.116.232/matchup/teams/'+matchup.details[0].team_name+'/members', config).success(function (data){
 
-                        angular.forEach(members, function(member){
+                            var members = data;
+                            var foundMember = false;
 
-                            if(member.customer_username == $window.sessionStorage.username && !foundMember){
+                            angular.forEach(members, function(member){
 
-                                var temp = matchup.details[0];
-                                matchup.details[0] = matchup.details[1];
-                                matchup.details[1] = temp;
+                                if(member.customer_username == $window.sessionStorage.username && !foundMember){
+
+                                    var temp = matchup.details[0];
+                                    matchup.details[0] = matchup.details[1];
+                                    matchup.details[1] = temp;
+                                    $scope.matchups.push(matchup);
+                                    foundMember = true;
+
+                                }
+
+                            });
+
+                            if(!foundMember)
                                 $scope.matchups.push(matchup);
-                                foundMember = true;
 
-                            }
+                        }).error(function (err) {
+
+                            console.log(err);
 
                         });
 
-                        if(!foundMember)
-                            $scope.matchups.push(matchup);
-
-                    }).error(function (err) {
-
-                        console.log(err);
-
-                    });
-
+                    }
                 }
 
             });
@@ -830,6 +879,7 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
 
     $scope.$on('$ionicView.enter', function () {
         $scope.matchupInfo = sharedDataService.get();
+        console.log($scope.matchupInfo);
 
         $scope.scoreInput = [ ];
 
@@ -851,7 +901,6 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
         $http.get('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'', config).success(function (data) {
 
             $scope.players = data.players;
-            console.log($scope.players)
 
             angular.forEach($scope.players, function(player){
                 if(player.score == null){
@@ -869,7 +918,7 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
 
             $scope.sets = [ ];
 
-            var posZero 
+            var posZero; 
             //add if for teams
             if($scope.matchupInfo.team_size == 1)
                 posZero = $scope.players[0].customer_username;

@@ -1,0 +1,39 @@
+{
+    "org.apache.cordova.camera": {
+        "source": {
+            "type": "registry",
+            "id": "org.apache.cordova.camera"
+        }
+    },
+    "org.apache.cordova.inappbrowser": {
+        "source": {
+            "type": "registry",
+            "id": "org.apache.cordova.inappbrowser"
+        }
+    },
+    "com.paypal.cordova.mobilesdk": {
+        "source": {
+            "type": "registry",
+            "id": "com.paypal.cordova.mobilesdk"
+        }
+    },
+    "com.rjfun.cordova.plugin.paypalmpl": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/floatinghotpot/cordova-plugin-paypalmpl.git",
+            "subdir": "."
+        }
+    },
+    "com.paypal.mpl-android": {
+        "source": {
+            "type": "registry",
+            "id": "com.paypal.mpl-android"
+        }
+    },
+    "com.paypal.mpl-ios": {
+        "source": {
+            "type": "registry",
+            "id": "com.paypal.mpl-ios"
+        }
+    }
+}

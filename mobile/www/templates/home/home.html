@@ -33,21 +33,5 @@
                 <p>{{event.event_start_date | date: 'medium'}}</p>
             </a>
         </div>
-
-        <div class="item item-divider">
-            Popular Games
-        </div>
-<!--
-        <div class="pad-sides" masonry="{columnWidth: 60}">
-            <div class="masonry-brick" ng-repeat="game in popularGames | limitTo: 6">
-                <img ng-src="{{ game.game_image }}" ng-click="goToGameProfile(game.game_name, game.game_image)" class="game-cover" style="max-width: 45vw; max-height: 45vh">
-            </div>
-        </div>
--->
-        <!---- Esperando que se implemente desde el server
-<ion-infinite-scroll on-infinite="add()" distance="1%">
-</ion-infinite-scroll>
---->
-
     </ion-content>
 </ion-view>

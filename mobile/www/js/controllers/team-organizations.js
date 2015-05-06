@@ -270,6 +270,7 @@ myApp.controller('teamController', function ($scope, $ionicPopover, $state, $ion
         //Synchronously makes server calls
         //Obtain general team information
         $scope.loggedInUserIsCaptain = false;
+        
         $http.get('http://136.145.116.232/matchup/teams/'+$stateParams.teamname+'', config).
         success(function(data, status, headers, config) {
 
@@ -301,7 +302,7 @@ myApp.controller('teamController', function ($scope, $ionicPopover, $state, $ion
             $http.get('http://136.145.116.232/matchup/teams/'+$stateParams.teamname+'/standings', config).
             success(function(data, status, headers, config) {
 
-                console.log(data);
+                $scope.standings = angular.fromJson(data);
 
             }).
             error(function(data, status, headers, config) {
@@ -335,8 +336,6 @@ myApp.controller("editTeamController", ['$scope', '$ionicPopup', '$stateParams',
     };
 
     $scope.teamProfile = [ ];
-
-    console.log($scope.teamProfile);
 
     $scope.$on('$ionicView.enter', function () {
         //Synchronously makes server calls
@@ -385,7 +384,7 @@ myApp.controller("editTeamController", ['$scope', '$ionicPopup', '$stateParams',
                 };
 
                 //Call to upload image to imgur
-                $http.post('https://api.imgur.com/3/upload', {
+                $http.post('http://api.imgur.com/3/upload', {
                     "image": imageData
                 }).success(function (data) {
 
@@ -426,7 +425,7 @@ myApp.controller("editTeamController", ['$scope', '$ionicPopup', '$stateParams',
                 };
 
                 //Call to upload image to imgur
-                $http.post('https://api.imgur.com/3/upload', {
+                $http.post('http://api.imgur.com/3/upload', {
                     "image": imageData
                 }).success(function (data) {
 
@@ -467,7 +466,7 @@ myApp.controller("editTeamController", ['$scope', '$ionicPopup', '$stateParams',
                 };
 
                 //Call to upload image to imgur
-                $http.post('https://api.imgur.com/3/upload', {
+                $http.post('http://api.imgur.com/3/upload', {
                     "image": imageData
                 }).success(function (data) {
 
