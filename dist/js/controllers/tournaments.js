@@ -223,11 +223,11 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 			$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/register?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data, status) {
 				$('#competitorSignUpModal').modal('hide');
 				$('#successModal').modal('show');
-				if (parseInt(status) == 200) {
+				if (status == 200) {
 					console.log(status);
 					localStorage.setItem('payKey', data.payKey);
 					window.location.href = 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey;
-				} else if (parseInt(status) == 201) {
+				} else if (status == 201) {
 					$scope.tournament.is_competitor = true;
 					getCompetitors();
 					console.log(201);
@@ -249,7 +249,15 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 				$scope.tournament.is_competitor = true;
 				$('#teamSignUpModal').modal('hide');
 				$('#successModal').modal('show');
-				getCompetitors();
+				if (status == 200) {
+					console.log(status);
+					localStorage.setItem('payKey', data.payKey);
+					window.location.href = 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey;
+				} else if (status == 201) {
+					$scope.tournament.is_competitor = true;
+					getCompetitors();
+					console.log(201);
+				}
 			}).error(function (status) {
 				$('#teamSignUpModal').modal('hide');
 			});

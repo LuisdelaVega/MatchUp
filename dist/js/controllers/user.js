@@ -430,9 +430,6 @@ function ($scope, $http, $state, $stateParams, $rootScope) {
 myApp.controller('paySuccessfulController', ['$scope', '$http', '$stateParams', '$state', '$rootScope',
 function ($scope, $http, $stateParams, $state, $rootScope) {
 
-		$scope.hi = "hey";
-		$scope.payKey = localStorage.getItem('payKey');
-
 		$http.get($rootScope.baseURL + '/matchup/paypal/' + $scope.payKey).success(function (data) {
 			$scope.payInfo = data;
 			console.log(data);

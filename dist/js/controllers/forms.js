@@ -665,14 +665,13 @@ myApp.controller("editTeamController", function($scope, $rootScope, $http, $stat
  *	URL (POST): http://matchup.neptunolabs.com/matchup/organizations
  */
 myApp.controller("RequestOrganizationController", function($scope, $window, $http, $rootScope, $state) {
-
 	$scope.submitOrganization = function(valid) {
 		if (valid) {
 			//Organization objects
 			$http.post($rootScope.baseURL + "/matchup/organizations", $scope.organization).success(function() {
 				alert("Request for an organization successful");
-				$state.go("app.userProfile", {
-					"username" : localStorage.getItem("username")
+				$state.go("app.userOrganizations", {
+					"username" : $scope.me
 				});
 			});
 		};

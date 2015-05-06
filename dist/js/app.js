@@ -315,12 +315,6 @@ myApp.run(function($rootScope, $state, AuthenticationService, $window, acuteSele
 
 	$rootScope.baseURL = "https://matchup.neptunolabs.com";
 	$rootScope.imgurKey = "6528448c258cff474ca9701c5bab6927";
-	$rootScope.PAYPAL_USERID = 'neptunolabs-facilitator_api1.gmail.com';
-	$rootScope.PAYPAL_PASSWORD = 'XWBY9MS84HGAH5QD';
-	$rootScope.PAYPAL_SIGNATURE = 'AQU0e5vuZCvSg-XJploSa.sGUDlpADHudcLIG.989J8K1T5hwCU6BTLu';
-	$rootScope.PAYPAL_FORMAT = 'JSON';
-	$rootScope.PAYPAL_APPID = 'APP-80W284485P519543T';
-	$rootScope.SANDBOX_ENV = 'https://svcs.sandbox.paypal.com';
 
 	// Set the template path for all instances for acute template
 	acuteSelectService.updateSetting("templatePath", "event");

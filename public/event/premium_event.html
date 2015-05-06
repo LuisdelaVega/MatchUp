@@ -128,6 +128,20 @@
 						</div>
 					</div>
 				</div>
+			</div>			
+			<!--			Tournaments-->
+			<div class="box box-margin">
+				<p class="info-title">
+					Tournaments
+				</p>
+				<div class="row">
+					<div ng-repeat="tourn in tournamentsInfo">
+						<div class="col-lg-3 col-md-4 col-xs-6">
+							<a class="thumbnail" ng-click="goToTournament(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location, tourn.tournament_name)"> <img ng-src="{{tourn.game_image}}">
+								<h4 align="center">{{tourn.tournament_name}}</h4> </a>
+						</div>
+					</div>
+				</div>
 			</div>
 			<!--			Sponsors 		-->
 			<div class="box box-margin" ng-if="sponsors.length">
@@ -137,22 +151,6 @@
 				<div class="row">
 					<div class="col-lg-3 col-md-4 col-xs-12" ng-repeat="sponsor in sponsors">
 						<a class="thumbnail" ng-href="{{sponsor.sponsor_link}}"> <img ng-src="{{ sponsor.sponsor_logo }}"> </a>
-					</div>
-
-				</div>
-			</div>
-			<!--			Tournmants-->
-			<div class="box box-margin">
-				<p class="info-title">
-					Tournaments
-				</p>
-				<div class="row">
-					<div ng-repeat="tourn in tournamentsInfo">
-						<div class="col-lg-3 col-md-4 col-xs-6">
-
-							<a class="thumbnail" ng-click="goToTournament(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location, tourn.tournament_name)"> <img ng-src="{{tourn.game_image}}">
-								<h4 align="center">{{tourn.tournament_name}}</h4> </a>
-						</div>
 					</div>
 				</div>
 			</div>
