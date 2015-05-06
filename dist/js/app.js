@@ -366,7 +366,6 @@ myApp.run(function ($rootScope, $state, AuthenticationService, $window, acuteSel
 	document.domain = "matchup.neptunolabs.com";
 	console.log(localStorage.getItem('payKey'));
 	if (localStorage.getItem('payKey') != null) {
-		console.log("hey");
 		$state.go('app.paySuccessful');
 	}
 
