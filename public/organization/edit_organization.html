@@ -4,6 +4,10 @@
 			Edit Info
 		</legend>
 		<div class="form-group">
+			<label>Paypal email</label>
+			<input class="form-control" name="email" type="email" ng-model="organization.organization_paypal_info" required>
+		</div>
+		<div class="form-group">
 			<label for="organizationBio" class="col-sm-2 control-label">Bio:</label>
 			<div class="col-sm-10">
 				<textarea class="form-control" rows="6" ng-model="organization.organization_bio"></textarea>
