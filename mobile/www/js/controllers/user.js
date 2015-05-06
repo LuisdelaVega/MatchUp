@@ -113,8 +113,7 @@ myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$st
                         };
                         //Call to subscribe to the user
                         $http.post('http://136.145.116.232/matchup/profile/'+username+'', {}, config).success(function (data) {
-                            console.log('http://136.145.116.232/matchup/profile/'+username+'');
-                            console.log("Subscribed to"+username+"");
+
 
                         }).error(function (err) {
                             console.log(err);
@@ -391,10 +390,11 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
                 };
 
                 //Call to upload image to imgur
-                $http.post('https://api.imgur.com/3/upload', {
+                $http.post('http://api.imgur.com/3/upload', {
                     "image": imageData
                 }).success(function (data) {
 
+                    $ionicLoading.hide();
                     $scope.user.profile_pic = data.data.link; //Here's the link
 
                 }).
@@ -432,7 +432,7 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
                 });
 
                 //Call to upload image to imgur
-                $http.post('https://api.imgur.com/3/upload', {
+                $http.post('http://api.imgur.com/3/upload', {
                     "image": imageData
                 }).success(function (data) {
 

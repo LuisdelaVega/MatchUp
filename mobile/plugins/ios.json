@@ -22,7 +22,7 @@
                     "CoreGraphics.framework": [
                         {
                             "xml": false,
-                            "count": 2
+                            "count": 3
                         }
                     ],
                     "AssetsLibrary.framework": [
@@ -36,7 +36,22 @@
                             "xml": false,
                             "count": 1
                         }
-                    ]
+                    ],
+                    "AudioToolbox.framework": [],
+                    "AVFoundation.framework": [],
+                    "CFNetwork.framework": [],
+                    "CoreMedia.framework": [],
+                    "CoreVideo.framework": [],
+                    "MessageUI.framework": [],
+                    "OpenGLES.framework": [],
+                    "Security.framework": [],
+                    "SystemConfiguration.framework": [],
+                    "QuartzCore.framework": [],
+                    "UIKit.framework": [],
+                    "libc++.dylib": [],
+                    "libPayPalMobile.a": [],
+                    "libxml2.dylib": [],
+                    "libz.1.2.5.dylib": []
                 }
             },
             "config.xml": {
@@ -48,6 +63,10 @@
                         },
                         {
                             "xml": "<preference name=\"CameraUsesGeolocation\" value=\"false\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"InAppBrowser\"><param name=\"ios-package\" value=\"CDVInAppBrowser\" /></feature>",
                             "count": 1
                         }
                     ]
@@ -67,6 +86,9 @@
     },
     "installed_plugins": {
         "org.apache.cordova.camera": {
+            "PACKAGE_NAME": "com.ionicframework.matchuppt240119"
+        },
+        "org.apache.cordova.inappbrowser": {
             "PACKAGE_NAME": "com.ionicframework.matchuppt240119"
         }
     },

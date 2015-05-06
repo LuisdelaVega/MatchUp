@@ -47,20 +47,18 @@
             <div class="item item-divider">
                 Standings
             </div>
-<!--
-            <a class="item item-avatar" href="#">
-                <img src="img/lolbr.jpeg">
+            <a class="item item-thumbnail-left" ng-repeat="standing in standings">
+                <img ng-src="{{standing.event_logo}}">
                 <div class="row">
                     <div class="col col-75">
-                        <h2>Project M 2015</h2>
-                        <p>fecha fecha</p>
+                        <h2>{{ standing.tournament_name }}</h2>
+                        <p>{{ standing.event_start_date | date: 'medium'}}</p>
                     </div>
                     <div class="col center-text">
-                        <h1 class="h1-username">1st</h1>
+                        <h1 class="h1-username" style="vertical-align: middle">{{ standing.standing | ordinal }}</h1>
                     </div>
                 </div>
             </a>
--->
             <a class="item item-icon-left dark" href="#/app/teamprofilestandings">
                 <i class="icon ion-android-arrow-forward"></i> See More
             </a>

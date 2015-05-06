@@ -1,3 +1,23 @@
+.match-square {
+	height: 20px;
+	width: 20px;
+	margin-top: 2px;
+	display: inline-block;
+	text-align: center;
+	color: #292929;
+	cursor: pointer;
+}
+
+.loss {
+	border-color: #e83134;
+	background-color: #e83134;
+}
+
+.pending {
+	border-color: #e3ea22;
+	background-color: #e3ea22;
+}
+
 .img-with-text {
     text-align: justify;
     width: [width of img];

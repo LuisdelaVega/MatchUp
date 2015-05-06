@@ -3,37 +3,80 @@
         <div class="crop-banner">
             <img class="crop-image" ng-src="{{ eventInfo.event_banner }}">
         </div>
-        <div>
-            <div class="center-text">
-                <img class="profile-pic" ng-src="{{ currentTournament.game_image }}">
-            </div>
-            <div class="card">
-                <div class="item item-text-wrap">
-                    <div class="center-text">
-                        <h1 class="h1-username">{{ currentTournament.tournament_name }}</h1>
-                    </div>
-                    <div class="center-text">
-                        <h2 class="h1-username">Registration Deadline: </h2>
-                        <h2 >{{ eventInfo.event_registration_deadline | date: 'medium' }}</h2>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <div class=" center-text">
-                                <h2 class="h1-username">Start Date: <br><br></h2>
-                                <span>{{ currentTournament.tournament_start_date | date: 'medium' }}</span>
-                            </div>
-                        </div>
-                        <div class="col center-text">
-                            <h2 class="h1-username">Location<br><br></h2>
-                            <span>{{ eventInfo.event_location }}</span>
-                        </div>
-                    </div>            
-                    <p>
-                        <br>{{ currentTournament.tournament_rules }}
-                    </p>
+        <div class="center-text">
+            <img class="profile-pic" ng-src="{{ currentTournament.game_image }}">
+        </div>
+        <div class="card">
+            <div class="item item-text-wrap">
+                <div class="center-text">
+                    <h1 class="h1-username">{{ currentTournament.tournament_name }}</h1>
                 </div>
+                <div class="center-text">
+                    <h2 class="h1-username">Registration Deadline: </h2>
+                    <h2 >{{ eventInfo.event_registration_deadline | date: 'medium' }}</h2>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class=" center-text">
+                            <h2 class="h1-username">Start Date: <br><br></h2>
+                            <span>{{ currentTournament.tournament_start_date | date: 'medium' }}</span>
+                        </div>
+                    </div>
+                    <div class="col center-text">
+                        <h2 class="h1-username">Location<br><br></h2>
+                        <span>{{ eventInfo.event_location }}</span>
+                    </div>
+                </div>            
+
             </div>
         </div>
+
+        <div class="card">
+            <div class="item item-divider">
+                Rules
+            </div>
+            <div class="item item-text-wrap">
+                {{ currentTournament.tournament_rules }}
+            </div>
+        </div>
+
+        <div ng-if="currentTournament.tournament_completed">
+            <ion-scroll zooming="false" direction="x" style="width: 500px">
+                <table class="pure-table pure-table-horizontal" ng-if="standings">
+                    <thead>
+                        <tr>
+                            <th style="text-align:center">Standing</th>
+                            <th style="text-align:center">Competitor</th>
+                            <th style="text-align:center">Seed</th>
+                            <th>Match History</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="standing in standings">
+                        <!-- Mierda que no sirve -->
+                        <tr ng-repeat="competitor in standing">
+                            <td style="text-align:center" ng-if="$first && currentTournament.tournament_completed" rowspan="{{standing.length}}">{{competitor.standing}}</td>
+                            <td style="text-align:center" id="competitor-name" ng-if="competitor.customer_tag">{{competitor.customer_tag}}</td>
+                            <td id="competitor-name" ng-if="competitor.team_name">{{competitor.team_name}}</td>
+                            <td style="text-align:center">{{competitor.competitor_seed}}</td>
+                            <td>
+                                <span ng-repeat="match in competitor.match_history">
+                                    <span ng-if="match.win" class="match-square player-1">
+                                        W
+                                    </span>
+                                    <span ng-if="!match.win" class="match-square loss">
+                                        L
+                                    </span>
+                                    <span ng-if="match.win == null" class="match-square pending">
+                                        P
+                                    </span>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </ion-scroll>
+        </div>
+
 
         <div ng-controller="REController">
             <div ng-if="currentTournament.tournament_completed != null">
@@ -127,29 +170,17 @@
                     </div>
 
                     <div ng-if="!hasMatches(selectedRound.round.matches)">
-
                         <p style="padding: 7px 10px 7px 0px;
                                   text-align: center;
                                   margin-top: 10px;
                                   color: #444;
                                   font-size: 16px;">
                             There are no matches here yet!</p>
-
                     </div>
-
                 </div>
             </div>
 
-            <div class="card">
-                <div class="item item-divider">
-                    Rules
-                </div>
-                <div class="item item-text-wrap">
-                    These are the rules for the tournament.
-                </div>
-            </div>
-
-            <button class="button button-positive" ng-if="!isOngoing && !requiresTeam && !currentTournament.is_competitor" ng-click="showConfirm()" style="width: 100vw">
+            <button class="button button-positive" ng-if="!isOngoing && !requiresTeam && !currentTournament.is_competitor" ng-click="signUpCompetitor()" style="width: 100vw">
                 Sign Up
             </button>
 

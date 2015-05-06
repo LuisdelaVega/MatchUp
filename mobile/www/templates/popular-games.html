@@ -2,9 +2,10 @@
     <ion-content>
         <div masonry>
             <div class="masonry-brick" ng-repeat="game in popularGames">
-                    <img ng-src="{{ game.game_image }}" ng-click="goToGameProfile(game.game_name, game.game_image)">
+                    <img ng-src="{{ game.game_image }}" ng-click="goToGameProfile(game.game_name, game.game_image)" style="max-width: 40vw; max-height: 40vh; width: auto; height: auto;">
             </div>
         </div>
+        
         <ion-infinite-scroll ng-if="allGamesIsEmpty()"
                              on-infinite="add()"
                              distance="1%">

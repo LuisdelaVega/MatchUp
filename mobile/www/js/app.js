@@ -451,14 +451,27 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
     // if none of the above states are matched, use this as the fallback
     $urlRouterProvider.otherwise('/login');
 
-
-
     //Used for authentication and complying with CORS
     $httpProvider.defaults.useXDomain = true;
 
     delete $httpProvider.defaults.headers.common["X-Requested-With"];
 
 })
+
+//    .config(function($cordovaInAppBrowserProvider) {
+//
+//    var defaultOptions = {
+//        location: 'no',
+//        clearcache: 'no',
+//        toolbar: 'no'
+//    };
+//
+//    document.addEventListener(function () {
+//
+//        $cordovaInAppBrowserProvider.setDefaultOptions(options)
+//
+//    }, false);
+//})
 //Allows controllers to pass data between each other. Should be used only when values set will immediately used by another controller in a get.
     .factory('sharedDataService', function () {
     var savedData = {}
