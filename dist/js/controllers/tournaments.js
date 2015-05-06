@@ -223,8 +223,15 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 			$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/register?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data, status) {
 				$('#competitorSignUpModal').modal('hide');
 				$('#successModal').modal('show');
-				$scope.tournament.is_competitor = true;
-				getCompetitors();
+				if (parseInt(status) == 200) {
+					console.log(status);
+					localStorage.setItem('payKey', data.payKey);
+					window.location.href = 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey;
+				} else if (parseInt(status) == 201) {
+					$scope.tournament.is_competitor = true;
+					getCompetitors();
+					console.log(201);
+				}
 			}).error(function (status) {
 				$('#competitorSignUpModal').modal('hide');
 			});
