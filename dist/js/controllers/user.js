@@ -441,7 +441,8 @@ function ($scope, $http, $stateParams, $state, $rootScope) {
 				'X-PAYPAL-SECURITY-SIGNATURE': $rootScope.PAYPAL_SIGNATURE,
 				'X-PAYPAL-REQUEST-DATA-FORMAT': $rootScope.PAYPAL_FORMAT,
 				'X-PAYPAL-RESPONSE-DATA-FORMAT': $rootScope.PAYPAL_FORMAT,
-				'X-PAYPAL-APPLICATION-ID': $rootScope.PAYPAL_APPID
+				'X-PAYPAL-APPLICATION-ID': $rootScope.PAYPAL_APPID,
+				'Access-Control-Allow-Origin': '*'
 			}
 		};
 
