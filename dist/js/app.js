@@ -359,11 +359,19 @@ myApp.run(function ($rootScope, $state, AuthenticationService, $window, acuteSel
 
 	$rootScope.baseURL = "https://matchup.neptunolabs.com";
 	$rootScope.imgurKey = "6528448c258cff474ca9701c5bab6927";
+	$rootScope.PAYPAL_USERID = 'neptunolabs-facilitator_api1.gmail.com';
+	$rootScope.PAYPAL_PASSWORD = 'XWBY9MS84HGAH5QD';
+	$rootScope.PAYPAL_SIGNATURE = 'AQU0e5vuZCvSg-XJploSa.sGUDlpADHudcLIG.989J8K1T5hwCU6BTLu';
+	$rootScope.PAYPAL_FORMAT = 'JSON';
+	$rootScope.PAYPAL_APPID = 'APP-80W284485P519543T';
+	$rootScope.SANDBOX_ENV = 'https://svcs.sandbox.paypal.com';
 
 	// Set the template path for all instances for acute template
 	acuteSelectService.updateSetting("templatePath", "event");
 
 	document.domain = "matchup.neptunolabs.com";
+
+	console.log(localStorage.getItem('payKey'));
 
 	// Redirect to pay successful 
 	if (localStorage.getItem('payKey')) {
@@ -372,13 +380,15 @@ myApp.run(function ($rootScope, $state, AuthenticationService, $window, acuteSel
 		});
 	}
 
-	// Do not let user access login if the user is authenticated
+
 	$rootScope.$on('$stateChangeStart',
 		function (event, toState) {
-			if ((toState.name === "login") && AuthenticationService.isAuthenticated()) {
+			// Do not let user access login if the user is authenticated
+			if ((toState.name === "login") && AuthenticationService.isAuthenticated())
 				event.preventDefault();
-			}
-	});
+
+		}
+	);
 });
 
 myApp.factory("MatchUpCache", function ($cacheFactory) {
