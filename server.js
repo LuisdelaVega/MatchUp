@@ -300,6 +300,59 @@ app.post('/paypal', function(req,res){
 	}, 'done response');
 });
 
+app.get('/matchup/paypal/:payKey', function(req,res){
+	// Set up payment details headers and body
+	var req_options = {
+		host: 'svcs.sandbox.paypal.com',
+		method: 'POST',
+		path: '/AdaptivePayments/PaymentDetails',
+		headers: {
+			'X-PAYPAL-SECURITY-USERID': PAYPAL_USERID,
+			'X-PAYPAL-SECURITY-PASSWORD': PAYPAL_PASSWORD,
+			'X-PAYPAL-SECURITY-SIGNATURE': PAYPAL_SIGNATURE,
+			'X-PAYPAL-REQUEST-DATA-FORMAT': PAYPAL_FORMAT,
+			'X-PAYPAL-RESPONSE-DATA-FORMAT': PAYPAL_FORMAT,
+			'X-PAYPAL-APPLICATION-ID': PAYPAL_APPID
+		}
+	};
+
+	var body = {
+			'payKey': req.params.payKey,
+			'requestEnvelope': {
+				'errorLanguage': 'en_US',
+				'detailLevel': 'ReturnAll'
+			}
+		};
+
+	var paypalReq = https.request(req_options, function paypal_request(paypalRes) {
+		var data = '';
+
+		paypalRes.on('data', function paypal_response(d) {
+			data += d;
+		});
+
+		paypalRes.on('end', function response_end() {
+			var dataJSON = JSON.parse(data);
+			console.log(dataJSON);
+
+			res.status(200).send(JSON.stringify(dataJSON));
+			log.info({
+				res: res
+			}, 'done response');
+		});
+	});
+
+	//Add the post parameters to the request body
+	paypalReq.write(JSON.stringify(body));
+
+	//Request error
+	paypalReq.on('error', function (err) {
+		console.log('error requesting paypal');
+	});
+
+	paypalReq.end();
+});
+
 ///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
 //*\\\\\\\\\\* API *//////////*/
 /* /api
