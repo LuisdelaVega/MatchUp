@@ -384,9 +384,10 @@ myApp.run(function ($rootScope, $state, AuthenticationService, $window, acuteSel
 	$rootScope.$on('$stateChangeStart',
 		function (event, toState) {
 			// Do not let user access login if the user is authenticated
-			if ((toState.name === "login") && AuthenticationService.isAuthenticated())
+			if ((toState.name === "login") && AuthenticationService.isAuthenticated()){
 				event.preventDefault();
-
+				$state.go("app.home");
+			}
 		}
 	);
 });
