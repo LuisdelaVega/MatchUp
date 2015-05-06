@@ -355,7 +355,7 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 	});
 });
 
-myApp.run(function ($rootScope, $state, AuthenticationService, $window, acuteSelectService) {
+myApp.run(function ($rootScope, $state, AuthenticationService, $window, acuteSelectService,$timeout) {
 
 	$rootScope.baseURL = "https://matchup.neptunolabs.com";
 	$rootScope.imgurKey = "6528448c258cff474ca9701c5bab6927";
@@ -364,9 +364,18 @@ myApp.run(function ($rootScope, $state, AuthenticationService, $window, acuteSel
 	acuteSelectService.updateSetting("templatePath", "event");
 
 	document.domain = "matchup.neptunolabs.com";
+	
 	console.log(localStorage.getItem('payKey'));
-	if (localStorage.getItem('payKey') != null) {
-		$state.go('app.paySuccessful');
+	
+	if (localStorage.getItem('payKey')) {
+		$timeout(function () {
+			$state.go('app.paySuccessful');
+		});
+	}
+	else if(localStorage.getItem("token") && localStorage.getItem("username")){
+		$timeout(function () {
+			$state.go('app.home');
+		});
 	}
 
 	// Authenticated selected states, not used for capstone
