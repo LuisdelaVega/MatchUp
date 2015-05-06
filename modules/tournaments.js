@@ -2768,7 +2768,7 @@ function competitor(req, pg, conString, payKey, tournament) {
 		query.on("end", function (result) {
 			var nextCompetitor = (!(result.rows[0].next_competitor) ? 1 : result.rows[0].next_competitor);
 			client.query({
-				text: "INSERT INTO competitor (event_name, event_start_date, event_location, tournament_name, competitor_number, competitor_standing, competitor_seed, matches_won, matches_lost, competitor_has_forfeited, competitor_check_in, competitor_paid) VALUES($1, $2, $3, $4, $5, 0, 0, 0, 0, false, false, true)",
+				text: "INSERT INTO competitor (event_name, event_start_date, event_location, tournament_name, competitor_number, competitor_standing, competitor_seed, matches_won, matches_lost, competitor_has_forfeited, competitor_check_in) VALUES($1, $2, $3, $4, $5, 0, 0, 0, 0, false, false)",
 				values: [req.params.event, req.query.date, req.query.location, req.params.tournament, nextCompetitor]
 			}, function (err, result) {
 				if (err) {
@@ -2778,8 +2778,8 @@ function competitor(req, pg, conString, payKey, tournament) {
 					console.log(err);
 				} else {
 					client.query({
-						text: "INSERT INTO competitor_pays (event_name, event_start_date, event_location, spec_fee_name, customer_username, competitor_paid, competitor_paykey) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-						values: [req.params.event, req.query.date, req.query.location, req.params.spec_fee, req.user.username, false, payKey]
+						text: "INSERT INTO competitor_pays (event_name, event_start_date, event_location, tournament_name, competitor_number, competitor_paid, competitor_paykey) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+						values: [req.params.event, req.query.date, req.query.location, req.params.tournament, nextCompetitor, false, payKey]
 					}, function (err, result) {
 						if (err) {
 							client.query("ROLLBACK");
@@ -2804,7 +2804,7 @@ function competitor(req, pg, conString, payKey, tournament) {
 											for (var i = 0, index = 0; i < parseInt(tournament.team_size); i++) {
 												client.query({
 													text: "INSERT INTO is_a (event_name, event_start_date, event_location, tournament_name, competitor_number, customer_username) VALUES($1, $2, $3, $4, $5, $6)",
-													values: [req.params.event, req.query.date, req.query.location, req.params.tournament, parseInt(competitor_number), customer_username]
+													values: [req.params.event, req.query.date, req.query.location, req.params.tournament, parseInt(nextCompetitor), req.body.players[i]]
 												}, function (err, result) {
 													if (err) {
 														client.query("ROLLBACK");
@@ -2825,14 +2825,14 @@ function competitor(req, pg, conString, payKey, tournament) {
 							} else {
 								client.query({
 									text: "INSERT INTO is_a (event_name, event_start_date, event_location, tournament_name, competitor_number, customer_username) VALUES($1, $2, $3, $4, $5, $6)",
-									values: [req.params.event, req.query.date, req.query.location, req.params.tournament, parseInt(competitor_number), customer_username]
+									values: [req.params.event, req.query.date, req.query.location, req.params.tournament, parseInt(nextCompetitor), req.user.username]
 								}, function (err, result) {
 									if (err) {
 										client.query("ROLLBACK");
 										done();
 										console.log("torunament.js - customerIsACompetitor");
 										console.log(err);
-									} else if (index == length) {
+									} else {
 										client.query("COMMIT");
 										done();
 									}
@@ -2894,7 +2894,7 @@ var registerForTournament = function(req, res, pg, conString, log, initPaypal) {
 					query.on("end", function (result) {
 						var nextCompetitor = (!(result.rows[0].next_competitor) ? 1 : result.rows[0].next_competitor);
 						client.query({
-							text: "INSERT INTO competitor (event_name, event_start_date, event_location, tournament_name, competitor_number, competitor_standing, competitor_seed, matches_won, matches_lost, competitor_has_forfeited, competitor_check_in, competitor_paid) VALUES($1, $2, $3, $4, $5, 0, 0, 0, 0, false, false, true)",
+							text: "INSERT INTO competitor (event_name, event_start_date, event_location, tournament_name, competitor_number, competitor_standing, competitor_seed, matches_won, matches_lost, competitor_has_forfeited, competitor_check_in) VALUES($1, $2, $3, $4, $5, 0, 0, 0, 0, false, false)",
 							values: [req.params.event, req.query.date, req.query.location, req.params.tournament, nextCompetitor]
 						}, function (err, result) {
 							if (err) {
