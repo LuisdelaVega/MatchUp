@@ -134,6 +134,15 @@ function($scope, $http, $state, $window, AuthenticationService, $rootScope) {
 
 	$scope.incorrectPassword = false;
 	$scope.badCredentials = false;
+	
+	$scope.paypal = function (){
+		$http.get($rootScope.baseURL + '/initPaypal').success(function(data, status, headers) {
+			
+			localStorage.setItem('payKey', data.payKey);
+			$window.location.href = 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey;
+
+		});
+	}
 
 	$scope.login = function(valid) {
 		if (valid) {
@@ -170,7 +179,7 @@ function($scope, $http, $state, $window, AuthenticationService, $rootScope) {
 
 myApp.controller('sidebarController', ['$scope', '$window', '$http', '$state', 'AuthenticationService', '$rootScope', 'MatchUpCache',
 function($scope, $window, $http, $state, AuthenticationService, $rootScope, MatchUpCache) {
-	$scope.me = $window.sessionStorage.username;
+	$scope.me = localStorage.getItem("username");
 
 	$scope.userSearch = function(query) {
 		$http.get($rootScope.baseURL + '/matchup/search/users/' + query).success(function(data, status, headers) {

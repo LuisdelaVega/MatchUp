@@ -133,7 +133,7 @@ myApp.controller('userOrganizationsController', ['$scope', '$http', '$stateParam
 function($scope, $http, $stateParams, $window, $state, $rootScope) {
 
 	$scope.customerUsername = $stateParams.username;
-	if ($scope.customerUsername == $window.sessionStorage.username)
+	if ($scope.customerUsername == localStorage.getItem("username"))
 		$scope.isUser = true;
 	else
 		$scope.isUser = false;
@@ -152,7 +152,7 @@ function($scope, $http, $stateParams, $window, $state, $rootScope) {
 		});
 	};
 
-	$http.get($rootScope.baseURL + '/matchup/profile/' + $window.sessionStorage.username + '/requests').success(function(data) {
+	$http.get($rootScope.baseURL + '/matchup/profile/' + localStorage.getItem("username") + '/requests').success(function(data) {
 		$scope.organizationRequests = data;
 	});
 
@@ -211,7 +211,7 @@ myApp.controller('userTeamsController', ['$scope', '$http', '$stateParams', '$wi
 function($scope, $http, $stateParams, $window, $state, $rootScope) {
 
 	$scope.customerUsername = $stateParams.username;
-	if ($scope.customerUsername == $window.sessionStorage.username)
+	if ($scope.customerUsername == localStorage.getItem("username"))
 		$scope.isUser = true;
 	else
 		$scope.isUser = false;
@@ -289,7 +289,7 @@ function($scope, $http, $state, sharedDataService, $rootScope, $window) {
 	$scope.user = sharedDataService.get();
 	// Check if data service is empty
 	if (Object.keys($scope.user).length == 0) {
-		$http.get($rootScope.baseURL + '/matchup/profile/' + $window.sessionStorage.username).success(function(data) {
+		$http.get($rootScope.baseURL + '/matchup/profile/' + localStorage.getItem("username")).success(function(data) {
 			$scope.user = data;
 		});
 	}
@@ -336,7 +336,7 @@ function($scope, $http, $state, sharedDataService, $rootScope, $window) {
 			};
 			$http.put($rootScope.baseURL + "/matchup/profile", profile).success(function() {
 				$state.go("app.userProfile", {
-					"username" : $window.sessionStorage.username
+					"username" : localStorage.getItem("username")
 				});
 			});
 		}
@@ -424,4 +424,20 @@ function($scope, $http, $state, $stateParams, $rootScope) {
 
 	};
 
-}]); 
+}]);
+
+//Controller used to display the teams page for a user, manages data about the teams a user belongs to.
+myApp.controller('paySuccessfulController', ['$scope', '$http', '$stateParams', '$state', '$rootScope',
+function($scope, $http, $stateParams, $state, $rootScope) {
+
+	$scope.hi = "hey";
+	$scope.payKey = localStorage.getItem('payKey');
+	localStorage.removeItem('payKey');
+//	$http.get($rootScope.baseURL + '/matchup/profile/' + $stateParams.username + '/teams').success(function(data) {
+//		$scope.teamsData = data;
+//
+//	}).error(function(data, status) {
+//		console.log(status);
+//	});
+
+}]);

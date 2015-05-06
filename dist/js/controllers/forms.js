@@ -18,10 +18,10 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 	$scope.tournament.game = "";
 
 	//Get the organization the customer belongs to
-	$http.get($rootScope.baseURL + '/matchup/profile/' + $window.sessionStorage.username + '/organizations').success(function(data) {
+	$http.get($rootScope.baseURL + '/matchup/profile/' + localStorage.getItem("username") + '/organizations').success(function(data) {
 
 		$scope.userOrganization = [];
-		$scope.userOrganization.push($window.sessionStorage.username);
+		$scope.userOrganization.push(localStorage.getItem("username"));
 		for (var i = 0; i < data.length; i++) {
 			$scope.userOrganization.push(data[i].organization_name);
 		}
@@ -512,7 +512,8 @@ myApp.controller("editTeamController", function($scope, $rootScope, $http, $stat
 			"name" : data.team_name,
 			"bio" : data.team_bio,
 			"logo" : data.team_logo,
-			"cover" : data.team_cover_photo
+			"cover" : data.team_cover_photo,
+			"team_paypal_info" : data.team_paypal_info
 		};
 		getMembers();
 	});
@@ -671,7 +672,7 @@ myApp.controller("RequestOrganizationController", function($scope, $window, $htt
 			$http.post($rootScope.baseURL + "/matchup/organizations", $scope.organization).success(function() {
 				alert("Request for an organization successful");
 				$state.go("app.userProfile", {
-					"username" : $window.sessionStorage.username
+					"username" : localStorage.getItem("username")
 				});
 			});
 		};
@@ -751,6 +752,7 @@ myApp.controller("editOrganizationController", function($scope, $window, $stateP
 			"cover" : $scope.organization.organization_cover_photo,
 			"bio" : $scope.organization.organization_bio,
 			"logo" : $scope.organization.organization_logo,
+			"organization_paypal_info" : $scope.organization.organization_paypal_info,
 
 		};
 

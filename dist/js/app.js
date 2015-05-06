@@ -299,10 +299,7 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			url: "/:user/request/organization/status",
 			templateUrl: "user/organization_requests.html",
 			controller: "organizationRequestsController"
-		})
-
-
-	.state('app.search', {
+		}).state('app.search', {
 			url: "/search/:query",
 			templateUrl: "search.html",
 			controller: "searchController"
@@ -311,6 +308,11 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			url: "/search/:type/:query",
 			templateUrl: "searchResults.html",
 			controller: "searchResultsController"
+		})
+		.state('app.paySuccessful', {
+			url: "/paySuccessful",
+			templateUrl: "paySuccessful.html",
+			controller: "paySuccessfulController"
 		});
 
 	$httpProvider.interceptors.push(function ($q, $timeout, $injector) {
@@ -327,8 +329,9 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			request: function (config) {
 				// AutheticationService is not initiated if the browser is refreshed
 				// Hack it with sessionStorage
-				if (sessionStorage.getItem("token") && sessionStorage.getItem("username"))
-					config.headers['Authorization'] = 'Bearer ' + sessionStorage.getItem("token");
+				console.log(localStorage.getItem("token"));
+				if (localStorage.getItem("token") && localStorage.getItem("username"))
+					config.headers['Authorization'] = "Bearer " + localStorage.getItem("token");
 				return config;
 			},
 			responseError: function (rejection) {
@@ -360,6 +363,10 @@ myApp.run(function ($rootScope, $state, AuthenticationService, $window, acuteSel
 
 	// Set the template path for all instances for acute template
 	acuteSelectService.updateSetting("templatePath", "event");
+
+	if (localStorage.getItem('payKey')) {
+		$state.go('app.paySuccessful');
+	}
 
 	// Authenticated selected states, not used for capstone
 	//	$rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams,error) {

@@ -1,7 +1,7 @@
 angular.module('Authentication', [])
 
-.factory('AuthenticationService', ['$http', '$window','$rootScope',
-    function ($http, $window,$rootScope) {
+.factory('AuthenticationService', ['$http','$rootScope',
+    function ($http,$rootScope) {
 		var service = {};
 
 		service.Login = function (username, password, callback) {
@@ -23,16 +23,16 @@ angular.module('Authentication', [])
 		};
 
 		service.SetCredentials = function (username, token) {
-			$window.sessionStorage.token = token;
-			$window.sessionStorage.username = username;
+			localStorage.setItem('token', token);
+			localStorage.setItem('username', username);
 		};
 
 		service.isAuthenticated = function () {
-			return ($window.sessionStorage.username && $window.sessionStorage.token);
+			return (localStorage.getItem("token") && localStorage.getItem("username"));
 		}
 
 		service.clearCredentials = function () {
-			$window.sessionStorage.clear();
+			localStorage.clear();
 		};
 
 		return service;

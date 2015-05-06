@@ -892,7 +892,7 @@ myApp.controller("editEventController", function($scope, $http, $window, $rootSc
 			$('#deleteEventModal').modal('hide');
 			$timeout(function() {
 				$state.go("app.myEvents", {
-					"username" : $window.sessionStorage.username,
+					"username" : localStorage.getItem("username"),
 				});
 			}, 300);
 		}).error(function(err) {
