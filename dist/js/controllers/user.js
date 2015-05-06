@@ -434,32 +434,12 @@ function ($scope, $http, $stateParams, $state, $rootScope) {
 		$scope.payKey = localStorage.getItem('payKey');
 		localStorage.removeItem('payKey');
 
-		var config = {
-			headers: {
-				'X-PAYPAL-SECURITY-USERID': $rootScope.PAYPAL_USERID,
-				'X-PAYPAL-SECURITY-PASSWORD': $rootScope.PAYPAL_PASSWORD,
-				'X-PAYPAL-SECURITY-SIGNATURE': $rootScope.PAYPAL_SIGNATURE,
-				'X-PAYPAL-REQUEST-DATA-FORMAT': $rootScope.PAYPAL_FORMAT,
-				'X-PAYPAL-RESPONSE-DATA-FORMAT': $rootScope.PAYPAL_FORMAT,
-				'X-PAYPAL-APPLICATION-ID': $rootScope.PAYPAL_APPID,
-				'Access-Control-Allow-Origin': '*'
-			}
-		};
+		$http.get($rootScope.baseURL + '/matchup/paypal/' + $scope.payKey).success(function (data) {
+			$scope.payInfo = data;
+			console.log(data);
 
-		var body = {
-			'payKey': $scope.payKey,
-			'requestEvelope': {
-				'errorLanguage': 'en_US',
-				'detailLevel': 'ReturlAll'
-			}
-		};
-
-//		$http.post($rootScope.SANDBOX_ENV + '/AdaptivePayments/PaymentDetails', body, config).success(function (data) {
-//			$scope.payInfo = data;
-//			console.log(data);
-//
-//		}).error(function (data, status) {
-//			console.log(status);
-//		});
+		}).error(function (data, status) {
+			console.log(status);
+		});
 
 }]);
