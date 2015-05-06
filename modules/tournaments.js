@@ -2768,7 +2768,7 @@ function competitor(req, pg, conString, payKey, tournament) {
 		query.on("end", function (result) {
 			var nextCompetitor = (!(result.rows[0].next_competitor) ? 1 : result.rows[0].next_competitor);
 			client.query({
-				text: "INSERT INTO competitor (event_name, event_start_date, event_location, tournament_name, competitor_number, competitor_standing, competitor_seed, matches_won, matches_lost, competitor_has_forfeited, competitor_check_in, competitor_paid) VALUES($1, $2, $3, $4, $5, 0, 0, 0, 0, false, false, true)",
+				text: "INSERT INTO competitor (event_name, event_start_date, event_location, tournament_name, competitor_number, competitor_standing, competitor_seed, matches_won, matches_lost, competitor_has_forfeited, competitor_check_in) VALUES($1, $2, $3, $4, $5, 0, 0, 0, 0, false, false)",
 				values: [req.params.event, req.query.date, req.query.location, req.params.tournament, nextCompetitor]
 			}, function (err, result) {
 				if (err) {
@@ -2894,7 +2894,7 @@ var registerForTournament = function(req, res, pg, conString, log, initPaypal) {
 					query.on("end", function (result) {
 						var nextCompetitor = (!(result.rows[0].next_competitor) ? 1 : result.rows[0].next_competitor);
 						client.query({
-							text: "INSERT INTO competitor (event_name, event_start_date, event_location, tournament_name, competitor_number, competitor_standing, competitor_seed, matches_won, matches_lost, competitor_has_forfeited, competitor_check_in, competitor_paid) VALUES($1, $2, $3, $4, $5, 0, 0, 0, 0, false, false, true)",
+							text: "INSERT INTO competitor (event_name, event_start_date, event_location, tournament_name, competitor_number, competitor_standing, competitor_seed, matches_won, matches_lost, competitor_has_forfeited, competitor_check_in) VALUES($1, $2, $3, $4, $5, 0, 0, 0, 0, false, false)",
 							values: [req.params.event, req.query.date, req.query.location, req.params.tournament, nextCompetitor]
 						}, function (err, result) {
 							if (err) {
