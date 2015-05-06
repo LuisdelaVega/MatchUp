@@ -5,7 +5,7 @@ myApp.controller("addTeamMemberController", ['$scope', '$ionicPopup', '$http', '
     //Confirm dialogue asking whether the user would like to add specified user to the team
     $scope.showConfirm = function (name, username) {
         var confirmPopup = $ionicPopup.confirm({
-            title: 'Remove Member',
+            title: 'Add Team Member',
             template: 'Are you sure you want to add ' + name + ''
         });
         confirmPopup.then(function (res) {
@@ -270,7 +270,7 @@ myApp.controller('teamController', function ($scope, $ionicPopover, $state, $ion
         //Synchronously makes server calls
         //Obtain general team information
         $scope.loggedInUserIsCaptain = false;
-        
+
         $http.get('http://136.145.116.232/matchup/teams/'+$stateParams.teamname+'', config).
         success(function(data, status, headers, config) {
 
@@ -701,7 +701,7 @@ myApp.controller('organizationController', function ($scope, $ionicPopover, $sta
     };
     $scope.goToEditOrganization = function () {
         $scope.popover.hide();
-        $state.go("app.editorganization");
+        $state.go("app.editorganization", {"organizationname": $stateParams.organizationname});
     }
     // A confirm dialog for deletion of team
     $scope.deleteOrganizationPopup = function () {
@@ -817,7 +817,6 @@ myApp.controller("organizationEventsController", ['$scope', '$ionicPopup', '$htt
             }
         };
 
-
         //Get event information
         $http.get('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'', config).
         success(function(data, status, headers, config) {
@@ -847,5 +846,35 @@ myApp.controller("organizationEventsController", ['$scope', '$ionicPopup', '$htt
         $state.go('app.organizationprofile', {"organizationname": $stateParams.organizationname});
 
     };
+
+}]);
+
+myApp.controller("editOrganizationMemberController", ['$scope', '$ionicPopup', '$http', '$window', '$stateParams', '$state', function ($scope, $ionicPopup, $http, $window, $stateParams, $state) {
+
+
+    $scope.$on('$ionicView.enter', function () {
+        
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+        $http.get('http://136.145.116.232/matchup/organizations/'+$stateParams.organizationname+'', config).
+        success(function(data, status, headers, config) {
+
+            $scope.organization = angular.fromJson(data);
+
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in goToEvent");
+        });
+    });
+
+    $scope.goToOrganizationProfile = function () {
+
+        $state.go('app.organizationprofile', {"organizationname": $stateParams.organizationname});
+
+    }
 
 }]);

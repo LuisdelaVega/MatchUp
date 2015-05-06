@@ -1,6 +1,23 @@
 var myApp = angular.module('regular-events',[]);
 
-myApp.controller('REController', ['$scope', '$http', '$ionicPopup', '$stateParams', '$window', 'sharedDataService', '$cordovaInAppBrowser', function ($scope, $http, $ionicPopup, $stateParams, $window, sharedDataService, $cordovaInAppBrowser) {
+myApp.controller('REController', ['$scope', '$http', '$ionicPopup', '$stateParams', '$window', 'sharedDataService', '$cordovaInAppBrowser', '$ionicPlatform', '$rootScope', function ($scope, $http, $ionicPopup, $stateParams, $window, sharedDataService, $cordovaInAppBrowser, $ionicPlatform, $rootScope) {
+
+    $rootScope.$on('$cordovaInAppBrowser:loadstart', function(e, event){
+        if(ionic.Platform.isIOS()){
+            if(event.url.match("matchup.neptunolabs.com")) {
+                $ionicPlatform.ready(function() {
+                    $cordovaInAppBrowser.close();
+                });
+            }
+        }
+        else if(ionic.Platform.isAndroid()){
+            if((event.url).startsWith("https://matchup.neptunolabs.com")) {
+                $ionicPlatform.ready(function() {
+                    $cordovaInAppBrowser.close();
+                });
+            }
+        }
+    });
 
     //Create popup when user clicks the sign up button
     $scope.signUpCompetitor = function () {
@@ -11,27 +28,15 @@ myApp.controller('REController', ['$scope', '$http', '$ionicPopup', '$stateParam
         confirmPopup.then(function (res) {
             if (res) {
 
+                var selectedTournament = sharedDataService.get(); //Get info from sharedDataService
 
-                if($scope.eventInfo.host == null){
-                    var selectedTournament = sharedDataService.get(); //Get info from sharedDataService
+                var config = {
+                    headers: {
+                        'Authorization': "Bearer "+ $window.sessionStorage.token
+                    }
+                };
 
-                    var config = {
-                        headers: {
-                            'Authorization': "Bearer "+ $window.sessionStorage.token
-                        }
-                    };
-
-                    $http.post('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+selectedTournament+'/register?date='+$stateParams.date+'&location='+$stateParams.location+'', { }, config).success(function(data, status, headers, config) {
-
-                        console.log("entered tournament");
-
-                    }).
-                    error(function(data, status, headers, config) {
-                        console.log("error in regularEventController");
-                    }); 
-                }
-
-                else{
+                $http.post('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+selectedTournament+'/register?date='+$stateParams.date+'&location='+$stateParams.location+'', { }, config).success(function(data, status, headers, config) {
 
                     var options = {
                         location: 'yes',
@@ -39,26 +44,28 @@ myApp.controller('REController', ['$scope', '$http', '$ionicPopup', '$stateParam
                         toolbar: 'no'
                     };
 
-                    $http.get('http://136.145.116.232/initPaypal', config).success(function(data, status, headers, config){
-
-                        $cordovaInAppBrowser.open('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey, '_system', options)
-                            .then(function(event) {
-                            // success
-
-                        })
-                            .catch(function(event) {
-                            // error
+                    if(status == 200){
+                        $ionicPlatform.ready(function() {
+                            $cordovaInAppBrowser.open('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey, '_blank', options).then(function () {
+                            }, function (error) {
+                                console.log("Error: " + error);
+                            });
                         });
+                    }
 
-                        // $cordovaInAppBrowser.close();
+                    else if (status == 201){
+                        var confirmPopup = $ionicPopup.alert({
+                            title: 'Team Sign Up',
+                            template: 'You have succesfully signed up '+$scope.selectedTeam.team.team_name+' in '+$stateParams.tournament+'!'
+                        });
+                        confirmPopup.then(function (res) {
 
-                    }).
-                    error(function(data, status, headers, config) {
-                        console.log("error in regularEventController");
-                    }); 
-
-                }
-
+                        });
+                    }                 
+                }).
+                error(function(data, status, headers, config) {
+                    console.log("error in regularEventController");
+                }); 
             } 
 
             else {
@@ -242,7 +249,7 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
 
 }]);
 
-myApp.controller('teamSignUpController', ['$scope', '$http', '$ionicPopup', '$stateParams', '$window', 'sharedDataService', '$cordovaInAppBrowser', function ($scope, $http, $ionicPopup, $stateParams, $window, sharedDataService, $cordovaInAppBrowser) {
+myApp.controller('teamSignUpController', ['$scope', '$http', '$ionicPopup', '$stateParams', '$window', 'sharedDataService', '$cordovaInAppBrowser', '$rootScope', '$ionicPlatform', function ($scope, $http, $ionicPopup, $stateParams, $window, sharedDataService, $cordovaInAppBrowser, $rootScope, $ionicPlatform) {
 
     $scope.$on('$ionicView.enter', function () {
 
@@ -308,6 +315,23 @@ myApp.controller('teamSignUpController', ['$scope', '$http', '$ionicPopup', '$st
         });     
     };
 
+    $rootScope.$on('$cordovaInAppBrowser:loadstart', function(e, event){
+        if(ionic.Platform.isIOS()){
+            if(event.url.match("matchup.neptunolabs.com")) {
+                $ionicPlatform.ready(function() {
+                    $cordovaInAppBrowser.close();
+                });
+            }
+        }
+        else if(ionic.Platform.isAndroid()){
+            if((event.url).startsWith("https://matchup.neptunolabs.com")) {
+                $ionicPlatform.ready(function() {
+                    $cordovaInAppBrowser.close();
+                });
+            }
+        }
+    });
+
     $scope.teamSignUp = function () {
 
         var config = {
@@ -317,34 +341,12 @@ myApp.controller('teamSignUpController', ['$scope', '$http', '$ionicPopup', '$st
         };
 
 
-        $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'?date='+$stateParams.date+'&location='+$stateParams.location+'', config).success(function(data, status, headers, config) {
+        $http.post('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+$stateParams.tournament+'/register?date='+$stateParams.date+'&location='+$stateParams.location+'', {
 
-            var eventInfo = angular.fromJson(data);
-            
-            if(eventInfo.host == null){     
+            "team": $scope.selectedTeam.team.team_name,
+            "players": $scope.checkedMembers
 
-            $http.post('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+$stateParams.tournament+'/register?date='+$stateParams.date+'&location='+$stateParams.location+'', {
-
-                "team": $scope.selectedTeam.team.team_name,
-                "players": $scope.checkedMembers
-
-            }, config).success(function(data) {
-
-                var confirmPopup = $ionicPopup.alert({
-                    title: 'Team Sign Up',
-                    template: 'You have succesfully signed up '+$scope.selectedTeam.team.team_name+' in '+$stateParams.tournament+'!'
-                });
-                confirmPopup.then(function (res) {
-
-                });
-
-            }).
-            error(function(data, status, headers, config) {
-                console.log("error in regularEventController");
-            });
-        }
-
-        else{
+        }, config).success(function(data, status) {
 
             var options = {
                 location: 'yes',
@@ -352,28 +354,24 @@ myApp.controller('teamSignUpController', ['$scope', '$http', '$ionicPopup', '$st
                 toolbar: 'no'
             };
 
-            $http.get('http://136.145.116.232/initPaypal', config).success(function(data, status, headers, config){
-
-                $cordovaInAppBrowser.open('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey, '_system', options)
-                    .then(function(event) {
-                    // success
-
-                })
-                    .catch(function(event) {
-                    // error
+            if(status == 200){
+                $ionicPlatform.ready(function() {
+                    $cordovaInAppBrowser.open('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey, '_blank', options).then(function () {
+                    }, function (error) {
+                        console.log("Error: " + error);
+                    });
                 });
+            }
 
-                // $cordovaInAppBrowser.close();
+            else if (status == 201){
+                var confirmPopup = $ionicPopup.alert({
+                    title: 'Team Sign Up',
+                    template: 'You have succesfully signed up '+$scope.selectedTeam.team.team_name+' in '+$stateParams.tournament+'!'
+                });
+                confirmPopup.then(function (res) {
 
-
-            }).
-            error(function(data, status, headers, config) {
-                console.log("error in regularEventController");
-            });
-
-
-        }
-
+                });
+            }
         }).
         error(function(data, status, headers, config) {
             console.log("error in regularEventController");

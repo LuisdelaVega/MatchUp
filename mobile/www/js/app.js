@@ -287,6 +287,7 @@ angular.module('App', ['ionic', 'wu.masonry', 'ionic.rating', 'home' , 'premium-
         .state('app.editorganization', {
         url: "/editorganization/:organizationname",
         templateUrl: "templates/organizationprofile/edit.html",
+        controller: "editOrganizationMemberController"
     })
 
     //================================================================================

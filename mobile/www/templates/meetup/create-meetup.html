@@ -4,29 +4,31 @@
             <i class="icon ion-ios-arrow-back"></i>
         </button>
     </ion-nav-buttons>
-    <ion-nav-buttons side="right">
-        <button class="button button-icon ion-android-alert">
-        </button>
-    </ion-nav-buttons>
     <ion-content>
         <div class="list list-inset">
             <label class="item item-input item-stacked-label">
                 <span class="input-label">Meetup Name</span>
-                <input type="text" placeholder="Name">
+                <input type="text" placeholder="Name" ng-model="meetup.name">
             </label>
             <label class="item item-input item-stacked-label">
                 <span class="input-label">Location</span>
-                <input type="text" placeholder="Room 101">
+                <input type="text" placeholder="Room 101" ng-model="meetup.location">
             </label>
             <label class="item item-input item-stacked-label">
                 <span class="input-label">Start Date</span>
-                <input type="datetime-local">
+                <input type="datetime-local" ng-model="meetup.start_date">
+            </label>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">End Date</span>
+                <input type="datetime-local" ng-model="meetup.end_date">
             </label>
             <label class="item item-input item-stacked-label">
                 <span class="input-label">Details</span>
-                <textarea rows="4"></textarea>
+                <textarea rows="4" ng-model="meetup.description"></textarea>
             </label>
-            <button class="button button-block button-balanced" ng-click="goToMeetups()">
+            {{ meetup}}
+            
+            <button class="button button-block button-balanced" ng-click="submitMeetup()">
                 Submit
             </button>
         </div>

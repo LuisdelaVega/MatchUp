@@ -1,6 +1,6 @@
-<ion-view view-title="Edit Organization">
+<ion-view view-title="Edit {{ organization.organization_name }}">
     <ion-nav-buttons side="left">
-        <button class="button button-icon" ui-sref="app.organizationprofile">
+        <button class="button button-icon" ng-click="goToOrganizationProfile()">
             <i class="icon ion-ios-arrow-back"></i>
         </button>
     </ion-nav-buttons>
@@ -8,12 +8,12 @@
         <div class="list list-inset">
             <label class="item item-input item-stacked-label">
                 <span class="input-label">Bio</span>
-                <textarea rows="5"></textarea>
+                <textarea rows="5" ng-model="organization.organization_bio"></textarea>
             </label>
         </div>
         <div class="card">
             <div class="item item-body">
-                <p>Image Preview</p>
+                <img class="full-image" ng-src="{{ organization.organization_cover_photo }}" id="preview">
             </div>
             <div class="item">
                 <button class="button button-block button-positive">
@@ -23,7 +23,7 @@
         </div>
         <div class="card">
             <div class="item item-body">
-                <p>Image Preview</p>
+                <img class="full-image" ng-src="{{ organization.organization_logo }}" id="preview2">
             </div>
             <div class="item">
                 <button class="button button-block button-positive">

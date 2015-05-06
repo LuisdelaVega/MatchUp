@@ -351,8 +351,8 @@ myApp.controller('reportController', ['$scope', '$http', '$cordovaCamera', '$ion
         var options = { 
             quality : 75, 
             destinationType : Camera.DestinationType.DATA_URL, 
-            //sourceType : Camera.PictureSourceType.CAMERA, 
-            sourceType : Camera.PictureSourceType.PHOTOLIBRARY,
+            sourceType : Camera.PictureSourceType.CAMERA, 
+//            sourceType : Camera.PictureSourceType.PHOTOLIBRARY,
             allowEdit : true,
             encodingType: Camera.EncodingType.JPEG,
             targetWidth: 300,

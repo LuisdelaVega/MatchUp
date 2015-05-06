@@ -155,16 +155,40 @@ myApp.controller('eventPremiumParentController', function ($scope, $state, $http
     });
 });
 
-myApp.controller('createMeetupController', function ($scope, $state, $http, $stateParams, sharedDataService) {
+myApp.controller('createMeetupController', function ($scope, $state, $http, $stateParams, sharedDataService, $ionicPopup, $window, $filter) {
 
 
-    $scope.goToMeetups = function () {
-        $state.go("app.meetups", {
-            eventname: $stateParams.eventname,
-            date: $stateParams.date,
-            location: $stateParams.location
-        })
-    };
+    $scope.submitMeetup = function () {
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+        $scope.meetup.start_date = new Date($filter('date')(new Date($scope.meetup.start_date), 'yyyy-MM-dd HH:mm:ss'));
+        $scope.meetup.end_date= new Date($filter('date')(new Date($scope.meetup.end_date), 'yyyy-MM-dd HH:mm:ss'));
+
+        $http.post('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/meetups?date='+$stateParams.date+'&location='+$stateParams.meetup+'', $scope.meetup, config).
+        success(function(data, status, headers, config) {
+
+            var confirmPopup = $ionicPopup.alert({
+                title: 'Host Meetup',
+                template: 'You have successfully submitted your meetup!'
+            });
+
+            confirmPopup.then(function (res) {
+                $state.go("app.meetups", {
+                    eventname: $stateParams.eventname,
+                    date: $stateParams.date,
+                    location: $stateParams.location
+                })
+            });
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in eventPremiumSummaryController");
+        });
+    }
+    $scope.meetup = { };
 
 });
 
@@ -200,18 +224,22 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
 
     });
 
-    $rootScope.$on('$cordovaInAppBrowser:loadstop', function(e, event){
-        if (event.url.match("matchup.neptunolabs.com")) {
-            $ionicPlatform.ready(function() {
-                $cordovaInAppBrowser.close();
-            });
+    $rootScope.$on('$cordovaInAppBrowser:loadstart', function(e, event){
+        if(ionic.Platform.isIOS()){
+            if(event.url.match("matchup.neptunolabs.com")) {
+                $ionicPlatform.ready(function() {
+                    $cordovaInAppBrowser.close();
+                });
+            }
+        }
+        else if(ionic.Platform.isAndroid()){
+            if((event.url).startsWith("https://matchup.neptunolabs.com")) {
+                $ionicPlatform.ready(function() {
+                    $cordovaInAppBrowser.close();
+                });
+            }
         }
     });
-
-//    else if(ionic.Platform.isAndroid()){
-//        //ADD ANDROID LISTENER
-//    }
-
 
     $scope.signUpSpectator = function () {
 
@@ -227,10 +255,9 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
             toolbar: 'no'
         };
 
-        $http.get('http://136.145.116.232/initPaypal', config).success(function(data, status, headers, config){
+        $http.post('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/specfees/'+$scope.spectator.Fee+'?date='+$stateParams.date+'&location='+$stateParams.location+'', { }, config).success(function(data, status, headers, config) {
 
-
-            if(ionic.Platform.isIOS()){
+            if(status == 200){
                 $ionicPlatform.ready(function() {
                     $cordovaInAppBrowser.open('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey, '_blank', options).then(function () {
                     }, function (error) {
@@ -239,20 +266,16 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
                 });
             }
 
-            else if(ionic.Platform.isAndroid()){
-                $ionicPlatform.ready(function() {
-                    $cordovaInAppBrowser.open('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey, '_system', options).then(function () {
-                    }, function (error) {
-                        console.log("Error: " + error);
-                    });
-                });
+            else if (status == 201){
+                $state.go("app.eventpremium", {
+                    eventname: $stateParams.eventname,
+                    date: $stateParams.date,
+                    location: $stateParams.location
+                });   
             }
-
-
-
         }).
         error(function(data, status, headers, config) {
-            console.log("error in regularEventController");
+            console.log("error in eventPremiumSummaryController");
         });
 
     }
@@ -382,7 +405,6 @@ myApp.controller('meetupController', function ($scope, $state, $http, $statePara
         }
     };
 
-
     //Get meetups added to the event
     $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/meetups?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
     success(function(data, status, headers, config) {
@@ -412,14 +434,38 @@ myApp.controller('meetupController', function ($scope, $state, $http, $statePara
 
 });
 
-myApp.controller('writeReviewController', function ($scope, $state, $http, $stateParams, sharedDataService) {
+myApp.controller('writeReviewController', function ($scope, $state, $http, $stateParams, sharedDataService, $ionicPopup, $window) {
 
-    $scope.goToSummaryFromReview = function (eventName) {
-        $state.go("app.review", {
-            eventname: $stateParams.eventname,
-            date: $stateParams.date,
-            location: $stateParams.location
-        })
+    $scope.review = { };
 
+    $scope.max = 5;
+
+    var config = {
+        headers: {
+            'Authorization': "Bearer "+ $window.sessionStorage.token
+        }
+    };
+
+    $scope.submitReview = function (eventName) {
+
+        $http.post('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/reviews?date='+$stateParams.date+'&location='+$stateParams.location+'', $scope.review, config).
+        success(function(data, status, headers, config) {
+
+            var confirmPopup = $ionicPopup.alert({
+                title: 'Write Review',
+                template: 'You have successfully submitted your review!'
+            });
+
+            confirmPopup.then(function (res) {
+                $state.go("app.review", {
+                    eventname: $stateParams.eventname,
+                    date: $stateParams.date,
+                    location: $stateParams.location
+                });
+            });
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in eventPremiumSummaryController");
+        });
     }
 });
