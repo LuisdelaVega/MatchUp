@@ -363,7 +363,7 @@ myApp.run(function ($rootScope, $state, AuthenticationService, $window, acuteSel
 	// Set the template path for all instances for acute template
 	acuteSelectService.updateSetting("templatePath", "event");
 
-	document.domain = $rootScope.baseURL;
+	document.domain = "matchup.neptunolabs.com";
 	if (localStorage.getItem('payKey')) {
 		$state.go('app.paySuccessful');
 	}
