@@ -311,7 +311,7 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 		})
 		.state('app.paySuccessful', {
 			url: "/paySuccessful",
-			templateUrl: "paySuccessful.html",
+			templateUrl: "user/paySuccessful.html",
 			controller: "paySuccessfulController"
 		});
 
@@ -329,7 +329,6 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			request: function (config) {
 				// AutheticationService is not initiated if the browser is refreshed
 				// Hack it with sessionStorage
-				console.log(localStorage.getItem("token"));
 				if (localStorage.getItem("token") && localStorage.getItem("username"))
 					config.headers['Authorization'] = "Bearer " + localStorage.getItem("token");
 				return config;
@@ -364,6 +363,7 @@ myApp.run(function ($rootScope, $state, AuthenticationService, $window, acuteSel
 	// Set the template path for all instances for acute template
 	acuteSelectService.updateSetting("templatePath", "event");
 
+	document.domain = $rootScope.baseURL;
 	if (localStorage.getItem('payKey')) {
 		$state.go('app.paySuccessful');
 	}
