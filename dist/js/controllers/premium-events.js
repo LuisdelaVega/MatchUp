@@ -1,7 +1,7 @@
 var myApp = angular.module('premium-events', []);
 
 //Controller used to manage the Premium event page, includes various tasks such as retriving participants, sponsors, the organization hosting the event, the different tournaments, meetups and news
-myApp.controller('eventPremiumSummaryController', function ($scope, $state, $http, $stateParams, sharedDataService, $q, $rootScope,$window) {
+myApp.controller('eventPremiumSummaryController', function ($scope, $state, $http, $stateParams, sharedDataService, $q, $rootScope) {
 
 	var now_utc = new Date();
 
@@ -92,7 +92,7 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 				if (parseInt(status) == 200) {
 					console.log(200);
 					localStorage.setItem('payKey', data.payKey);
-					$window.location.href = 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey;
+					window.location.href = 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey;
 				} else if (parseInt(status) == 201) {
 					console.log(201);
 				}
