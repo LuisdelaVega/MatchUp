@@ -729,9 +729,8 @@ function displayBracket($scope) {
 		// Calculate height of loser bracket
 		var loserBracketHeight = $scope.loserRounds[0].length * 96 + 18 + 39 + 20;
 
-
-		if ($scope.loserRounds[0].length == 1) {
-			loserBracketHeight += 200;
+		if (roundsResponse.loserRounds[0].matches.length == 1) {
+			loserBracketHeight += 120;
 		}
 
 			$scope.loserBracketHeight = {

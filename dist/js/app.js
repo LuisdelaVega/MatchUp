@@ -1,9 +1,10 @@
 var myApp = angular.module('MatchUp', ['ui.router', 'ngResource', 'as.sortable', 'ui.bootstrap.datetimepicker', 'panhandler', 'Authentication', 'InputDirectives', 'bracketDirective', 'acute.select', 'home', 'premium-events', 'tournaments', 'user', 'organizer', 'organization', 'forms', 'ordinal']);
 
 myApp.config(function($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider) {
-	//
-	// For any unmatched url, redirect to /home
+	
+	// For any unmatched url, redirect to /login
 	$urlRouterProvider.otherwise(function($injector, $location) {
+		// this fixes a bug in onstatechangestart where a infinite loop arises in the digest
 		var $state = $injector.get("$state");
 		$state.go("login");
 	});
@@ -326,9 +327,8 @@ myApp.run(function($rootScope, $state, AuthenticationService, $window, acuteSele
 
 	document.domain = "matchup.neptunolabs.com";
 
-	console.log(localStorage.getItem('payKey'));
-
-	$rootScope.$on('$stateChangeStart', function(event, toState) {
+	$rootScope.$on('$stateChangeStart',
+		function (event, toState, toParams, fromState, fromParams) {
 		// Redirect to pay successful
 		if ((toState.name == "login") && localStorage.getItem('payKey')) {
 			console.log("in pay key");
@@ -340,8 +340,14 @@ myApp.run(function($rootScope, $state, AuthenticationService, $window, acuteSele
 			console.log("in home");
 			event.preventDefault();
 			$state.go("app.home");
+			// Remove paykey if user navigates away from paySuccessful
+			} else if (fromState.name == 'app.paySuccessful' && toState.name != 'app.paySuccessful') {
+				localStorage.removeItem('payKey');
+			// Do not let user go to paySuccessful if theres no paykey
+			} else if (toState.name == 'app.paySuccessful' && !localStorage.getItem('payKey'))
+				event.preventDefault();
 		}
-	});
+	);
 });
 
 myApp.factory("MatchUpCache", function($cacheFactory) {

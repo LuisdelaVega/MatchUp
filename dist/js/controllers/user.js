@@ -432,7 +432,6 @@ function ($scope, $http, $stateParams, $state, $rootScope) {
 
 		$scope.hi = "hey";
 		$scope.payKey = localStorage.getItem('payKey');
-		localStorage.removeItem('payKey');
 
 		$http.get($rootScope.baseURL + '/matchup/paypal/' + $scope.payKey).success(function (data) {
 			$scope.payInfo = data;
