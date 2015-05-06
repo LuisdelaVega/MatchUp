@@ -81,9 +81,9 @@ myApp.controller("SeedingController", function($scope, $http, $window, $rootScop
 			$scope.seedingSaved = data.competitors.length > 0;
 
 			// Check if every player has a seed
-			for(var i = 0; i < data.competitors.length; i++){
+			for (var i = 0; i < data.competitors.length; i++) {
 				// Seed = 0
-				if(!data.competitors[i].competitor_seed)
+				if (!data.competitors[i].competitor_seed)
 					$scope.seedingSaved = false;
 			}
 
@@ -99,7 +99,6 @@ myApp.controller("SeedingController", function($scope, $http, $window, $rootScop
 				$scope.twoStageCheck = (numberOfPeopleAdvancing < 4);
 			} else
 				$scope.twoStageCheck = false;
-
 
 		}).error(function(err) {
 			console.log(err);
@@ -1532,3 +1531,46 @@ myApp.controller("tournamentDetailsController", function($scope, $http, $window,
 
 });
 
+myApp.controller("eventOverviewController", function($scope, $http, $window, $rootScope, $state, $stateParams) {
+	//event/:eventName/:eventDate/:eventLocation/overview",
+
+	//GET EVENT INFO
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation + '').success(function(data) {
+		$scope.eventInfo = data;
+		console.log("Event Info");
+		console.log(data);
+	});
+	//GET TOURNAMENT INFO
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+		$scope.tournamentsInfo = data;
+		console.log("Tournament Info");
+		console.log(data);
+
+		if ($scope.tournamentsInfo) {
+			if ($scope.tournamentsInfo.length)
+				$scope.getCompetitors(0);
+		}
+	});
+
+	//GET SPECTATOR FEES
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/specfees' + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+		$scope.fees = data;
+		console.log("Spectator Fees");
+		console.log(data);
+	});
+	//GET PARTICIPANTS
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/spectators?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+		$scope.participants = data;
+		console.log("Participants");
+		console.log(data);
+	});
+
+	//GET COMPETITORS FOR SELECTED TOURNMANET
+	$scope.getCompetitors = function(index) {
+		$scope.selectedTournament = $scope.tournamentsInfo[index];
+		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournamentsInfo[index].tournament_name + '/competitors?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
+			$scope.competitors = data;
+		});
+	};
+
+});

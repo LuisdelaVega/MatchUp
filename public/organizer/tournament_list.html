@@ -5,11 +5,11 @@
 				<legend>
 					Tournaments
 				</legend>
-				<div class="list-group">
+				<div class="list-group" ng-if="type">
 					<div class="list-group-item clearfix" ng-repeat="item in tournaments">
-						<span class="pull-right"><a class="btn btn-sm btn-danger" ng-click="deleteTournament($index)"><span class="fa fa-times"></span> </a> </span>
+						<span class="pull-right" ><a class="btn btn-sm btn-danger" ng-click="deleteTournament($index)"><span class="fa fa-times"></span> </a> </span>
 						<span class="pull-right"><a class="btn btn-sm btn-primary second-button-ticket" ui-sref="app.editTournament({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location, tournamentName: item.tournament_name})"><span class="fa fa-gear"></span> </a> </span>
-						<div ui-sref="app.tournamentDetails({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location, tournamentName: item.tournament_name})" >
+						<div  >
 
 							<p class="lead event-footer-title">
 								{{item.tournament_name}}
@@ -26,11 +26,30 @@
 						</div>
 					</div>
 				</div>
-				<a class="btn btn-success" ng-click="addTournament()">Add Tournament</a>
+				<div class="list-group" ng-if="!type">
+					<div class="list-group-item clearfix" ng-repeat="item in tournaments">
+						<div  ui-sref="app.tournamentDetails({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location, tournamentName: item.tournament_name})">
+
+							<p class="lead event-footer-title">
+								{{item.tournament_name}}
+							</p>
+							Game: {{item.game_name}}
+							<br>
+							Type: {{item.tournament_type}}
+							<br>
+							Format:{{item.tournament_format}}
+							<br>
+							Price {{item.competitor_fee}}
+							<br>
+							Capacity {{item.tournament_max_capacity}}
+						</div>
+					</div>
+				</div>
+				<a class="btn btn-success" ng-click="addTournament()" ng-if="type">Add Tournament</a>
 			</form>
 		</div>
 	</div>
-	<div class="tab-pane fade" id="tournament-tab">
+	<div class="tab-pane fade" id="tournament-tab" ng-if="type">
 		<div class="box">
 			<h2>Tournament</h2>
 			<form>
@@ -203,7 +222,7 @@
 	</li>
 </ul>
 
-<div class="modal fade" id="deleteModal">
+<div class="modal fade" id="deleteModal" ng-if="type">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">

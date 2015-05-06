@@ -887,6 +887,8 @@ myApp.controller("editHostedTournamentListController", function($scope, $http, $
 	// FUCK ACUTE
 	$scope.newTournament = {};
 	$scope.newTournament.game = "";
+	
+	$scope.type = $stateParams.manage  == 'edit';
 
 	// Get games for dropdown
 	$http.get($rootScope.baseURL + '/matchup/popular/games').success(function(data) {
