@@ -2804,7 +2804,7 @@ function competitor(req, pg, conString, payKey, tournament) {
 											for (var i = 0, index = 0; i < parseInt(tournament.team_size); i++) {
 												client.query({
 													text: "INSERT INTO is_a (event_name, event_start_date, event_location, tournament_name, competitor_number, customer_username) VALUES($1, $2, $3, $4, $5, $6)",
-													values: [req.params.event, req.query.date, req.query.location, req.params.tournament, parseInt(competitor_number), customer_username]
+													values: [req.params.event, req.query.date, req.query.location, req.params.tournament, parseInt(nextCompetitor), req.body.players[i]]
 												}, function (err, result) {
 													if (err) {
 														client.query("ROLLBACK");
@@ -2825,7 +2825,7 @@ function competitor(req, pg, conString, payKey, tournament) {
 							} else {
 								client.query({
 									text: "INSERT INTO is_a (event_name, event_start_date, event_location, tournament_name, competitor_number, customer_username) VALUES($1, $2, $3, $4, $5, $6)",
-									values: [req.params.event, req.query.date, req.query.location, req.params.tournament, parseInt(competitor_number), customer_username]
+									values: [req.params.event, req.query.date, req.query.location, req.params.tournament, parseInt(nextCompetitor), req.user.username]
 								}, function (err, result) {
 									if (err) {
 										client.query("ROLLBACK");
