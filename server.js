@@ -38,6 +38,7 @@ var organizations = require('./modules/organizations');
 // Global variables
 var conString = "pg://luis:portal1!@127.0.0.1:5432/matchupdb";
 var secret = '7h1s h6Re i5 th6 p6rf6c7 plac6 t0 m4kE 4 Nyx A5s4s51n j0k6!';
+// Paypal
 var PAYPAL_USERID = 'neptunolabs-facilitator_api1.gmail.com';
 var PAYPAL_PASSWORD = 'XWBY9MS84HGAH5QD';
 var PAYPAL_SIGNATURE = 'AQU0e5vuZCvSg-XJploSa.sGUDlpADHudcLIG.989J8K1T5hwCU6BTLu';
@@ -146,13 +147,11 @@ function authenticate(req, res) {
 	});
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
 //*\\\\\\\\\\* Paypal *//////////*/
-app.get('/initPaypal', function (req, res) {
-	log.info({
-		req: req
-	}, 'start request');
-
+/*
+ * Callback function to initialize the paypal transaction
+ */
+function initPaypal(req, res, details, log, createTables) {
 	//Set up the request to paypal
 	var req_options = {
 		host: 'svcs.sandbox.paypal.com',
@@ -174,8 +173,8 @@ app.get('/initPaypal', function (req, res) {
 		"receiverList": {
 			"receiver": [
 				{
-					"amount": "10.00",
-					"email": "bigote@gmail.com"
+					"amount": details.amount,//"10.00", // Changes
+					"email": details.email//"bigote@gmail.com" // Changes
 				}
 			]
 		},
@@ -199,6 +198,10 @@ app.get('/initPaypal', function (req, res) {
 			var dataJSON = JSON.parse(data);
 			console.log(dataJSON);
 			console.log(dataJSON.payKey);
+
+			// Create the tables
+			createTables(req, pg, conString, dataJSON.payKey, details);
+
 			res.status(200).send(JSON.stringify(dataJSON));
 			log.info({
 				res: res
@@ -215,16 +218,54 @@ app.get('/initPaypal', function (req, res) {
 	});
 
 	paypalReq.end();
-});
+}
 
-app.get('/paypalSuccess', function(req,res){
+app.get('/paypalSuccess', function(req, res){
 	log.info({
 		req : req
 	}, 'start request');
 
 	console.log(req.headers.referer);
 	var payKey = req.headers.referer.split("=")[2];
-	//res.status(200).send('Congratulations here is your paykey: ' + payKey);
+
+	/*
+	 * Query looking for the paykey to know if competitor/spectator/payout
+	 * Update query competitor/spectator/payout paid value
+	 */
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		client.query("BEGIN");
+		client.query({
+			text: "UPDATE spectator_pays SET transaction_completed = true WHERE spectator_paykey = $1",
+			values: [payKey]
+		}, function (err, result) {
+			if (err) {
+				client.query("ROLLBACK");
+				done();
+				console.log(err);
+			} else {
+				client.query({
+					text: "UPDATE competitor_pays SET competitor_paid = true WHERE competitor_paykey = $1",
+					values: [payKey]
+				}, function (err, result) {
+					if (err) {
+						client.query("ROLLBACK");
+						done();
+						console.log(err);
+					} else {
+						//TODO payout
+						client.query("COMMIT");
+						done();
+					}
+				});
+			}
+		});
+	});
+
+	//res.status(200).send(payKey);
 	res.status(302).redirect('https://matchup.neptunolabs.com');
 
 	log.info({
@@ -259,6 +300,7 @@ app.post('/paypal', function(req,res){
 	}, 'done response');
 });
 
+///////////////////////////////////////////////////////////////////////////////////////////// TEST ROUTES
 //*\\\\\\\\\\* API *//////////*/
 /* /api
  *
@@ -532,7 +574,7 @@ app.route('/matchup/events/:event/specfees/:spec_fee').post(function(req, res) {
 	log.info({
 		req : req
 	}, 'start request');
-	customers.registerAsSpectator(req, res, pg, conString, log);
+	customers.registerAsSpectator(req, res, pg, conString, log, initPaypal);
 }).delete(function(req, res) {
 	log.info({
 		req : req
@@ -617,7 +659,7 @@ app.route('/matchup/events/:event/tournaments/:tournament/register').post(functi
 	log.info({
 		req : req
 	}, 'start request');
-	tournaments.registerForTournament(req, res, pg, conString, log);
+	tournaments.registerForTournament(req, res, pg, conString, log, initPaypal);
 });
 
 /* /matchup/events/:event/tournaments/:tournament/standings?date=date&location=string

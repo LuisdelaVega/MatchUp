@@ -1244,7 +1244,41 @@ var createEvent = function(req, res, pg, conString, log) {
 	});
 };
 
-var registerAsSpectator = function(req, res, pg, conString, log) {
+function spectator(req, pg, conString, payKey) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		client.query("BEGIN");
+		client.query({
+			text: "INSERT INTO pays (event_name, event_start_date, event_location, spec_fee_name, customer_username, check_in) VALUES ($1, $2, $3, $4, $5, $6)",
+			values: [req.params.event, req.query.date, req.query.location, req.params.spec_fee, req.user.username, false]
+		}, function (err, result) {
+			if (err) {
+				client.query("ROLLBACK");
+				done();
+				console.log(err);
+			} else {
+				client.query({
+					text: "INSERT INTO spectator_pays (event_name, event_start_date, event_location, spec_fee_name, customer_username, transaction_completed, spectator_paykey) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+					values: [req.params.event, req.query.date, req.query.location, req.params.spec_fee, req.user.username, false, payKey]
+				}, function (err, result) {
+					if (err) {
+						client.query("ROLLBACK");
+						done();
+						console.log(err);
+					} else {
+						client.query("COMMIT");
+						done();
+					}
+				});
+			}
+		});
+	});
+}
+
+var registerAsSpectator = function(req, res, pg, conString, log, initPaypal) {
 	pg.connect(conString, function(err, client, done) {
 		if (err) {
 			return console.error('error fetching client from pool', err);
@@ -1252,7 +1286,7 @@ var registerAsSpectator = function(req, res, pg, conString, log) {
 
 		client.query("BEGIN");
 		var query = client.query({
-			text : "SELECT spec_fee_amount, spec_fee_amount_available AS amount_available, ($5 IN (SELECT customer_username FROM pays WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND spec_fee_name = $4)) AS already_purchased, (SELECT count(*) FROM pays WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND spec_fee_name = $4) AS sold FROM spectator_fee NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND spec_fee_name = $4 AND event_active",
+			text : "SELECT spectator_fee.spec_fee_amount AS amount, organization.organization_paypal_info AS email, spectator_fee.spec_fee_amount_available AS amount_available, ($5 IN (SELECT customer_username FROM pays WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND spec_fee_name = $4)) AS already_purchased, (SELECT count(*) FROM pays WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND spec_fee_name = $4) AS sold FROM spectator_fee NATURAL JOIN event LEFT OUTER JOIN hosts ON hosts.event_name = event.event_name AND hosts.event_start_date = event.event_start_date AND hosts.event_location = event.event_location LEFT OUTER JOIN organization ON organization.organization_name = hosts.organization_name WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND spec_fee_name = $4 AND event_active",
 			values : [req.params.event, req.query.date, req.query.location, req.params.spec_fee, req.user.username]
 		});
 		query.on("row", function(row, result) {
@@ -1269,6 +1303,7 @@ var registerAsSpectator = function(req, res, pg, conString, log) {
 		});
 		query.on("end", function(result) {
 			if (result.rows.length) {
+				var details = result.rows[0];
 				if (result.rows[0].already_purchased || result.rows[0].sold >= result.rows[0].amount_available) {
 					client.query("ROLLBACK");
 					done();
@@ -1280,15 +1315,7 @@ var registerAsSpectator = function(req, res, pg, conString, log) {
 						res : res
 					}, 'done response');
 				} else {
-					//if (result.rows[0].spec_fee_amount > 0) {
-						/*
-						 Here we would handle the payment.
-						 After getting some sort of confirmation that the process was completed, we would insert into the pays table.
-						 This could most likelly be done using webhooks, only concern is managing the parameter data over at the webhook.
-						 If I can specify some req of query parameters over at the webhook we wont have any problems. And I believe I can cause that's the whole point of webhooks.
-						 I'll just redirect to a uri that contains all the needed parameters, or better yet, if I can set the payload for the webhook this will be really simple
-						 */
-					//} else {
+					if (parseInt(details.amount) == 0) {
 						client.query({
 							text: "INSERT INTO pays (event_name, event_start_date, event_location, spec_fee_name, customer_username, check_in) VALUES ($1, $2, $3, $4, $5, $6)",
 							values: [req.params.event, req.query.date, req.query.location, req.params.spec_fee, req.user.username, false]
@@ -1301,13 +1328,17 @@ var registerAsSpectator = function(req, res, pg, conString, log) {
 							} else {
 								client.query("COMMIT");
 								done();
-								res.status(201).send("Spec fee added");
+								res.status(201).send("Added as a spectator");
 							}
 							log.info({
 								res: res
 							}, 'done response');
 						});
-					//}
+					} else {
+						client.query("COMMIT");
+						done();
+						initPaypal(req, res, details, log, spectator);
+					}
 				}
 			} else {
 				client.query("ROLLBACK");
