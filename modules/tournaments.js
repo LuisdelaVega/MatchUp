@@ -3323,6 +3323,98 @@ var deleteStages = function(req, res, pg, conString, log) {
 	});
 };
 
+var getPayouts = function(req, res, pg, conString, log) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		client.query("BEGIN");
+		var query = client.query({
+			text: "SELECT tournament_name FROM tournament NATURAL JOIN event WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND event_active AND tournament_active",
+			values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+		});
+		query.on("row", function (row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function (error) {
+			client.query("ROLLBACK");
+			done();
+			console.log("torunament.js - deleteStages");
+			console.log(error);
+			res.status(500).send(error);
+			log.info({
+				res: res
+			}, 'done response');
+		});
+		query.on("end", function (result) {
+			if (result.rows.length) {
+				client.query({
+					text: "DELETE FROM round WHERE (event_name, event_start_date, event_location, tournament_name) = ($1, $2, $3, $4)",
+					values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+				}, function (err, result) {
+					if (err) {
+						client.query("ROLLBACK");
+						done();
+						console.log("torunament.js - deleteStages");
+						console.log(err);
+						res.status(500).send(err);
+						log.info({
+							res: res
+						}, 'done response');
+					} else {
+						client.query({
+							text: 'DELETE FROM "group" WHERE (event_name, event_start_date, event_location, tournament_name) = ($1, $2, $3, $4)',
+							values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+						}, function (err, result) {
+							if (err) {
+								client.query("ROLLBACK");
+								done();
+								console.log("torunament.js - deleteStages");
+								console.log(err);
+								res.status(500).send(err);
+								log.info({
+									res: res
+								}, 'done response');
+							} else {
+								client.query({
+									text: 'UPDATE competitor SET (matches_won, matches_lost) = (0, 0) WHERE (event_name, event_start_date, event_location, tournament_name) = ($1, $2, $3, $4)',
+									values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+								}, function (err, result) {
+									if (err) {
+										client.query("ROLLBACK");
+										done();
+										console.log("torunament.js - deleteStages");
+										console.log(err);
+										res.status(500).send(err);
+										log.info({
+											res: res
+										}, 'done response');
+									} else {
+										client.query("COMMIT");
+										done();
+										res.status(204).send("");
+										log.info({
+											res: res
+										}, 'done response');
+									}
+								});
+							}
+						});
+					}
+				});
+			} else {
+				client.query("ROLLBACK");
+				done();
+				res.status(404).send('Tournament was not found');
+				log.info({
+					res : res
+				}, 'done response');
+			}
+		});
+	});
+};
+
 module.exports.createTournament = createTournament;
 module.exports.getStandings = getStandings;
 module.exports.getRounds = getRounds;
