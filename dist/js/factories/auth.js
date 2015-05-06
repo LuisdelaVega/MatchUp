@@ -28,7 +28,7 @@ angular.module('Authentication', [])
 		};
 
 		service.isAuthenticated = function () {
-			return (localStorage.getItem("token") && localStorage.getItem("username"));
+			return ((localStorage.getItem("token") != null) && (localStorage.getItem("username") != null));
 		}
 
 		service.clearCredentials = function () {
