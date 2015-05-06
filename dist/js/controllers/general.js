@@ -134,15 +134,6 @@ function($scope, $http, $state, $window, AuthenticationService, $rootScope) {
 
 	$scope.incorrectPassword = false;
 	$scope.badCredentials = false;
-	
-	$scope.paypal = function (){
-		$http.get($rootScope.baseURL + '/initPaypal').success(function(data, status, headers) {
-			
-			localStorage.setItem('payKey', data.payKey);
-			$window.location.href = 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey;
-
-		});
-	}
 
 	$scope.login = function(valid) {
 		if (valid) {

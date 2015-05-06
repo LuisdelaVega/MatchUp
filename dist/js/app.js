@@ -3,7 +3,11 @@ var myApp = angular.module('MatchUp', ['ui.router', 'ngResource', 'as.sortable',
 myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locationProvider) {
 	//
 	// For any unmatched url, redirect to /home
-	$urlRouterProvider.otherwise("/login");
+	$urlRouterProvider.otherwise(function ($injector, $location) {
+		var $state = $injector.get("$state");
+		$state.go("login");
+	});
+
 	//
 	// Now set up the states
 	$stateProvider
@@ -353,12 +357,6 @@ myApp.config(function ($stateProvider, $urlRouterProvider, $httpProvider, $locat
 			}
 		};
 	});
-
-	$httpProvider.defaults.useXDomain = true;
-	$httpProvider.defaults.withCredentials = true;
-	delete $httpProvider.defaults.headers.common["X-Requested-With"];
-	$httpProvider.defaults.headers.common["Accept"] = "application/json";
-	$httpProvider.defaults.headers.common["Content-Type"] = "application/json";
 });
 
 myApp.run(function ($rootScope, $state, AuthenticationService, $window, acuteSelectService, $timeout) {
@@ -379,18 +377,17 @@ myApp.run(function ($rootScope, $state, AuthenticationService, $window, acuteSel
 
 	console.log(localStorage.getItem('payKey'));
 
-	// Redirect to pay successful 
-	if (localStorage.getItem('payKey')) {
-		$timeout(function () {
-			$state.go('app.paySuccessful');
-		});
-	}
-
-
 	$rootScope.$on('$stateChangeStart',
 		function (event, toState) {
+			// Redirect to pay successful			
+			if ((toState.name == "login") && localStorage.getItem('payKey')) {
+				console.log("in pay key");
+				event.preventDefault();
+				$state.go('app.paySuccessful');
+			}
 			// Do not let user access login if the user is authenticated
-			if ((toState.name === "login") && AuthenticationService.isAuthenticated()) {
+			else if ((toState.name == "login") && AuthenticationService.isAuthenticated()) {
+				console.log("in home");
 				event.preventDefault();
 				$state.go("app.home");
 			}

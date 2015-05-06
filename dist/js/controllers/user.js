@@ -454,12 +454,12 @@ function ($scope, $http, $stateParams, $state, $rootScope) {
 			}
 		};
 
-		$http.post($rootScope.SANDBOX_ENV + '/AdaptivePayments/PaymentDetails', body, config).success(function (data) {
-			$scope.payInfo = data;
-			console.log(data);
-
-		}).error(function (data, status) {
-			console.log(status);
-		});
+//		$http.post($rootScope.SANDBOX_ENV + '/AdaptivePayments/PaymentDetails', body, config).success(function (data) {
+//			$scope.payInfo = data;
+//			console.log(data);
+//
+//		}).error(function (data, status) {
+//			console.log(status);
+//		});
 
 }]);
