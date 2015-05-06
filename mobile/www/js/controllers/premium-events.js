@@ -170,7 +170,7 @@ myApp.controller('createMeetupController', function ($scope, $state, $http, $sta
 
 });
 
-myApp.controller('premiumSignUpController', function ($scope, $state, $http, $stateParams, sharedDataService, $window, $cordovaInAppBrowser, $rootScope) {
+myApp.controller('premiumSignUpController', function ($scope, $state, $http, $stateParams, sharedDataService, $window, $cordovaInAppBrowser, $rootScope, $ionicPlatform) {
 
     $scope.returnToPremiumEvent = function () {
         $state.go("app.eventpremium", {
@@ -219,10 +219,13 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
 
         $http.get('http://136.145.116.232/initPaypal', config).success(function(data, status, headers, config){
 
-            $cordovaInAppBrowser.open('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey, '_blank', options).then(function () {
-                console.log("InAppBrowser opened http://ngcordova.com successfully");
-            }, function (error) {
-                console.log("Error: " + error);
+
+            $ionicPlatform.ready(function() {
+                $cordovaInAppBrowser.open('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_ap-payment&paykey=' + data.payKey, '_blank', options).then(function () {
+                    console.log("InAppBrowser opened http://ngcordova.com successfully");
+                }, function (error) {
+                    console.log("Error: " + error);
+                });
             });
 
             //            $cordovaInAppBrowser.open('http://ngcordova.com', '_blank', options).then(function () {
