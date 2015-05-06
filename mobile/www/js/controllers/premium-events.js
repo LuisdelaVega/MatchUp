@@ -1,27 +1,14 @@
 var myApp = angular.module('premium-events',[]);
 
-myApp.run(function($rootScope, $cordovaInAppBrowser, $ionicPlatform){
-
-    if(ionic.Platform.isIOS()){
-        $rootScope.$on('$cordovaInAppBrowser:loadstop', function(e, event){
-            if (event.url.match("/paypalSuccess")) {
-                $ionicPlatform.ready(function() {
-                    $cordovaInAppBrowser.close();
-                });
-            }
-        });
-    }
-    
-    else if(ionic.Platform.isAndroid()){
-        $rootScope.$on('$cordovaInAppBrowser:loadstop', function(event){
-            if (event.url.match("/paypalSuccess")) {
-                $ionicPlatform.ready(function() {
-                    $cordovaInAppBrowser.close();
-                });
-            }
-        });
-    }
-});
+//myApp.run(function($rootScope, $cordovaInAppBrowser, $ionicPlatform){
+//    $rootScope.$on('$cordovaInAppBrowser:loadstop', function(e, event){
+//        if (event.url.match("/paypalSuccess")) {
+//            $ionicPlatform.ready(function() {
+//                $cordovaInAppBrowser.close();
+//            });
+//        }
+//    });
+//});
 
 
 myApp.controller('ratingsController', ['$scope', '$http', '$stateParams', '$window', '$state', function ($scope, $http, $stateParams, $window, $state) {
@@ -211,6 +198,14 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
             console.log("error in eventPremiumSummaryController");
         });
 
+    });
+
+    $rootScope.$on('$cordovaInAppBrowser:loadstop', function(e, event){
+        if (event.url.match("/paypalSuccess")) {
+            $ionicPlatform.ready(function() {
+                $cordovaInAppBrowser.close();
+            });
+        }
     });
 
 
