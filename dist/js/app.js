@@ -364,6 +364,7 @@ myApp.run(function ($rootScope, $state, AuthenticationService, $window, acuteSel
 	acuteSelectService.updateSetting("templatePath", "event");
 
 	document.domain = "matchup.neptunolabs.com";
+	console.log(localStorage.getItem('payKey'));
 	if (localStorage.getItem('payKey')) {
 		$state.go('app.paySuccessful');
 	}
