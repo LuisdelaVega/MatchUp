@@ -2832,7 +2832,7 @@ function competitor(req, pg, conString, payKey, tournament) {
 										done();
 										console.log("torunament.js - customerIsACompetitor");
 										console.log(err);
-									} else if (index == length) {
+									} else {
 										client.query("COMMIT");
 										done();
 									}
