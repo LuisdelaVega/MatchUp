@@ -319,7 +319,7 @@ myApp.run(function($rootScope, $state, AuthenticationService, $window, acuteSele
 	// Set the template path for all instances for acute template
 	acuteSelectService.updateSetting("templatePath", "event");
 
-//	document.domain = "matchup.neptunolabs.com";
+	document.domain = "matchup.neptunolabs.com";
 
 	$rootScope.$on('$stateChangeStart',
 		function (event, toState, toParams, fromState, fromParams) {

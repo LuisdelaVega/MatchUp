@@ -581,8 +581,6 @@ myApp.controller("editTeamController", function($scope, $rootScope, $http, $stat
 		} else {
 			$scope.validCover = true;
 			$http.put($rootScope.baseURL + '/matchup/teams/' + $scope.team.name, $scope.team).success(function(data, status) {
-				alert("Team Succesfully Edited");
-
 				$state.go("app.teamProfile", {
 					"teamName" : $scope.team.name
 				});
