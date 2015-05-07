@@ -1834,11 +1834,12 @@ function getNewScores(req, res, client, done, log, newScores, player, details, i
              * Also, set the appropriate "completed" values (for rounds and matches).
              */
             if (newScores.players[0].newScore > newScores.players[1].newScore && newScores.players[0].competitor_number != newScores.prevWinner) {
+                console.log("HEEEEEEEEEEEEEEEEEEEEEEEEELLOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO!!!!!!!");
                 newScores.playersToRemoveFromWinners.push(newScores.players[1].competitor_number);
-                //if (details.tournament_format === "Double Elimination") {
+                if (details.tournament_format === "Double Elimination") {
                     //newScores.playersToRemoveFromLosers = [];
                     newScores.playersToRemoveFromWinners.push(newScores.players[0].competitor_number);
-                //}
+                }
                 client.query({
                     text : "UPDATE submits SET (score, points) = ($10, $11) WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
                     values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.body.players[0].competitor_number, (parseInt(req.body.players[0].score) > parseInt(req.body.players[1].score) ? 1 : 0), req.body.players[0].score]
@@ -1873,11 +1874,12 @@ function getNewScores(req, res, client, done, log, newScores, player, details, i
                     }
                 });
             } else if (newScores.players[1].newScore > newScores.players[0].newScore && newScores.players[1].competitor_number != newScores.prevWinner) {
+                console.log("OVER HEREEEEEEEEEEEEEE!!!!");
                 newScores.playersToRemoveFromWinners.push(newScores.players[0].competitor_number);
-                //if (details.tournament_format === "Double Elimination") {
+                if (details.tournament_format === "Double Elimination") {
                     //newScores.playersToRemoveFromLosers = [];
                     newScores.playersToRemoveFromWinners.push(newScores.players[1].competitor_number);
-                //}
+                }
                 client.query({
                     text : "UPDATE submits SET (score, points) = ($10, $11) WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
                     values : [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.params.set, req.body.players[0].competitor_number, (parseInt(req.body.players[0].score) > parseInt(req.body.players[1].score) ? 1 : 0), req.body.players[0].score]
@@ -1912,6 +1914,7 @@ function getNewScores(req, res, client, done, log, newScores, player, details, i
                     }
                 });
             } else {
+                console.log("NOOOOOOO!!!!!!!!!!!");
                 // Just update the score as if the match the match wasn't completed because this means that the winner of this match was is still the winner after the change to the score
                 client.query({
                     text : "UPDATE submits SET (score, points) = ($10, $11) WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
