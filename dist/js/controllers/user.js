@@ -333,6 +333,7 @@ function ($scope, $http, $state, sharedDataService, $rootScope, $window) {
 					"email": $scope.user.customer_email,
 					"country": $scope.user.customer_country,
 					"bio": $scope.user.customer_bio,
+					"customer_paypal_info": $scope.user.customer_paypal_info
 				};
 				$http.put($rootScope.baseURL + "/matchup/profile", profile).success(function () {
 					$state.go("app.userProfile", {
