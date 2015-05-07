@@ -106,6 +106,7 @@ var editTeam = function(req, res, pg, conString, log) {
 						if (err) {
 							client.query("ROLLBACK");
 							done();
+							console.log(err);
 							res.status(500).send(err);
 						} else {
 							client.query("COMMIT");
