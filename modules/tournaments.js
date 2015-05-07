@@ -3498,23 +3498,32 @@ var payWhatYouOwe = function(req, res, pg, conString, log, initPaypal) {
 					query.on("end", function (result) {
 						// No, it's not for drugs
 						var potMoney = parseInt(prizeDistribution.seed_money) + parseFloat(prizeDistribution.competitor_fee) * parseInt(prizeDistribution.tickets_sold) * parseInt(prizeDistribution.event_deduction_fee)/100;
+						var flag = true;
 						for (var i = 0; i < players.length; i++) {
 							if (!i && parseInt(players[0].competitor_number) == parseInt(req.body.competitor_number)) {
+								flag = false;
 								players[0].amount = parseFloat((potMoney * parseInt(prizeDistribution.first)/100).toFixed(2));
+								done();
 								initPaypal(req, res, players[0], log, payout);
 							} else if (i == 1 && parseInt(players[1].competitor_number) == parseInt(req.body.competitor_number)) {
+								flag = false;
 								players[1].amount = parseFloat((potMoney * parseInt(prizeDistribution.second)/100).toFixed(2));
+								done();
 								initPaypal(req, res, players[0], log, payout);
 							} else if (i == 2 && parseInt(players[2].competitor_number) == parseInt(req.body.competitor_number)) {
+								flag = false;
 								players[2].amount = parseFloat((potMoney * parseInt(prizeDistribution.third)/100).toFixed(2));
-								initPaypal(req, res, players[0], log, payout);
-							} else {
 								done();
-								res.status(403).send("invalid competitor number");
-								log.info({
-									res: res
-								}, 'done response');
+								initPaypal(req, res, players[0], log, payout);
 							}
+						}
+
+						if (flag) {
+							done();
+							res.status(403).send("invalid competitor number");
+							log.info({
+								res: res
+							}, 'done response');
 						}
 					});
 				} else {
