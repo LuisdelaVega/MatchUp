@@ -1766,7 +1766,7 @@ var getRounds = function(req, res, pg, conString, log) {
 							score : row.score
 						};
 					}
-					if (row.group_number) {
+					if (row.group_number && details.tournament_type === "Two Stage") {
 						if (!tournament.groupStage.groups[row.group_number-1]) {
 							tournament.groupStage.groups[row.group_number-1] = {};
 							tournament.groupStage.groups[row.group_number-1].group_number = row.group_number;
