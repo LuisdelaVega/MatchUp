@@ -100,7 +100,7 @@ var editTeam = function(req, res, pg, conString, log) {
 			query.on("end", function (result) {
 				if (result.rows.length && result.rows[0].is_member) {
 					client.query({
-						text: 'UPDATE team SET (team_logo, team_bio, team_cover_photo, team_paypal_info) = ("$1", "$2", "$3", "$5") WHERE team_name = $4',
+						text: 'UPDATE team SET (team_logo, team_bio, team_cover_photo, team_paypal_info) = ($1, $2, $3, $5) WHERE team_name = $4',
 						values: [req.body.logo, req.body.bio, req.body.cover, req.params.team, req.body.team_paypal_info]
 					}, function (err, result) {
 						if (err) {
