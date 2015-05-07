@@ -1299,8 +1299,8 @@ function getMatchHistory(req, res, client, done, log, standings, players, index,
 
 function getStandingsForFinalStage(req, res, client, done, log, standings) {
 	var query = client.query({
-		text: 'SELECT every(round_completed) AS stage_completed FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_of = $5',
-		values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Winner"]
+		text: 'SELECT every(round_completed) AS stage_completed FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND (round_of = $5 OR round_of = $6)',
+		values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Winner", "Round Robin"]
 	});
 	query.on("row", function (row, result) {
 		result.addRow(row);
@@ -1318,8 +1318,8 @@ function getStandingsForFinalStage(req, res, client, done, log, standings) {
 		//TODO logic here
 		if (!result.rows[0].stage_completed) {
 			var query = client.query({
-				text: 'SELECT distinct competitor.competitor_number FROM competes NATURAL JOIN competitor WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_of = $5 AND competitor.competitor_check_in',
-				values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Winner"]
+				text: 'SELECT distinct competitor.competitor_number FROM competes NATURAL JOIN competitor WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND (round_of = $5 OR round_of = $6) AND competitor.competitor_check_in',
+				values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Winner", "Round Robin"]
 			});
 			query.on("row", function (row, result) {
 				result.addRow(row);
