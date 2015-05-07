@@ -34,7 +34,7 @@ var getOrganization = function(req, res, pg, conString, log) {
 		}
 
 		var query = client.query({
-			text : "SELECT organization_name, organization_logo, organization_bio, organization_cover_photo, bool_and(organization_name IN (SELECT organization_name FROM belongs_to WHERE customer_username = $1)) AS is_member FROM organization WHERE organization_active AND organization_name = $2 GROUP BY organization_name",
+			text : "SELECT organization_name, organization_logo, organization_bio, organization_cover_photo, organization_paypal_info, bool_and(organization_name IN (SELECT organization_name FROM belongs_to WHERE customer_username = $1)) AS is_member FROM organization WHERE organization_active AND organization_name = $2 GROUP BY organization_name",
 			values : [req.user.username, req.params.organization]
 		});
 		query.on("row", function(row, result) {

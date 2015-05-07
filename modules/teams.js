@@ -37,7 +37,7 @@ var getTeam = function(req, res, pg, conString, log) {
 		}
 
 		var query = client.query({
-			text : "SELECT team_name, team_logo, team_bio, team_cover_photo, bool_and(team_name IN (SELECT team_name FROM plays_for WHERE customer_username = $2)) AS is_member FROM team WHERE team_active AND team_name = $1 GROUP BY team_name, team_logo, team_bio, team_cover_photo",
+			text : "SELECT team_name, team_logo, team_bio, team_cover_photo, team_paypal_info, bool_and(team_name IN (SELECT team_name FROM plays_for WHERE customer_username = $2)) AS is_member FROM team WHERE team_active AND team_name = $1 GROUP BY team_name, team_logo, team_bio, team_cover_photo",
 			values : [req.params.team, req.user.username]
 		});
 		query.on("row", function(row, result) {
@@ -62,7 +62,7 @@ var getTeam = function(req, res, pg, conString, log) {
 				log.info({
 					res : res
 				}, 'done response');
-			};
+			}
 		});
 	});
 };
@@ -204,7 +204,7 @@ var getTeamMembers = function(req, res, pg, conString, log) {
 				log.info({
 					res : res
 				}, 'done response');
-			};
+			}
 		});
 	});
 };
