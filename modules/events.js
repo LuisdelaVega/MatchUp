@@ -1818,11 +1818,14 @@ function getNewScores(req, res, client, done, log, newScores, player, details, i
         player.oldScore = parseInt(result.rows[0].oldscore);
 
         if (index == length) {
+            console.log("Old scores");
+            console.log(newScores.players[0].competitor_number, newScores.players[0].oldScore);
+            console.log(newScores.players[1].competitor_number, newScores.players[1].oldScore);
             // First, find out who was the original winner
             if (newScores.players[0].oldScore > newScores.players[1].oldScore) {
                 newScores.prevWinner = newScores.players[0].competitor_number;
                 newScores.prevLoser = newScores.players[1].competitor_number;
-            } else {
+            } else if (newScores.players[0].oldScore < newScores.players[1].oldScore) {
                 newScores.prevWinner = newScores.players[1].competitor_number;
                 newScores.prevLoser = newScores.players[0].competitor_number;
             }
@@ -1833,8 +1836,7 @@ function getNewScores(req, res, client, done, log, newScores, player, details, i
              * All the work was mentioned in a comment in the handler function, but basically we have to switch the new winner and loser in the following match, and remove everything from every match that is associated with any of the players here.
              * Also, set the appropriate "completed" values (for rounds and matches).
              */
-            if (newScores.players[0].newScore > newScores.players[1].newScore && newScores.players[0].competitor_number != newScores.prevWinner) {
-                console.log("HEEEEEEEEEEEEEEEEEEEEEEEEELLOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO!!!!!!!");
+            if (newScores.players[0].newScore > newScores.players[1].newScore && (!newScores.prevWinner || newScores.players[0].competitor_number != newScores.prevWinner)) {
                 newScores.playersToRemoveFromWinners.push(newScores.players[1].competitor_number);
                 if (details.tournament_format === "Double Elimination") {
                     //newScores.playersToRemoveFromLosers = [];
@@ -1873,8 +1875,7 @@ function getNewScores(req, res, client, done, log, newScores, player, details, i
                         });
                     }
                 });
-            } else if (newScores.players[1].newScore > newScores.players[0].newScore && newScores.players[1].competitor_number != newScores.prevWinner) {
-                console.log("OVER HEREEEEEEEEEEEEEE!!!!");
+            } else if (newScores.players[1].newScore > newScores.players[0].newScore && (!newScores.prevWinner ||  newScores.players[1].competitor_number != newScores.prevWinner)) {
                 newScores.playersToRemoveFromWinners.push(newScores.players[0].competitor_number);
                 if (details.tournament_format === "Double Elimination") {
                     //newScores.playersToRemoveFromLosers = [];
@@ -1914,7 +1915,6 @@ function getNewScores(req, res, client, done, log, newScores, player, details, i
                     }
                 });
             } else {
-                console.log("NOOOOOOO!!!!!!!!!!!");
                 // Just update the score as if the match the match wasn't completed because this means that the winner of this match was is still the winner after the change to the score
                 client.query({
                     text : "UPDATE submits SET (score, points) = ($10, $11) WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, set_seq, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
@@ -2060,7 +2060,7 @@ var changeScore = function(req, res, pg, conString, log) {
                         for (var i = 0; i < req.body.players.length; i++) {
                             newScores.players[i] = {
                                 competitor_number : parseInt(req.body.players[i].competitor_number),
-                                newScore : (parseInt(req.body.players[i%2].score) > parseInt(req.body.players[(i+1)%2].score) ? 1 : 0)
+                                newScore : (parseInt(req.body.players[i].score) > parseInt(req.body.players[(i+1)%2].score) ? 1 : 0)
                             };
                             getNewScores(req, res, client, done, log, newScores, newScores.players[i], details, i, req.body.players.length-1);
                         }
