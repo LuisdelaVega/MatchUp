@@ -3416,6 +3416,125 @@ var getPayouts = function(req, res, pg, conString, log) {
 	});
 };
 
+function payout(req, pg, conString, payKey) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		client.query("BEGIN");
+		client.query({
+			text: "INSERT INTO payout (event_name, event_start_date, event_location, tournament_name, competitor_number, transaction_completed, payout_paykey) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+			values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.body.competitor_number, false, payKey]
+		}, function (err, result) {
+			if (err) {
+				client.query("ROLLBACK");
+				done();
+				console.log(err);
+			} else {
+				client.query("COMMIT");
+				done();
+			}
+		});
+	});
+}
+
+var payWhatYouOwe = function(req, res, pg, conString, log, initPaypal) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var query = client.query({
+			text: "SELECT team_size, prize_distribution.*, seed_money, event_deduction_fee, (SELECT count(*) FROM competitor_pays WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_paid) AS tickets_sold, competitor_fee FROM event NATURAL JOIN tournament NATURAL JOIN prize_distribution WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_fee > 0",
+			values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+		});
+		query.on("row", function (row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function (error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+			log.info({
+				res: res
+			}, 'done response');
+		});
+		query.on("end", function (result) {
+			if (result.rows.length) {
+				var prizeDistribution = result.rows[0];
+				var limit = 0;
+				if (prizeDistribution.prize_distribution_name === "Standard") {
+					limit = 3;
+				} else if (prizeDistribution.prize_distribution_name === "First and Second") {
+					limit = 2;
+				} else if (prizeDistribution.prize_distribution_name === "Winner Takes All") {
+					limit = 1;
+				}
+
+				if (limit) {
+					var players = [];
+					var queryText = "";
+					if (prizeDistribution.team_size > 1) {
+						queryText = "SELECT competitor_number, team_paypal_info AS email FROM competitor NATURAL JOIN competes_for NATURAL JOIN team WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_standing > 0 ORDER BY competitor_standing LIMIT $5";
+					} else {
+						queryText = "SELECT competitor_number, customer_paypal_info AS email FROM competitor NATURAL JOIN is_a NATURAL JOIN customer WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_standing > 0 ORDER BY competitor_standing LIMIT $5";
+					}
+					var query = client.query({
+						text: queryText,
+						values: [req.params.event, req.query.date, req.query.location, req.params.tournament, limit]
+					});
+					query.on("row", function (row, result) {
+						players.push(row);
+					});
+					query.on('error', function (error) {
+						done();
+						console.log(error);
+						res.status(500).send(error);
+						log.info({
+							res: res
+						}, 'done response');
+					});
+					query.on("end", function (result) {
+						// No, it's not for drugs
+						var potMoney = parseInt(prizeDistribution.seed_money) + parseFloat(prizeDistribution.competitor_fee) * parseInt(prizeDistribution.tickets_sold) * parseInt(prizeDistribution.event_deduction_fee)/100;
+						for (var i = 0; i < players.length; i++) {
+							if (!i && parseInt(players[0].competitor_number) == parseInt(req.body.competitor_number)) {
+								players[0].amount = parseFloat((potMoney * parseInt(prizeDistribution.first)/100).toFixed(2));
+								initPaypal(req, res, players[0], log, payout);
+							} else if (i == 1 && parseInt(players[1].competitor_number) == parseInt(req.body.competitor_number)) {
+								players[1].amount = parseFloat((potMoney * parseInt(prizeDistribution.second)/100).toFixed(2));
+								initPaypal(req, res, players[0], log, payout);
+							} else if (i == 2 && parseInt(players[2].competitor_number) == parseInt(req.body.competitor_number)) {
+								players[2].amount = parseFloat((potMoney * parseInt(prizeDistribution.third)/100).toFixed(2));
+								initPaypal(req, res, players[0], log, payout);
+							} else {
+								done();
+								res.status(403).send("invalid competitor number");
+								log.info({
+									res: res
+								}, 'done response');
+							}
+						}
+					});
+				} else {
+					done();
+					res.status(200).send([]);
+					log.info({
+						res: res
+					}, 'done response');
+				}
+			} else {
+				done();
+				res.status(200).send([]);
+				log.info({
+					res: res
+				}, 'done response');
+			}
+		});
+	});
+};
+
 module.exports.createTournament = createTournament;
 module.exports.getStandings = getStandings;
 module.exports.getRounds = getRounds;
@@ -3432,3 +3551,4 @@ module.exports.changeStation = changeStation;
 module.exports.changeTimeAndDateOfRound = changeTimeAndDateOfRound;
 module.exports.deleteStages = deleteStages;
 module.exports.getPayouts = getPayouts;
+module.exports.payWhatYouOwe = payWhatYouOwe;
