@@ -897,7 +897,7 @@ app.route('/matchup/events/:event/tournaments/:tournament/payouts').get(function
 	log.info({
 		req : req
 	}, 'start request');
-	tournaments.payWhatYouOwe(req, res, pg, conString, log);
+	tournaments.payWhatYouOwe(req, res, pg, conString, log, initPaypal);
 });
 
 /* /matchup/events/:event/tournaments/:tournament/competitors/checked?date=date&location=string
