@@ -391,7 +391,7 @@ SELECT round_number IN (SELECT future_round_number FROM competitor_goes_to WHERE
 
 
 
-
+SELECT tournament_name, tournament_rules, team_size, tournament_start_date, tournament_check_in_deadline, competitor_fee, tournament_max_capacity, seed_money, tournament_type, tournament_format, score_type, number_of_people_per_group, amount_of_winners_per_group, game.*, prize_distribution.*, (SELECT every(round_completed) FROM round WHERE event_name = 'Event 01' AND event_start_date = '2015-03-25 09:00:00' AND event_location = 'miradero' AND tournament_name = tournament.tournament_name) AS tournament_completed FROM tournament NATURAL JOIN game NATURAL JOIN event NATURAL JOIN prize_distribution WHERE event_name = 'Event 01' AND event_start_date = '2015-03-25 09:00:00' AND event_location = 'miradero' AND event_active AND tournament_active
 
 
 

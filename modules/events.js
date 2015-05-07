@@ -1591,6 +1591,8 @@ function switchPlayers(req, res, client, done, log, newScores, player1, player2,
                 match_number : parseInt(result.rows[0].future_match)
             };
             // Remove the previous winner
+            console.log("DELETE FROM");
+            console.log(req.params.event, req.query.date, req.query.location, req.params.tournament, nextMatch.round_number, nextMatch.round_of, nextMatch.match_number, player1.competitor_number);
             client.query({
                 text: "DELETE FROM competes WHERE (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, competitor_number) = ($1, $2, $3, $4, $5, $6, $7, $8)",
                 values: [req.params.event, req.query.date, req.query.location, req.params.tournament, nextMatch.round_number, nextMatch.round_of, nextMatch.match_number, player1.competitor_number]
@@ -1605,6 +1607,8 @@ function switchPlayers(req, res, client, done, log, newScores, player1, player2,
                     }, 'done response');
                 } else {
                     // And insert the new winner. Switch done
+                    console.log("INSERT INTO");
+                    console.log(req.params.event, req.query.date, req.query.location, req.params.tournament, nextMatch.round_number, nextMatch.round_of, nextMatch.match_number, player2.competitor_number);
                     client.query({
                         text: "INSERT INTO competes (event_name, event_start_date, event_location, tournament_name, round_number, round_of, match_number, competitor_number) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
                         values: [req.params.event, req.query.date, req.query.location, req.params.tournament, nextMatch.round_number, nextMatch.round_of, nextMatch.match_number, player2.competitor_number]
