@@ -697,6 +697,7 @@ var editAccount = function(req, res, pg, conString, log) {
 			values : [req.body.first_name, req.body.last_name, req.body.tag, req.body.profile_pic, req.body.cover, req.body.bio, req.body.country, req.body.email, req.user.username, req.body.customer_paypal_info]
 		}, function(err, result) {
 			if (err) {
+				console.log(err);
 				client.query("ROLLBACK");
 				done();
 				res.status(500).send(err);
