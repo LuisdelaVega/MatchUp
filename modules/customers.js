@@ -777,7 +777,7 @@ var createAccount = function(req, res, pg, conString, jwt, secret, crypto, log) 
 				throw err;
 			client.query("BEGIN");
 			client.query({
-				text : "INSERT INTO customer (customer_username, customer_first_name, customer_last_name, customer_tag, customer_password, customer_salt, customer_email, customer_active, customer_paypal_info) VALUES ('$1', '$2', '$3', '$4', $5, $6, '$7', TRUE, '$8')",
+				text : "INSERT INTO customer (customer_username, customer_first_name, customer_last_name, customer_tag, customer_password, customer_salt, customer_email, customer_active, customer_paypal_info) VALUES ($1, $2, $3, $4, $5, $6, $7, TRUE, $8)",
 				values : [req.body.username, // customer_username
 					req.body.first_name, // customer_first_name
 					req.body.last_name, // customer_last_name
