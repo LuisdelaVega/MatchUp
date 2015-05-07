@@ -1,4 +1,4 @@
-<h2 class="page-header">{{gameName}}</h2>
+<h2 class="page-header">{{gameName}}'s Events</h2>
 
 <!-- Nav tabs -->
 <ul class="nav nav-tabs nav-justified tab-padding-top">
@@ -9,7 +9,7 @@
 		<a data-target="#liveGame" data-toggle="tab">Live</a>
 	</li>
 	<li>
-		<a data-target="#historyGame" data-toggle="tab">History</a>
+		<a data-target="#historyGame" data-toggle="tab">Past</a>
 	</li>
 </ul>
 <!-- Tab panes -->
@@ -33,6 +33,12 @@
 					</div>
 				</a>
 			</div>
+			<div class="col-md-6 col-md-offset-3" style="margin-top:35vh" ng-if="!gamesUpcoming.length">
+				<div style="text-align:center">
+					<i class="fa fa-meh-o fa-5x"></i>
+					<h3 class="info-title">No upcoming events for {{gameName}}</h3>
+				</div>
+			</div>
 		</div>
 		<!-- row -->
 	</div>
@@ -55,6 +61,12 @@
 					</div>
 				</a>
 			</div>
+			<div class="col-md-6 col-md-offset-3" style="margin-top:35vh" ng-if="!gamesLive.length">
+				<div style="text-align:center">
+					<i class="fa fa-meh-o fa-5x"></i>
+					<h3 class="info-title">No live events for {{gameName}}</h3>
+				</div>
+			</div>
 		</div>
 	</div>
 	<div class="tab-pane fade" id="historyGame">
@@ -75,6 +87,12 @@
 						</p>
 					</div>
 				</a>
+			</div>
+			<div class="col-md-6 col-md-offset-3" style="margin-top:35vh" ng-if="!gamesPast.length">
+				<div style="text-align:center">
+					<i class="fa fa-meh-o fa-5x"></i>
+					<h3 class="info-title">No past events for {{gameName}}</h3>
+				</div>
 			</div>
 		</div>
 	</div>

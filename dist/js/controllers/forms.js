@@ -174,7 +174,7 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 
 		// Validate deadline with respect to tournament start date and event end date
 		if ($scope.tournament.start_date <= $scope.tournament.deadline | $scope.tournament.deadline > $scope.event.end_date | $scope.tournament.deadline <= $scope.event.start_date) {
-			alert("Tournament check in deadline cant be after the event end date or before the tournament start date or end date");
+			alert("Tournament check in deadline can not be before the tournament start date or the event start date.");
 			return;
 		}
 
@@ -371,7 +371,7 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 			fd.append("image", e.target.result.split(",")[1]);
 			fd.append("key", $rootScope.imgurKey);
 			var xhr = new XMLHttpRequest();
-			xhr.open("POST", "http://api.imgur.com/2/upload.json");
+			xhr.open("POST", "https://api.imgur.com/2/upload.json");
 			xhr.onload = function() {
 				// Apply changes to scope. Not a angular function it is needed
 				$scope.$apply(function() {
@@ -459,7 +459,7 @@ myApp.controller("CreateTeamController", function($scope, $window, $rootScope, $
 			fd.append("image", e.target.result.split(",")[1]);
 			fd.append("key", $rootScope.imgurKey);
 			var xhr = new XMLHttpRequest();
-			xhr.open("POST", "http://api.imgur.com/2/upload.json");
+			xhr.open("POST", "https://api.imgur.com/2/upload.json");
 			xhr.onload = function() {
 				// Apply changes to scope. Not a angular function it is needed
 				$scope.$apply(function() {
@@ -556,7 +556,7 @@ myApp.controller("editTeamController", function($scope, $rootScope, $http, $stat
 			fd.append("image", e.target.result.split(",")[1]);
 			fd.append("key", $rootScope.imgurKey);
 			var xhr = new XMLHttpRequest();
-			xhr.open("POST", "http://api.imgur.com/2/upload.json");
+			xhr.open("POST", "https://api.imgur.com/2/upload.json");
 			xhr.onload = function() {
 				// Apply changes to scope. Not a angular function it is needed
 				$scope.$apply(function() {
@@ -726,7 +726,7 @@ myApp.controller("editOrganizationController", function($scope, $window, $stateP
 			fd.append("image", e.target.result.split(",")[1]);
 			fd.append("key", $rootScope.imgurKey);
 			var xhr = new XMLHttpRequest();
-			xhr.open("POST", "http://api.imgur.com/2/upload.json");
+			xhr.open("POST", "https://api.imgur.com/2/upload.json");
 			xhr.onload = function() {
 				// Apply changes to scope. Not a angular function it is needed
 				$scope.$apply(function() {

@@ -8,9 +8,9 @@
 				<div class="media-left media-middle">
 					<a ng-click="goToUser(sub.customer_username)"> <img class="media-object match-avatar" ng-src="{{sub.customer_profile_pic}}"> </a>
 				</div>
-				<div class="media-body" ng-click="getSubMatches($index)">
+				<div class="media-body" ng-click="getSubMatches($index)" style="cursor:pointer">
 					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-						<span class="pull-right"><a class="btn btn-sm btn-primary" ng-click="unsubscribe(sub.customer_username, $index)"><span class="fa fa-user"></span> </a>
+						<span class="pull-right"><a class="btn btn-sm btn-danger" ng-click="unsubscribe(sub.customer_username, $index)"> Unsubscribe</a>
 						</span>
 						<h3>{{sub.customer_tag}}</h3>
 						<p class="info-paragraph">

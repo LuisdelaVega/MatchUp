@@ -2,7 +2,7 @@
 	<div class="col-lg-9 col-md-9 col-sm-12 col-xs-12" ng-if="tournament.team_size == 1">
 		<div class="box">
 			<form role="form">
-				<div class="form-group">
+				<div class="form-group" ng-if="signups.length">
 					<input class="form-control" type="search" placeholder="Search Users by Nickname, name, or filter by fee name" ng-model="item"/>
 				</div>
 				<ul class="list-group">
@@ -17,14 +17,15 @@
 							</div>
 						</div>
 					</li>
-				</ul>
+				</ul>							
 			</form>
+			<p class="lead" ng-if="!signups.length">Registrations are empty</p>
 		</div>
 	</div>
 	<div class="col-lg-9 col-md-9 col-sm-12 col-xs-12" ng-if="tournament.team_size > 1">
 		<div class="box">
 			<form role="form">
-				<div class="form-group">
+				<div class="form-group" ng-if="signups.length">
 					<input class="form-control" type="search" placeholder="Search Teams by name" ng-model="item"/>
 				</div>
 				<ul class="list-group">
@@ -41,6 +42,7 @@
 					</li>
 				</ul>
 			</form>
+			<p class="lead" ng-if="!signups.length">Registrations are empty</p>
 		</div>
 	</div>
 </div>
