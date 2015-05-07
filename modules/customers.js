@@ -693,7 +693,7 @@ var editAccount = function(req, res, pg, conString, log) {
 
 		client.query("BEGIN");
 		client.query({
-			text : "UPDATE customer SET (customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, customer_email, customer_paypal_info) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE customer_username = $9",
+			text : "UPDATE customer SET (customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, customer_email, customer_paypal_info) = ($1, $2, $3, $4, $5, $6, $7, $8, $10) WHERE customer_username = $9",
 			values : [req.body.first_name, req.body.last_name, req.body.tag, req.body.profile_pic, req.body.cover, req.body.bio, req.body.country, req.body.email, req.user.username, req.body.customer_paypal_info]
 		}, function(err, result) {
 			if (err) {
