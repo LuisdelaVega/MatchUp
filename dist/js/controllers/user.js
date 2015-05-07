@@ -304,7 +304,7 @@ function ($scope, $http, $state, sharedDataService, $rootScope, $window) {
 				fd.append("image", e.target.result.split(",")[1]);
 				fd.append("key", $rootScope.imgurKey);
 				var xhr = new XMLHttpRequest();
-				xhr.open("POST", "http://api.imgur.com/2/upload.json");
+				xhr.open("POST", "https://api.imgur.com/2/upload.json");
 				xhr.onload = function () {
 					// Apply changes to scope. Not a angular function it is needed
 					$scope.$apply(function () {

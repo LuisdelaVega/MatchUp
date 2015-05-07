@@ -109,7 +109,7 @@ myApp.config(function($stateProvider, $urlRouterProvider, $httpProvider, $locati
 		templateUrl : "organizer/tournament_list.html",
 		controller : "editHostedTournamentListController"
 	}).state('app.tournamentDetails', {
-		url : "/settings/event/:eventName/:eventDate/:eventLocation/tournaments/:tournamentName",
+		url : "/settings/event/:eventName/:eventDate/:eventLocation/tournaments/:tournamentName/details",
 		templateUrl : "organizer/tournament_details.html",
 		controller : "tournamentDetailsController"
 	}).state('app.registrations', {
@@ -319,7 +319,7 @@ myApp.run(function($rootScope, $state, AuthenticationService, $window, acuteSele
 	// Set the template path for all instances for acute template
 	acuteSelectService.updateSetting("templatePath", "event");
 
-	document.domain = "matchup.neptunolabs.com";
+//	document.domain = "matchup.neptunolabs.com";
 
 	$rootScope.$on('$stateChangeStart',
 		function (event, toState, toParams, fromState, fromParams) {

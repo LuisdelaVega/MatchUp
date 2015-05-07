@@ -158,6 +158,7 @@ myApp.controller("SeedingController", function ($scope, $http, $window, $rootSco
 		$http.put($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournaments[$scope.index].tournament_name + '/competitors/checked?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation, {
 			"players": seedList
 		}).success(function (data) {
+			$scope.seedingSaved = true;
 			alert("Seeding succesfully updated for the following tournament: " + $scope.tournaments[$scope.index].tournament_name);
 		}).error(function (err) {
 			console.log(err);
@@ -689,7 +690,7 @@ myApp.controller("editEventController", function ($scope, $http, $window, $rootS
 			fd.append("image", e.target.result.split(",")[1]);
 			fd.append("key", $rootScope.imgurKey);
 			var xhr = new XMLHttpRequest();
-			xhr.open("POST", "http://api.imgur.com/2/upload.json");
+			xhr.open("POST", "https://api.imgur.com/2/upload.json");
 			xhr.onload = function () {
 				// Apply changes to scope. Not a angular function it is needed
 				$scope.$apply(function () {
@@ -1577,6 +1578,10 @@ myApp.controller("eventOverviewController", function ($scope, $http, $window, $r
 		// Get standings/payouts
 		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $scope.tournamentsInfo[index].tournament_name + '/payouts?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function (data) {
 			$scope.payouts = data;
+			$scope.prizePool = 0;
+			angular.forEach($scope.payouts, function(payout){
+				$scope.prizePool += payout.amount;
+			});
 			console.log(data)
 		});
 

@@ -262,6 +262,11 @@ input[readonly] {
 	background-color: white !important;
 	cursor: text !important;
 }
+
+textarea {
+	resize:vertical;
+}
+
 /*Snippets*/
 
 @import url(//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css);
