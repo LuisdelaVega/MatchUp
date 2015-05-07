@@ -3509,12 +3509,12 @@ var payWhatYouOwe = function(req, res, pg, conString, log, initPaypal) {
 								flag = false;
 								players[1].amount = parseFloat((potMoney * parseInt(prizeDistribution.second)/100).toFixed(2));
 								done();
-								initPaypal(req, res, players[0], log, payout);
+								initPaypal(req, res, players[1], log, payout);
 							} else if (i == 2 && parseInt(players[2].competitor_number) == parseInt(req.body.competitor_number)) {
 								flag = false;
 								players[2].amount = parseFloat((potMoney * parseInt(prizeDistribution.third)/100).toFixed(2));
 								done();
-								initPaypal(req, res, players[0], log, payout);
+								initPaypal(req, res, players[2], log, payout);
 							}
 						}
 
