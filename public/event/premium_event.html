@@ -120,9 +120,14 @@
 									Spectator Sign Up
 								</button>
 							</div>
-							<div class="btn-group" role="group" ng-if="eventInfo.is_organizer && !finished">
-								<button type="button" class="btn btn-primary" ui-sref="app.eventSettings({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location })">
+							<div class="btn-group" role="group" ng-if="eventInfo.is_organizer">
+								<button type="button" class="btn btn-success" ui-sref="app.eventSettings({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location })">
 									Settings
+								</button>
+							</div>
+							<div class="btn-group" role="group" ng-if="eventInfo.is_organizer">
+								<button type="button" class="btn btn-primary" ui-sref="app.eventOverview({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location })">
+									Overview
 								</button>
 							</div>
 						</div>
