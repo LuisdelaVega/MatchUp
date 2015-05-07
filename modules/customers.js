@@ -693,7 +693,7 @@ var editAccount = function(req, res, pg, conString, log) {
 
 		client.query("BEGIN");
 		client.query({
-			text : "UPDATE customer SET (customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, customer_email, customer_paypal_info) = ('$1', '$2', '$3', '$4', '$5', '$6', '$7', '$8', '$9') WHERE customer_username = $9",
+			text : "UPDATE customer SET (customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, customer_email, customer_paypal_info) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE customer_username = $9",
 			values : [req.body.first_name, req.body.last_name, req.body.tag, req.body.profile_pic, req.body.cover, req.body.bio, req.body.country, req.body.email, req.user.username, req.body.customer_paypal_info]
 		}, function(err, result) {
 			if (err) {
@@ -836,7 +836,7 @@ var createTeam = function(req, res, pg, conString, log) {
 		query.on("end", function(result) {
 			if (!result.rows.length) {
 				client.query({
-					text : "INSERT INTO team (team_name, team_logo, team_bio, team_cover_photo, team_active, team_paypal_info) VALUES ('$1', '$2', '$3', '$4', TRUE, '$5')",
+					text : "INSERT INTO team (team_name, team_logo, team_bio, team_cover_photo, team_active, team_paypal_info) VALUES ($1, $2, $3, $4, TRUE, $5)",
 					values : [req.body.name, // team_name
 						req.body.logo, // team_logo
 						req.body.bio, // team_bio
