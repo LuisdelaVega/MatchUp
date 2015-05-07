@@ -3360,9 +3360,9 @@ var getPayouts = function(req, res, pg, conString, log) {
 					var players = [];
 					var queryText = "";
 					if (prizeDistribution.team_size > 1) {
-						queryText = "SELECT competitor_number, competitor_standing, team_name, team_logo FROM competitor NATURAL JOIN competes_for NATURAL JOIN team WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_standing > 0 ORDER BY competitor_standing LIMIT $5";
+						queryText = "SELECT competitor.competitor_number, competitor.competitor_standing, team.team_name, team.team_logo, payout.transaction_completed FROM competitor NATURAL JOIN competes_for NATURAL JOIN team LEFT OUTER JOIN payout ON competitor.event_name = payout.event_name AND competitor.event_start_date = payout.event_start_date AND competitor.event_location = payout.event_location AND competitor.tournament_name = payout.tournament_name AND competitor.competitor_number = payout.competitor_number WHERE competitor.event_name = $1 AND competitor.event_start_date = $2 AND competitor.event_location = $3 AND competitor.tournament_name = $4 AND competitor.competitor_standing > 0 ORDER BY competitor.competitor_standing LIMIT $5";
 					} else {
-						queryText = "SELECT competitor_number, competitor_standing, customer_username, customer_profile_pic, customer_tag FROM competitor NATURAL JOIN is_a NATURAL JOIN customer WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_standing > 0 ORDER BY competitor_standing LIMIT $5";
+						queryText = "SELECT competitor.competitor_number, competitor.competitor_standing, customer.customer_username, customer.customer_profile_pic, customer.customer_tag, payout.transaction_completed FROM competitor NATURAL JOIN is_a NATURAL JOIN customer LEFT OUTER JOIN payout ON competitor.event_name = payout.event_name AND competitor.event_start_date = payout.event_start_date AND competitor.event_location = payout.event_location AND competitor.tournament_name = payout.tournament_name AND competitor.competitor_number = payout.competitor_number WHERE competitor.event_name = $1 AND competitor.event_start_date = $2 AND competitor.event_location = $3 AND competitor.tournament_name = $4 AND competitor.competitor_standing > 0 ORDER BY competitor.competitor_standing LIMIT $5";
 					}
 					var query = client.query({
 						text: queryText,
@@ -3519,14 +3519,14 @@ var payWhatYouOwe = function(req, res, pg, conString, log, initPaypal) {
 					});
 				} else {
 					done();
-					res.status(200).send([]);
+					res.status(201).send([]);
 					log.info({
 						res: res
 					}, 'done response');
 				}
 			} else {
 				done();
-				res.status(200).send([]);
+				res.status(201).send([]);
 				log.info({
 					res: res
 				}, 'done response');
