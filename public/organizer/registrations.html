@@ -6,11 +6,11 @@
 			</a>
 		</div>
 	</div>
-	<div class="col-lg-9 col-md-9 col-sm-12 col-xs-12" ng-if="index == 0 || tournaments[index].team_size == 1">
+	<div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
 		<div class="box">
-			<form role="form">
+			<form role="form" ng-if="index == 0 || tournaments[index].team_size == 1 && signups.length">
 				<div class="form-group">
-					<input class="form-control" type="search" placeholder="Search Users by Nickname, name, or filter by fee name" ng-model="item"/>
+					<input class="form-control" type="search" placeholder="Search Users by Nickname, name, or filter by fee name" ng-model="item" />
 				</div>
 				<ul class="list-group">
 					<li class="list-group-item" ng-repeat="item in signups | filter:item | orderBy: 'customer_tag'">
@@ -26,13 +26,9 @@
 					</li>
 				</ul>
 			</form>
-		</div>
-	</div>
-	<div class="col-lg-9 col-md-9 col-sm-12 col-xs-12" ng-if="tournaments[index].team_size > 1">
-		<div class="box">
-			<form role="form">
+			<form role="form" ng-if="tournaments[index].team_size > 1 && signups.length">
 				<div class="form-group">
-					<input class="form-control" type="search" placeholder="Search Teams by name" ng-model="item"/>
+					<input class="form-control" type="search" placeholder="Search Teams by name" ng-model="item" />
 				</div>
 				<ul class="list-group">
 					<li class="list-group-item" ng-repeat="item in signups | filter:item | orderBy: 'team_name'">
@@ -48,6 +44,7 @@
 					</li>
 				</ul>
 			</form>
+			<p class="lead" ng-if="!signups.length">Registrations are empty</p>
 		</div>
 	</div>
 </div>

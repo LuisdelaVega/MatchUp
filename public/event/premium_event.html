@@ -110,7 +110,7 @@
 				<div class="row">
 					<div class="col-xs-12 col-md-8 col-lg-6 col-lg-offset-3 col-md-offset-2">
 						<div class="btn-group btn-group-justified box-margin" role="group">
-							<div class="btn-group" role="group" ng-if="eventInfo.is_spectator">
+							<div class="btn-group" role="group" ng-if="(eventInfo.is_spectator || eventInfo.is_organizer) &&  !finished">
 								<button type="button" class="btn btn-default" ng-click="goToMeetupList(eventInfo.event_name, eventInfo.event_start_date, eventInfo.event_location)">
 									MeetUp
 								</button>
@@ -120,9 +120,14 @@
 									Spectator Sign Up
 								</button>
 							</div>
-							<div class="btn-group" role="group" ng-if="eventInfo.is_organizer && !finished">
-								<button type="button" class="btn btn-primary" ui-sref="app.eventSettings({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location })">
+							<div class="btn-group" role="group" ng-if="eventInfo.is_organizer">
+								<button type="button" class="btn btn-success" ui-sref="app.eventSettings({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location })">
 									Settings
+								</button>
+							</div>
+							<div class="btn-group" role="group" ng-if="eventInfo.is_organizer">
+								<button type="button" class="btn btn-primary" ui-sref="app.eventOverview({eventName: eventInfo.event_name , eventDate: eventInfo.event_start_date, eventLocation: eventInfo.event_location })">
+									Overview
 								</button>
 							</div>
 						</div>
@@ -205,7 +210,7 @@
 								<button class="btn btn-danger pull-right" ng-click="deleteReviewPrompt(review, $index)" ng-if="review.is_writer">
 									<i class="fa fa-trash-o"></i>
 								</button>
-								<button class="btn btn-info pull-right" style="margin-right:5px" ng-click="editReviewPrompt(review)" ng-if="review.is_writer">
+								<button class="btn btn-info pull-right" style="margin-right:5px" ng-click="editReviewPrompt(review, $index)" ng-if="review.is_writer">
 									<i class="fa fa-pencil-square-o"></i>
 								</button>
 								<img ng-src="{{ review.customer_profile_pic }}" class="user-pic">
@@ -461,7 +466,7 @@
 					<div class="form-group">
 						<label class="col-sm-2 control-label">Review Rating</label>
 						<div class="col-sm-10">
-							<input type="number" class="form-control" ng-model="newReview.rating">
+							<input type="number" min="1" max="5" class="form-control" ng-model="newReview.rating">
 						</div>
 					</div>
 					<div class="form-group">
@@ -504,7 +509,7 @@
 					<div class="form-group">
 						<label class="col-sm-2 control-label">Review Rating</label>
 						<div class="col-sm-10">
-							<input type="number" class="form-control" ng-model="newReview.star_rating">
+							<input type="number" min="1" max="5" class="form-control" ng-model="newReview.star_rating">
 						</div>
 					</div>
 					<div class="form-group">

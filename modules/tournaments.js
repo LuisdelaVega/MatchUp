@@ -176,11 +176,12 @@ function createGroup(res, client, done, log, group) {
 		} else {
 			// Add the players of that group
 			for (var i = 0; i < group.players.length; i++) {
-				console.log(group.players[i]);
+				console.log("addCompetitorToGroup");
 				addCompetitorToGroup(res, client, done, log, group, group.players[i]);
 			}
 			for (var i = 0; i < group.rounds.length; i++) {
 				for (var j = 0; j < group.rounds[i].matches.length; j++) {
+					console.log("attachGroupToMatch");
 					attachGroupToMatch(res, client, done, log, group.rounds[i].matches[j], group.group_number);
 				}
 			}
@@ -318,6 +319,7 @@ var createTournament = function(req, res, pg, conString, log) {
 							} else {
 								tournament.group = {};
 								tournament.group.playersPerGroup = tournament.players.length;
+								tournament.number_of_people_per_group = tournament.players.length;
 								generateGroupStage(tournament.group, tournament.players, tournament, station, assignStationsForFinalStage, "Round Robin");
 							}
 						}
@@ -479,6 +481,8 @@ function assignStationsForFinalStage(tournament, station) {
 }
 
 function generateGroupStage(groupStage, players, tournament, station, assignStations, round_of) {
+	console.log("tournament.number_of_people_per_group");
+	console.log(tournament.number_of_people_per_group);
 	console.log("Number of groups in the Group Stage");
 	groupStage.numOfGroups = Math.ceil(players.length / tournament.number_of_people_per_group);
 	console.log(groupStage.numOfGroups);
@@ -1295,8 +1299,8 @@ function getMatchHistory(req, res, client, done, log, standings, players, index,
 
 function getStandingsForFinalStage(req, res, client, done, log, standings) {
 	var query = client.query({
-		text: 'SELECT every(round_completed) AS stage_completed FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_of = $5',
-		values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Winner"]
+		text: 'SELECT every(round_completed) AS stage_completed FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND (round_of = $5 OR round_of = $6)',
+		values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Winner", "Round Robin"]
 	});
 	query.on("row", function (row, result) {
 		result.addRow(row);
@@ -1314,8 +1318,8 @@ function getStandingsForFinalStage(req, res, client, done, log, standings) {
 		//TODO logic here
 		if (!result.rows[0].stage_completed) {
 			var query = client.query({
-				text: 'SELECT distinct competitor.competitor_number FROM competes NATURAL JOIN competitor WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_of = $5 AND competitor.competitor_check_in',
-				values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Winner"]
+				text: 'SELECT distinct competitor.competitor_number FROM competes NATURAL JOIN competitor WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND (round_of = $5 OR round_of = $6) AND competitor.competitor_check_in',
+				values: [req.params.event, req.query.date, req.query.location, req.params.tournament, "Winner", "Round Robin"]
 			});
 			query.on("row", function (row, result) {
 				result.addRow(row);
@@ -1762,7 +1766,7 @@ var getRounds = function(req, res, pg, conString, log) {
 							score : row.score
 						};
 					}
-					if (row.group_number) {
+					if (row.group_number && details.tournament_type === "Two Stage") {
 						if (!tournament.groupStage.groups[row.group_number-1]) {
 							tournament.groupStage.groups[row.group_number-1] = {};
 							tournament.groupStage.groups[row.group_number-1].group_number = row.group_number;
@@ -1954,7 +1958,7 @@ var getMatch = function(req, res, pg, conString, log) {
 				matchDetails.is_competitor = false;
 				console.log(req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match);
 				var query = client.query({
-					text: 'SELECT CASE WHEN tournament.team_size > 1 THEN team.team_name || $9 || team.team_logo ELSE customer.customer_username || $9 || customer.customer_profile_pic || $9 || customer.customer_tag END AS info, competes.competitor_number, (customer.customer_username = $8) AS is_competitor, match.match_completed, match.is_favourite, sum(submits.score) AS score, (SELECT every(round_completed) FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND CASE WHEN $6 = $10 THEN round_of = $11 ELSE round_of = $6 END) AS stage_completed, tournament.score_type, is_played_in.station_number, stream.stream_link, match.is_favourite FROM customer NATURAL JOIN is_a NATURAL JOIN tournament LEFT OUTER JOIN competes ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number LEFT OUTER JOIN competes_for ON competes_for.event_name = competes.event_name AND competes_for.event_start_date = competes.event_start_date AND competes_for.event_location = competes.event_location AND competes_for.tournament_name = competes.tournament_name AND competes_for.competitor_number = competes.competitor_number LEFT OUTER JOIN team ON team.team_name = competes_for.team_name LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number LEFT OUTER JOIN match ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND match.round_number = competes.round_number AND match.round_of = competes.round_of AND match.match_number = competes.match_number LEFT OUTER JOIN is_played_in ON match.event_name = is_played_in.event_name AND match.event_start_date = is_played_in.event_start_date AND match.event_location = is_played_in.event_location AND match.tournament_name = is_played_in.tournament_name AND is_played_in.round_number = match.round_number AND is_played_in.round_of = match.round_of AND is_played_in.match_number = match.match_number LEFT OUTER JOIN stream ON stream.event_name = is_played_in.event_name AND stream.event_start_date = is_played_in.event_start_date AND stream.event_location = is_played_in.event_location AND stream.station_number = is_played_in.station_number  WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND competes.match_number = $7 GROUP BY customer.customer_username, customer.customer_tag, customer.customer_profile_pic, match.match_completed, match.is_favourite, competes.competitor_number, tournament.team_size, team.team_name, team.team_logo, tournament.score_type, is_played_in.station_number, stream.stream_link, match.is_favourite ORDER BY competes.competitor_number',
+					text: 'SELECT CASE WHEN tournament.team_size > 1 THEN team.team_name || $9 || team.team_logo ELSE customer.customer_username || $9 || customer.customer_profile_pic || $9 || customer.customer_tag END AS info, competes.competitor_number, (customer.customer_username = $8) AS is_competitor, match.match_completed, match.is_favourite, sum(submits.score) AS score, (SELECT every(round_pause) FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND CASE WHEN $6 = $10 THEN round_of = $11 ELSE round_of = $6 END) AS stage_completed, (SELECT round_completed FROM round WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND round_number = $5 AND round_of = $6) AS round_pause, tournament.score_type, is_played_in.station_number, stream.stream_link, match.is_favourite FROM customer NATURAL JOIN is_a NATURAL JOIN tournament LEFT OUTER JOIN competes ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number LEFT OUTER JOIN competes_for ON competes_for.event_name = competes.event_name AND competes_for.event_start_date = competes.event_start_date AND competes_for.event_location = competes.event_location AND competes_for.tournament_name = competes.tournament_name AND competes_for.competitor_number = competes.competitor_number LEFT OUTER JOIN team ON team.team_name = competes_for.team_name LEFT OUTER JOIN submits ON submits.event_name = competes.event_name AND submits.event_start_date = competes.event_start_date AND submits.event_location = competes.event_location AND submits.tournament_name = competes.tournament_name AND submits.competitor_number = competes.competitor_number AND submits.round_number = competes.round_number AND submits.round_of = competes.round_of AND submits.match_number = competes.match_number LEFT OUTER JOIN match ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND match.round_number = competes.round_number AND match.round_of = competes.round_of AND match.match_number = competes.match_number LEFT OUTER JOIN is_played_in ON match.event_name = is_played_in.event_name AND match.event_start_date = is_played_in.event_start_date AND match.event_location = is_played_in.event_location AND match.tournament_name = is_played_in.tournament_name AND is_played_in.round_number = match.round_number AND is_played_in.round_of = match.round_of AND is_played_in.match_number = match.match_number LEFT OUTER JOIN stream ON stream.event_name = is_played_in.event_name AND stream.event_start_date = is_played_in.event_start_date AND stream.event_location = is_played_in.event_location AND stream.station_number = is_played_in.station_number  WHERE competes.event_name = $1 AND competes.event_start_date = $2 AND competes.event_location = $3 AND competes.tournament_name = $4 AND competes.round_number = $5 AND competes.round_of = $6 AND competes.match_number = $7 GROUP BY customer.customer_username, customer.customer_tag, customer.customer_profile_pic, match.match_completed, match.is_favourite, competes.competitor_number, tournament.team_size, team.team_name, team.team_logo, tournament.score_type, is_played_in.station_number, stream.stream_link, match.is_favourite ORDER BY competes.competitor_number',
 					values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.params.round, req.query.round_of, req.params.match, req.user.username, ",;!;,", "Loser", "Winner"]
 				});
 				query.on("row", function (row, result) {
@@ -1991,6 +1995,7 @@ var getMatch = function(req, res, pg, conString, log) {
 					//matchDetails.players.push(temp);
 					matchDetails.match_completed = row.match_completed;
 					matchDetails.stage_completed = row.stage_completed;
+					matchDetails.round_completed = row.round_completed;
 					matchDetails.is_favourite = row.is_favourite;
 					matchDetails.score_type = row.score_type;
 					matchDetails.station_number = row.station_number;
@@ -3360,9 +3365,9 @@ var getPayouts = function(req, res, pg, conString, log) {
 					var players = [];
 					var queryText = "";
 					if (prizeDistribution.team_size > 1) {
-						queryText = "SELECT competitor_number, competitor_standing, team_name, team_logo FROM competitor NATURAL JOIN competes_for NATURAL JOIN team WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_standing > 0 ORDER BY competitor_standing LIMIT $5";
+						queryText = "SELECT competitor.competitor_number, competitor.competitor_standing, team.team_name, team.team_logo, payout.transaction_completed FROM competitor NATURAL JOIN competes_for NATURAL JOIN team LEFT OUTER JOIN payout ON competitor.event_name = payout.event_name AND competitor.event_start_date = payout.event_start_date AND competitor.event_location = payout.event_location AND competitor.tournament_name = payout.tournament_name AND competitor.competitor_number = payout.competitor_number WHERE competitor.event_name = $1 AND competitor.event_start_date = $2 AND competitor.event_location = $3 AND competitor.tournament_name = $4 AND competitor.competitor_standing > 0 ORDER BY competitor.competitor_standing LIMIT $5";
 					} else {
-						queryText = "SELECT competitor_number, competitor_standing, customer_username, customer_profile_pic, customer_tag FROM competitor NATURAL JOIN is_a NATURAL JOIN customer WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_standing > 0 ORDER BY competitor_standing LIMIT $5";
+						queryText = "SELECT competitor.competitor_number, competitor.competitor_standing, customer.customer_username, customer.customer_profile_pic, customer.customer_tag, payout.transaction_completed FROM competitor NATURAL JOIN is_a NATURAL JOIN customer LEFT OUTER JOIN payout ON competitor.event_name = payout.event_name AND competitor.event_start_date = payout.event_start_date AND competitor.event_location = payout.event_location AND competitor.tournament_name = payout.tournament_name AND competitor.competitor_number = payout.competitor_number WHERE competitor.event_name = $1 AND competitor.event_start_date = $2 AND competitor.event_location = $3 AND competitor.tournament_name = $4 AND competitor.competitor_standing > 0 ORDER BY competitor.competitor_standing LIMIT $5";
 					}
 					var query = client.query({
 						text: queryText,
@@ -3416,6 +3421,134 @@ var getPayouts = function(req, res, pg, conString, log) {
 	});
 };
 
+function payout(req, pg, conString, payKey) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		client.query("BEGIN");
+		client.query({
+			text: "INSERT INTO payout (event_name, event_start_date, event_location, tournament_name, competitor_number, transaction_completed, payout_paykey) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+			values: [req.params.event, req.query.date, req.query.location, req.params.tournament, req.body.competitor_number, false, payKey]
+		}, function (err, result) {
+			if (err) {
+				client.query("ROLLBACK");
+				done();
+				console.log(err);
+			} else {
+				client.query("COMMIT");
+				done();
+			}
+		});
+	});
+}
+
+var payWhatYouOwe = function(req, res, pg, conString, log, initPaypal) {
+	pg.connect(conString, function(err, client, done) {
+		if (err) {
+			return console.error('error fetching client from pool', err);
+		}
+
+		var query = client.query({
+			text: "SELECT team_size, prize_distribution.*, seed_money, event_deduction_fee, (SELECT count(*) FROM competitor_pays WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_paid) AS tickets_sold, competitor_fee FROM event NATURAL JOIN tournament NATURAL JOIN prize_distribution WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_fee > 0",
+			values: [req.params.event, req.query.date, req.query.location, req.params.tournament]
+		});
+		query.on("row", function (row, result) {
+			result.addRow(row);
+		});
+		query.on('error', function (error) {
+			done();
+			console.log(error);
+			res.status(500).send(error);
+			log.info({
+				res: res
+			}, 'done response');
+		});
+		query.on("end", function (result) {
+			if (result.rows.length) {
+				var prizeDistribution = result.rows[0];
+				var limit = 0;
+				if (prizeDistribution.prize_distribution_name === "Standard") {
+					limit = 3;
+				} else if (prizeDistribution.prize_distribution_name === "First and Second") {
+					limit = 2;
+				} else if (prizeDistribution.prize_distribution_name === "Winner Takes All") {
+					limit = 1;
+				}
+
+				if (limit) {
+					var players = [];
+					var queryText = "";
+					if (prizeDistribution.team_size > 1) {
+						queryText = "SELECT competitor_number, team_paypal_info AS email FROM competitor NATURAL JOIN competes_for NATURAL JOIN team WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_standing > 0 ORDER BY competitor_standing LIMIT $5";
+					} else {
+						queryText = "SELECT competitor_number, customer_paypal_info AS email FROM competitor NATURAL JOIN is_a NATURAL JOIN customer WHERE event_name = $1 AND event_start_date = $2 AND event_location = $3 AND tournament_name = $4 AND competitor_standing > 0 ORDER BY competitor_standing LIMIT $5";
+					}
+					var query = client.query({
+						text: queryText,
+						values: [req.params.event, req.query.date, req.query.location, req.params.tournament, limit]
+					});
+					query.on("row", function (row, result) {
+						players.push(row);
+					});
+					query.on('error', function (error) {
+						done();
+						console.log(error);
+						res.status(500).send(error);
+						log.info({
+							res: res
+						}, 'done response');
+					});
+					query.on("end", function (result) {
+						// No, it's not for drugs
+						var potMoney = parseInt(prizeDistribution.seed_money) + parseFloat(prizeDistribution.competitor_fee) * parseInt(prizeDistribution.tickets_sold) * parseInt(prizeDistribution.event_deduction_fee)/100;
+						var flag = true;
+						for (var i = 0; i < players.length; i++) {
+							if (!i && parseInt(players[0].competitor_number) == parseInt(req.body.competitor_number)) {
+								flag = false;
+								players[0].amount = parseFloat((potMoney * parseInt(prizeDistribution.first)/100).toFixed(2));
+								done();
+								initPaypal(req, res, players[0], log, payout);
+							} else if (i == 1 && parseInt(players[1].competitor_number) == parseInt(req.body.competitor_number)) {
+								flag = false;
+								players[1].amount = parseFloat((potMoney * parseInt(prizeDistribution.second)/100).toFixed(2));
+								done();
+								initPaypal(req, res, players[1], log, payout);
+							} else if (i == 2 && parseInt(players[2].competitor_number) == parseInt(req.body.competitor_number)) {
+								flag = false;
+								players[2].amount = parseFloat((potMoney * parseInt(prizeDistribution.third)/100).toFixed(2));
+								done();
+								initPaypal(req, res, players[2], log, payout);
+							}
+						}
+
+						if (flag) {
+							done();
+							res.status(403).send("invalid competitor number");
+							log.info({
+								res: res
+							}, 'done response');
+						}
+					});
+				} else {
+					done();
+					res.status(201).send([]);
+					log.info({
+						res: res
+					}, 'done response');
+				}
+			} else {
+				done();
+				res.status(201).send([]);
+				log.info({
+					res: res
+				}, 'done response');
+			}
+		});
+	});
+};
+
 module.exports.createTournament = createTournament;
 module.exports.getStandings = getStandings;
 module.exports.getRounds = getRounds;
@@ -3432,3 +3565,4 @@ module.exports.changeStation = changeStation;
 module.exports.changeTimeAndDateOfRound = changeTimeAndDateOfRound;
 module.exports.deleteStages = deleteStages;
 module.exports.getPayouts = getPayouts;
+module.exports.payWhatYouOwe = payWhatYouOwe;

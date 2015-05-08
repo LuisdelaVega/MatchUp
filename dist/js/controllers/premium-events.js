@@ -61,7 +61,6 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 
 		$q.all(competitorsGets).then(function (results) {
 			$scope.competitorsResult = results;
-			console.log($scope.competitorsResult);
 		});
 
 	}, function (err) {
@@ -197,9 +196,11 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/reviews?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data) {
 		$scope.reviews = data;
 		$scope.hasReview = false;
-		angular.forEach($scope.reviews, function (review) {
-			$scope.hasReview = (review.customer_username == $scope.me);
-		});
+		for(var i = 0; i < $scope.reviews.length; i++){
+			if($scope.reviews[i].customer_username == $scope.me){
+				$scope.hasReview = true;
+			}
+		}
 	}).error(function (err) {
 		console.log(err);
 	});
@@ -216,8 +217,7 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 		} else {
 
 			$http.post($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/reviews?date=' + $stateParams.date + '&location=' + $stateParams.location, $scope.newReview).success(function (data) {
-				//$scope.tournaments.push($scope.newTournament);
-				//console.log($scope.newTournament);
+				$scope.hasReview = true;
 				$http.get($rootScope.baseURL + '/matchup/profile').success(function (data) {
 					$scope.user = data;
 					var now = new Date;
@@ -250,14 +250,12 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 
 	};
 
-	$scope.editReviewPrompt = function (review) {
+	$scope.editReviewPrompt = function (review, index) {
 		//get news Index
 		//show modal
-		$scope.newReview = review;
+		$scope.newReview = angular.copy(review);
+		$scope.editReviewIndex = index;
 		$('#editReviewModal').modal("show");
-
-		//load information
-
 	};
 
 	$scope.editReview = function () {
@@ -280,7 +278,7 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
 					"rating": $scope.newReview.star_rating
 				}).success(function (data) {
 					$('#editReviewModal').modal("hide");
-					$scope.newNews = {};
+					$scope.reviews[$scope.editReviewIndex] = $scope.newReview;
 
 				}).error(function (err) {
 					console.log(err);

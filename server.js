@@ -256,9 +256,19 @@ app.get('/paypalSuccess', function(req, res){
 						done();
 						console.log(err);
 					} else {
-						//TODO payout
-						client.query("COMMIT");
-						done();
+						client.query({
+							text: "UPDATE payout SET transaction_completed = true WHERE payout_paykey = $1",
+							values: [payKey]
+						}, function (err, result) {
+							if (err) {
+								client.query("ROLLBACK");
+								done();
+								console.log(err);
+							} else {
+								client.query("COMMIT");
+								done();
+							}
+						});
 					}
 				});
 			}
@@ -887,7 +897,7 @@ app.route('/matchup/events/:event/tournaments/:tournament/payouts').get(function
 	log.info({
 		req : req
 	}, 'start request');
-	events.getCompetitors(req, res, pg, conString, log);
+	tournaments.payWhatYouOwe(req, res, pg, conString, log, initPaypal);
 });
 
 /* /matchup/events/:event/tournaments/:tournament/competitors/checked?date=date&location=string

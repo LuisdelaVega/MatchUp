@@ -34,7 +34,7 @@ var getOrganization = function(req, res, pg, conString, log) {
 		}
 
 		var query = client.query({
-			text : "SELECT organization_name, organization_logo, organization_bio, organization_cover_photo, bool_and(organization_name IN (SELECT organization_name FROM belongs_to WHERE customer_username = $1)) AS is_member FROM organization WHERE organization_active AND organization_name = $2 GROUP BY organization_name",
+			text : "SELECT organization_name, organization_logo, organization_bio, organization_cover_photo, organization_paypal_info, bool_and(organization_name IN (SELECT organization_name FROM belongs_to WHERE customer_username = $1)) AS is_member FROM organization WHERE organization_active AND organization_name = $2 GROUP BY organization_name",
 			values : [req.user.username, req.params.organization]
 		});
 		query.on("row", function(row, result) {
@@ -88,8 +88,8 @@ var editOrganization = function(req, res, pg, conString, log) {
 			if (result.rows.length && result.rows[0].is_member) {
                 if (req.body.logo && req.body.bio && req.body.cover) {
                     client.query({
-                        text: "UPDATE organization SET (organization_logo, organization_bio, organization_cover_photo) = ($1, $2, $3) WHERE organization_name = $4",
-                        values: [req.body.logo, req.body.bio, req.body.cover, req.params.organization]
+                        text: "UPDATE organization SET (organization_logo, organization_bio, organization_cover_photo, organization_paypal_info) = ($1, $2, $3, $5) WHERE organization_name = $4",
+                        values: [req.body.logo, req.body.bio, req.body.cover, req.params.organization, req.body.organization_paypal_info]
                     }, function (err, result) {
                         if (err) {
                             client.query("ROLLBACK");

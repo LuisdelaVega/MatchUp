@@ -304,7 +304,7 @@ function ($scope, $http, $state, sharedDataService, $rootScope, $window) {
 				fd.append("image", e.target.result.split(",")[1]);
 				fd.append("key", $rootScope.imgurKey);
 				var xhr = new XMLHttpRequest();
-				xhr.open("POST", "http://api.imgur.com/2/upload.json");
+				xhr.open("POST", "https://api.imgur.com/2/upload.json");
 				xhr.onload = function () {
 					// Apply changes to scope. Not a angular function it is needed
 					$scope.$apply(function () {
@@ -333,6 +333,7 @@ function ($scope, $http, $state, sharedDataService, $rootScope, $window) {
 					"email": $scope.user.customer_email,
 					"country": $scope.user.customer_country,
 					"bio": $scope.user.customer_bio,
+					"customer_paypal_info": $scope.user.customer_paypal_info
 				};
 				$http.put($rootScope.baseURL + "/matchup/profile", profile).success(function () {
 					$state.go("app.userProfile", {
@@ -430,7 +431,7 @@ function ($scope, $http, $state, $stateParams, $rootScope) {
 myApp.controller('paySuccessfulController', ['$scope', '$http', '$stateParams', '$state', '$rootScope',
 function ($scope, $http, $stateParams, $state, $rootScope) {
 
-		$http.get($rootScope.baseURL + '/matchup/paypal/' + $scope.payKey).success(function (data) {
+		$http.get($rootScope.baseURL + '/matchup/paypal/' + localStorage.getItem('payKey')).success(function (data) {
 			$scope.payInfo = data;
 			console.log(data);
 

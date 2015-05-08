@@ -18,7 +18,7 @@ var getUserProfile = function(req, res, pg, conString, log) {
 
 		// Query the database to find the user's account
 		var query = client.query({
-			text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic, customer.customer_cover_photo, customer.customer_bio, customer.customer_country, customer.customer_email, sum(competitor.matches_won) AS wins, sum(competitor.matches_lost) AS loses, bool_and(customer.customer_username = $1) AS my_profile FROM customer LEFT OUTER JOIN is_a ON is_a.customer_username = customer.customer_username LEFT OUTER JOIN competitor ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number WHERE customer.customer_username = $2 AND customer.customer_active GROUP BY customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic, customer.customer_cover_photo, customer.customer_bio, customer.customer_country, customer.customer_email",
+			text : "SELECT customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic, customer.customer_cover_photo, customer.customer_bio, customer.customer_country, customer.customer_email, customer.customer_paypal_info, sum(competitor.matches_won) AS wins, sum(competitor.matches_lost) AS loses, bool_and(customer.customer_username = $1) AS my_profile FROM customer LEFT OUTER JOIN is_a ON is_a.customer_username = customer.customer_username LEFT OUTER JOIN competitor ON is_a.event_name = competitor.event_name AND is_a.event_start_date = competitor.event_start_date AND is_a.event_location = competitor.event_location AND is_a.tournament_name = competitor.tournament_name AND is_a.competitor_number = competitor.competitor_number WHERE customer.customer_username = $2 AND customer.customer_active GROUP BY customer.customer_username, customer.customer_first_name, customer.customer_last_name, customer.customer_tag, customer.customer_profile_pic, customer.customer_cover_photo, customer.customer_bio, customer.customer_country, customer.customer_email",
 			values : [req.user.username, req.params.username]
 		});
 		query.on("row", function(row, result) {
@@ -91,7 +91,7 @@ var getMatchups = function(req, res, pg, conString, log) {
 		if (req.query.state === "Past") {
 			queryText = "SELECT match.event_name, match.event_start_date, match.event_location, match.tournament_name, match.round_number, match.round_of, round.round_best_of, match.match_number, tournament.team_size, is_played_in.station_number FROM match NATURAL JOIN round JOIN competes ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND match.round_number = competes.round_number AND match.round_of = competes.round_of AND match.match_number = competes.match_number JOIN is_a ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number JOIN tournament ON match.event_name = tournament.event_name AND match.event_start_date = tournament.event_start_date AND match.event_location = tournament.event_location AND match.tournament_name = tournament.tournament_name LEFT OUTER JOIN is_played_in ON match.event_name = is_played_in.event_name AND match.event_start_date = is_played_in.event_start_date AND match.event_location = is_played_in.event_location AND match.tournament_name = is_played_in.tournament_name AND match.round_number = is_played_in.round_number AND match.round_of = is_played_in.round_of AND match.match_number = is_played_in.match_number WHERE is_a.customer_username = $1 AND match.match_completed ORDER BY match.event_start_date DESC, match.event_name, match.tournament_name, CASE WHEN match.round_of = 'Loser' THEN 1 WHEN match.round_of = 'Round Robin' THEN 2 WHEN match.round_of = 'Winner' THEN 3 WHEN match.round_of = 'Group' THEN 4 END, match.round_number DESC";
 		} else {
-			queryText = "SELECT match.event_name, match.event_start_date, match.event_location, match.tournament_name, match.round_number, match.round_of, round.round_best_of, match.match_number, tournament.team_size, is_played_in.station_number FROM match NATURAL JOIN round JOIN competes ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND match.round_number = competes.round_number AND match.round_of = competes.round_of AND match.match_number = competes.match_number JOIN is_a ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number JOIN tournament ON match.event_name = tournament.event_name AND match.event_start_date = tournament.event_start_date AND match.event_location = tournament.event_location AND match.tournament_name = tournament.tournament_name JOIN event ON event.event_name = tournament.event_name AND event.event_start_date = tournament.event_start_date AND event.event_location = tournament.event_location LEFT OUTER JOIN is_played_in ON match.event_name = is_played_in.event_name AND match.event_start_date = is_played_in.event_start_date AND match.event_location = is_played_in.event_location AND match.tournament_name = is_played_in.tournament_name AND match.round_number = is_played_in.round_number AND match.round_of = is_played_in.round_of AND match.match_number = is_played_in.match_number WHERE is_a.customer_username = $1 AND NOT match.match_completed AND event.event_active AND event.event_start_date < now() at time zone 'utc' AND event.event_end_date > now() at time zone 'utc' ORDER BY match.event_start_date DESC, match.event_name, match.tournament_name, CASE WHEN match.round_of = 'Loser' THEN 1 WHEN match.round_of = 'Round Robin' THEN 2 WHEN match.round_of = 'Winner' THEN 3 WHEN match.round_of = 'Group' THEN 4 END, match.round_number DESC";
+			queryText = "SELECT match.event_name, match.event_start_date, match.event_location, match.tournament_name, match.round_number, match.round_of, round.round_best_of, match.match_number, tournament.team_size, is_played_in.station_number FROM match NATURAL JOIN round JOIN competes ON match.event_name = competes.event_name AND match.event_start_date = competes.event_start_date AND match.event_location = competes.event_location AND match.tournament_name = competes.tournament_name AND match.round_number = competes.round_number AND match.round_of = competes.round_of AND match.match_number = competes.match_number JOIN is_a ON is_a.event_name = competes.event_name AND is_a.event_start_date = competes.event_start_date AND is_a.event_location = competes.event_location AND is_a.tournament_name = competes.tournament_name AND is_a.competitor_number = competes.competitor_number JOIN tournament ON match.event_name = tournament.event_name AND match.event_start_date = tournament.event_start_date AND match.event_location = tournament.event_location AND match.tournament_name = tournament.tournament_name JOIN event ON event.event_name = tournament.event_name AND event.event_start_date = tournament.event_start_date AND event.event_location = tournament.event_location LEFT OUTER JOIN is_played_in ON match.event_name = is_played_in.event_name AND match.event_start_date = is_played_in.event_start_date AND match.event_location = is_played_in.event_location AND match.tournament_name = is_played_in.tournament_name AND match.round_number = is_played_in.round_number AND match.round_of = is_played_in.round_of AND match.match_number = is_played_in.match_number WHERE is_a.customer_username = $1 AND NOT match.match_completed AND event.event_active AND event.event_start_date < now() at time zone 'utc' AND event.event_end_date > now() at time zone 'utc' AND NOT round.round_pause ORDER BY match.event_start_date DESC, match.event_name, match.tournament_name, CASE WHEN match.round_of = 'Loser' THEN 1 WHEN match.round_of = 'Round Robin' THEN 2 WHEN match.round_of = 'Winner' THEN 3 WHEN match.round_of = 'Group' THEN 4 END, match.round_number DESC";
 		}
 
 		var query = client.query({
@@ -693,10 +693,11 @@ var editAccount = function(req, res, pg, conString, log) {
 
 		client.query("BEGIN");
 		client.query({
-			text : "UPDATE customer SET (customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, customer_email) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE customer_username = $9",
-			values : [req.body.first_name, req.body.last_name, req.body.tag, req.body.profile_pic, req.body.cover, req.body.bio, req.body.country, req.body.email, req.user.username]
+			text : "UPDATE customer SET (customer_first_name, customer_last_name, customer_tag, customer_profile_pic, customer_cover_photo, customer_bio, customer_country, customer_email, customer_paypal_info) = ($1, $2, $3, $4, $5, $6, $7, $8, $10) WHERE customer_username = $9",
+			values : [req.body.first_name, req.body.last_name, req.body.tag, req.body.profile_pic, req.body.cover, req.body.bio, req.body.country, req.body.email, req.user.username, req.body.customer_paypal_info]
 		}, function(err, result) {
 			if (err) {
+				console.log(err);
 				client.query("ROLLBACK");
 				done();
 				res.status(500).send(err);
@@ -777,14 +778,15 @@ var createAccount = function(req, res, pg, conString, jwt, secret, crypto, log) 
 				throw err;
 			client.query("BEGIN");
 			client.query({
-				text : "INSERT INTO customer (customer_username, customer_first_name, customer_last_name, customer_tag, customer_password, customer_salt, customer_email, customer_active) VALUES ($1, $2, $3, $4, $5, $6, $7, TRUE)",
+				text : "INSERT INTO customer (customer_username, customer_first_name, customer_last_name, customer_tag, customer_password, customer_salt, customer_email, customer_active, customer_paypal_info) VALUES ($1, $2, $3, $4, $5, $6, $7, TRUE, $8)",
 				values : [req.body.username, // customer_username
 					req.body.first_name, // customer_first_name
 					req.body.last_name, // customer_last_name
 					req.body.tag, // customer_tag
 					key.toString('hex'), // customer_password
 					salt, // customer_salt
-					req.body.email] // customer_email
+					req.body.email,
+					req.body.customer_paypal_info] // customer_email
 			}, function(err, result) {
 				if (err) {
 					client.query("ROLLBACK");
@@ -835,12 +837,12 @@ var createTeam = function(req, res, pg, conString, log) {
 		query.on("end", function(result) {
 			if (!result.rows.length) {
 				client.query({
-					text : "INSERT INTO team (team_name, team_logo, team_bio, team_cover_photo, team_active) VALUES ('$1', $2, '$3', $4, TRUE)",
+					text : "INSERT INTO team (team_name, team_logo, team_bio, team_cover_photo, team_active, team_paypal_info) VALUES ($1, $2, $3, $4, TRUE, $5)",
 					values : [req.body.name, // team_name
 						req.body.logo, // team_logo
 						req.body.bio, // team_bio
-						req.body.cover // team_cover_photo
-					]
+						req.body.cover, // team_cover_photo
+						req.body.team_paypal_info]
 				}, function(err, result) {
 					if (err) {
 						client.query("ROLLBACK");
