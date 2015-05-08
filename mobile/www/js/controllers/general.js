@@ -380,6 +380,7 @@ myApp.controller('reportController', ['$scope', '$http', '$cordovaCamera', '$ion
 
                 }).
                 error(function (err){
+                    $scope.fuckedup = err;
                     console.log("error in editProfileController");
                     $ionicLoading.hide();
                     var alertPopup = $ionicPopup.alert({

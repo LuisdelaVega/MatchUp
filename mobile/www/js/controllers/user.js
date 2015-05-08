@@ -338,8 +338,6 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
             $scope.user.email = profileData.customer_email;
             $scope.user.customer_paypal_info = profileData.customer_paypal_info;
 
-            console.log($scope.user);
-
         }).
         error(function (err){
             console.log("error in goToEvent");
