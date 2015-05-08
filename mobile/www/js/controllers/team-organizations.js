@@ -385,7 +385,7 @@ myApp.controller("editTeamController", ['$scope', '$ionicPopup', '$stateParams',
                 };
 
                 //Call to upload image to imgur
-                $http.post('http://api.imgur.com/3/upload', {
+                $http.post('https://api.imgur.com/3/upload', {
                     "image": imageData
                 }).success(function (data) {
 
@@ -426,7 +426,7 @@ myApp.controller("editTeamController", ['$scope', '$ionicPopup', '$stateParams',
                 };
 
                 //Call to upload image to imgur
-                $http.post('http://api.imgur.com/3/upload', {
+                $http.post('https://api.imgur.com/3/upload', {
                     "image": imageData
                 }).success(function (data) {
 
@@ -859,7 +859,7 @@ myApp.controller("editOrganizationMemberController", ['$scope', '$ionicPopup', '
                 };
 
                 //Call to upload image to imgur
-                $http.post('http://api.imgur.com/3/upload', {
+                $http.post('https://api.imgur.com/3/upload', {
                     "image": imageData
                 }).success(function (data) {
 
@@ -900,7 +900,7 @@ myApp.controller("editOrganizationMemberController", ['$scope', '$ionicPopup', '
                 };
 
                 //Call to upload image to imgur
-                $http.post('http://api.imgur.com/3/upload', {
+                $http.post('https://api.imgur.com/3/upload', {
                     "image": imageData
                 }).success(function (data) {
 
