@@ -7,7 +7,7 @@
     <ion-content>
         <div class="card">
             <div class="item item-text-wrap">
-                <h2> {{ matchupInfo.round_number }}:  Round {{ matchupInfo.round_number }} Match {{ matchupInfo.match_number }}</h2>
+                <h2> {{ matchupInfo.round_of }}:  Round {{ matchupInfo.round_number }} Match {{ matchupInfo.match_number }}</h2>
                 <p ng-if="matchup.station_number != null">Station {{ matchupInfo.station_number }}</p>
             </div>
             <div class="row">
@@ -41,7 +41,7 @@
         </div>
         <div class="card" ng-if="!matchCompleted">
             <div class="item">
-                <p>Set {{ currentSet }}</p>
+                <p>Set {{ currentSet }}</p> <p ng-if="sentScore.sent" style="text-align: center">Waiting for opponent to report score...</p>
                 <div class="list list-inset">
                     <div class="item item-divider">
                         Report Score
@@ -75,8 +75,6 @@
                 </div>
             </div>
         </div>
-
-
 
         <div class="card" ng-if="matchCompleted">
             <div class="item item-text-wrap">

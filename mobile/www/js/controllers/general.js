@@ -512,7 +512,8 @@ myApp.controller('createAccountController', ['$scope', '$http', '$state', 'share
                 "first_name": $scope.newAccount.firstName,
                 "last_name": $scope.newAccount.lastName,
                 "tag": $scope.newAccount.tag,
-                "password": $scope.newAccount.password
+                "password": $scope.newAccount.password,
+                "customer_paypal_info": $scope.newAccount.customer_paypal_info
             }).success(function (data) {
 
                 var alertPopup = $ionicPopup.alert({
@@ -546,7 +547,7 @@ myApp.controller('createAccountController', ['$scope', '$http', '$state', 'share
 myApp.controller('sidebarController', ['$scope', '$http', '$state', 'sharedDataService', '$window', '$timeout', function ($scope, $http, $state, sharedDataService, $window, $timeout) {
 
     //Load profile information of currently logged in user. The token is used by the server to obtain user credentials.
-    $scope.$on('$ionicView.enter', function () {
+    $scope.$on('$ionicView.beforeEnter', function () {
         var config = {
             headers: {
                 'Authorization': "Bearer "+ $window.sessionStorage.token
@@ -622,17 +623,20 @@ myApp.controller('sidebarController', ['$scope', '$http', '$state', 'sharedDataS
     };
 
     $scope.goToMySubscriptions = function (customer_username) {
-
         sharedDataService.set(customer_username);
         $state.go('app.mysubscriptions');
 
     };
 
     $scope.goToProfile = function (customer_username) {
-
         sharedDataService.set(customer_username);
         $state.go('app.profile.summary', { "username":  customer_username});
-
+    };
+    
+    $scope.logout = function () {
+        $window.sessionStorage.token = "";
+        $window.sessionStorage.username = "";
+        $state.go('login');
     };
 
 }]);
@@ -886,6 +890,10 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
         $scope.matchCompleted = false;
 
         $scope.currentSet = 1;
+        
+        $scope.sentScore = { };
+        
+        $scope.sentScore.sent = false;
 
         $scope.pollServer();
     });
@@ -899,6 +907,8 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
         };        
 
         $http.get('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'', config).success(function (data) {
+            
+            console.log('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'');
 
             $scope.players = data.players;
 
@@ -939,10 +949,15 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
             });
 
             var foundSet = false;
+            var currentSet = $scope.currentSet;
+            
             angular.forEach(sets, function(set){
                 if(!set.set_completed && !foundSet){
                     $scope.currentSet = set.set_seq;
                     foundSet = true;
+                    if(currentSet != $scope.currentSet){
+                        $scope.sentScore.sent = false;       
+                    }
                 }
             });
 
@@ -980,8 +995,11 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
                         template: 'You have succesfully submitted your score for set '+$scope.currentSet+' with a Win.'
                     });
                     confirmPopup.then(function (res) {
-
+                        
                     });
+                    
+                    
+                    $scope.sentScore.sent = true;
 
                 }).error(function (data, status, header, config) {
 
@@ -995,6 +1013,8 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
                         confirmPopup.then(function (res) {
 
                         });
+                        
+                        $scope.sentScore.sent = true;
 
                     }
 
@@ -1027,6 +1047,8 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
                     confirmPopup.then(function (res) {
 
                     });
+                    
+                    $scope.sentScore.sent = true;
 
                 }).error(function (data, status, header, config) {
 
@@ -1038,6 +1060,8 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
                         confirmPopup.then(function (res) {
 
                         });
+                        
+                        $scope.sentScore.sent = true;
                     }
 
                     else if(status == 409){
@@ -1083,6 +1107,8 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
                 confirmPopup.then(function (res) {
 
                 });
+                
+                $scope.sentScore = true;
 
             }).error(function (data, status, header, config) {
 
@@ -1095,6 +1121,8 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
                     confirmPopup.then(function (res) {
 
                     });
+                    
+                    $scope.sentScore.sent = true;
                 }
 
                 else if(status == 409){
@@ -1106,7 +1134,6 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
                     confirmPopup.then(function (res) {
 
                     });
-
                 }
 
             });

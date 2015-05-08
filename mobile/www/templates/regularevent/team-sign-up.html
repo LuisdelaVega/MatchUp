@@ -19,7 +19,7 @@
         </ul>
         <h2 style="color: rgb(102, 221, 51); text-align: center;" ng-if="checkedMembers.length == tournamentInfo.team_size">{{ checkedMembers.length }}/{{ tournamentInfo.team_size }} selected</h2>
         <h2 style="color: rgb(255, 102, 102); text-align: center;" ng-if="checkedMembers.length != tournamentInfo.team_size">{{ checkedMembers.length }}/{{ tournamentInfo.team_size }} selected</h2>
-        <button class="button" style="width: 100vw" ng-click="teamSignUp()" ng-if="checkedMembers.length == tournamentInfo.team_size">
+        <button class="button button-block button-positive" style="width: 100vw" ng-click="teamSignUp()" ng-if="checkedMembers.length == tournamentInfo.team_size">
             Finish
         </button>
     </ion-content>

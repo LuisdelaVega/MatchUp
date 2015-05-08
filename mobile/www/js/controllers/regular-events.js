@@ -3,20 +3,13 @@ var myApp = angular.module('regular-events',[]);
 myApp.controller('REController', ['$scope', '$http', '$ionicPopup', '$stateParams', '$window', 'sharedDataService', '$cordovaInAppBrowser', '$ionicPlatform', '$rootScope', function ($scope, $http, $ionicPopup, $stateParams, $window, sharedDataService, $cordovaInAppBrowser, $ionicPlatform, $rootScope) {
 
     $rootScope.$on('$cordovaInAppBrowser:loadstart', function(e, event){
-        if(ionic.Platform.isIOS()){
+        
             if(event.url.match("matchup.neptunolabs.com")) {
                 $ionicPlatform.ready(function() {
                     $cordovaInAppBrowser.close();
                 });
             }
-        }
-        else if(ionic.Platform.isAndroid()){
-            if((event.url).startsWith("https://matchup.neptunolabs.com")) {
-                $ionicPlatform.ready(function() {
-                    $cordovaInAppBrowser.close();
-                });
-            }
-        }
+        
     });
 
     //Create popup when user clicks the sign up button
@@ -118,7 +111,8 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
                 $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+selectedTournament+'?date='+$stateParams.date+'&location='+$stateParams.location+'', config).success(function(data, status, headers, config) {
 
                     $scope.currentTournament = angular.fromJson(data);
-
+                    
+                    console.log('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+selectedTournament+'?date='+$stateParams.date+'&location='+$stateParams.location+'');
 
                     $http.get('http://136.145.116.232/matchup/events/' + $stateParams.eventname + '/tournaments/' + selectedTournament + '/standings?date=' + $stateParams.date + '&location=' + $stateParams.location, config).success(function (data) {
                         if (data.finalStage){
@@ -316,20 +310,13 @@ myApp.controller('teamSignUpController', ['$scope', '$http', '$ionicPopup', '$st
     };
 
     $rootScope.$on('$cordovaInAppBrowser:loadstart', function(e, event){
-        if(ionic.Platform.isIOS()){
+        
             if(event.url.match("matchup.neptunolabs.com")) {
                 $ionicPlatform.ready(function() {
                     $cordovaInAppBrowser.close();
                 });
             }
-        }
-        else if(ionic.Platform.isAndroid()){
-            if((event.url).startsWith("https://matchup.neptunolabs.com")) {
-                $ionicPlatform.ready(function() {
-                    $cordovaInAppBrowser.close();
-                });
-            }
-        }
+        
     });
 
     $scope.teamSignUp = function () {

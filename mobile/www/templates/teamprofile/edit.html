@@ -11,6 +11,12 @@
                 <textarea rows="5" ng-model="teamProfile.bio"></textarea>
             </label>
         </div>
+
+        <label class="item item-input">
+            <span class="input-label">Paypal Email</span>
+            <input type="text" ng-model="teamProfile.customer_paypal_info">
+        </label>
+
         <div class="card">
             <div class="item item-body">
                 <img class="full-image" ng-src="{{ teamProfile.logo }}" id="preview">

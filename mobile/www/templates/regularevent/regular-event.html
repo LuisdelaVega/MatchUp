@@ -11,9 +11,15 @@
                 <div class="center-text">
                     <h1 class="h1-username">{{ currentTournament.tournament_name }}</h1>
                 </div>
+                <br>
                 <div class="center-text">
-                    <h2 class="h1-username">Registration Deadline: </h2>
+                    <h2 class="h1-username">Registration Deadline:</h2>
                     <h2 >{{ eventInfo.event_registration_deadline | date: 'medium' }}</h2>
+                </div>
+                <br>
+                <div class="center-text" ng-if="currentTournament.competitor_fee > 0 && !isOngoing && !currentTournament.is_competitor">
+                    <h2 class="h1-username">Registration Cost:</h2>
+                    <h2 >${{ currentTournament.competitor_fee  }}</h2>
                 </div>
                 <div class="row">
                     <div class="col">
@@ -180,11 +186,11 @@
                 </div>
             </div>
 
-            <button class="button button-positive" ng-if="!isOngoing && !requiresTeam && !currentTournament.is_competitor" ng-click="signUpCompetitor()" style="width: 100vw">
+            <button class="button button-block button-positive" ng-if="!isOngoing && !requiresTeam && !currentTournament.is_competitor" ng-click="signUpCompetitor()">
                 Sign Up
             </button>
 
-            <button class="button button-positive" ng-if="!isOngoing && requiresTeam && !currentTournament.is_competitor"  ui-sref="app.teamsignup({eventname: eventInfo.event_name, date: eventInfo.event_start_date, location: eventInfo.event_location, tournament: currentTournament.tournament_name})" style="width: 100vw">
+            <button class="button button-block button-positive" ng-if="!isOngoing && requiresTeam && !currentTournament.is_competitor"  ui-sref="app.teamsignup({eventname: eventInfo.event_name, date: eventInfo.event_start_date, location: eventInfo.event_location, tournament: currentTournament.tournament_name})">
                 Sign Up
             </button>
         </div>

@@ -330,6 +330,9 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
             $scope.user.profile_pic = profileData.customer_profile_pic;
             $scope.user.country = profileData.customer_country;
             $scope.user.email = profileData.customer_email;
+            $scope.user.customer_paypal_info = profileData.customer_paypal_info;
+            
+            console.log($scope.user);
 
         }).
         error(function (err){

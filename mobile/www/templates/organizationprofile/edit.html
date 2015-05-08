@@ -11,12 +11,18 @@
                 <textarea rows="5" ng-model="organization.organization_bio"></textarea>
             </label>
         </div>
+        
+        <label class="item item-input">
+            <span class="input-label">Paypal Email</span>
+            <input type="text" ng-model="organization.organization_paypal_info">
+        </label>
+        
         <div class="card">
             <div class="item item-body">
                 <img class="full-image" ng-src="{{ organization.organization_cover_photo }}" id="preview">
             </div>
             <div class="item">
-                <button class="button button-block button-positive">
+                <button class="button button-block button-positive" ng-click="changeCoverPhoto()">
                     Edit Cover
                 </button>
             </div>
@@ -26,13 +32,13 @@
                 <img class="full-image" ng-src="{{ organization.organization_logo }}" id="preview2">
             </div>
             <div class="item">
-                <button class="button button-block button-positive">
+                <button class="button button-block button-positive" ng-click="changeLogo()">
                     Edit Logo
                 </button>
             </div>
         </div>
         <div class="padding">
-            <button class="button button-block button-balanced">
+            <button class="button button-block button-balanced" ng-click="editOrganization()">
                 Submit
             </button>
         </div>

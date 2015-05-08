@@ -348,6 +348,7 @@ myApp.controller("editTeamController", ['$scope', '$ionicPopup', '$stateParams',
             $scope.teamProfile.bio = teamProfileData.team_bio;
             $scope.teamProfile.logo = teamProfileData.team_logo;
             $scope.teamProfile.cover = teamProfileData.team_cover_photo;
+            $scope.teamProfile.team_paypal_info = teamProfileData.team_paypal_info;
 
 
         }).
@@ -356,47 +357,6 @@ myApp.controller("editTeamController", ['$scope', '$ionicPopup', '$stateParams',
         });
 
     });
-
-    $scope.changeCoverPhoto = function() {
-        var options = { 
-            quality : 75, 
-            destinationType : Camera.DestinationType.DATA_URL, 
-            sourceType : Camera.PictureSourceType.PHOTOLIBRARY, //Open photo gallery instead of camera
-            allowEdit : true,
-            encodingType: Camera.EncodingType.JPEG,
-            targetWidth: 300,
-            targetHeight: 300,
-            popoverOptions: CameraPopoverOptions,
-            saveToPhotoAlbum: false
-        };
-
-        $ionicPlatform.ready(function() {
-            $cordovaCamera.getPicture(options).then(function(imageData) {
-
-                $ionicLoading.show({
-                    template: 'loading'
-                });
-
-                var config = {
-                    headers: {
-                        'Authorization': "Bearer "+ $window.sessionStorage.token
-                    }
-                };
-
-                //Call to upload image to imgur
-                $http.post('http://api.imgur.com/3/upload', {
-                    "image": imageData
-                }).success(function (data) {
-
-                    $scope.teamProfile.cover = data.data.link; //Here's the link
-
-                }).
-                error(function (err){
-                    console.log("error in editProfileController");
-                });
-            })
-        });
-    }
 
     $scope.changeCoverPhoto = function() {
         var options = { 
@@ -485,7 +445,8 @@ myApp.controller("editTeamController", ['$scope', '$ionicPopup', '$stateParams',
         $http.put('http://matchup.neptunolabs.com/matchup/teams/'+$stateParams.teamname+'', {
             "bio": $scope.teamProfile.bio,
             "logo": $scope.teamProfile.logo,
-            "cover": $scope.teamProfile.cover
+            "cover": $scope.teamProfile.cover,
+            "team_paypal_info": $scope.teamProfile.team_paypal_info
         }  , config).success(function (data) {
 
             $state.go('app.teamprofile', {"teamname": $stateParams.teamname});
@@ -849,11 +810,11 @@ myApp.controller("organizationEventsController", ['$scope', '$ionicPopup', '$htt
 
 }]);
 
-myApp.controller("editOrganizationMemberController", ['$scope', '$ionicPopup', '$http', '$window', '$stateParams', '$state', function ($scope, $ionicPopup, $http, $window, $stateParams, $state) {
+myApp.controller("editOrganizationMemberController", ['$scope', '$ionicPopup', '$http', '$window', '$stateParams', '$state', '$ionicPlatform', '$cordovaCamera', '$ionicLoading', function ($scope, $ionicPopup, $http, $window, $stateParams, $state, $ionicPlatform, $cordovaCamera, $ionicLoading) {
 
 
     $scope.$on('$ionicView.enter', function () {
-        
+
         var config = {
             headers: {
                 'Authorization': "Bearer "+ $window.sessionStorage.token
@@ -870,6 +831,119 @@ myApp.controller("editOrganizationMemberController", ['$scope', '$ionicPopup', '
             console.log("error in goToEvent");
         });
     });
+
+    $scope.changeCoverPhoto = function() {
+        var options = { 
+            quality : 75, 
+            destinationType : Camera.DestinationType.DATA_URL, 
+            sourceType : Camera.PictureSourceType.PHOTOLIBRARY, //Open photo gallery instead of camera
+            allowEdit : true,
+            encodingType: Camera.EncodingType.JPEG,
+            targetWidth: 300,
+            targetHeight: 300,
+            popoverOptions: CameraPopoverOptions,
+            saveToPhotoAlbum: false
+        };
+
+        $ionicPlatform.ready(function() {
+            $cordovaCamera.getPicture(options).then(function(imageData) {
+
+                $ionicLoading.show({
+                    template: 'loading'
+                });
+
+                var config = {
+                    headers: {
+                        'Authorization': "Bearer "+ $window.sessionStorage.token
+                    }
+                };
+
+                //Call to upload image to imgur
+                $http.post('http://api.imgur.com/3/upload', {
+                    "image": imageData
+                }).success(function (data) {
+
+                    $scope.organization.organization_cover_photo = data.data.link; //Here's the link
+
+                }).
+                error(function (err){
+                    console.log("error in editProfileController");
+                });
+            })
+        });
+    }
+    
+    $scope.changeLogo = function() {
+        var options = { 
+            quality : 75, 
+            destinationType : Camera.DestinationType.DATA_URL, 
+            sourceType : Camera.PictureSourceType.PHOTOLIBRARY, //Open photo gallery instead of camera
+            allowEdit : true,
+            encodingType: Camera.EncodingType.JPEG,
+            targetWidth: 300,
+            targetHeight: 300,
+            popoverOptions: CameraPopoverOptions,
+            saveToPhotoAlbum: false
+        };
+
+        $ionicPlatform.ready(function() {
+            $cordovaCamera.getPicture(options).then(function(imageData) {
+
+                $ionicLoading.show({
+                    template: 'loading'
+                });
+
+                var config = {
+                    headers: {
+                        'Authorization': "Bearer "+ $window.sessionStorage.token
+                    }
+                };
+
+                //Call to upload image to imgur
+                $http.post('http://api.imgur.com/3/upload', {
+                    "image": imageData
+                }).success(function (data) {
+
+                    $scope.organization.organization_logo = data.data.link; //Here's the link
+
+                }).
+                error(function (err){
+                    console.log("error in editProfileController");
+                });
+            })
+        });
+    }
+
+
+    $scope.editOrganization = function () {
+
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+        $http.put('http://136.145.116.232/matchup/organizations/'+$stateParams.organizationname+'', {
+
+            "logo": $scope.organization.organization_logo,
+            "bio": $scope.organization.organization_bio,
+            "cover": $scope.organization.organization_cover_photo,
+            "organization_paypal_info": $scope.organization.organization_paypal_info
+
+        },config).
+        success(function(data, status, headers, config) {
+
+            var alertPopup = $ionicPopup.alert({
+                title: 'Edit Organization',
+                template: 'Successfully edited organization profile!'
+            });
+
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in goToEvent");
+        });
+
+    }
 
     $scope.goToOrganizationProfile = function () {
 

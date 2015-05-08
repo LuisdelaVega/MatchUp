@@ -192,7 +192,7 @@ myApp.controller('createMeetupController', function ($scope, $state, $http, $sta
 
 });
 
-myApp.controller('premiumSignUpController', function ($scope, $state, $http, $stateParams, sharedDataService, $window, $cordovaInAppBrowser, $rootScope, $ionicPlatform) {
+myApp.controller('premiumSignUpController', function ($scope, $state, $http, $stateParams, sharedDataService, $window, $cordovaInAppBrowser, $rootScope, $ionicPlatform, $ionicPopup) {
 
     $scope.returnToPremiumEvent = function () {
         $state.go("app.eventpremium", {
@@ -225,19 +225,25 @@ myApp.controller('premiumSignUpController', function ($scope, $state, $http, $st
     });
 
     $rootScope.$on('$cordovaInAppBrowser:loadstart', function(e, event){
-        if(ionic.Platform.isIOS()){
-            if(event.url.match("matchup.neptunolabs.com")) {
-                $ionicPlatform.ready(function() {
-                    $cordovaInAppBrowser.close();
+
+        if(event.url.match("matchup.neptunolabs.com")) {
+            $ionicPlatform.ready(function() {
+                $cordovaInAppBrowser.close();
+
+                var confirmPopup = $ionicPopup.alert({
+                    title: 'Successful Signup',
+                    template: 'You have successfully signed up as a spectator!'
                 });
-            }
-        }
-        else if(ionic.Platform.isAndroid()){
-            if((event.url).startsWith("https://matchup.neptunolabs.com")) {
-                $ionicPlatform.ready(function() {
-                    $cordovaInAppBrowser.close();
+
+                confirmPopup.then(function (res) {
+                    $state.go("app.eventpremium", {
+                        eventname: $stateParams.eventname,
+                        date: $stateParams.date,
+                        location: $stateParams.location
+                    });
                 });
-            }
+
+            });
         }
     });
 
