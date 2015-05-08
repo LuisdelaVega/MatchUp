@@ -631,7 +631,7 @@ function blahblah(req, res, log, client, done, competitor, details) {
                                             var flag = false;
                                             var competitors = result.rows;
                                             for (var i = 0 ; i < competitors.length; i++) {
-                                                checkForUpdate(req, res, client, done, log, competitors, index, competitors.length)
+                                                checkForUpdate(req, res, client, done, log, competitors, i, competitors.length)
                                             }
                                         });
                                     }
