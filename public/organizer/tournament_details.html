@@ -50,6 +50,9 @@
 				<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
 					<datetimepicker data-ng-model="selectedRound.round_start_date" data-datetimepicker-config="{ dropdownSelector: '#dropdown1' }" />
 				</ul>
+				 <button class="btn btn-primary" ng-click="changeDate()">
+						Save Date
+					</button> 
 			</div>
 			</p>
 			<div class="list-group">
@@ -77,6 +80,7 @@
 						<tbody ng-if="tournament.team_size == 1">
 
 							<tr ng-click="getTournamentMatch(match.match_number)" ng-repeat="match in selectedRound.matches">
+							
 								<td><i class="fa fa-star" ng-if="match.is_favourite"></i> &nbsp; {{match.match_number}} </td>
 								<td ng-if="match.players[0].customer_tag">{{match.players[0].customer_tag}}</td>
 								<td ng-if="match.players[1].customer_tag">{{match.players[1].customer_tag}}</td>
@@ -95,7 +99,9 @@
 						<tbody ng-if="tournament.team_size > 1">
 
 							<tr ng-click="getTournamentMatch(match.match_number)" ng-repeat="match in selectedRound.matches">
-								<td>{{match.match_number}}</td>
+								
+																<td><i class="fa fa-star" ng-if="match.is_favourite"></i> &nbsp; {{match.match_number}} </td>
+
 								<td ng-if="match.players[0].team_name">{{match.players[0].team_name}}</td>
 								<td ng-if="match.players[1].team_name">{{match.players[1].team_name}}</td>
 
@@ -131,20 +137,20 @@
 						<div class="form-group">
 							<label class="col-sm-2 control-label">Best of</label>
 							<div class="col-sm-10">
-								<input type="number" class="form-control" ng-model="bestOf">
+								<input type="number" class="form-control" ng-model="selectedRound.round_best_of">
 							</div>
 						</div>
 
 					</form>
 
-					<h4 ng-if="bestOf%2" style="text-align:center;">To win a match players will need to win {{bestOf/2| number:0}} out of {{bestOf}} rounds.</h4>
-					<h4 ng-if="!(bestOf%2) && bestOf" style="text-align:center; color: red">The entered value must be an odd number.</h4>
+					<h4 ng-if="selectedRound.round_best_of%2" style="text-align:center;">To win a match players will need to win {{selectedRound.round_best_of/2| number:0}} out of {{selectedRound.round_best_of}} rounds.</h4>
+					<h4 ng-if="!(selectedRound.round_best_of%2) && selectedRound.round_best_of" style="text-align:center; color: red">The entered value must be an odd number.</h4>
 					<!-- <h4 ng-if="bestOf = 'e'" style="text-align:center; color: red"></h4> -->
 
 					<!-- <h4 ng-if="!isInt(bestOf) && bestOf" style="text-align:center; color: red">The entered value must be an integer number.</h4> -->
 
-					<h4 ng-if="bestOf ==0" style="text-align:center; color: red">You must have at least one set</h4>
-					<h4 ng-if="bestOf< 0" style="text-align:center; color: red">You cannot have a negative amount of set</h4>
+					<h4 ng-if="selectedRound.round_best_of ==0" style="text-align:center; color: red">You must have at least one set</h4>
+					<h4 ng-if="selectedRound.round_best_of< 0" style="text-align:center; color: red">You cannot have a negative amount of set</h4>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">
