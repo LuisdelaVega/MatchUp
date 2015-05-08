@@ -357,7 +357,7 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 
 	// Clears tournament inputs
 	var clearTournamentPage = function() {
-		$scope.tournament.name = $scope.tournament.start_date = $scope.tournament.deadline = $scope.tournament.rules = $scope.tournament.fee = $scope.tournament.seed_money = $scope.tournament.deduction_fee = $scope.tournament.capacity = $scope.tournament.team_size = $scope.tournament.group_players = $scope.tournament.group_winners = $scope.tournament.scoring = $scope.tournament.game = "";
+		$scope.tournament.name = $scope.tournament.start_date = $scope.tournament.deadline = $scope.tournament.rules = $scope.tournament.fee = $scope.tournament.seed_money = $scope.tournament.deduction_fee = $scope.tournament.capacity = $scope.tournament.team_size = $scope.tournament.group_players = $scope.tournament.group_winners = $scope.tournament.scoring = "";
 
 	};
 	// Image upload

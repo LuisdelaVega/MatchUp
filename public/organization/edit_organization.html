@@ -12,7 +12,7 @@
 		<div class="form-group">
 			<label for="organizationBio" class="col-sm-2 control-label">Bio:</label>
 			<div class="col-sm-10">
-				<textarea class="form-control" rows="6" ng-model="organization.organization_bio"></textarea>
+				<textarea class="form-control" rows="6" ng-model="organization.organization_bio" required></textarea>
 			</div>
 		</div>
 		<div class="form-group">
@@ -85,7 +85,7 @@
 		</div>
 		<div class="row">
 			<div class="col-sm-offset-9 col-sm-3">
-				<button class="btn btn-success btn-block" data-toggle="modal" data-target="#addMemberModal" ng-if="currentUser.is_owner">
+				<button class="btn btn-primary btn-block" data-toggle="modal" data-target="#addMemberModal" ng-if="currentUser.is_owner">
 					Add
 				</button>
 			</div>
@@ -117,7 +117,7 @@
 		</div>
 		<div class="row">
 			<div class="col-sm-offset-9 col-sm-3">
-				<button class="btn btn-success btn-block" ui-sref="app.sponsorRequests({organizationName: organization.organization_name})">
+				<button class="btn btn-primary btn-block" ui-sref="app.sponsorRequests({organizationName: organization.organization_name})">
 					View Sponsor Requests
 				</button>
 			</div>
