@@ -298,7 +298,7 @@ myApp.controller('eventPremiumSummaryController', function ($scope, $state, $htt
         $scope.location =  params[2];
 
         var now = new Date(); 
-        var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds()); //Get current date in UTC
+        var now_utc = new Date();
 
 
         var config = {

@@ -3,13 +3,13 @@ var myApp = angular.module('regular-events',[]);
 myApp.controller('REController', ['$scope', '$http', '$ionicPopup', '$stateParams', '$window', 'sharedDataService', '$cordovaInAppBrowser', '$ionicPlatform', '$rootScope', function ($scope, $http, $ionicPopup, $stateParams, $window, sharedDataService, $cordovaInAppBrowser, $ionicPlatform, $rootScope) {
 
     $rootScope.$on('$cordovaInAppBrowser:loadstart', function(e, event){
-        
-            if(event.url.match("matchup.neptunolabs.com")) {
-                $ionicPlatform.ready(function() {
-                    $cordovaInAppBrowser.close();
-                });
-            }
-        
+
+        if(event.url.match("matchup.neptunolabs.com")) {
+            $ionicPlatform.ready(function() {
+                $cordovaInAppBrowser.close();
+            });
+        }
+
     });
 
     //Create popup when user clicks the sign up button
@@ -83,7 +83,7 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
 
         //Obtain current date in UTC
         var now = new Date(); 
-        var now_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
+        var now_utc = new Date();
 
         //Header containing token
         var config = {
@@ -98,7 +98,7 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
             $scope.eventInfo = angular.fromJson(data);
             var startDate = new Date($scope.eventInfo.event_registration_deadline);
 
-            startDate = startDate.setHours(startDate.getHours() - 4);
+            //            startDate = startDate.setHours(startDate.getHours() - 4);
 
             //isOngoing is true if startdate is equal to or greater than the current start date
             $scope.isOngoing = now_utc > startDate;
@@ -111,8 +111,6 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
                 $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+selectedTournament+'?date='+$stateParams.date+'&location='+$stateParams.location+'', config).success(function(data, status, headers, config) {
 
                     $scope.currentTournament = angular.fromJson(data);
-                    
-                    console.log('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+selectedTournament+'?date='+$stateParams.date+'&location='+$stateParams.location+'');
 
                     $http.get('http://136.145.116.232/matchup/events/' + $stateParams.eventname + '/tournaments/' + selectedTournament + '/standings?date=' + $stateParams.date + '&location=' + $stateParams.location, config).success(function (data) {
                         if (data.finalStage){
@@ -138,12 +136,19 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
 
                         $scope.roundInfo = data;
 
-                        $scope.selectedRound = $scope.roundInfo.finalStage.winnerRounds[0];
+                        if($scope.currentTournament.tournament_format == 'Round Robin'){
+                            $scope.selectedRound = $scope.roundInfo.finalStage.roundRobinRounds[0];
+                        }
+                        else{
+                            $scope.selectedRound = $scope.roundInfo.finalStage.winnerRounds[0];   
+                        }
 
                         if($scope.currentTournament.tournament_format == "Double Elimination")
                             $scope.selectedType.type = 'Winner\'s Bracket'; 
                         else if($scope.currentTournament.tournament_format == "Single Elimination")
-                            $scope.selectedType.type = 'Bracket'; 
+                            $scope.selectedType.type = 'Bracket';
+                        else if($scope.currentTournament.tournament_format == "Round Robin")
+                            $scope.selectedType.type = 'Round Robin';
 
                     }).
                     error(function(data, status, headers, config) {
@@ -185,13 +190,21 @@ myApp.controller('regularEventController', ['$scope', '$http', '$stateParams', '
                         $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+$scope.currentTournament.tournament_name+'/rounds?date='+$stateParams.date+'&location='+$stateParams.location+'', config).success(function(data, status, headers, config) {
 
 
-                            $scope.roundInfo = data;  
-                            $scope.selectedRound = $scope.roundInfo.finalStage.winnerRounds[0];
+                            $scope.roundInfo = data;
+
+                            if($scope.currentTournament.tournament_format == 'Round Robin'){
+                                $scope.selectedRound = $scope.roundInfo.finalStage.roundRobinRounds[0];
+                            }
+                            else{
+                                $scope.selectedRound = $scope.roundInfo.finalStage.winnerRounds[0];   
+                            }
 
                             if($scope.currentTournament.tournament_format == "Double Elimination")
                                 $scope.selectedType.type = 'Winner\'s Bracket'; 
                             else if($scope.currentTournament.tournament_format == "Single Elimination")
-                                $scope.selectedType.type = 'Bracket'; 
+                                $scope.selectedType.type = 'Bracket';
+                            else if($scope.currentTournament.tournament_format == "Round Robin")
+                                $scope.selectedType.type = 'Round Robin';
 
                         }).
                         error(function(data, status, headers, config) {
@@ -310,13 +323,13 @@ myApp.controller('teamSignUpController', ['$scope', '$http', '$ionicPopup', '$st
     };
 
     $rootScope.$on('$cordovaInAppBrowser:loadstart', function(e, event){
-        
-            if(event.url.match("matchup.neptunolabs.com")) {
-                $ionicPlatform.ready(function() {
-                    $cordovaInAppBrowser.close();
-                });
-            }
-        
+
+        if(event.url.match("matchup.neptunolabs.com")) {
+            $ionicPlatform.ready(function() {
+                $cordovaInAppBrowser.close();
+            });
+        }
+
     });
 
     $scope.teamSignUp = function () {

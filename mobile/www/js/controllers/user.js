@@ -139,7 +139,7 @@ myApp.controller('profileSummaryController', ['$scope', '$http', '$window', '$st
 
 }]);
 
-myApp.controller('profileStandingsController', ['$scope', '$http', '$stateParams', '$window', 'sharedDataService', '$state', function ($scope, $http, $stateParams, $window, sharedDataService, $state) {
+myApp.controller('profileStandingsController', ['$scope', '$http', '$stateParams', '$window', 'sharedDataService', '$state', '$filter', function ($scope, $http, $stateParams, $window, sharedDataService, $state, $filter) {
 
     $scope.$on('$ionicView.enter', function () {
 
@@ -150,8 +150,6 @@ myApp.controller('profileStandingsController', ['$scope', '$http', '$stateParams
                 'Authorization': "Bearer "+ $window.sessionStorage.token
             }
         };
-
-
 
         $http.get('http://136.145.116.232/matchup/profile/'+customerUsername+'', config).success(function (data){
             $scope.customerTag = data.customer_tag;
@@ -183,6 +181,14 @@ myApp.controller('profileStandingsController', ['$scope', '$http', '$stateParams
         });
 
     });
+
+    $scope.applyOrdinal = function (value) {
+
+        var ordinal = $filter('ordinal');
+
+        return ordinal(value);
+
+    };
 
 }]);
 
@@ -331,7 +337,7 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
             $scope.user.country = profileData.customer_country;
             $scope.user.email = profileData.customer_email;
             $scope.user.customer_paypal_info = profileData.customer_paypal_info;
-            
+
             console.log($scope.user);
 
         }).

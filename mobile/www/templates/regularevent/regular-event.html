@@ -135,11 +135,11 @@
                         </select>
                         <select ng-if="selectedType.type == 'Group Stage'" ng-model="selectedRound.round" ng-options="round.round_number for round in roundInfo.groupStage.groups[selectedGroup.group.group_number - 1].rounds" ng-init="selectedRound.round = roundInfo.groupStage.groups[selectedGroup.group.group_number - 1].rounds[0]">
                         </select>
-                        <select ng-if="selectedType.type == 'Round Robin'" ng-model="selectedRound.round" ng-options="round.round_number for round in roundInfo.finalStage.winnerRounds" ng-init="selectedRound.round = roundInfo.finalStage.winnerRounds[0]">
+                        <select ng-if="selectedType.type == 'Round Robin'" ng-model="selectedRound.round" ng-options="round.round_number for round in roundInfo.finalStage.roundRobinRounds" ng-init="selectedRound.round = roundInfo.finalStage.roundRobinRounds[0]">
                         </select>
                     </label>
 
-                    <div ng-if="(selectedType.type == 'Bracket' || selectedType.type == 'Winner\'s Bracket' || selectedType.type == 'Loser\'s Bracket' || selectedType.type == 'Group Stage') && hasMatches(selectedRound.round.matches)" ng-repeat="match in selectedRound.round.matches">
+                    <div ng-if="(selectedType.type == 'Bracket' || selectedType.type == 'Winner\'s Bracket' || selectedType.type == 'Loser\'s Bracket' || selectedType.type == 'Group Stage' || selectedType.type == 'Round Robin') && hasMatches(selectedRound.round.matches)" ng-repeat="match in selectedRound.round.matches">
                         <div class="row" >
                             <div class="col .col-33 absolute-center" ng-if="match.players[0].competitor_number != null && !requiresTeam">
                                 <img class="img-circular large player-1" ng-src="{{ match.players[0].customer_profile_pic }}" ng-if="match.players.length >= 1">
@@ -160,7 +160,7 @@
                         </div>
 
                         <div class="row">
-                            <div class="col .col-33 absolute-center" ng-if="match.players[0].competitor_number != null && !requiresTeam">
+                            <div class="col .col-33 absolute-center">
                                 <p ng-if="match.players.length >= 1 && !requiresTeam"> {{ match.players[0].customer_tag }}</p>
                                 <p ng-if="match.players.length >= 1 && requiresTeam"> {{ match.players[0].team_name }}</p>
                             </div>
@@ -169,8 +169,8 @@
                             </div>
 
                             <div class="col .col-33 absolute-center">
-                                <p ng-if="match.players.length > 1 && !requiresTeam"> {{ match.players[1].customer_tag }}</p>
-                                <p ng-if="match.players.length > 1 && requiresTeam"> {{ match.players[0].team_name }}</p>
+                                <p ng-if="match.players.length >= 1 && !requiresTeam"> {{ match.players[1].customer_tag }}</p>
+                                <p ng-if="match.players.length >= 1 && requiresTeam"> {{ match.players[0].team_name }}</p>
                             </div>
                         </div>
                     </div>

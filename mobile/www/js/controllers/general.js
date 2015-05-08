@@ -907,8 +907,6 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
         };        
 
         $http.get('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'', config).success(function (data) {
-            
-            console.log('http://matchup.neptunolabs.com/matchup/events/'+$scope.matchupInfo.event_name+'/tournaments/'+$scope.matchupInfo.tournament_name+'/rounds/'+$scope.matchupInfo.round_number+'/matches/'+$scope.matchupInfo.match_number+'?date='+$scope.matchupInfo.event_start_date+'&location='+$scope.matchupInfo.event_location+'&round_of='+$scope.matchupInfo.round_of+'');
 
             $scope.players = data.players;
 
@@ -994,10 +992,6 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
                         title: 'Submit Score',
                         template: 'You have succesfully submitted your score for set '+$scope.currentSet+' with a Win.'
                     });
-                    confirmPopup.then(function (res) {
-                        
-                    });
-                    
                     
                     $scope.sentScore.sent = true;
 
