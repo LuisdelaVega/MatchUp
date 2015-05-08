@@ -30,13 +30,13 @@
                 Events
             </div>
             <div class="list">
-                <a class="item item-thumbnail-left" href="#" ng-repeat="event in events | limitTo : 3">
+                <a class="item item-thumbnail-left" ng-repeat="event in events | limitTo : 3" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)">
                     <img ng-src="{{event.event_logo}}">
                     <h2>{{event.event_name}}</h2>
                     <p>{{event.event_location}}</p>
                 </a>
             </div>
-            <a class="item item-icon-left dark" ng-click="goToOrganizationEvents()">
+            <a class="item item-icon-left dark" ng-click="goToOrganizationEvents()" ng-if="events.length > 3">
                 <i class="icon ion-android-arrow-forward"></i> See More
             </a>
         </div>
@@ -45,7 +45,7 @@
             <div class="item item-divider">
                 Organization Members
             </div>
-            <a class="item center-item item-avatar item-button-right" href="#" ng-repeat="member in members">
+            <a class="item center-item item-avatar item-button-right" ng-repeat="member in members" ui-sref="app.profile.summary({username: member.customer_username})">
                 <img ng-src="{{member.customer_profile_pic}}">
                 <h2>{{member.customer_tag}}</h2>
                 <p>{{member.customer_first_name}} {{member.customer_last_name}}</p>

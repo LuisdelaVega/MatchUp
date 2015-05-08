@@ -1,4 +1,11 @@
 <ion-view view-title="{{ eventInfo.event_name }}">
+    <ion-nav-buttons side="left">
+        <button ng-if="eventInfo.host != null" class="button button-icon" ui-sref="app.eventpremium({eventname: eventInfo.event_name,
+            date: eventInfo.event_start_date,
+            location: eventInfo.event_location})">
+            <i class="icon ion-ios-arrow-back"></i>
+        </button>
+    </ion-nav-buttons>
     <ion-content>
         <div class="crop-banner">
             <img class="crop-image" ng-src="{{ eventInfo.event_banner }}">
@@ -171,7 +178,7 @@
 
                             <div class="col .col-33 absolute-center">
                                 <p ng-if="match.players.length >= 1 && !requiresTeam"> {{ match.players[1].customer_tag }}</p>
-                                <p ng-if="match.players.length >= 1 && requiresTeam"> {{ match.players[0].team_name }}</p>
+                                <p ng-if="match.players.length >= 1 && requiresTeam"> {{ match.players[1].team_name }}</p>
                             </div>
                         </div>
                     </div>

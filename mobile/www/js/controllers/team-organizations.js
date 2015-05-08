@@ -647,7 +647,7 @@ myApp.controller("addOrganizationMemberController", ['$scope', '$ionicPopup', '$
 }]);
 
 /// TODO configure popvoer for edit and deletion of organization
-myApp.controller('organizationController', function ($scope, $ionicPopover, $state, $ionicPopup, $http, $window, $stateParams) {
+myApp.controller('organizationController', function ($scope, $ionicPopover, $state, $ionicPopup, $http, $window, $stateParams, sharedDataService) {
     //Create popover event that allows further navigation to organization members
     $ionicPopover.fromTemplateUrl('templates/organizationprofile/popover.html', {
         scope: $scope,
@@ -731,6 +731,41 @@ myApp.controller('organizationController', function ($scope, $ionicPopover, $sta
         });
     });
 
+    $scope.goToEvent = function(eventName, date, location){
+
+        eventName = eventName.replace(" ", "%20");
+        var params = [eventName, date, location];
+
+        var config = {
+            headers: {
+                'Authorization': "Bearer "+ $window.sessionStorage.token
+            }
+        };
+
+        //Get event information
+        $http.get('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'', config).
+        success(function(data, status, headers, config) {
+
+            var eventData = angular.fromJson(data);
+
+            var isHosted = eventData.host; //Server returns organization that is hosting the event. If the event does not have a host than the value returned is null.
+
+            sharedDataService.set(params);
+
+            //If isHosted is null, than the user is requesting to go to a regular event. Otherwise the user is going to a premium event. 
+            if(isHosted != null){
+                $state.go('app.eventpremium', {"eventname": eventName, "date": date, "location": location});
+            }
+            else{
+                $state.go('app.regularevent', {"eventname": eventName, "date": date, "location": location});
+            }
+
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in goToEvent");
+        });
+    };
+
 
     $scope.goToOrganizationEvents = function () {
 
@@ -747,7 +782,7 @@ myApp.controller('organizationController', function ($scope, $ionicPopover, $sta
 });
 
 // Popup for adding a Organization member, change id to index when using ng-repeat
-myApp.controller("organizationEventsController", ['$scope', '$ionicPopup', '$http', '$window', '$stateParams', '$state', function ($scope, $ionicPopup, $http, $window, $stateParams, $state) {
+myApp.controller("organizationEventsController", ['$scope', '$ionicPopup', '$http', '$window', '$stateParams', '$state', 'sharedDataService', function ($scope, $ionicPopup, $http, $window, $stateParams, $state, sharedDataService) {
 
     var config = {
         headers: {
@@ -872,7 +907,7 @@ myApp.controller("editOrganizationMemberController", ['$scope', '$ionicPopup', '
             })
         });
     }
-    
+
     $scope.changeLogo = function() {
         var options = { 
             quality : 75, 
