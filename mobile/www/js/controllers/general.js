@@ -371,7 +371,7 @@ myApp.controller('reportController', ['$scope', '$http', '$cordovaCamera', '$ion
                 });
 
                 //Call to upload image to imgur
-                $http.post('http://api.imgur.com/3/upload', {
+                $http.post('http://api.imgur.com/3/image', {
                     "image": imageData
                 }).success(function (data) {
 
