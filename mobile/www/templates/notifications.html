@@ -1,6 +1,5 @@
 <ion-view view-title="Notifications">
     <ion-content>
-
         <div class="list">
             <a class="item item-avatar" ng-repeat="matchup in matchups" ng-click="goToMatchupOngoing(matchup)">
                 <img ng-if="matchup.team_size == 1" ng-src="{{ matchup.details[0].customer_profile_pic }}">
@@ -11,6 +10,5 @@
                 <p>{{matchup.tournament_name}}</p>
             </a>          
         </div>
-
     </ion-content>
 </ion-view>

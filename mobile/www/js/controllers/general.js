@@ -352,7 +352,7 @@ myApp.controller('reportController', ['$scope', '$http', '$cordovaCamera', '$ion
             quality : 75, 
             destinationType : Camera.DestinationType.DATA_URL, 
             sourceType : Camera.PictureSourceType.CAMERA, 
-//            sourceType : Camera.PictureSourceType.PHOTOLIBRARY,
+            //            sourceType : Camera.PictureSourceType.PHOTOLIBRARY,
             allowEdit : true,
             encodingType: Camera.EncodingType.JPEG,
             targetWidth: 300,
@@ -381,6 +381,11 @@ myApp.controller('reportController', ['$scope', '$http', '$cordovaCamera', '$ion
                 }).
                 error(function (err){
                     console.log("error in editProfileController");
+                    $ionicLoading.hide();
+                    var alertPopup = $ionicPopup.alert({
+                        title: 'Uploading Image',
+                        template: 'There was an error uploading the image to imgur!'
+                    });
                 });
 
 
@@ -462,7 +467,7 @@ myApp.controller('popularGameViewController', ['$scope', '$http', '$state', 'sha
 }]);
 
 myApp.controller('loginController', ['$scope', '$http', '$state', 'sharedDataService', '$window', '$ionicPopup', '$rootScope', function ($scope, $http, $state, sharedDataService, $window, $ionicPopup, $rootScope) {
-    
+
     $rootScope.baseURL = "http://matchup.neptunolabs.com";
 
     $scope.credentials = { }; //Tied to ng-model and stores user crdedentials. Username is stored in $scope.credentials.userEmail and password in $scope.credentials.userPassword
@@ -583,11 +588,11 @@ myApp.controller('sidebarController', ['$scope', '$http', '$state', 'sharedDataS
         $http.get('http://136.145.116.232/matchup/profile/matchups?state=Upcoming', config).success(function (data) {
 
             var matchups = angular.fromJson(data);
-            
+
             $scope.notifications = 0;
-            
+
             angular.forEach(matchups, function(matchup){
-               
+
                 if(matchup.team_size == 1){
                     if(matchup.details[1].customer_username != null){
                         $scope.notifications++;
@@ -598,7 +603,7 @@ myApp.controller('sidebarController', ['$scope', '$http', '$state', 'sharedDataS
                         $scope.notifications++;
                     }
                 }
-                
+
             });
 
             $timeout( function(){ $scope.pollNotifications(); }, 30000);
@@ -632,7 +637,7 @@ myApp.controller('sidebarController', ['$scope', '$http', '$state', 'sharedDataS
         sharedDataService.set(customer_username);
         $state.go('app.profile.summary', { "username":  customer_username});
     };
-    
+
     $scope.logout = function () {
         $window.sessionStorage.token = "";
         $window.sessionStorage.username = "";
@@ -890,9 +895,9 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
         $scope.matchCompleted = false;
 
         $scope.currentSet = 1;
-        
+
         $scope.sentScore = { };
-        
+
         $scope.sentScore.sent = false;
 
         $scope.pollServer();
@@ -948,7 +953,7 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
 
             var foundSet = false;
             var currentSet = $scope.currentSet;
-            
+
             angular.forEach(sets, function(set){
                 if(!set.set_completed && !foundSet){
                     $scope.currentSet = set.set_seq;
@@ -992,7 +997,7 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
                         title: 'Submit Score',
                         template: 'You have succesfully submitted your score for set '+$scope.currentSet+' with a Win.'
                     });
-                    
+
                     $scope.sentScore.sent = true;
 
                 }).error(function (data, status, header, config) {
@@ -1007,7 +1012,7 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
                         confirmPopup.then(function (res) {
 
                         });
-                        
+
                         $scope.sentScore.sent = true;
 
                     }
@@ -1041,7 +1046,7 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
                     confirmPopup.then(function (res) {
 
                     });
-                    
+
                     $scope.sentScore.sent = true;
 
                 }).error(function (data, status, header, config) {
@@ -1054,7 +1059,7 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
                         confirmPopup.then(function (res) {
 
                         });
-                        
+
                         $scope.sentScore.sent = true;
                     }
 
@@ -1101,7 +1106,7 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
                 confirmPopup.then(function (res) {
 
                 });
-                
+
                 $scope.sentScore = true;
 
             }).error(function (data, status, header, config) {
@@ -1115,7 +1120,7 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
                     confirmPopup.then(function (res) {
 
                     });
-                    
+
                     $scope.sentScore.sent = true;
                 }
 
