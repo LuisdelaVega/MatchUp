@@ -8,5 +8,10 @@
                     <br>{{ event.event_location }}</p>
             </a>
         </div>
+        <div class="card" ng-if="pastEvents.length == 0">
+            <div class="item item-text-wrap">
+                There are no events here.
+            </div>
+        </div>
     </ion-content>
 </ion-view>

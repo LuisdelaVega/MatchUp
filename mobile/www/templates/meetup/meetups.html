@@ -27,5 +27,10 @@
                 <p>Created by: {{meetup.customer_tag}}</p>
             </div>
         </div>
+        <div class="card" ng-if="meetups.length == 0">
+            <div class="item item-text-wrap">
+                There are no meetups.
+            </div>
+        </div>
     </ion-content>
 </ion-view>

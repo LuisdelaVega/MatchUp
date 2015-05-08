@@ -21,5 +21,10 @@
                 {{review.review_content}}
             </div>
         </div>
+        <div class="card" ng-if="reviews.length == 0">
+            <div class="item item-text-wrap">
+                There are no reviews.
+            </div>
+        </div>
     </ion-content>
 </ion-view>

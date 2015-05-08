@@ -8,8 +8,11 @@ myApp.controller('REController', ['$scope', '$http', '$ionicPopup', '$stateParam
             $ionicPlatform.ready(function() {
                 $cordovaInAppBrowser.close();
             });
+            var confirmPopup = $ionicPopup.alert({
+                title: 'Sign Up',
+                template: 'You have successfully signed up!'
+            });
         }
-
     });
 
     //Create popup when user clicks the sign up button
@@ -28,7 +31,6 @@ myApp.controller('REController', ['$scope', '$http', '$ionicPopup', '$stateParam
                         'Authorization': "Bearer "+ $window.sessionStorage.token
                     }
                 };
-
                 $http.post('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/tournaments/'+selectedTournament+'/register?date='+$stateParams.date+'&location='+$stateParams.location+'', { }, config).success(function(data, status, headers, config) {
 
                     var options = {
@@ -327,6 +329,10 @@ myApp.controller('teamSignUpController', ['$scope', '$http', '$ionicPopup', '$st
         if(event.url.match("matchup.neptunolabs.com")) {
             $ionicPlatform.ready(function() {
                 $cordovaInAppBrowser.close();
+                var confirmPopup = $ionicPopup.alert({
+                    title: 'Team Sign Up',
+                    template: 'You have succesfully signed up '+$scope.selectedTeam.team.team_name+' in '+$stateParams.tournament+'!'
+                });
             });
         }
 

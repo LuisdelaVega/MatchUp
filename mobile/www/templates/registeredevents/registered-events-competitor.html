@@ -1,7 +1,7 @@
 <ion-view view-title="Registered Events">
     <ion-content>
         <div class="list list-inset">
-            <a class="item item-thumbnail-left" href="#" ng-repeat="event in eventsCompeting">
+            <a class="item item-thumbnail-left" ng-repeat="event in eventsCompeting" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)">
                 <img ng-src="{{event.event_logo}}">
                 <h2>{{ event.event_name }}</h2>
                 <p>{{ event.event_location }}</p>

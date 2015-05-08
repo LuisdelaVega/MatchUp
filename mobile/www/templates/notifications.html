@@ -10,5 +10,10 @@
                 <p>{{matchup.tournament_name}}</p>
             </a>          
         </div>
+        <div class="card" ng-if="matchups.length == 0">
+            <div class="item item-text-wrap">
+                You have no notifications.
+            </div>
+        </div>
     </ion-content>
 </ion-view>

@@ -29,7 +29,7 @@
             <div class="item item-divider">
                 Team Members
             </div>
-            <a class="item center-item item-avatar item-button-right" href="#" ng-repeat="player in players">
+            <a class="item center-item item-avatar item-button-right" ng-repeat="player in players" ui-sref="app.profile.summary({ username: player.customer_username })">
                 <img ng-src="{{player.customer_profile_pic}}">
                 <h2>{{player.customer_tag}}</h2>
                 <p>{{player.customer_first_name}} {{player.customer_last_name}}</p>
@@ -43,7 +43,7 @@
                 <i class="icon ion-android-arrow-forward"></i> Edit Team
             </a>
         </div>
-        <div class="list list-inset">
+        <div class="list list-inset" ng-if="standings.length > 0">
             <div class="item item-divider">
                 Standings
             </div>
@@ -59,7 +59,7 @@
                     </div>
                 </div>
             </a>
-            <a class="item item-icon-left dark" href="#/app/teamprofilestandings">
+            <a class="item item-icon-left dark" ng-if="standings.length > 3">
                 <i class="icon ion-android-arrow-forward"></i> See More
             </a>
         </div>

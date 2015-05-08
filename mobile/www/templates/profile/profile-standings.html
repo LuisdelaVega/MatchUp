@@ -1,7 +1,7 @@
 <ion-view view-title="{{customerTag}}'s Standings">
     <ion-content>
         <div class="list list-inset">
-            <a class="item item-thumbnail-left" ng-repeat="standing in standings">
+            <a class="item item-thumbnail-left" ng-repeat="standing in standings" ng-click="goToEvent(standing.event_name, standing.event_start_date, standing.event_location)">
                 <img ng-src="{{standing.event_logo}}">
                 <div class="row">
                     <div class="col col-75">
@@ -13,6 +13,11 @@
                     </div>
                 </div>
             </a>
+        </div>
+        <div class="card" ng-if="standings.length == 0">
+            <div class="item item-text-wrap">
+                This user hasn't participated in any events yet.
+            </div>
         </div>
     </ion-content>
 </ion-view>

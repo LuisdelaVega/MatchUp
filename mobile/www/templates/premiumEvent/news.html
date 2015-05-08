@@ -5,7 +5,7 @@
         </button>
     </ion-nav-buttons>
     <ion-nav-buttons side="right">
-        <button class="button button-icon ion-ios-compose" ng-click="clickAdd('{{$index}}')">
+        <button class="button button-icon ion-ios-compose" ng-click="clickAdd('{{$index}}')" ng-if="isOrganizer">
         </button>
         <button class="button button-icon ion-android-alert">
         </button>
@@ -23,6 +23,11 @@
                 <a class="tab-item" ng-click="clickEdit('{{$index}}')">
                     <i class="icon ion-edit"></i> Edit
                 </a>
+            </div>
+        </div>
+        <div class="card" ng-if="news.length == 0">
+            <div class="item item-text-wrap">
+                There are no news.
             </div>
         </div>
     </ion-content>

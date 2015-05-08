@@ -6,9 +6,9 @@
                 <h1>{{ gameName }}</h1>
             </div>
         </div>
-         <div class="list list-inset">
+        <div class="list list-inset">
             <div class="item item-divider">
-               All Events
+                Promoted Events
             </div>
             <a class="item item-thumbnail-left" ng-click="goToEvent(event.event_name, event.event_start_date, event.event_location)" ng-repeat="event in promotedEvents">
                 <img ng-src="{{ event.event_logo }}">
@@ -16,6 +16,9 @@
                 <p>{{ event.event_start_date | date: 'medium' }}</p>
                 <p>{{ event.event_location }}</p>
             </a>
+            <div class="item item-text-wrap" ng-if="promotedEvents.length == 0">
+                There are no events here.
+            </div>
         </div>
     </ion-content>
 </ion-view>

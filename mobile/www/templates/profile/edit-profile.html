@@ -289,13 +289,6 @@
                 <span class="input-label">Bio</span>
                 <textarea rows="5" ng-model="user.bio"></textarea>
             </label>
-
-            <div class="item">
-                <button class="button button-block button-positive" ng-click="editUserProfile()">
-                    Edit
-                </button>
-            </div>
-
         </div>
         <div class="card">
             <div class="item item-body">
@@ -323,6 +316,12 @@
             <div ng-if="editedCoverPhoto">
                 <p style="color: green">Succesfully edited cover photo</p>
             </div>
+        </div>
+
+        <div class="item">
+            <button class="button button-block button-positive" ng-click="editUserProfile()">
+                Edit
+            </button>
         </div>
 
         <div style="display: none;">

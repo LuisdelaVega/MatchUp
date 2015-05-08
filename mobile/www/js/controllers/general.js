@@ -63,7 +63,6 @@ myApp.controller('homeViewController', ['$scope', '$http', '$state', 'sharedData
             }
         };
 
-
         //Get event information
         $http.get('http://136.145.116.232/matchup/events/'+eventName+'?date='+date+'&location='+location+'', config).
         success(function(data, status, headers, config) {
@@ -187,7 +186,6 @@ myApp.controller('searchController', ['$scope', '$http', 'sharedDataService', '$
         error(function(data, status, headers, config) {
             console.log("error in goToEvent");
         });
-
     };
 
     $scope.goToGameProfile = function (gameName, gameImage) {
@@ -380,7 +378,6 @@ myApp.controller('reportController', ['$scope', '$http', '$cordovaCamera', '$ion
 
                 }).
                 error(function (err){
-                    $scope.fuckedup = err;
                     console.log("error in editProfileController");
                     $ionicLoading.hide();
                     var alertPopup = $ionicPopup.alert({
@@ -889,7 +886,6 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
 
     $scope.$on('$ionicView.enter', function () {
         $scope.matchupInfo = sharedDataService.get();
-        console.log($scope.matchupInfo);
 
         $scope.scoreInput = [ ];
 
@@ -923,10 +919,6 @@ myApp.controller('matchupOngoingController', ['$scope', '$http', '$state', 'shar
             });
 
             $scope.matchInfo = data;
-
-            if($scope.matchInfo.score_type == "Points"){
-                $scope.scoreInput.score = 0;
-            }
 
             var sets = data.sets;
 

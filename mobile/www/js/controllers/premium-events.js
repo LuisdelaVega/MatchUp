@@ -98,15 +98,33 @@ myApp.controller('newsController', function ($scope, sharedDataService, $statePa
         }
     };
 
-    //Obtain news of currently selected event
-    $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/news?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
-    success(function(data, status, headers, config) {
 
-        $scope.news = angular.fromJson(data);
+    $scope.$on('$ionicView.enter', function () {
 
-    }).
-    error(function(data, status, headers, config) {
-        console.log("error in eventPremiumSummaryController");
+        $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
+        success(function(data, status, headers, config) {
+
+            $scope.isOrganizer = data.is_organizer;
+
+            //Obtain news of currently selected event
+            $http.get('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/news?date='+$stateParams.date+'&location='+$stateParams.location+'', config).
+            success(function(data, status, headers, config) {
+
+                console.log('http://136.145.116.232/matchup/events/'+$stateParams.eventname+'/news?date='+$stateParams.date+'&location='+$stateParams.location+'');
+
+                $scope.news = angular.fromJson(data);
+
+            }).
+            error(function(data, status, headers, config) {
+                console.log("error in eventPremiumSummaryController");
+            });
+
+        }).
+        error(function(data, status, headers, config) {
+            console.log("error in eventPremiumSummaryController");
+        });
+
+
     });
 
     // Send data to post news controller

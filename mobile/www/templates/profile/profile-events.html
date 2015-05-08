@@ -8,5 +8,10 @@
                     <br>{{ event.event_location }}</p>
             </a>
         </div>
+        <div class="card" ng-if="eventsData.length == 0">
+            <div class="item item-text-wrap">
+                This user hasn't hosted an event yet.
+            </div>
+        </div>
     </ion-content>
 </ion-view>
