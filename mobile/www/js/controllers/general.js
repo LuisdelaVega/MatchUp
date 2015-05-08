@@ -332,7 +332,7 @@ myApp.controller('searchResultController', ['$scope', '$stateParams', 'sharedDat
 
 }]);
 
-myApp.controller('reportController', ['$scope', '$http', '$cordovaCamera', '$ionicPlatform', 'sharedDataService', '$state', '$window', '$ionicLoading', function ($scope, $http, $cordovaCamera, $ionicPlatform, sharedDataService, $state, $window, $ionicLoading) {
+myApp.controller('reportController', ['$scope', '$http', '$cordovaCamera', '$ionicPlatform', 'sharedDataService', '$state', '$window', '$ionicLoading', '$ionicPopup', function ($scope, $http, $cordovaCamera, $ionicPlatform, sharedDataService, $state, $window, $ionicLoading, $ionicPopup) {
 
     $http.defaults.useXDomain = true;
     $http.defaults.headers.common['Authorization'] = 'Client-ID 44f5a38fc083775';

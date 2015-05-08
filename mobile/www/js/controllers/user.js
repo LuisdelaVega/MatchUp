@@ -408,6 +408,7 @@ myApp.controller('editProfileController', ['$scope', '$http', '$stateParams', '$
 
                 }).
                 error(function (err){
+                    $ionicLoading.hide();
                     console.log("error in editProfileController");
                 });
             })
