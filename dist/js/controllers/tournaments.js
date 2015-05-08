@@ -18,6 +18,7 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 	$scope.roundsTab = false;
 	$scope.bracketTab = false;
 	$scope.canRegister = false;
+	$scope.roundRobinTab = false;
 
 	// Get Tournament Information
 	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data) {
@@ -50,12 +51,14 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 			$scope.competitorsTab = true;
 			getCompetitors();
 		} else {
-			
+
 			$scope.standingsTab = true;
 			getStandings();
-			
+
 			// Show rounds tab if single, double, or round robin
-			$scope.roundsTab = ($scope.tournament.tournament_format == 'Single Elimination' || $scope.tournament.tournament_format == 'Double Elimination' || $scope.tournament.tournament_format == 'Round Robin');
+			$scope.roundsTab = ($scope.tournament.tournament_format == 'Single Elimination' || $scope.tournament.tournament_format == 'Double Elimination');
+
+			$scope.roundRobinTab = ($scope.tournament.tournament_format == 'Round Robin');
 
 			// Show groupstage tab if Two stage
 			$scope.groupStageTab = $scope.tournament.tournament_type == 'Two Stage';
@@ -97,9 +100,14 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 			console.log($scope.tournamentInfo.finalStage);
 			if ($scope.tournamentInfo.finalStage) {
 				if (Object.keys($scope.tournamentInfo.finalStage).length) {
-					$scope.bracketType = $scope.tournamentInfo.finalStage.winnerRounds
-					$scope.selectedRound = $scope.bracketType[0];
-					displayBracket($scope);
+					if ($scope.tournamentInfo.finalStage.winnerRounds) {
+						$scope.bracketType = $scope.tournamentInfo.finalStage.winnerRounds
+						$scope.selectedRound = $scope.bracketType[0];
+						displayBracket($scope);
+					}
+					else if($scope.tournamentInfo.finalStage.roundRobinRounds){
+						$scope.roundRobinRounds = $scope.tournamentInfo.finalStage.roundRobinRounds;
+					}
 				}
 			}
 			if ($scope.tournamentInfo.groupStage) {
@@ -113,8 +121,8 @@ myApp.controller('tournamentController', ['$scope', '$http', '$stateParams', 'sh
 
 	var getStandings = function () {
 		$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventname + '/tournaments/' + $stateParams.tournament + '/standings?date=' + $stateParams.date + '&location=' + $stateParams.location).success(function (data) {
-			if (data.finalStage){
-				if(data.finalStage.standings)
+			if (data.finalStage) {
+				if (data.finalStage.standings)
 					$scope.standings = data.finalStage.standings;
 				else
 					$scope.onGoingStanding = data.finalStage
@@ -634,15 +642,14 @@ function displayBracket($scope) {
 
 		// Init rounds by pushing the first round
 		$scope.loserRounds.push([]);
-		
+
 		// Check edge case where only two rounds are present
-		if(losersRound.length == 2){
+		if (losersRound.length == 2) {
 			losersRound[1].matches[0].isLoser = true;
 			$scope.loserRounds[0].push(losersRound[1].matches[0]);
-		}	
-		else{
+		} else {
 			$scope.loserRounds[0].push(losersRound[losersRound.length - 1].matches[0]);
-			$scope.loserRounds[0][0].extra = true;	
+			$scope.loserRounds[0][0].extra = true;
 		}
 
 		// Start iterating from the last round till the round 2
@@ -667,8 +674,7 @@ function displayBracket($scope) {
 					$scope.loserRounds[0].push(losersRound[i - 1].matches[matchChild1]);
 					checkNamePostions(j, $scope.loserRounds);
 				}
-			}
-			else {
+			} else {
 				// Iterate through the matches of last round pushed to arrange the child matches
 				for (var j = 0; j < losersRound[i].matches.length; j++) {
 					// Get the match number of the current round which is in order with repect to the bracket
@@ -741,11 +747,11 @@ function displayBracket($scope) {
 			loserBracketHeight += 120;
 		}
 
-			$scope.loserBracketHeight = {
-				"height": loserBracketHeight + 'px',
-			}
+		$scope.loserBracketHeight = {
+			"height": loserBracketHeight + 'px',
 		}
-		}
+	}
+}
 
 function getNextPowerOf2(numOfRounds) {
 	var power = 1;
