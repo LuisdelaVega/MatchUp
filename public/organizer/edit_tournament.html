@@ -1,4 +1,4 @@
-<div class="box">
+<div class="box" ng-if="event.is_organizer">
 	<h2>Tournament</h2>
 	<form>
 		<legend>General Info</legend>
@@ -142,4 +142,13 @@
 			<a class="btn btn-primary" ng-click="validateTournament()">Submit</a>
 		</div>
 	</div>
+</div>
+
+
+<div ng-if="!event.is_organizer && event.host">
+	<h1>You are not a member of this organization and therefore cannot manage this tournament!</h1>
+</div>
+
+<div ng-if="!event.is_organizer && !event.host">
+	<h1>You are not the creator of this tournament and therefore cannot manage it!</h1>
 </div>

@@ -1,4 +1,4 @@
-<div class="box box-margin-bottom">
+<div class="box box-margin-bottom" ng-if="organization.is_member">
 	<form class="form-horizontal" name="organizationForm" ng-submit="submitEditOrganization(organizationForm.$valid)">
 		<legend>
 			Edit Info
@@ -474,3 +474,5 @@
 	</div>
 	<!-- /.modal-dialog -->
 </div>
+
+<div class="box box-margin-bottom" ng-if="!organization.is_member"><h1>You are not a member of this organization and therfore cannot view this page!</h1></div>

@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row" ng-if="event.is_organizer">
 	<div class="col-lg-9 col-md-9 col-sm-12 col-xs-12" ng-if="tournament.team_size == 1">
 		<div class="box">
 			<form role="form">
@@ -45,4 +45,14 @@
 			<p class="lead" ng-if="!signups.length">Registrations are empty</p>
 		</div>
 	</div>
+</div>
+
+
+
+<div ng-if="!event.is_organizer && event.host">
+	<h1>You are not a member of this organization and therefore cannot manage this registrations!</h1>
+</div>
+
+<div ng-if="!event.is_organizer && !event.host">
+	<h1>You are not the creator of this tournament and therefore cannot manage registrations!</h1>
 </div>

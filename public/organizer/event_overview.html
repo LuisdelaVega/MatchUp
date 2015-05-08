@@ -1,3 +1,12 @@
+<div ng-if="!eventInfo.is_organizer && eventInfo.host">
+	<h1>You are not a member of this organization and therefore cannot view this page!</h1>
+</div>
+
+<div ng-if="!eventInfo.is_organizer && !eventInfo.host">
+	<h1>You cannot view this page!</h1>
+</div>
+
+<div  ng-if="eventInfo.is_organizer">
 <!-- General Event Info -->
 <div class="box box-margin">
 	<div class="row">
@@ -203,5 +212,8 @@
 			</div>
 		</ul>
 	</div>
+
+</div>
+
 
 </div>

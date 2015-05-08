@@ -1,4 +1,12 @@
-<div class="box">
+<div ng-if="!eventInfo.is_organizer && eventInfo.host">
+	<h1>You are not a member of this organization and therefore cannot manage match details for the tournaments of this event!</h1>
+</div>
+
+<div ng-if="!eventInfo.is_organizer && !eventInfo.host">
+	<h1>You are not the creator of this tournament and therefore cannot manage match details for the tournaments of this event!</h1>
+</div>
+
+<div class="box" ng-if="eventInfo.is_organizer">
 	<legend align="center">
 
 		<div class="row">
@@ -38,27 +46,26 @@
 					</button></span>
 			</div>
 			<p>
-			<div class="dropdown">
-				<lable>Start Date</lable>
-				<a class="dropdown-toggle" id="dropdown1" role="button" data-toggle="dropdown">
+				<div class="dropdown">
+					<lable>
+						Start Date
+					</lable>
+					<a class="dropdown-toggle" id="dropdown1" role="button" data-toggle="dropdown">
 					<div class="input-group">
 						<input type="text" class="form-control" value="{{selectedRound.round_start_date | date: 'EEEE, MMMM d, h:mm a'}}" readonly>
 						<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-					</div>
-
-				</a>
-				<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-					<datetimepicker data-ng-model="selectedRound.round_start_date" data-datetimepicker-config="{ dropdownSelector: '#dropdown1' }" />
-				</ul>
-				 <button class="btn btn-primary" ng-click="changeDate()">
+					</div> </a>
+					<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+						<datetimepicker data-ng-model="selectedRound.round_start_date" data-datetimepicker-config="{ dropdownSelector: '#dropdown1' }" />
+					</ul>
+					<button class="btn btn-primary" ng-click="changeDate()">
 						Save Date
-					</button> 
-			</div>
+					</button>
+				</div>
 			</p>
 			<div class="list-group">
 				<!-- <a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="tournament in tournaments" ng-click="getSeedingInfo($index)"> -->
-				<a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="round in rounds" ng-click="getRoundMatches(round, $index)">
-					<h4 class="list-group-item-heading">Round {{round.round_number}}
+				<a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="round in rounds" ng-click="getRoundMatches(round, $index)"> <h4 class="list-group-item-heading">Round {{round.round_number}}
 				&nbsp; <small ng-if="round.round_pause">(Paused) </small><small ng-if="!round.round_pause">(Un-Paused) </small></h4> </a>
 			</div>
 		</div>
@@ -80,7 +87,7 @@
 						<tbody ng-if="tournament.team_size == 1">
 
 							<tr ng-click="getTournamentMatch(match.match_number)" ng-repeat="match in selectedRound.matches">
-							
+
 								<td><i class="fa fa-star" ng-if="match.is_favourite"></i> &nbsp; {{match.match_number}} </td>
 								<td ng-if="match.players[0].customer_tag">{{match.players[0].customer_tag}}</td>
 								<td ng-if="match.players[1].customer_tag">{{match.players[1].customer_tag}}</td>
@@ -99,8 +106,8 @@
 						<tbody ng-if="tournament.team_size > 1">
 
 							<tr ng-click="getTournamentMatch(match.match_number)" ng-repeat="match in selectedRound.matches">
-								
-																<td><i class="fa fa-star" ng-if="match.is_favourite"></i> &nbsp; {{match.match_number}} </td>
+
+								<td><i class="fa fa-star" ng-if="match.is_favourite"></i> &nbsp; {{match.match_number}} </td>
 
 								<td ng-if="match.players[0].team_name">{{match.players[0].team_name}}</td>
 								<td ng-if="match.players[1].team_name">{{match.players[1].team_name}}</td>
@@ -175,26 +182,25 @@
 
 					<h4 class="modal-title">Round {{matchInfo.round}} Match {{matchInfo.match}}
 					<br>
-					<h5>Favorite: <i class="fa fa-star" ng-if="matchInfo.is_favourite" ng-click="favoriteMatchToggle(matchInfo.match)"></i><i class="fa fa-star-o" ng-if="!matchInfo.is_favourite" ng-click="favoriteMatchToggle(matchInfo.match)"></i></h5>
-					<select ng-options="station.station_number as 'Station '+ station.station_number for station in stations" ng-model="matchInfo.station_number" ng-change="changeStation(matchInfo.station_number)"></select>
-					</br>
-					<p ng-if="matchInfo.stream_link">Stream <a ng-href="{{matchInfo.stream_link}}"> 
-						{{matchInfo.stream_link}}</a></p></h4>
+					<h5>Favorite: <i class="fa fa-star" ng-if="matchInfo.is_favourite" ng-click="favoriteMatchToggle(matchInfo.match)"></i><i class="fa fa-star-o" ng-if="!matchInfo.is_favourite" ng-click="favoriteMatchToggle(matchInfo.match)"></i></h5><select ng-options="station.station_number as 'Station '+ station.station_number for station in stations" ng-model="matchInfo.station_number" ng-change="changeStation(matchInfo.station_number)"></select> </br>
+					<p ng-if="matchInfo.stream_link">
+						Stream <a ng-href="{{matchInfo.stream_link}}"> {{matchInfo.stream_link}}</a>
+					</p></h4>
 				</div>
 				<!-- <div class="modal-body">
-					<div align="center" >
-						<button type="button" class="btn btn-primary" ng-click="changeStationPrompt()">
-							Change Station
-						</button>
-						<button type="button" class="btn btn-primary" ng-click="favoriteMatchToggle(matchInfo.match)" ng-if="!matchInfo.is_favourite">
-							Mark as Favorite
-						</button>
-						<button type="button" class="btn btn-primary" ng-click="favoriteMatchToggle(matchInfo.match)" ng-if="matchInfo.is_favourite">
-							Un-mark as favorite
-						</button>
-					</div>
+				<div align="center" >
+				<button type="button" class="btn btn-primary" ng-click="changeStationPrompt()">
+				Change Station
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="favoriteMatchToggle(matchInfo.match)" ng-if="!matchInfo.is_favourite">
+				Mark as Favorite
+				</button>
+				<button type="button" class="btn btn-primary" ng-click="favoriteMatchToggle(matchInfo.match)" ng-if="matchInfo.is_favourite">
+				Un-mark as favorite
+				</button>
+				</div>
 
-					<hr>
+				<hr>
 				</div> -->
 
 				<div class="modal-body">
@@ -244,35 +250,30 @@
 									<tr>
 										<th></th>
 										<th>
-											<div align="center">
-												{{matchInfo.players[0].customer_tag}}
-											</div>
-										</th>
+										<div align="center">
+											{{matchInfo.players[0].customer_tag}}
+										</div></th>
 										<th>
-											<div align="center">
-												{{matchInfo.players[1].customer_tag}}
-											</div>
-										</th>
+										<div align="center">
+											{{matchInfo.players[1].customer_tag}}
+										</div></th>
 
 									</tr>
 								</thead>
 								<tbody>
 									<tr ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number && set.scores[1].competitor_number">
 										<td style="width: 30%">
-											<p style="text-align: center">
-												Set &nbsp; {{$index +1}}
-											</p>
-										</td>
+										<p style="text-align: center">
+											Set &nbsp; {{$index +1}}
+										</p></td>
 										<td>
-											<div align="center">
-												<input type="text" class="form-control" ng-model="set.scores[0].score" valid-input input-pattern="[^0-9]+" style="width: 25%">
-											</div>
-										</td>
+										<div align="center">
+											<input type="text" class="form-control" ng-model="set.scores[0].score" valid-input input-pattern="[^0-9]+" style="width: 25%">
+										</div></td>
 										<td>
-											<div align="center">
-												<input type="text" class="form-control" ng-model="set.scores[1].score" valid-input input-pattern="[^0-9]+" style="width: 25%">
-											</div>
-										</td>
+										<div align="center">
+											<input type="text" class="form-control" ng-model="set.scores[1].score" valid-input input-pattern="[^0-9]+" style="width: 25%">
+										</div></td>
 										</td>
 									</tr>
 								</tbody>
@@ -326,35 +327,30 @@
 									<tr>
 										<th></th>
 										<th>
-											<div align="center">
-												{{matchInfo.players[0].team_name}}
-											</div>
-										</th>
+										<div align="center">
+											{{matchInfo.players[0].team_name}}
+										</div></th>
 										<th>
-											<div align="center">
-												{{matchInfo.players[1].team_name}}
-											</div>
-										</th>
+										<div align="center">
+											{{matchInfo.players[1].team_name}}
+										</div></th>
 
 									</tr>
 								</thead>
 								<tbody>
 									<tr ng-repeat="set in matchInfo.sets" ng-if="set.scores[0].competitor_number && set.scores[1].competitor_number">
 										<td style="width: 30%">
-											<p style="text-align: center">
-												Set &nbsp; {{$index +1}}
-											</p>
-										</td>
+										<p style="text-align: center">
+											Set &nbsp; {{$index +1}}
+										</p></td>
 										<td>
-											<div align="center">
-												<input type="text" class="form-control" ng-model="set.scores[0].score" valid-input input-pattern="[^0-9]+" style="width: 25%">
-											</div>
-										</td>
+										<div align="center">
+											<input type="text" class="form-control" ng-model="set.scores[0].score" valid-input input-pattern="[^0-9]+" style="width: 25%">
+										</div></td>
 										<td>
-											<div align="center">
-												<input type="text" class="form-control" ng-model="set.scores[1].score" valid-input input-pattern="[^0-9]+" style="width: 25%">
-											</div>
-										</td>
+										<div align="center">
+											<input type="text" class="form-control" ng-model="set.scores[1].score" valid-input input-pattern="[^0-9]+" style="width: 25%">
+										</div></td>
 										</td>
 									</tr>
 								</tbody>

@@ -1,4 +1,4 @@
-<div class="tab-content">
+<div class="tab-content" ng-if="meetup.customer_username == currentUser.customer_username">
 	<div class="box">
 		<form name="editMeetUpForm" ng-submit="submitEditmeetup(editMeetUpForm.$valid)">
 			<legend>
@@ -64,3 +64,4 @@
 	</div>
 </div>
 
+<div class="tab-content" ng-if="meetup.customer_username != currentUser.customer_username"> <h1>This is not your meetup!</h1></div>

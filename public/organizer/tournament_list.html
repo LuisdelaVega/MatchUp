@@ -1,3 +1,6 @@
+<div ng-if="eventInfo.is_organizer">
+
+
 <div class="tab-content">
 	<div class="tab-pane fade in active" id="tournaments-tab">
 		<div class="box">
@@ -248,4 +251,9 @@
 		<!-- /.modal-content -->
 	</div>
 	<!-- /.modal-dialog -->
+</div></div>
+
+
+<div ng-if="!eventInfo.is_organizer">
+	<h1>You are not a member of this organization and therefore cannot manage its tournaments!</h1>
 </div>

@@ -1,122 +1,133 @@
-<div class="row">
-	<div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
-		<div class="list-group">
-			<a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="tournament in tournaments track by $index" ng-click="getTournamentStation($index)"> <h4 class="list-group-item-heading">{{tournament.tournament_name}}</h4> </a>
-		</div>
-	</div>
-	<div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
-		<div class="box">
-			<legend>
-				Stations
-			</legend>
+<div  ng-if="event.is_organizer">
+
+	<div class="row">
+		<div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
 			<div class="list-group">
-				<div class="list-group-item clearfix cursor" ng-repeat="item in stations" ng-click="editStationModal($index)">
-					<p class="lead event-footer-title">
-						Station {{item.station_number}}
-					<p ng-if="item.stream_link">
-						Stream: {{item.stream_link}}
-					</p>
-					<!-- TODO Use ongoing variable!-->
-					<p>
-						Station in Use:{{item.station_in_use}}
-					</p>
-				</div>
-			</div>
-			<button class="btn btn-success" ng-click="addStation()" ng-if="!index">
-				Add New Station
-			</button>
-			<button class="btn btn-default" ng-click="linkStation()" ng-if="index">
-				Link Station
-			</button>
-		</div>
-	</div>
-</div>
-
-<div class="modal fade" id="editStationModal">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-				<h4 class="modal-title">Station {{stations[stationIndex].station_number}} Info</h4>
-			</div>
-			<div class="modal-body">
-				<form>
-					<div class="form-group">
-						<h4>Tournaments Assigned to</h4>
-						<ul>
-							<li ng-repeat="tournament in stationInUse">
-								{{tournament.name}}
-							</li>
-						</ul>
-					</div>
-					<div class="form-group">
-						<label>Stream: </label>
-						<input class="form-control" placeholder="Enter stream link" ng-model="newStream">
-					</div>
-					<button class="btn btn-success" ng-click="editStream()" ng-if="stations[stationIndex].stream_link">
-						Edit Stream
-					</button>
-					<button class="btn btn-success" ng-click="addStream()" ng-if="!stations[stationIndex].stream_link">
-						Add Stream
-					</button>
-
-				</form>
-			</div>
-			<div class="modal-footer">
-				<div ng-switch on="index == 0">
-					<div ng-switch-when="true">
-						<button type="button" class="btn btn-danger" ng-click="deleteStation()">
-							Delete Station
-						</button>
-						<button type="button" class="btn btn-default" data-dismiss="modal">
-							Close
-						</button>
-					</div>
-					<div ng-switch-default>
-						<button type="button" class="btn btn-warning" ng-click="removeStation()">
-							Remove Station
-						</button>
-						<button type="button" class="btn btn-default" data-dismiss="modal">
-							Close
-						</button>
-					</div>
-				</div>
+				<a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="tournament in tournaments track by $index" ng-click="getTournamentStation($index)"> <h4 class="list-group-item-heading">{{tournament.tournament_name}}</h4> </a>
 			</div>
 		</div>
-		<!-- /.modal-content -->
-	</div>
-	<!-- /.modal-dialog -->
-</div>
-<!-- /.modal -->
-
-<div class="modal fade" id="linkStation">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
+		<div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+			<div class="box">
+				<legend>
+					Stations
+				</legend>
+				<div class="list-group">
+					<div class="list-group-item clearfix cursor" ng-repeat="item in stations" ng-click="editStationModal($index)">
+						<p class="lead event-footer-title">
+							Station {{item.station_number}}
+						<p ng-if="item.stream_link">
+							Stream: {{item.stream_link}}
+						</p>
+						<!-- TODO Use ongoing variable!-->
+						<p>
+							Station in Use:{{item.station_in_use}}
+						</p>
+					</div>
+				</div>
+				<button class="btn btn-success" ng-click="addStation()" ng-if="!index">
+					Add New Station
 				</button>
-				<h4 class="modal-title">Link Station to Tournament</h4>
-			</div>
-			<div class="modal-body">
-				<ul>
-					<li ng-repeat="item in availableStations">
-						<label>Station {{item.station_number}}
-							<input type="radio" name="optionsRadios" value="{{item}}" ng-model="selected.station" />
-						</label>
-					</li>
-				</ul>
-
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-primary" ng-click="attatch()">
+				<button class="btn btn-default" ng-click="linkStation()" ng-if="index">
 					Link Station
 				</button>
 			</div>
 		</div>
-		<!-- /.modal-content -->
 	</div>
-	<!-- /.modal-dialog -->
+
+	<div class="modal fade" id="editStationModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">Station {{stations[stationIndex].station_number}} Info</h4>
+				</div>
+				<div class="modal-body">
+					<form>
+						<div class="form-group">
+							<h4>Tournaments Assigned to</h4>
+							<ul>
+								<li ng-repeat="tournament in stationInUse">
+									{{tournament.name}}
+								</li>
+							</ul>
+						</div>
+						<div class="form-group">
+							<label>Stream: </label>
+							<input class="form-control" placeholder="Enter stream link" ng-model="newStream">
+						</div>
+						<button class="btn btn-success" ng-click="editStream()" ng-if="stations[stationIndex].stream_link">
+							Edit Stream
+						</button>
+						<button class="btn btn-success" ng-click="addStream()" ng-if="!stations[stationIndex].stream_link">
+							Add Stream
+						</button>
+
+					</form>
+				</div>
+				<div class="modal-footer">
+					<div ng-switch on="index == 0">
+						<div ng-switch-when="true">
+							<button type="button" class="btn btn-danger" ng-click="deleteStation()">
+								Delete Station
+							</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">
+								Close
+							</button>
+						</div>
+						<div ng-switch-default>
+							<button type="button" class="btn btn-warning" ng-click="removeStation()">
+								Remove Station
+							</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">
+								Close
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!-- /.modal -->
+
+	<div class="modal fade" id="linkStation">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">Link Station to Tournament</h4>
+				</div>
+				<div class="modal-body">
+					<ul>
+						<li ng-repeat="item in availableStations">
+							<label>Station {{item.station_number}}
+								<input type="radio" name="optionsRadios" value="{{item}}" ng-model="selected.station" />
+							</label>
+						</li>
+					</ul>
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" ng-click="attatch()">
+						Link Station
+					</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+</div>
+
+<div ng-if="!event.is_organizer && event.host">
+	<h1>You are not a member of this organization and therefore cannot manage its stations!</h1>
+</div>
+
+<div ng-if="!event.is_organizer && !event.host">
+	<h1>You are not the creator of this tournament and therefore cannot manage its stations!</h1>
 </div>

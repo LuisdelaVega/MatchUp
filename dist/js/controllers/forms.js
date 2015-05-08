@@ -243,7 +243,7 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 			"group_players" : parseInt($scope.tournament.group_players),
 			"group_winners" : parseInt($scope.tournament.group_winners),
 		};
-		
+
 		console.log($scope.tournament);
 
 		// Create Event if user is hosting the event by calling a post
@@ -886,8 +886,8 @@ myApp.controller("editHostedTournamentListController", function($scope, $http, $
 	// FUCK ACUTE
 	$scope.newTournament = {};
 	$scope.newTournament.game = "";
-	
-	$scope.type = $stateParams.manage  == 'edit';
+
+	$scope.type = $stateParams.manage == 'edit';
 
 	// Get games for dropdown
 	$http.get($rootScope.baseURL + '/matchup/popular/games').success(function(data) {
@@ -1097,6 +1097,10 @@ myApp.controller("editMeetUpController", function($scope, $http, $window, $rootS
 		$scope.meetup.meetup_start_date = new Date($scope.meetup.meetup_start_date);
 		console.log(data);
 		$scope.meetup.customer_username = $stateParams.customerUsername;
+	});
+
+	$http.get($rootScope.baseURL + '/matchup/profile').success(function(data, status, headers) {
+		$scope.currentUser = data;
 	});
 
 	$scope.submitEditmeetup = function(valid) {

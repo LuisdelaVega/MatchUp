@@ -1,4 +1,12 @@
-<div class="row">
+<div ng-if="!event.is_organizer && event.host">
+	<h1>You are not a member of this organization and therefore cannot manage seeding or brackets for its tournaments!</h1>
+</div>
+
+<div ng-if="!event.is_organizer && !event.host">
+	<h1>You are not the creator of this tournament and therefore cannot manage seeding or brackets the tournament!</h1>
+</div>
+
+<div class="row"  ng-if="event.is_organizer">
 	<div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
 		<div class="list-group">
 			<a class="list-group-item" ng-class="{ 'active': $index == index }" ng-repeat="tournament in tournaments" ng-click="getTournament($index)"> <h4 class="list-group-item-heading">{{tournament.tournament_name}}</h4> </a>

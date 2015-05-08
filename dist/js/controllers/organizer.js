@@ -55,6 +55,13 @@ myApp.controller('eventSettingsController', function($scope, $state, $http, $sta
  *
  */
 myApp.controller("SeedingController", function($scope, $http, $window, $rootScope, $state, $stateParams) {
+		//get event
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data, status) {
+		$scope.event = data;
+
+	});
+
+	
 	$scope.competitors = [];
 	$scope.twoStageCheck = false;
 
@@ -178,6 +185,10 @@ myApp.controller("SeedingController", function($scope, $http, $window, $rootScop
  */
 myApp.controller("RegistrationController", function($scope, $http, $window, $rootScope, $state, $stateParams) {
 
+	//get event
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data, status) {
+		$scope.event = data;
+	});
 	// Initiate Get from server and get tournaments in the event
 
 	//get all SPECTATORS for this event
@@ -256,6 +267,11 @@ myApp.controller("RegistrationController", function($scope, $http, $window, $roo
 
 myApp.controller("RegistrationRegularController", function($scope, $http, $window, $rootScope, $state, $stateParams) {
 
+	//get event
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data, status) {
+		$scope.event = data;
+	});
+
 	//get tournament data to check if its team base
 	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments/' + $stateParams.tournamentName + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
 		$scope.tournament = data;
@@ -285,6 +301,10 @@ myApp.controller("RegistrationRegularController", function($scope, $http, $windo
 });
 
 myApp.controller("ReportsController", function($scope, $http, $window, $rootScope, $state, $stateParams) {
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data, status) {
+		$scope.event = data;
+		console.log(data);
+	});
 
 	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/reports?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
 		console.log("Reports");
@@ -350,6 +370,10 @@ myApp.controller("StationController", function($scope, $http, $window, $rootScop
 
 	};
 	$scope.showEventStations();
+
+	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data, status) {
+		$scope.event = data;
+	});
 
 	//get all tournaments for this event
 	$http.get($rootScope.baseURL + '/matchup/events/' + $stateParams.eventName + '/tournaments?date=' + $stateParams.eventDate + '&location=' + $stateParams.eventLocation).success(function(data) {
