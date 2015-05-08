@@ -160,7 +160,7 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 				return;
 			}
 		} else {
-			if (!$scope.tournament.name | !$scope.tournament.deadline | !$scope.tournament.rules | !$scope.tournament.start_date | !$scope.tournament.fee | !$scope.tournament.seed_money | !$scope.tournament.capacity | !$scope.tournament.game) {
+			if (!$scope.tournament.name | !$scope.tournament.deadline | !$scope.tournament.rules | !$scope.tournament.start_date | !$scope.tournament.fee | !$scope.tournament.seed_money | !$scope.tournament.capacity) {
 				alert("Please fill out the general info section");
 				return;
 			}
@@ -180,7 +180,7 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 
 		if ($scope.tournament.teams) {
 			// Illegal team size
-			if ($scope.tournament.team_size <= 1) {
+			if ($scope.tournament.team_size <= 1 || isNaN($scope.tournament.team_size)) {
 				alert("Theres no I or 0 or negativity in team");
 				return;
 			}
@@ -243,6 +243,8 @@ myApp.controller("CreateEventController", function($scope, $http, $window, $root
 			"group_players" : parseInt($scope.tournament.group_players),
 			"group_winners" : parseInt($scope.tournament.group_winners),
 		};
+		
+		console.log($scope.tournament);
 
 		// Create Event if user is hosting the event by calling a post
 		// to the url describe in the controller definition
