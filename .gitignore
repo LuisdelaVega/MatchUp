@@ -2,6 +2,6 @@
 mobile/platforms
 cert.pem
 key.pem
-.idea
+.idea/
 .project
-node_modules
+node_modules/
