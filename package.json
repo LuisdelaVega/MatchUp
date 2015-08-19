@@ -14,7 +14,8 @@
     "basic-auth": "*",
     "cors": "*",
     "pg": "*",
-    "paypal-ipn": "*"
+    "paypal-ipn": "*",
+    "bunyan": "*"
   },
   "author": "Luis de la Vega",
   "license": ""
