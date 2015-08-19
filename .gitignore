@@ -1,6 +1,4 @@
 .DS_Store
-.project
 mobile/platforms
 cert.pem
 key.pem
-.idea
