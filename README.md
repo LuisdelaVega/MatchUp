@@ -1,7 +1,7 @@
 <img src="http://neptunolabs.com/images/matchup-logo.png">
 
 # MatchUp
-API hosted on Apiary: http://matchup.neptunolabs.com/api
+API hosted on [Apiary](http://docs.neptunolabsmatchup.apiary.io/#)
 
 MatchUp is an eSports management platform and social network for gaming enthusiast and event organizers.
 The system aims to solve the biggest problem that event organizers face when producing an eSports event, the lack of a unified management tool.
